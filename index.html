@@ -1,71 +1,382 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
-<title>太空漫步 | MAIMINE STUDIO</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>喵喵太空跳</title>
 <style>
-*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#101b3a;font-family:system-ui,-apple-system,"Noto Sans TC",sans-serif}
-#stage{position:fixed;inset:0;width:100vw;height:100dvh;overflow:hidden;background:#10233f;touch-action:none}
-canvas{display:block;width:100%;height:100%}
-#hud{position:absolute;top:max(10px,env(safe-area-inset-top));left:12px;right:12px;display:flex;justify-content:space-between;align-items:center;pointer-events:none}
-#scoreWrap{position:relative;width:clamp(125px,32vw,190px)}#scoreWrap img{width:100%;display:block}#score{position:absolute;inset:0;display:grid;place-items:center;color:#304941;font-weight:900;font-size:clamp(18px,4.5vw,26px)}
-#buttons{display:flex;gap:8px;pointer-events:auto}#buttons button{width:clamp(38px,10vw,54px);padding:0;background:none;border:0}#buttons img{width:100%;display:block}
-.overlay{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;flex-direction:column;text-align:center;padding:24px;background:rgba(8,18,42,.38)}.hide{display:none!important}
-#logo{width:min(72vw,340px);max-height:22vh;object-fit:contain}h1{font-size:clamp(34px,9vw,56px);color:#fff2d9;margin:8px 0;text-shadow:0 4px #607d75;line-height:1.1}.sub{color:#e0eee2;font-size:14px;margin:8px 0 22px}
-#startBtn{width:min(68vw,290px);border:0;background:none;padding:0}button img{max-width:100%}.brand{margin-top:14px;font-size:12px;font-weight:900;letter-spacing:.18em;color:#e0eee2}
-#gameoverPanel{width:min(82vw,430px);max-height:70vh;object-fit:contain;position:absolute}#overContent{z-index:2}#final{font-size:22px;color:#fff2d9;margin:8px 0 20px}.actions{display:flex;gap:18px}.actions button{width:75px;background:none;border:0;padding:0}
-#pausePanel{background:rgba(6,15,35,.72)}#resume{border:2px solid #fff2d9;border-radius:24px;padding:12px 24px;color:#fff2d9;background:transparent;font-weight:800;font-size:18px}
-#hint{position:absolute;bottom:max(10px,env(safe-area-inset-bottom));left:0;right:0;text-align:center;color:#e6eee7;font-size:11px;opacity:.72;pointer-events:none}
-</style></head>
-<body><div id="stage">
+  html,body{margin:0;height:100%;background:#0b1530;overflow:hidden;touch-action:none;
+    display:flex;align-items:center;justify-content:center}
+  canvas{display:block;touch-action:none}
+</style>
+</head>
+<body>
 <canvas id="c"></canvas>
-<div id="hud"><div id="scoreWrap"><img src="images/ui_btn_score.png"><span id="score">0 m</span></div><div id="buttons"><button id="sound"><img src="images/ui_btn_sound.png"></button><button id="pause"><img src="images/ui_btn_pause.png"></button></div></div>
-<div id="menu" class="overlay"><img id="logo" src="images/ui_btn_logo.png"><h1>太空漫步</h1><div class="sub">SPACE JUMP</div><button id="startBtn"><img src="images/ui_btn_start.png"></button><div class="brand">MAIMINE STUDIO</div><div class="sub" style="margin-top:18px">觸控左右移動 · 電腦 ← → / A D</div></div>
-<div id="over" class="overlay hide"><img id="gameoverPanel" src="images/ui_btn_game_over.png"><div id="overContent"><h1 style="font-size:36px">GAME OVER</h1><div id="final">0 m</div><div class="actions"><button id="restart"><img src="images/ui_btn_restart.png"></button><button id="home"><img src="images/ui_btn_home.png"></button></div><div class="brand">MAIMINE STUDIO</div></div></div>
-<div id="pausePanel" class="overlay hide"><h1>PAUSED</h1><div class="sub">宇宙補給中</div><button id="resume">繼續遊戲</button><div class="brand">MAIMINE STUDIO</div></div>
-<div id="hint">MAIMINE STUDIO · SPACE JUMP</div></div>
 <script>
-(()=>{
-const c=document.querySelector('#c'),ctx=c.getContext('2d'),$=id=>document.getElementById(id);
-const files=['bg_space.png','player_front.png','player_idle.png','player_jump.png','player_fall.png','player_land.png','player_dizzy.png','player_powerup.png','platform_normal.png','platform_spring.png','platform_fragile.png','platform_fragile_broken.png','platform_moving.png','platform_crystal.png','item_propeller.png','item_rocket.png','item_shield.png','item_star.png','enemy_alien.png','enemy_satellite.png'];
-const imgs={};files.forEach(f=>{let im=new Image();im.src='images/'+f;imgs[f]=im});
-let CW=540,CH=960,scale=1,ox=0,oy=0;
-function resize(){let dpr=Math.min(devicePixelRatio||1,2);c.width=innerWidth*dpr;c.height=innerHeight*dpr;CW=c.width;CH=c.height;ctx.setTransform(1,0,0,1,0,0);scale=Math.min(CW/540,CH/960);/* game world scales with viewport, filling it */scale=Math.max(CW/540,CH/960);ox=(CW-540*scale)/2;oy=(CH-960*scale)/2;}
-addEventListener('resize',resize);resize();
-const keys={l:false,r:false};let state='menu',paused=false,camera=0,score=0,best=+(localStorage.getItem('spacejump_best')||0),last=0,plats=[],items=[],foes=[];
-const p={x:230,y:720,w:80,h:100,vy:-8.7,power:0,shield:0};
-const rand=(a,b)=>a+Math.random()*(b-a);
-function drawImg(name,x,y,w,h){let im=imgs[name];if(im&&im.complete&&im.naturalWidth)ctx.drawImage(im,x,y,w,h);else{ctx.fillStyle='#c8d8c9';ctx.fillRect(x,y,w,h)}}
-function alphaBounds(im){try{let cv=document.createElement('canvas');cv.width=im.naturalWidth;cv.height=im.naturalHeight;let cx=cv.getContext('2d');cx.drawImage(im,0,0);let d=cx.getImageData(0,0,cv.width,cv.height).data,minX=cv.width,minY=cv.height,maxX=0,maxY=0;for(let y=0;y<cv.height;y+=2)for(let x=0;x<cv.width;x+=2)if(d[(y*cv.width+x)*4+3]>30){minX=Math.min(minX,x);minY=Math.min(minY,y);maxX=Math.max(maxX,x);maxY=Math.max(maxY,y)}return {x:minX/im.naturalWidth,y:minY/im.naturalHeight,w:(maxX-minX)/im.naturalWidth,h:(maxY-minY)/im.naturalHeight}}catch(e){return{x:0,y:0,w:1,h:1}}}
-function pBounds(){let im=imgs['player_jump.png'];return im&&im.complete&&im.naturalWidth?alphaBounds(im):{x:.1,y:.05,w:.8,h:.9}}
-function platformType(){let r=Math.random();if(score>550&&r<.14)return'platform_moving.png';if(score>280&&r<.22)return'platform_fragile.png';if(r<.1)return'platform_spring.png';if(score>1000&&r<.13)return'platform_crystal.png';return'platform_normal.png'}
-function addPlat(y,x=rand(12,430),type=platformType()){plats.push({x,y,w:116,h:34,type,dx:type==='platform_moving.png'?rand(.7,1.6)*(Math.random()<.5?-1:1):0,broken:false})}
-function reset(){score=0;camera=0;plats=[];items=[];foes=[];p.x=230;p.y=730;p.vy=-8.8;p.power=0;p.shield=0;for(let i=0;i<12;i++)addPlat(890-i*83,rand(8,416),i===0?'platform_normal.png':platformType());state='play';paused=false;$('menu').classList.add('hide');$('over').classList.add('hide');$('pausePanel').classList.add('hide')}
-function jump(v=-9.5){p.vy=v}
-function spawn(){let top=Math.min(...plats.map(a=>a.y));while(top>-camera-160){top-=rand(75,116);addPlat(top);if(score>600&&Math.random()<.1)foes.push({x:rand(20,450),y:top-rand(95,160),w:66,h:66,type:Math.random()<.5?'enemy_alien.png':'enemy_satellite.png',dx:rand(-1,1)});if(Math.random()<.11)items.push({x:rand(25,455),y:top-rand(40,75),w:54,h:54,type:['item_star.png','item_propeller.png','item_rocket.png','item_shield.png'][Math.floor(Math.random()*4)]})}}
-function bg(){let im=imgs['bg_space.png'];if(im&&im.complete&&im.naturalWidth){let s=Math.max(540/im.width,960/im.height),iw=im.width*s,ih=im.height*s;let y=-(camera*.42%ih);ctx.drawImage(im,(540-iw)/2,y,iw,ih);ctx.drawImage(im,(540-iw)/2,y+ih,iw,ih)}else{ctx.fillStyle='#13294b';ctx.fillRect(0,0,540,960)}}
-function end(){if(state!=='play')return;state='over';best=Math.max(best,Math.floor(score));localStorage.setItem('spacejump_best',best);$('final').textContent=Math.floor(score)+' m · BEST '+best+' m';$('over').classList.remove('hide')}
-function update(dt){if(state!=='play'||paused)return;
-p.x+=(keys.l?-5.3:0)+(keys.r?5.3:0);if(p.x<-p.w)p.x=540;if(p.x>540)p.x=-p.w;
-let oldY=p.y;p.vy+=.29*dt*60;p.y+=p.vy*dt*60;
-if(p.vy>0){let b=pBounds(),foot=oldY+(b.y+b.h)*p.h,newFoot=p.y+(b.y+b.h)*p.h;for(let pl of plats){if(pl.broken)continue;let py=pl.y-camera;if(p.x+p.w*.82>pl.x&&p.x+p.w*.18<pl.x+pl.w&&foot<=py+5&&newFoot>=py&&p.vy>0){p.y=py-(b.y+b.h)*p.h;jump(pl.type==='platform_spring.png'?-15.2:-9.4);if(pl.type==='platform_spring.png')score+=15;if(pl.type==='platform_fragile.png'){pl.broken=true;pl.type='platform_fragile_broken.png'}break}}}
-plats.forEach(pl=>{if(pl.dx){pl.x+=pl.dx*dt*60;if(pl.x<0||pl.x+pl.w>540)pl.dx*=-1}});
-items=items.filter(it=>{let y=it.y-camera;if(p.x+p.w*.75>it.x&&p.x+p.w*.25<it.x+it.w&&p.y+p.h>y&&p.y<y+it.h){if(it.type==='item_star.png')score+=100;else if(it.type==='item_rocket.png'){p.vy=-16;p.power=90}else if(it.type==='item_propeller.png')p.power=210;else p.shield=600;return false}return y<1050});
-foes=foes.filter(e=>{e.x+=e.dx*dt*60;let y=e.y-camera;if(p.x+p.w*.75>e.x&&p.x+p.w*.25<e.x+e.w&&p.y+p.h>y&&p.y<y+e.h){if(p.shield>0){p.shield=0;return false}end();return true}return y<1050});
-if(p.power>0){p.power-=dt*60;p.vy=Math.min(p.vy,-5.3)}if(p.shield>0)p.shield-=dt*60;
-if(p.y-camera<390)camera=p.y-390;score=Math.max(score,Math.floor(Math.max(0,-camera)/8));plats=plats.filter(pl=>pl.y-camera<1060);spawn();if(p.y-camera>1020)end()}
-function render(){ctx.setTransform(scale,0,0,scale,ox,oy);ctx.clearRect(-ox/scale,-oy/scale,CW/scale,CH/scale);bg();
-plats.forEach(pl=>{let y=pl.y-camera;if(y>-120&&y<1080)drawImg(pl.type,pl.x,y,pl.w,pl.h)});
-items.forEach(it=>drawImg(it.type,it.x,it.y-camera,it.w,it.h));foes.forEach(e=>drawImg(e.type,e.x,e.y-camera,e.w,e.h));
-let sprite=p.power>0?'player_powerup.png':p.vy>0?'player_fall.png':'player_jump.png';if(state==='menu')sprite='player_front.png';
-let im=imgs[sprite],b=im&&im.complete&&im.naturalWidth?alphaBounds(im):{x:.1,y:.05,w:.8,h:.9};let dw=102,dh=120;drawImg(sprite,p.x,p.y-camera,dw,dh);
-if(p.shield>0){ctx.strokeStyle='rgba(190,245,222,.85)';ctx.lineWidth=5;ctx.beginPath();ctx.ellipse(p.x+dw/2,p.y-camera+dh/2,dw*.65,dh*.65,0,0,Math.PI*2);ctx.stroke()}
-$('score').textContent=Math.floor(score)+' m'}
-function loop(t){let dt=Math.min(.033,(t-last)/1000||0);last=t;update(dt);render();requestAnimationFrame(loop)}
-$('startBtn').onclick=reset;$('restart').onclick=reset;$('home').onclick=()=>{state='menu';$('over').classList.add('hide');$('menu').classList.remove('hide')};$('pause').onclick=()=>{if(state==='play'){paused=!paused;$('pausePanel').classList.toggle('hide',!paused)}};$('resume').onclick=()=>{paused=false;$('pausePanel').classList.add('hide')};
-addEventListener('keydown',e=>{if(['ArrowLeft','a','A'].includes(e.key))keys.l=true;if(['ArrowRight','d','D'].includes(e.key))keys.r=true;if(e.key==='Escape'&&state==='play')$('pause').click()});addEventListener('keyup',e=>{if(['ArrowLeft','a','A'].includes(e.key))keys.l=false;if(['ArrowRight','d','D'].includes(e.key))keys.r=false});
-let lastX=null;c.addEventListener('touchstart',e=>lastX=e.touches[0].clientX,{passive:true});c.addEventListener('touchmove',e=>{if(lastX===null)return;let x=e.touches[0].clientX,d=x-lastX;keys.l=d<-1;keys.r=d>1;lastX=x},{passive:true});c.addEventListener('touchend',()=>{lastX=null;keys.l=keys.r=false});
-$('sound').onclick=()=>{$('sound').style.opacity=$('sound').style.opacity==='0.45'?'1':'.45'};
-requestAnimationFrame(loop);
+(() => {
+/* ============ 可調整的設定（改這裡就好） ============ */
+const TITLE = '喵喵太空跳';          // 遊戲名稱（顯示在 Logo 上）
+const CFG = {
+  gravity: 1500,      // 重力
+  jump: -820,         // 普通跳躍力道
+  spring: -1180,      // 彈簧平台力道
+  moveSpeed: 380,     // 左右移動速度
+  playerW: 104,       // 角色顯示寬度（px）
+  feetPad: 6,         // 角色腳底往上的空白（圖片底部有留白就調大）
+  platformW: 120      // 平台顯示寬度
+};
+const IMG_DIR = 'images/';
+/* ================================================== */
+
+const W = 480, H = 854;
+const canvas = document.getElementById('c');
+const ctx = canvas.getContext('2d');
+const DPR = 2;
+canvas.width = W * DPR; canvas.height = H * DPR;
+ctx.scale(DPR, DPR);
+
+function fit() {
+  const s = Math.min(innerWidth / W, innerHeight / H);
+  canvas.style.width = W * s + 'px';
+  canvas.style.height = H * s + 'px';
+}
+addEventListener('resize', fit); fit();
+
+/* ---------- 圖片載入 ---------- */
+const NAMES = ['player_front','player_idle','player_jump','player_fall','player_land','player_dizzy','player_powerup',
+  'platform_normal','platform_spring','platform_fragile','platform_fragile_broken','platform_moving','platform_crystal',
+  'item_propeller','item_rocket','item_shield','item_star','enemy_alien','enemy_satellite',
+  'bg_space','bg_start_room','ui_btn_start','ui_btn_restart','ui_btn_home','ui_btn_pause','ui_btn_sound',
+  'ui_panel_score','ui_panel_gameover','ui_logo'];
+const imgs = {}; let loaded = 0;
+NAMES.forEach(n => {
+  const im = new Image();
+  im.onload = im.onerror = () => { loaded++; };
+  im.src = IMG_DIR + n + '.png';
+  imgs[n] = im;
+});
+const ok = n => imgs[n] && imgs[n].naturalWidth > 0;
+const asp = n => ok(n) ? imgs[n].naturalHeight / imgs[n].naturalWidth : 0.6;
+
+// 畫圖：x,y 是左上角，w 是寬度，高度依比例；找不到圖時畫洋紅色方塊提醒
+function draw(n, x, y, w, o = {}) {
+  const h = w * asp(n);
+  ctx.save();
+  if (o.alpha != null) ctx.globalAlpha = o.alpha;
+  if (!ok(n)) {
+    ctx.fillStyle = 'rgba(255,0,255,.45)'; ctx.fillRect(x, y, w, h);
+    ctx.fillStyle = '#fff'; ctx.font = '12px sans-serif'; ctx.textAlign = 'left';
+    ctx.fillText(n, x + 3, y + 14);
+  } else if (o.rot || o.flip) {
+    ctx.translate(x + w / 2, y + h / 2);
+    if (o.rot) ctx.rotate(o.rot);
+    if (o.flip) ctx.scale(-1, 1);
+    ctx.drawImage(imgs[n], -w / 2, -h / 2, w, h);
+  } else {
+    ctx.drawImage(imgs[n], x, y, w, h);
+  }
+  ctx.restore();
+  return h;
+}
+function text(s, x, y, size, color = '#5a4630', align = 'center', stroke) {
+  ctx.font = `bold ${size}px "PingFang TC","Microsoft JhengHei","Noto Sans TC",sans-serif`;
+  ctx.textAlign = align; ctx.textBaseline = 'middle';
+  if (stroke) { ctx.lineWidth = 5; ctx.strokeStyle = stroke; ctx.lineJoin = 'round'; ctx.strokeText(s, x, y); }
+  ctx.fillStyle = color; ctx.fillText(s, x, y);
+}
+const rand = (a, b) => a + Math.random() * (b - a);
+
+/* ---------- 音效（簡單電子音，免音檔） ---------- */
+let soundOn = true, actx;
+function beep(f, d = 0.1, type = 'sine', vol = 0.12) {
+  if (!soundOn) return;
+  try {
+    actx = actx || new (window.AudioContext || window.webkitAudioContext)();
+    const o = actx.createOscillator(), g = actx.createGain();
+    o.type = type; o.frequency.setValueAtTime(f, actx.currentTime);
+    o.frequency.exponentialRampToValueAtTime(f * 1.6, actx.currentTime + d);
+    g.gain.setValueAtTime(vol, actx.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.001, actx.currentTime + d);
+    o.connect(g); g.connect(actx.destination); o.start(); o.stop(actx.currentTime + d);
+  } catch (e) {}
+}
+
+/* ---------- 狀態 ---------- */
+let state = 'start';   // start | play | pause | over
+let best = 0;
+try { best = +localStorage.getItem('catjump_best') || 0; } catch (e) {}
+let score, scrollTotal, bonus, bgOffset, plats, items, enemies, pieces, player, fx, dying, topY, newBest;
+const keys = {}; let touchDir = 0;
+let buttons = [];
+
+const PH = () => CFG.playerW * asp('player_idle');
+const TOP_OFF = { normal: .06, spring: .02, fragile: .06, moving: .32, crystal: .06 };
+
+function reset() {
+  score = 0; scrollTotal = 0; bonus = 0; bgOffset = 0; newBest = false;
+  plats = []; items = []; enemies = []; pieces = [];
+  player = { x: W / 2, y: H - 170, vx: 0, vy: CFG.jump, dir: -1, land: 0 };
+  fx = { prop: 0, rocket: 0, shield: 0 };
+  dying = false;
+  plats.push({ type: 'normal', x: W / 2 - CFG.platformW / 2, y: H - 160, vx: 0, a: 1 });
+  topY = H - 160;
+  fill();
+}
+function fill() {
+  while (topY > -300) {
+    const diff = Math.min(1, score / 6000);
+    topY -= rand(70, 110 + diff * 70);
+    const last = plats[plats.length - 1];
+    let type = 'normal'; const r = Math.random();
+    if (r < 0.07) type = 'spring';
+    else if (r < 0.14) type = 'crystal';
+    else if (r < 0.14 + 0.05 + 0.2 * diff) type = 'moving';
+    else if (r < 0.14 + 0.05 + 0.2 * diff + 0.08 + 0.12 * diff && last.type !== 'fragile') type = 'fragile';
+    const p = { type, x: rand(10, W - CFG.platformW - 10), y: topY, vx: type === 'moving' ? (Math.random() < .5 ? -1 : 1) * (60 + diff * 80) : 0, a: 1 };
+    plats.push(p);
+    const pw = CFG.platformW;
+    if (type === 'normal' && Math.random() < 0.18) {
+      const r2 = Math.random();
+      const t = r2 < 0.06 ? 'rocket' : r2 < 0.16 ? 'propeller' : r2 < 0.28 ? 'shield' : 'star';
+      const iw = t === 'star' ? 44 : 56;
+      items.push({ type: t, x: p.x + pw / 2, y: p.y + pw * asp('platform_normal') * TOP_OFF.normal, w: iw });
+    }
+    if (score > 400 && Math.random() < 0.05 + 0.07 * diff) {
+      enemies.push({ type: Math.random() < .5 ? 'alien' : 'satellite', x: rand(60, W - 60), y: topY - 70, t: rand(0, 6), vx: (Math.random() < .5 ? -1 : 1) * rand(30, 70), alive: true });
+    }
+  }
+}
+function startGame() { reset(); state = 'play'; beep(520, .15); }
+function gameOver() {
+  state = 'over';
+  if (score > best) { best = score; newBest = true; try { localStorage.setItem('catjump_best', best); } catch (e) {} }
+  beep(180, .4, 'triangle');
+}
+
+/* ---------- 更新 ---------- */
+function update(dt) {
+  if (state !== 'play') return;
+  const g = CFG.gravity;
+  // 碎片
+  pieces.forEach(p => { p.vy += g * dt; p.y += p.vy * dt; p.a -= dt * 0.8; p.rot += p.vr * dt; });
+  pieces = pieces.filter(p => p.a > 0 && p.y < H + 100);
+  plats.forEach(p => {
+    if (p.type === 'moving') { p.x += p.vx * dt; if (p.x < 5 || p.x > W - CFG.platformW - 5) p.vx *= -1; }
+    if (p.used) p.a -= dt * 3;
+  });
+
+  if (dying) {
+    player.vy += g * dt; player.y += player.vy * dt;
+    if (player.y - 160 > H) gameOver();
+    return;
+  }
+
+  const dir = (keys.left ? -1 : 0) + (keys.right ? 1 : 0) || touchDir;
+  player.vx += (dir * CFG.moveSpeed - player.vx) * Math.min(1, 12 * dt);
+  player.x += player.vx * dt;
+  if (player.x < -20) player.x = W + 20;
+  if (player.x > W + 20) player.x = -20;
+  if (Math.abs(player.vx) > 25) player.dir = player.vx > 0 ? 1 : -1;
+  player.land = Math.max(0, player.land - dt);
+  fx.prop = Math.max(0, fx.prop - dt); fx.rocket = Math.max(0, fx.rocket - dt); fx.shield = Math.max(0, fx.shield - dt);
+
+  const flying = fx.prop > 0 || fx.rocket > 0;
+  if (fx.rocket > 0) player.vy = -1100; else if (fx.prop > 0) player.vy = -560; else player.vy += g * dt;
+  const prevFeet = player.y - CFG.feetPad;
+  player.y += player.vy * dt;
+  const feet = player.y - CFG.feetPad;
+
+  // 踩平台
+  if (player.vy > 0 && !flying) {
+    for (const p of plats) {
+      if (p.broken || p.used) continue;
+      const ph = CFG.platformW * asp('platform_' + p.type);
+      const top = p.y + ph * TOP_OFF[p.type];
+      if (prevFeet <= top + 6 && feet >= top && Math.abs(player.x - (p.x + CFG.platformW / 2)) < CFG.platformW / 2 + 18) {
+        player.y = top + CFG.feetPad; player.land = 0.14;
+        if (p.type === 'spring') { player.vy = CFG.spring; beep(700, .2, 'square', .08); }
+        else if (p.type === 'fragile') {
+          p.broken = true; player.vy = CFG.jump * 0.55; beep(160, .25, 'sawtooth', .08);
+          pieces.push({ x: p.x, y: p.y, vy: -150, vr: rand(-1, 1), rot: 0, a: 1 });
+        } else if (p.type === 'crystal') { p.used = true; player.vy = CFG.jump; beep(880, .15, 'triangle'); }
+        else { player.vy = CFG.jump; beep(440, .1); }
+        break;
+      }
+    }
+  }
+
+  // 捲動
+  const line = H * 0.42;
+  if (player.y < line) {
+    const d = line - player.y; player.y = line;
+    plats.forEach(p => p.y += d); items.forEach(i => i.y += d); enemies.forEach(e => e.y += d); pieces.forEach(p => p.y += d);
+    topY += d; scrollTotal += d; bgOffset += d * 0.25;
+  }
+  score = Math.floor(scrollTotal / 8) + bonus;
+  plats = plats.filter(p => p.y < H + 120 && !(p.broken) && p.a > 0);
+  items = items.filter(i => i.y < H + 100);
+  enemies = enemies.filter(e => e.y < H + 100 && e.alive);
+  fill();
+
+  // 身體框
+  const body = { l: player.x - 26, r: player.x + 26, t: player.y - PH() * 0.85, b: player.y - CFG.feetPad };
+
+  // 道具
+  items = items.filter(it => {
+    const ih = it.w * asp('item_' + it.type);
+    const hit = body.r > it.x - it.w / 2 && body.l < it.x + it.w / 2 && body.b > it.y - ih && body.t < it.y;
+    if (!hit) return true;
+    if (it.type === 'star') { bonus += 100; beep(1000, .12, 'triangle'); }
+    else if (it.type === 'shield') { fx.shield = 9; beep(600, .2, 'triangle'); }
+    else if (it.type === 'propeller') { fx.prop = 4; beep(500, .3, 'square', .06); }
+    else if (it.type === 'rocket') { fx.rocket = 2.4; beep(300, .4, 'sawtooth', .07); }
+    return false;
+  });
+
+  // 敵人
+  for (const e of enemies) {
+    e.t += dt;
+    if (e.type === 'alien') { e.x += e.vx * dt; if (e.x < 50 || e.x > W - 50) e.vx *= -1; e.y += Math.sin(e.t * 2) * 0.6; }
+    else { e.x += Math.sin(e.t * 1.6) * 90 * dt; e.y += Math.cos(e.t * 1.2) * 0.8; }
+    const ew = e.type === 'alien' ? 84 : 84, eh = ew * asp('enemy_' + e.type);
+    const er = { l: e.x - ew * .42, r: e.x + ew * .42, t: e.y - eh / 2, b: e.y + eh / 2 };
+    if (body.r > er.l && body.l < er.r && body.b > er.t && body.t < er.b) {
+      if (flying) { e.alive = false; bonus += 50; beep(300, .2, 'square'); }
+      else if (player.vy > 0 && prevFeet <= e.y) { e.alive = false; player.vy = CFG.jump; bonus += 50; beep(760, .15, 'square', .08); }
+      else if (fx.shield > 0) { fx.shield = 0; e.alive = false; beep(300, .25, 'square'); }
+      else { dying = true; player.vy = -420; beep(150, .4, 'sawtooth'); break; }
+    }
+  }
+  if (!dying && player.y - 20 > H) gameOver();
+}
+
+/* ---------- 繪製 ---------- */
+function btn(n, cx, cy, w, fn, label, lsize = 26) {
+  const h = draw(n, cx - w / 2, cy - (w * asp(n)) / 2, w);
+  buttons.push({ x: cx - w / 2, y: cy - h / 2, w, h, fn });
+  if (label) text(label, cx, cy, lsize, '#5a4630');
+  return h;
+}
+function soundBtn(cx, cy, w = 52) {
+  btn('ui_btn_sound', cx, cy, w, () => { soundOn = !soundOn; });
+  if (!soundOn) {
+    ctx.save(); ctx.strokeStyle = '#c0392b'; ctx.lineWidth = 5; ctx.lineCap = 'round';
+    ctx.beginPath(); ctx.moveTo(cx - w * .32, cy - w * .32); ctx.lineTo(cx + w * .32, cy + w * .32); ctx.stroke(); ctx.restore();
+  }
+}
+function drawBg() {
+  const bh = W * asp('bg_space');
+  const off = bgOffset % bh;
+  if (!ok('bg_space')) { ctx.fillStyle = '#14234a'; ctx.fillRect(0, 0, W, H); }
+  for (let y = off - bh; y < H; y += bh) draw('bg_space', 0, y, W);
+}
+function drawPlayer() {
+  const px = player.x, py = player.y;
+  let spr = 'player_fall';
+  if (dying) spr = 'player_dizzy';
+  else if (fx.prop > 0 || fx.rocket > 0) spr = 'player_powerup';
+  else if (player.land > 0) spr = 'player_land';
+  else if (player.vy < 0) spr = 'player_jump';
+  const w = CFG.playerW, h = w * asp(spr);
+  if (fx.rocket > 0 && !dying) draw('item_rocket', px - 30 - player.dir * -14, py - h * .62, 60);
+  draw(spr, px - w / 2, py - h, w, { flip: player.dir > 0 });
+  if (fx.prop > 0 && !dying) draw('item_propeller', px - 30, py - h * 1.0 - 4 + Math.sin(performance.now() / 60) * 2, 60);
+  if (fx.shield > 0 && !dying) draw('item_shield', px - 70, py - h * .55 - 70, 140, { alpha: fx.shield < 2 ? (Math.floor(performance.now() / 120) % 2 ? .3 : .8) : .8 });
+}
+function drawWorld() {
+  drawBg();
+  plats.forEach(p => draw('platform_' + p.type, p.x, p.y, CFG.platformW, { alpha: Math.max(0, p.a) }));
+  pieces.forEach(p => draw('platform_fragile_broken', p.x - 10, p.y, CFG.platformW + 20, { alpha: Math.max(0, p.a), rot: p.rot }));
+  items.forEach(i => { const bob = Math.sin(performance.now() / 300 + i.x) * 3; draw('item_' + i.type, i.x - i.w / 2, i.y - i.w * asp('item_' + i.type) + bob, i.w); });
+  enemies.forEach(e => { const ew = 84; draw('enemy_' + e.type, e.x - ew / 2, e.y - ew * asp('enemy_' + e.type) / 2, ew); });
+  if (state !== 'over') drawPlayer();
+}
+function hud() {
+  const pw = 170, ph = draw('ui_panel_score', 12, 12, pw);
+  text('分數 ' + score, 12 + pw / 2, 12 + ph / 2, 22);
+  text('最高 ' + Math.max(best, score), 16, 12 + ph + 16, 16, '#fff', 'left', 'rgba(0,0,0,.4)');
+  btn('ui_btn_pause', W - 40, 40, 52, () => { state = state === 'play' ? 'pause' : 'play'; });
+  soundBtn(W - 100, 40);
+  // 道具剩餘時間
+  let ty = 12 + ph + 44;
+  [['prop', '螺旋槳'], ['rocket', '火箭'], ['shield', '護盾']].forEach(([k, nm]) => {
+    if (fx[k] > 0) { text(nm + ' ' + fx[k].toFixed(1) + 's', 16, ty, 15, '#fff', 'left', 'rgba(0,0,0,.4)'); ty += 22; }
+  });
+}
+function dim(a = .5) { ctx.fillStyle = `rgba(8,14,34,${a})`; ctx.fillRect(0, 0, W, H); }
+
+function drawStart() {
+  draw('bg_start_room', 0, 0, W);
+  const lw = 330, lh = draw('ui_logo', W / 2 - lw / 2, 90, lw);
+  text(TITLE, W / 2, 90 + lh * .47, 38, '#5a7a4e');
+  const pw = 190, ph = pw * asp('player_front');
+  draw('player_front', W / 2 - pw / 2, H * 0.72 - ph, pw);
+  btn('ui_btn_start', W / 2, H * 0.865, 250, startGame, '開始遊戲', 30);
+  text('最高分 ' + best, W / 2, H * 0.94, 20, '#fff', 'center', 'rgba(0,0,0,.45)');
+  soundBtn(W - 40, 40);
+  text('點左 / 右半邊螢幕或用 ← → 移動', W / 2, H - 16, 13, '#fff', 'center', 'rgba(0,0,0,.45)');
+}
+function drawPause() {
+  dim();
+  text('暫停', W / 2, H * 0.36, 48, '#fff', 'center', 'rgba(0,0,0,.4)');
+  btn('ui_btn_restart', W / 2 - 70, H * 0.5, 96, startGame);
+  btn('ui_btn_home', W / 2 + 70, H * 0.5, 96, () => { state = 'start'; });
+  text('再按右上角 ▮▮ 繼續', W / 2, H * 0.6, 18, '#fff', 'center', 'rgba(0,0,0,.4)');
+}
+function drawOver() {
+  dim(.55);
+  const pw = 340, ph = pw * asp('ui_panel_gameover'), py = H * 0.5 - ph / 2 - 30;
+  draw('ui_panel_gameover', W / 2 - pw / 2, py, pw);
+  text('遊戲結束', W / 2, py + ph * .30, 38);
+  text('分數 ' + score, W / 2, py + ph * .52, 30);
+  text('最高 ' + best, W / 2, py + ph * .68, 24, '#8a6d3b');
+  if (newBest) text('★ 新紀錄！ ★', W / 2, py + ph * .84, 22, '#e08a00');
+  btn('ui_btn_restart', W / 2 - 70, py + ph + 66, 96, startGame);
+  btn('ui_btn_home', W / 2 + 70, py + ph + 66, 96, () => { state = 'start'; });
+}
+
+function render() {
+  buttons = [];
+  ctx.clearRect(0, 0, W, H);
+  if (loaded < NAMES.length) { ctx.fillStyle = '#14234a'; ctx.fillRect(0, 0, W, H); text('載入中… ' + loaded + '/' + NAMES.length, W / 2, H / 2, 24, '#fff'); return; }
+  if (state === 'start') { drawStart(); return; }
+  drawWorld(); hud();
+  if (state === 'pause') drawPause();
+  if (state === 'over') drawOver();
+}
+
+/* ---------- 輸入 ---------- */
+function pos(e) { const r = canvas.getBoundingClientRect(); return { x: (e.clientX - r.left) / r.width * W, y: (e.clientY - r.top) / r.height * H }; }
+canvas.addEventListener('pointerdown', e => {
+  e.preventDefault();
+  try { actx = actx || new (window.AudioContext || window.webkitAudioContext)(); actx.resume(); } catch (er) {}
+  const p = pos(e);
+  for (const b of buttons) if (p.x >= b.x && p.x <= b.x + b.w && p.y >= b.y && p.y <= b.y + b.h) { b.fn(); return; }
+  if (state === 'play') touchDir = p.x < W / 2 ? -1 : 1;
+});
+canvas.addEventListener('pointermove', e => { if (state === 'play' && e.buttons) touchDir = pos(e).x < W / 2 ? -1 : 1; });
+['pointerup', 'pointercancel', 'pointerleave'].forEach(ev => canvas.addEventListener(ev, () => { touchDir = 0; }));
+addEventListener('keydown', e => {
+  if (e.key === 'ArrowLeft' || e.key === 'a') keys.left = true;
+  if (e.key === 'ArrowRight' || e.key === 'd') keys.right = true;
+  if (e.key === ' ' && (state === 'start' || state === 'over')) startGame();
+  if ((e.key === 'p' || e.key === 'Escape') && (state === 'play' || state === 'pause')) state = state === 'play' ? 'pause' : 'play';
+});
+addEventListener('keyup', e => {
+  if (e.key === 'ArrowLeft' || e.key === 'a') keys.left = false;
+  if (e.key === 'ArrowRight' || e.key === 'd') keys.right = false;
+});
+document.addEventListener('visibilitychange', () => { if (document.hidden && state === 'play') state = 'pause'; });
+
+/* ---------- 主迴圈 ---------- */
+let last = performance.now();
+function loop(now) {
+  const dt = Math.min(0.033, (now - last) / 1000); last = now;
+  update(dt); render();
+  requestAnimationFrame(loop);
+}
+reset(); requestAnimationFrame(loop);
 })();
-</script></body></html>
+</script>
+</body>
+</html>
