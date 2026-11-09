@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<title>太空漫步 SpaceJump | MAIMINE STUDIO</title>
+<style>
+*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#101b3a;font-family:system-ui,-apple-system,"Noto Sans TC",sans-serif}
+body{display:grid;place-items:center}#wrap{position:relative;width:min(100vw,56.25vh);height:min(100vh,177.78vw);max-width:540px;max-height:960px;overflow:hidden;background:#13264a;touch-action:none}
+canvas{width:100%;height:100%;display:block}.overlay{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:22px;text-align:center;background:rgba(10,20,48,.25)}.hidden{display:none!important}
+h1{margin:8px 0;color:#fff4df;font-size:clamp(30px,8vw,48px);line-height:1.1;text-shadow:0 3px 0 #607d75}.sub{color:#dce9df;margin:10px 0 22px;font-size:14px}.brand{font-weight:900;letter-spacing:.16em;font-size:12px;color:#d5e6d9;margin-top:14px}
+button{border:0;background:transparent;padding:0;cursor:pointer;touch-action:manipulation}button img{display:block;max-width:100%;height:auto}#startBtn{width:min(68%,270px)}
+#hud{position:absolute;top:10px;left:10px;right:10px;display:flex;align-items:center;justify-content:space-between;pointer-events:none}#scoreBox{width:150px;max-width:45%;position:relative}#scoreBox img{width:100%;display:block}#scoreText{position:absolute;inset:0;display:grid;place-items:center;font-weight:900;color:#334b45;font-size:20px}
+#controls{display:flex;gap:8px;pointer-events:auto}#controls button{width:42px}#controls img{width:100%}
+#hint{position:absolute;bottom:12px;left:0;right:0;text-align:center;color:#e8eee8;font-size:11px;opacity:.75;pointer-events:none}#brandBottom{position:absolute;bottom:30px;left:0;right:0;text-align:center;color:#dbe8dc;font-size:10px;letter-spacing:.18em;opacity:.7;pointer-events:none}
+#gameoverTitle{font-size:34px;color:#fff4df;font-weight:900;margin:0 0 8px}#finalScore{font-size:20px;color:#fff4df;margin:0 0 18px}.actions{display:flex;gap:14px;align-items:center;justify-content:center}.actions button{width:68px}
+#paused{background:rgba(8,15,37,.72)}#resumeBtn{color:#fff4df;font-size:18px;font-weight:800;padding:12px 24px;border:2px solid #fff4df;border-radius:22px}
+</style>
+</head>
+<body>
+<div id="wrap">
+<canvas id="game" width="540" height="960"></canvas>
+<div id="hud"><div id="scoreBox"><img src="images/ui_btn_score.png" alt=""><div id="scoreText">0 m</div></div><div id="controls"><button id="soundBtn" aria-label="音效"><img src="images/ui_btn_sound.png" alt=""></button><button id="pauseBtn" aria-label="暫停"><img src="images/ui_btn_pause.png" alt=""></button></div></div>
+<div id="start" class="overlay"><img src="images/ui_btn_logo.png" style="width:min(70%,300px);max-height:180px;object-fit:contain" alt="太空漫步"><h1>太空漫步</h1><div class="sub">SPACE JUMP</div><button id="startBtn"><img src="images/ui_btn_start.png" alt="開始遊戲"></button><div class="brand">MAIMINE STUDIO</div><div class="sub" style="margin-top:18px">左右滑動／方向鍵移動</div></div>
+<div id="gameover" class="overlay hidden"><img src="images/ui_btn_game_over.png" style="position:absolute;width:82%;max-height:68%;object-fit:contain" alt=""><div style="position:relative;z-index:1"><div id="gameoverTitle">GAME OVER</div><div id="finalScore">0 m</div><div class="actions"><button id="restartBtn"><img src="images/ui_btn_restart.png" alt="重新開始"></button><button id="homeBtn"><img src="images/ui_btn_home.png" alt="首頁"></button></div><div class="brand">MAIMINE STUDIO</div></div></div>
+<div id="paused" class="overlay hidden"><h1>PAUSED</h1><div class="sub">太空貓咪暫時休息中</div><button id="resumeBtn">繼續遊戲</button><div class="brand">MAIMINE STUDIO</div></div>
+<div id="hint">觸控左右移動 · 電腦使用 ← → 或 A / D</div><div id="brandBottom">MAIMINE STUDIO · SPACE JUMP</div>
+</div>
+<script>
+(()=> {
+const W=540,H=960,canvas=document.getElementById('game'),ctx=canvas.getContext('2d'),$=id=>document.getElementById(id);
+const img={};['player_front.png','player_idle.png','player_jump.png','player_fall.png','player_land.png','player_dizzy.png','player_powerup.png','platform_normal.png','platform_spring.png','platform_fragile.png','platform_fragile_broken.png','platform_moving.png','platform_crystal.png','item_propeller.png','item_rocket.png','item_shield.png','item_star.png','enemy_alien.png','enemy_satellite.png','bg_space.png'].forEach(n=>{let im=new Image();im.src='images/'+n;img[n]=im});
+let state='menu',paused=false,score=0,best=+(localStorage.getItem('spacejump_best')||0),camera=0,last=0,platforms=[],items=[],enemies=[];
+const player={x:232,y:740,w:76,h:96,vy:-10.5,mode:'jump',power:0,shield:0},keys={left:false,right:false};
+const rand=(a,b)=>a+Math.random()*(b-a);
+function drawImg(n,x,y,w,h){let im=img[n];if(im&&im.complete&&im.naturalWidth)ctx.drawImage(im,x,y,w,h);else{ctx.fillStyle='#dce8d8';ctx.fillRect(x,y,w,h)}}
+function type(){let r=Math.random();if(score>700&&r<.12)return'platform_moving.png';if(score>300&&r<.19)return'platform_fragile.png';if(r<.08)return'platform_spring.png';if(score>1200&&r<.1)return'platform_crystal.png';return'platform_normal.png'}
+function addPlat(y,x=rand(8,W-118),t=type()){platforms.push({x,y,w:110,h:28,type:t,dx:t==='platform_moving.png'?rand(.8,2)*(Math.random()<.5?-1:1):0,broken:false})}
+function reset(){score=0;camera=0;platforms=[];items=[];enemies=[];player.x=232;player.y=740;player.vy=-10.5;player.power=0;player.shield=0;for(let i=0;i<12;i++)addPlat(H-70-i*82,rand(8,W-118),i===0?'platform_normal.png':type());state='playing';paused=false;$('start').classList.add('hidden');$('gameover').classList.add('hidden');$('paused').classList.add('hidden')}
+function jump(v=-10.7){player.vy=v;player.mode='jump'}
+function spawn(){let top=Math.min(...platforms.map(p=>p.y));while(top>-camera-130){top-=rand(72,112);addPlat(top);if(score>650&&Math.random()<.11)enemies.push({x:rand(25,W-75),y:top-rand(90,170),w:62,h:62,type:Math.random()<.5?'enemy_alien.png':'enemy_satellite.png',dx:rand(-1.2,1.2)});if(Math.random()<.1)items.push({x:rand(35,W-75),y:top-rand(35,75),w:48,h:48,type:['item_star.png','item_propeller.png','item_rocket.png','item_shield.png'][Math.floor(Math.random()*4)]})}}
+function bg(){let im=img.bg_space;if(im&&im.complete&&im.naturalWidth){let s=Math.max(W/im.width,H/im.height),iw=im.width*s,ih=im.height*s,y=-(camera%ih);ctx.drawImage(im,(W-iw)/2,y,iw,ih);ctx.drawImage(im,(W-iw)/2,y+ih,iw,ih)}else{let g=ctx.createLinearGradient(0,0,0,H);g.addColorStop(0,'#111b3c');g.addColorStop(1,'#17616a');ctx.fillStyle=g;ctx.fillRect(0,0,W,H)}}
+function end(){if(state!=='playing')return;state='over';best=Math.max(best,Math.floor(score));localStorage.setItem('spacejump_best',best);$('finalScore').textContent=Math.floor(score)+' m · BEST '+best+' m';$('gameover').classList.remove('hidden')}
+function update(dt){if(state!=='playing'||paused)return;player.x+=(keys.left?-5.5:0)+(keys.right?5.5:0);if(player.x<-player.w)player.x=W;if(player.x>W)player.x=-player.w;
+player.vy+=.34*dt*60;player.y+=player.vy*dt*60;player.mode=player.power>0?'powerup':player.vy>0?'fall':'jump';
+if(player.vy>0){for(let p of platforms){if(p.broken)continue;let py=p.y-camera;if(player.x+player.w*.72>p.x&&player.x+player.w*.28<p.x+p.w&&player.y+player.h>py&&player.y+player.h<py+p.h+12&&player.y+player.h-player.vy*dt*60<=py+12){if(p.type==='platform_fragile.png'){p.broken=true;p.type='platform_fragile_broken.png'}else{jump(p.type==='platform_spring.png'?-17.5:-10.7);if(p.type==='platform_spring.png')score+=12}break}}}
+platforms.forEach(p=>{if(p.dx){p.x+=p.dx*dt*60;if(p.x<0||p.x+p.w>W)p.dx*=-1}});
+items=items.filter(it=>{let y=it.y-camera;if(player.x+player.w>it.x&&player.x<it.x+it.w&&player.y+player.h>y&&player.y<y+it.h){if(it.type==='item_star.png')score+=100;else if(it.type==='item_rocket.png'){player.vy=-19;player.power=90}else if(it.type==='item_propeller.png')player.power=240;else player.shield=600;return false}return y<H+80});
+enemies=enemies.filter(e=>{e.x+=e.dx*dt*60;let y=e.y-camera;if(player.x+player.w>e.x&&player.x<e.x+e.w&&player.y+player.h>y&&player.y<y+e.h){if(player.shield>0){player.shield=0;return false}end();return true}return y<H+80});
+if(player.power>0){player.power-=dt*60;player.vy=Math.min(player.vy,-5.8)}if(player.shield>0)player.shield-=dt*60;
+if(player.y-camera<H*.42)camera=player.y-H*.42;score=Math.max(score,Math.floor(Math.max(0,-camera)/10));platforms=platforms.filter(p=>p.y-camera<H+120);spawn();if(player.y-camera>H+80)end()}
+function draw(){bg();platforms.forEach(p=>{let y=p.y-camera;if(y>-100&&y<H+100)drawImg(p.type,p.x,y,p.w,p.h)});items.forEach(i=>drawImg(i.type,i.x,i.y-camera,i.w,i.h));enemies.forEach(e=>drawImg(e.type,e.x,e.y-camera,e.w,e.h));let n=player.mode==='powerup'?'player_powerup.png':player.mode==='fall'?'player_fall.png':player.mode==='land'?'player_land.png':'player_jump.png';if(state==='menu')n='player_front.png';drawImg(n,player.x,player.y-camera,player.w,player.h);if(player.shield>0){ctx.strokeStyle='rgba(184,239,218,.8)';ctx.lineWidth=5;ctx.beginPath();ctx.ellipse(player.x+player.w/2,player.y-camera+player.h/2,player.w*.75,player.h*.7,0,0,Math.PI*2);ctx.stroke()}$('scoreText').textContent=Math.floor(score)+' m'}
+function loop(t){let dt=Math.min(.033,(t-last)/1000||0);last=t;update(dt);draw();requestAnimationFrame(loop)}
+$('startBtn').onclick=reset;$('restartBtn').onclick=reset;$('homeBtn').onclick=()=>{state='menu';paused=false;$('gameover').classList.add('hidden');$('start').classList.remove('hidden')};$('pauseBtn').onclick=()=>{if(state==='playing'){paused=!paused;$('paused').classList.toggle('hidden',!paused)}};$('resumeBtn').onclick=()=>{$('paused').classList.add('hidden');paused=false};$('soundBtn').onclick=()=>{$('soundBtn').style.opacity=$('soundBtn').style.opacity==='0.45'?'1':'.45'};
+addEventListener('keydown',e=>{if(['ArrowLeft','a','A'].includes(e.key))keys.left=true;if(['ArrowRight','d','D'].includes(e.key))keys.right=true;if(e.key==='Escape'&&state==='playing'){$('pauseBtn').click()}});
+addEventListener('keyup',e=>{if(['ArrowLeft','a','A'].includes(e.key))keys.left=false;if(['ArrowRight','d','D'].includes(e.key))keys.right=false});
+let tx=null;canvas.addEventListener('touchstart',e=>{tx=e.touches[0].clientX},{passive:true});canvas.addEventListener('touchmove',e=>{if(tx===null)return;let x=e.touches[0].clientX,d=x-tx;keys.left=d<-2;keys.right=d>2;tx=x},{passive:true});canvas.addEventListener('touchend',()=>{tx=null;keys.left=keys.right=false});
+requestAnimationFrame(loop);
+})();
+</script>
+</body></html>
