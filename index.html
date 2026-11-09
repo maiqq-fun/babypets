@@ -1,61 +1,71 @@
 <!doctype html>
 <html lang="zh-Hant">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
-<title>太空漫步 SpaceJump | MAIMINE STUDIO</title>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<title>太空漫步 | MAIMINE STUDIO</title>
 <style>
 *{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#101b3a;font-family:system-ui,-apple-system,"Noto Sans TC",sans-serif}
-body{display:grid;place-items:center}#wrap{position:relative;width:100vw;height:100dvh;max-width:none;max-height:none;overflow:hidden;background:#13264a;touch-action:none}
-canvas{width:100%;height:100%;display:block}.overlay{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:22px;text-align:center;background:rgba(10,20,48,.25)}.hidden{display:none!important}
-h1{margin:8px 0;color:#fff4df;font-size:clamp(30px,8vw,48px);line-height:1.1;text-shadow:0 3px 0 #607d75}.sub{color:#dce9df;margin:10px 0 22px;font-size:14px}.brand{font-weight:900;letter-spacing:.16em;font-size:12px;color:#d5e6d9;margin-top:14px}
-button{border:0;background:transparent;padding:0;cursor:pointer;touch-action:manipulation}button img{display:block;max-width:100%;height:auto}#startBtn{width:min(68%,270px)}
-#hud{position:absolute;top:10px;left:10px;right:10px;display:flex;align-items:center;justify-content:space-between;pointer-events:none}#scoreBox{width:150px;max-width:45%;position:relative}#scoreBox img{width:100%;display:block}#scoreText{position:absolute;inset:0;display:grid;place-items:center;font-weight:900;color:#334b45;font-size:20px}
-#controls{display:flex;gap:8px;pointer-events:auto}#controls button{width:42px}#controls img{width:100%}
-#hint{position:absolute;bottom:12px;left:0;right:0;text-align:center;color:#e8eee8;font-size:11px;opacity:.75;pointer-events:none}#brandBottom{position:absolute;bottom:30px;left:0;right:0;text-align:center;color:#dbe8dc;font-size:10px;letter-spacing:.18em;opacity:.7;pointer-events:none}
-#gameoverTitle{font-size:34px;color:#fff4df;font-weight:900;margin:0 0 8px}#finalScore{font-size:20px;color:#fff4df;margin:0 0 18px}.actions{display:flex;gap:14px;align-items:center;justify-content:center}.actions button{width:68px}
-#paused{background:rgba(8,15,37,.72)}#resumeBtn{color:#fff4df;font-size:18px;font-weight:800;padding:12px 24px;border:2px solid #fff4df;border-radius:22px}
-</style>
-</head>
-<body>
-<div id="wrap">
-<canvas id="game" width="540" height="960"></canvas>
-<div id="hud"><div id="scoreBox"><img src="images/ui_btn_score.png" alt=""><div id="scoreText">0 m</div></div><div id="controls"><button id="soundBtn" aria-label="音效"><img src="images/ui_btn_sound.png" alt=""></button><button id="pauseBtn" aria-label="暫停"><img src="images/ui_btn_pause.png" alt=""></button></div></div>
-<div id="start" class="overlay"><img src="images/ui_btn_logo.png" style="width:min(70%,300px);max-height:180px;object-fit:contain" alt="太空漫步"><h1>太空漫步</h1><div class="sub">SPACE JUMP</div><button id="startBtn"><img src="images/ui_btn_start.png" alt="開始遊戲"></button><div class="brand">MAIMINE STUDIO</div><div class="sub" style="margin-top:18px">左右滑動／方向鍵移動</div></div>
-<div id="gameover" class="overlay hidden"><img src="images/ui_btn_game_over.png" style="position:absolute;width:82%;max-height:68%;object-fit:contain" alt=""><div style="position:relative;z-index:1"><div id="gameoverTitle">GAME OVER</div><div id="finalScore">0 m</div><div class="actions"><button id="restartBtn"><img src="images/ui_btn_restart.png" alt="重新開始"></button><button id="homeBtn"><img src="images/ui_btn_home.png" alt="首頁"></button></div><div class="brand">MAIMINE STUDIO</div></div></div>
-<div id="paused" class="overlay hidden"><h1>PAUSED</h1><div class="sub">太空貓咪暫時休息中</div><button id="resumeBtn">繼續遊戲</button><div class="brand">MAIMINE STUDIO</div></div>
-<div id="hint">觸控左右移動 · 電腦使用 ← → 或 A / D</div><div id="brandBottom">MAIMINE STUDIO · SPACE JUMP</div>
-</div>
+#stage{position:fixed;inset:0;width:100vw;height:100dvh;overflow:hidden;background:#10233f;touch-action:none}
+canvas{display:block;width:100%;height:100%}
+#hud{position:absolute;top:max(10px,env(safe-area-inset-top));left:12px;right:12px;display:flex;justify-content:space-between;align-items:center;pointer-events:none}
+#scoreWrap{position:relative;width:clamp(125px,32vw,190px)}#scoreWrap img{width:100%;display:block}#score{position:absolute;inset:0;display:grid;place-items:center;color:#304941;font-weight:900;font-size:clamp(18px,4.5vw,26px)}
+#buttons{display:flex;gap:8px;pointer-events:auto}#buttons button{width:clamp(38px,10vw,54px);padding:0;background:none;border:0}#buttons img{width:100%;display:block}
+.overlay{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;flex-direction:column;text-align:center;padding:24px;background:rgba(8,18,42,.38)}.hide{display:none!important}
+#logo{width:min(72vw,340px);max-height:22vh;object-fit:contain}h1{font-size:clamp(34px,9vw,56px);color:#fff2d9;margin:8px 0;text-shadow:0 4px #607d75;line-height:1.1}.sub{color:#e0eee2;font-size:14px;margin:8px 0 22px}
+#startBtn{width:min(68vw,290px);border:0;background:none;padding:0}button img{max-width:100%}.brand{margin-top:14px;font-size:12px;font-weight:900;letter-spacing:.18em;color:#e0eee2}
+#gameoverPanel{width:min(82vw,430px);max-height:70vh;object-fit:contain;position:absolute}#overContent{z-index:2}#final{font-size:22px;color:#fff2d9;margin:8px 0 20px}.actions{display:flex;gap:18px}.actions button{width:75px;background:none;border:0;padding:0}
+#pausePanel{background:rgba(6,15,35,.72)}#resume{border:2px solid #fff2d9;border-radius:24px;padding:12px 24px;color:#fff2d9;background:transparent;font-weight:800;font-size:18px}
+#hint{position:absolute;bottom:max(10px,env(safe-area-inset-bottom));left:0;right:0;text-align:center;color:#e6eee7;font-size:11px;opacity:.72;pointer-events:none}
+</style></head>
+<body><div id="stage">
+<canvas id="c"></canvas>
+<div id="hud"><div id="scoreWrap"><img src="images/ui_btn_score.png"><span id="score">0 m</span></div><div id="buttons"><button id="sound"><img src="images/ui_btn_sound.png"></button><button id="pause"><img src="images/ui_btn_pause.png"></button></div></div>
+<div id="menu" class="overlay"><img id="logo" src="images/ui_btn_logo.png"><h1>太空漫步</h1><div class="sub">SPACE JUMP</div><button id="startBtn"><img src="images/ui_btn_start.png"></button><div class="brand">MAIMINE STUDIO</div><div class="sub" style="margin-top:18px">觸控左右移動 · 電腦 ← → / A D</div></div>
+<div id="over" class="overlay hide"><img id="gameoverPanel" src="images/ui_btn_game_over.png"><div id="overContent"><h1 style="font-size:36px">GAME OVER</h1><div id="final">0 m</div><div class="actions"><button id="restart"><img src="images/ui_btn_restart.png"></button><button id="home"><img src="images/ui_btn_home.png"></button></div><div class="brand">MAIMINE STUDIO</div></div></div>
+<div id="pausePanel" class="overlay hide"><h1>PAUSED</h1><div class="sub">宇宙補給中</div><button id="resume">繼續遊戲</button><div class="brand">MAIMINE STUDIO</div></div>
+<div id="hint">MAIMINE STUDIO · SPACE JUMP</div></div>
 <script>
-(()=> {
-const W=540,H=960,canvas=document.getElementById('game'),ctx=canvas.getContext('2d'),$=id=>document.getElementById(id);
-const img={};['player_front.png','player_idle.png','player_jump.png','player_fall.png','player_land.png','player_dizzy.png','player_powerup.png','platform_normal.png','platform_spring.png','platform_fragile.png','platform_fragile_broken.png','platform_moving.png','platform_crystal.png','item_propeller.png','item_rocket.png','item_shield.png','item_star.png','enemy_alien.png','enemy_satellite.png','bg_space.png'].forEach(n=>{let im=new Image();im.src='images/'+n;img[n]=im});
-let state='menu',paused=false,score=0,best=+(localStorage.getItem('spacejump_best')||0),camera=0,last=0,platforms=[],items=[],enemies=[];
-const player={x:232,y:740,w:76,h:96,vy:-10.5,mode:'jump',power:0,shield:0},keys={left:false,right:false};
+(()=>{
+const c=document.querySelector('#c'),ctx=c.getContext('2d'),$=id=>document.getElementById(id);
+const files=['bg_space.png','player_front.png','player_idle.png','player_jump.png','player_fall.png','player_land.png','player_dizzy.png','player_powerup.png','platform_normal.png','platform_spring.png','platform_fragile.png','platform_fragile_broken.png','platform_moving.png','platform_crystal.png','item_propeller.png','item_rocket.png','item_shield.png','item_star.png','enemy_alien.png','enemy_satellite.png'];
+const imgs={};files.forEach(f=>{let im=new Image();im.src='images/'+f;imgs[f]=im});
+let CW=540,CH=960,scale=1,ox=0,oy=0;
+function resize(){let dpr=Math.min(devicePixelRatio||1,2);c.width=innerWidth*dpr;c.height=innerHeight*dpr;CW=c.width;CH=c.height;ctx.setTransform(1,0,0,1,0,0);scale=Math.min(CW/540,CH/960);/* game world scales with viewport, filling it */scale=Math.max(CW/540,CH/960);ox=(CW-540*scale)/2;oy=(CH-960*scale)/2;}
+addEventListener('resize',resize);resize();
+const keys={l:false,r:false};let state='menu',paused=false,camera=0,score=0,best=+(localStorage.getItem('spacejump_best')||0),last=0,plats=[],items=[],foes=[];
+const p={x:230,y:720,w:80,h:100,vy:-8.7,power:0,shield:0};
 const rand=(a,b)=>a+Math.random()*(b-a);
-function drawImg(n,x,y,w,h){let im=img[n];if(im&&im.complete&&im.naturalWidth)ctx.drawImage(im,x,y,w,h);else{ctx.fillStyle='#dce8d8';ctx.fillRect(x,y,w,h)}}
-function type(){let r=Math.random();if(score>700&&r<.12)return'platform_moving.png';if(score>300&&r<.19)return'platform_fragile.png';if(r<.08)return'platform_spring.png';if(score>1200&&r<.1)return'platform_crystal.png';return'platform_normal.png'}
-function addPlat(y,x=rand(8,W-118),t=type()){platforms.push({x,y,w:110,h:28,type:t,dx:t==='platform_moving.png'?rand(.8,2)*(Math.random()<.5?-1:1):0,broken:false})}
-function reset(){score=0;camera=0;platforms=[];items=[];enemies=[];player.x=232;player.y=740;player.vy=-10.5;player.power=0;player.shield=0;for(let i=0;i<12;i++)addPlat(H-70-i*82,rand(8,W-118),i===0?'platform_normal.png':type());state='playing';paused=false;$('start').classList.add('hidden');$('gameover').classList.add('hidden');$('paused').classList.add('hidden')}
-function jump(v=-10.7){player.vy=v;player.mode='jump'}
-function spawn(){let top=Math.min(...platforms.map(p=>p.y));while(top>-camera-130){top-=rand(72,112);addPlat(top);if(score>650&&Math.random()<.11)enemies.push({x:rand(25,W-75),y:top-rand(90,170),w:62,h:62,type:Math.random()<.5?'enemy_alien.png':'enemy_satellite.png',dx:rand(-1.2,1.2)});if(Math.random()<.1)items.push({x:rand(35,W-75),y:top-rand(35,75),w:48,h:48,type:['item_star.png','item_propeller.png','item_rocket.png','item_shield.png'][Math.floor(Math.random()*4)]})}}
-function bg(){let im=img.bg_space;if(im&&im.complete&&im.naturalWidth){let s=Math.max(W/im.width,H/im.height),iw=im.width*s,ih=im.height*s,y=-(camera%ih);ctx.drawImage(im,(W-iw)/2,y,iw,ih);ctx.drawImage(im,(W-iw)/2,y+ih,iw,ih)}else{let g=ctx.createLinearGradient(0,0,0,H);g.addColorStop(0,'#111b3c');g.addColorStop(1,'#17616a');ctx.fillStyle=g;ctx.fillRect(0,0,W,H)}}
-function end(){if(state!=='playing')return;state='over';best=Math.max(best,Math.floor(score));localStorage.setItem('spacejump_best',best);$('finalScore').textContent=Math.floor(score)+' m · BEST '+best+' m';$('gameover').classList.remove('hidden')}
-function update(dt){if(state!=='playing'||paused)return;player.x+=(keys.left?-5.5:0)+(keys.right?5.5:0);if(player.x<-player.w)player.x=W;if(player.x>W)player.x=-player.w;
-player.vy+=.34*dt*60;player.y+=player.vy*dt*60;player.mode=player.power>0?'powerup':player.vy>0?'fall':'jump';
-if(player.vy>0){for(let p of platforms){if(p.broken)continue;let py=p.y-camera;if(player.x+player.w*.72>p.x&&player.x+player.w*.28<p.x+p.w&&player.y+player.h>py&&player.y+player.h<py+p.h+12&&player.y+player.h-player.vy*dt*60<=py+12){if(p.type==='platform_fragile.png'){p.broken=true;p.type='platform_fragile_broken.png'}else{jump(p.type==='platform_spring.png'?-17.5:-10.7);if(p.type==='platform_spring.png')score+=12}break}}}
-platforms.forEach(p=>{if(p.dx){p.x+=p.dx*dt*60;if(p.x<0||p.x+p.w>W)p.dx*=-1}});
-items=items.filter(it=>{let y=it.y-camera;if(player.x+player.w>it.x&&player.x<it.x+it.w&&player.y+player.h>y&&player.y<y+it.h){if(it.type==='item_star.png')score+=100;else if(it.type==='item_rocket.png'){player.vy=-19;player.power=90}else if(it.type==='item_propeller.png')player.power=240;else player.shield=600;return false}return y<H+80});
-enemies=enemies.filter(e=>{e.x+=e.dx*dt*60;let y=e.y-camera;if(player.x+player.w>e.x&&player.x<e.x+e.w&&player.y+player.h>y&&player.y<y+e.h){if(player.shield>0){player.shield=0;return false}end();return true}return y<H+80});
-if(player.power>0){player.power-=dt*60;player.vy=Math.min(player.vy,-5.8)}if(player.shield>0)player.shield-=dt*60;
-if(player.y-camera<H*.42)camera=player.y-H*.42;score=Math.max(score,Math.floor(Math.max(0,-camera)/10));platforms=platforms.filter(p=>p.y-camera<H+120);spawn();if(player.y-camera>H+80)end()}
-function draw(){bg();platforms.forEach(p=>{let y=p.y-camera;if(y>-100&&y<H+100)drawImg(p.type,p.x,y,p.w,p.h)});items.forEach(i=>drawImg(i.type,i.x,i.y-camera,i.w,i.h));enemies.forEach(e=>drawImg(e.type,e.x,e.y-camera,e.w,e.h));let n=player.mode==='powerup'?'player_powerup.png':player.mode==='fall'?'player_fall.png':player.mode==='land'?'player_land.png':'player_jump.png';if(state==='menu')n='player_front.png';drawImg(n,player.x,player.y-camera,player.w,player.h);if(player.shield>0){ctx.strokeStyle='rgba(184,239,218,.8)';ctx.lineWidth=5;ctx.beginPath();ctx.ellipse(player.x+player.w/2,player.y-camera+player.h/2,player.w*.75,player.h*.7,0,0,Math.PI*2);ctx.stroke()}$('scoreText').textContent=Math.floor(score)+' m'}
-function loop(t){let dt=Math.min(.033,(t-last)/1000||0);last=t;update(dt);draw();requestAnimationFrame(loop)}
-$('startBtn').onclick=reset;$('restartBtn').onclick=reset;$('homeBtn').onclick=()=>{state='menu';paused=false;$('gameover').classList.add('hidden');$('start').classList.remove('hidden')};$('pauseBtn').onclick=()=>{if(state==='playing'){paused=!paused;$('paused').classList.toggle('hidden',!paused)}};$('resumeBtn').onclick=()=>{$('paused').classList.add('hidden');paused=false};$('soundBtn').onclick=()=>{$('soundBtn').style.opacity=$('soundBtn').style.opacity==='0.45'?'1':'.45'};
-addEventListener('keydown',e=>{if(['ArrowLeft','a','A'].includes(e.key))keys.left=true;if(['ArrowRight','d','D'].includes(e.key))keys.right=true;if(e.key==='Escape'&&state==='playing'){$('pauseBtn').click()}});
-addEventListener('keyup',e=>{if(['ArrowLeft','a','A'].includes(e.key))keys.left=false;if(['ArrowRight','d','D'].includes(e.key))keys.right=false});
-let tx=null;canvas.addEventListener('touchstart',e=>{tx=e.touches[0].clientX},{passive:true});canvas.addEventListener('touchmove',e=>{if(tx===null)return;let x=e.touches[0].clientX,d=x-tx;keys.left=d<-2;keys.right=d>2;tx=x},{passive:true});canvas.addEventListener('touchend',()=>{tx=null;keys.left=keys.right=false});
+function drawImg(name,x,y,w,h){let im=imgs[name];if(im&&im.complete&&im.naturalWidth)ctx.drawImage(im,x,y,w,h);else{ctx.fillStyle='#c8d8c9';ctx.fillRect(x,y,w,h)}}
+function alphaBounds(im){try{let cv=document.createElement('canvas');cv.width=im.naturalWidth;cv.height=im.naturalHeight;let cx=cv.getContext('2d');cx.drawImage(im,0,0);let d=cx.getImageData(0,0,cv.width,cv.height).data,minX=cv.width,minY=cv.height,maxX=0,maxY=0;for(let y=0;y<cv.height;y+=2)for(let x=0;x<cv.width;x+=2)if(d[(y*cv.width+x)*4+3]>30){minX=Math.min(minX,x);minY=Math.min(minY,y);maxX=Math.max(maxX,x);maxY=Math.max(maxY,y)}return {x:minX/im.naturalWidth,y:minY/im.naturalHeight,w:(maxX-minX)/im.naturalWidth,h:(maxY-minY)/im.naturalHeight}}catch(e){return{x:0,y:0,w:1,h:1}}}
+function pBounds(){let im=imgs['player_jump.png'];return im&&im.complete&&im.naturalWidth?alphaBounds(im):{x:.1,y:.05,w:.8,h:.9}}
+function platformType(){let r=Math.random();if(score>550&&r<.14)return'platform_moving.png';if(score>280&&r<.22)return'platform_fragile.png';if(r<.1)return'platform_spring.png';if(score>1000&&r<.13)return'platform_crystal.png';return'platform_normal.png'}
+function addPlat(y,x=rand(12,430),type=platformType()){plats.push({x,y,w:116,h:34,type,dx:type==='platform_moving.png'?rand(.7,1.6)*(Math.random()<.5?-1:1):0,broken:false})}
+function reset(){score=0;camera=0;plats=[];items=[];foes=[];p.x=230;p.y=730;p.vy=-8.8;p.power=0;p.shield=0;for(let i=0;i<12;i++)addPlat(890-i*83,rand(8,416),i===0?'platform_normal.png':platformType());state='play';paused=false;$('menu').classList.add('hide');$('over').classList.add('hide');$('pausePanel').classList.add('hide')}
+function jump(v=-9.5){p.vy=v}
+function spawn(){let top=Math.min(...plats.map(a=>a.y));while(top>-camera-160){top-=rand(75,116);addPlat(top);if(score>600&&Math.random()<.1)foes.push({x:rand(20,450),y:top-rand(95,160),w:66,h:66,type:Math.random()<.5?'enemy_alien.png':'enemy_satellite.png',dx:rand(-1,1)});if(Math.random()<.11)items.push({x:rand(25,455),y:top-rand(40,75),w:54,h:54,type:['item_star.png','item_propeller.png','item_rocket.png','item_shield.png'][Math.floor(Math.random()*4)]})}}
+function bg(){let im=imgs['bg_space.png'];if(im&&im.complete&&im.naturalWidth){let s=Math.max(540/im.width,960/im.height),iw=im.width*s,ih=im.height*s;let y=-(camera*.42%ih);ctx.drawImage(im,(540-iw)/2,y,iw,ih);ctx.drawImage(im,(540-iw)/2,y+ih,iw,ih)}else{ctx.fillStyle='#13294b';ctx.fillRect(0,0,540,960)}}
+function end(){if(state!=='play')return;state='over';best=Math.max(best,Math.floor(score));localStorage.setItem('spacejump_best',best);$('final').textContent=Math.floor(score)+' m · BEST '+best+' m';$('over').classList.remove('hide')}
+function update(dt){if(state!=='play'||paused)return;
+p.x+=(keys.l?-5.3:0)+(keys.r?5.3:0);if(p.x<-p.w)p.x=540;if(p.x>540)p.x=-p.w;
+let oldY=p.y;p.vy+=.29*dt*60;p.y+=p.vy*dt*60;
+if(p.vy>0){let b=pBounds(),foot=oldY+(b.y+b.h)*p.h,newFoot=p.y+(b.y+b.h)*p.h;for(let pl of plats){if(pl.broken)continue;let py=pl.y-camera;if(p.x+p.w*.82>pl.x&&p.x+p.w*.18<pl.x+pl.w&&foot<=py+5&&newFoot>=py&&p.vy>0){p.y=py-(b.y+b.h)*p.h;jump(pl.type==='platform_spring.png'?-15.2:-9.4);if(pl.type==='platform_spring.png')score+=15;if(pl.type==='platform_fragile.png'){pl.broken=true;pl.type='platform_fragile_broken.png'}break}}}
+plats.forEach(pl=>{if(pl.dx){pl.x+=pl.dx*dt*60;if(pl.x<0||pl.x+pl.w>540)pl.dx*=-1}});
+items=items.filter(it=>{let y=it.y-camera;if(p.x+p.w*.75>it.x&&p.x+p.w*.25<it.x+it.w&&p.y+p.h>y&&p.y<y+it.h){if(it.type==='item_star.png')score+=100;else if(it.type==='item_rocket.png'){p.vy=-16;p.power=90}else if(it.type==='item_propeller.png')p.power=210;else p.shield=600;return false}return y<1050});
+foes=foes.filter(e=>{e.x+=e.dx*dt*60;let y=e.y-camera;if(p.x+p.w*.75>e.x&&p.x+p.w*.25<e.x+e.w&&p.y+p.h>y&&p.y<y+e.h){if(p.shield>0){p.shield=0;return false}end();return true}return y<1050});
+if(p.power>0){p.power-=dt*60;p.vy=Math.min(p.vy,-5.3)}if(p.shield>0)p.shield-=dt*60;
+if(p.y-camera<390)camera=p.y-390;score=Math.max(score,Math.floor(Math.max(0,-camera)/8));plats=plats.filter(pl=>pl.y-camera<1060);spawn();if(p.y-camera>1020)end()}
+function render(){ctx.setTransform(scale,0,0,scale,ox,oy);ctx.clearRect(-ox/scale,-oy/scale,CW/scale,CH/scale);bg();
+plats.forEach(pl=>{let y=pl.y-camera;if(y>-120&&y<1080)drawImg(pl.type,pl.x,y,pl.w,pl.h)});
+items.forEach(it=>drawImg(it.type,it.x,it.y-camera,it.w,it.h));foes.forEach(e=>drawImg(e.type,e.x,e.y-camera,e.w,e.h));
+let sprite=p.power>0?'player_powerup.png':p.vy>0?'player_fall.png':'player_jump.png';if(state==='menu')sprite='player_front.png';
+let im=imgs[sprite],b=im&&im.complete&&im.naturalWidth?alphaBounds(im):{x:.1,y:.05,w:.8,h:.9};let dw=102,dh=120;drawImg(sprite,p.x,p.y-camera,dw,dh);
+if(p.shield>0){ctx.strokeStyle='rgba(190,245,222,.85)';ctx.lineWidth=5;ctx.beginPath();ctx.ellipse(p.x+dw/2,p.y-camera+dh/2,dw*.65,dh*.65,0,0,Math.PI*2);ctx.stroke()}
+$('score').textContent=Math.floor(score)+' m'}
+function loop(t){let dt=Math.min(.033,(t-last)/1000||0);last=t;update(dt);render();requestAnimationFrame(loop)}
+$('startBtn').onclick=reset;$('restart').onclick=reset;$('home').onclick=()=>{state='menu';$('over').classList.add('hide');$('menu').classList.remove('hide')};$('pause').onclick=()=>{if(state==='play'){paused=!paused;$('pausePanel').classList.toggle('hide',!paused)}};$('resume').onclick=()=>{paused=false;$('pausePanel').classList.add('hide')};
+addEventListener('keydown',e=>{if(['ArrowLeft','a','A'].includes(e.key))keys.l=true;if(['ArrowRight','d','D'].includes(e.key))keys.r=true;if(e.key==='Escape'&&state==='play')$('pause').click()});addEventListener('keyup',e=>{if(['ArrowLeft','a','A'].includes(e.key))keys.l=false;if(['ArrowRight','d','D'].includes(e.key))keys.r=false});
+let lastX=null;c.addEventListener('touchstart',e=>lastX=e.touches[0].clientX,{passive:true});c.addEventListener('touchmove',e=>{if(lastX===null)return;let x=e.touches[0].clientX,d=x-lastX;keys.l=d<-1;keys.r=d>1;lastX=x},{passive:true});c.addEventListener('touchend',()=>{lastX=null;keys.l=keys.r=false});
+$('sound').onclick=()=>{$('sound').style.opacity=$('sound').style.opacity==='0.45'?'1':'.45'};
 requestAnimationFrame(loop);
 })();
-</script>
-</body></html>
+</script></body></html>
