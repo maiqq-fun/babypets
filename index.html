@@ -2,381 +2,992 @@
 <html lang="zh-Hant">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<title>喵喵太空跳</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>毛很多</title>
+<meta name="description" content="毛很多：朋友們的毛孩小島">
+<meta name="theme-color" content="#2b2b38">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="毛很多">
+<link rel="manifest" href="manifest.json">
+<meta property="og:title" content="毛很多">
+<meta property="og:description" content="來島上看看大家的毛孩 🐾">
+<meta property="og:image" content="assets/share_preview.jpg">
+<link rel="icon" href="assets/favicon.png">
+<link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Huninn&display=swap" rel="stylesheet">
 <style>
-  html,body{margin:0;height:100%;background:#0b1530;overflow:hidden;touch-action:none;
-    display:flex;align-items:center;justify-content:center}
-  canvas{display:block;touch-action:none}
+:root{--ink:#5a4030;--soft:#9a8270;--cream:#fffaee;--line:#efe1cc;--wood:#b98d62;--accent:#ff9a6b;--accent-d:#e07a4c;--night:#2b2b38;--danger:#d9534f}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;background:var(--night);font-family:"Huninn","PingFang TC","Noto Sans TC",sans-serif;color:var(--ink)}
+button{font:inherit;color:inherit;cursor:pointer}
+button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.stage{position:relative;width:100%;max-width:520px;margin:0 auto;overflow:hidden;user-select:none;-webkit-user-select:none}
+.island{aspect-ratio:2/3;background:#a9def0}
+.home{aspect-ratio:848/1264;background:#f3dcc0;container-type:inline-size}
+.hidden{display:none!important}
+.bg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.island .bg{opacity:0;transition:opacity 1.2s ease}
+.island .bg.on{opacity:1}
+.thing{position:absolute;transform:translate(-50%,-100%);cursor:pointer;transition:transform .15s}
+.thing img{display:block;width:100%;height:auto;pointer-events:none}
+.thing:active{transform:translate(-50%,-100%) scale(.94)}
+.thing.pick{animation:pulse 1s ease-in-out infinite}
+@keyframes pulse{0%,100%{filter:drop-shadow(0 0 0 #fff)}50%{filter:drop-shadow(0 0 10px #fff) brightness(1.15)}}
+.label{position:absolute;transform:translate(-50%,0);white-space:nowrap;pointer-events:none;
+  font-size:clamp(10px,2.7vw,13px);padding:2px 9px;border-radius:999px;background:rgba(255,250,238,.93);
+  border:1.5px solid var(--wood);color:#6b4b33;box-shadow:0 1px 0 rgba(0,0,0,.12)}
+.label.mine{background:#fff0e6;border-color:var(--accent);color:#b4532a}
+.label.lot{background:rgba(255,255,255,.85);border-style:dashed;color:#7a5a40;padding:0;width:1.9em;height:1.9em;display:flex;align-items:center;justify-content:center;font-size:clamp(13px,3.6vw,17px)}
+.bubble{position:absolute;transform:translate(-50%,-100%);font-size:clamp(14px,4.4vw,22px);background:#fff;border-radius:50%;
+  width:2em;height:2em;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 0 rgba(0,0,0,.15);
+  animation:bob 1.8s ease-in-out infinite;pointer-events:none}
+.bubble::after{content:"";position:absolute;bottom:-5px;left:50%;margin-left:-5px;border:5px solid transparent;border-top-color:#fff;border-bottom:0}
+@keyframes bob{0%,100%{margin-top:0}50%{margin-top:-5px}}
+.top{position:absolute;left:0;right:0;top:0;display:flex;align-items:center;justify-content:space-between;gap:8px;padding:12px 14px;pointer-events:none;z-index:3000}
+.top>*{pointer-events:auto}
+.title{font-size:clamp(26px,8vw,38px);color:#fff;letter-spacing:3px;pointer-events:none!important;
+  text-shadow:-2px -2px 0 #8a5a3a,2px -2px 0 #8a5a3a,-2px 2px 0 #8a5a3a,2px 2px 0 #8a5a3a,0 4px 0 #8a5a3a}
+.topright{display:flex;gap:10px;align-items:center}
+.logo{width:40%;max-width:210px;height:auto;pointer-events:none!important;filter:drop-shadow(0 3px 2px rgba(60,35,15,.35))}
+.circle{position:relative;width:46px;height:46px;border-radius:50%;background:#fff6e6;border:3px solid #fff;box-shadow:0 0 0 2px var(--wood);
+  display:flex;align-items:center;justify-content:center;font-size:22px;overflow:hidden;padding:0}
+.circle img{width:100%;height:100%;object-fit:cover;border-radius:50%}
+#tix{overflow:visible}
+.badge{position:absolute;right:-6px;top:-6px;min-width:20px;height:20px;border-radius:10px;background:#ff5e5e;color:#fff;font-size:12px;display:flex;align-items:center;justify-content:center;padding:0 4px;z-index:2}
+.ticker{position:absolute;left:14px;right:14px;bottom:9.5%;z-index:3000;background:rgba(255,250,238,.92);border:1.5px solid var(--wood);border-radius:999px;
+  padding:4px 12px;font-size:clamp(11px,3.1vw,13px);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:pointer;box-shadow:0 2px 0 rgba(0,0,0,.12);transition:opacity .3s}
+.pickbar{position:absolute;left:50%;bottom:9.5%;transform:translateX(-50%);z-index:3001;background:var(--accent);color:#fff;border-radius:14px;padding:8px 14px;font-size:14px;display:flex;gap:10px;align-items:center;white-space:nowrap;box-shadow:0 3px 0 var(--accent-d)}
+.pickbar button{border:0;background:rgba(255,255,255,.25);color:#fff;border-radius:10px;padding:3px 10px}
+.bar{position:absolute;left:50%;bottom:2.2%;transform:translateX(-50%);display:flex;gap:4px;background:rgba(255,250,238,.92);
+  padding:4px;border-radius:999px;box-shadow:0 2px 0 rgba(0,0,0,.15);z-index:3000}
+.bar button{border:0;background:transparent;color:#7a5a40;font-size:13px;padding:6px 10px;border-radius:999px;white-space:nowrap}
+.bar button.on{background:var(--accent);color:#fff}
+/* home */
+.pill{border:2px solid var(--wood);background:rgba(255,250,238,.94);border-radius:999px;padding:6px 14px;font-size:15px;box-shadow:0 2px 0 rgba(0,0,0,.12);white-space:nowrap}
+.housename{font-size:clamp(15px,4.4vw,19px);padding:6px 14px;max-width:48%;overflow:hidden;text-overflow:ellipsis;text-align:center}
+.pet{position:absolute;transform-origin:50% 100%;cursor:pointer}
+.pet .body{display:block;transform-origin:50% 100%}
+.pet img{display:block;width:100%;height:auto;pointer-events:none}
+.pet .emoji{display:block;text-align:center;line-height:1;pointer-events:none}
+.pet .shadow{position:absolute;left:12%;right:12%;bottom:-4%;height:12%;border-radius:50%;background:rgba(90,55,25,.22);filter:blur(3px);z-index:-1}
+.pet .nm{position:absolute;left:50%;bottom:-1.6em;transform:translateX(-50%);font-size:clamp(10px,2.6cqw,13px);background:rgba(255,250,238,.85);border-radius:999px;padding:0 7px;white-space:nowrap;pointer-events:none}
+.poop{position:absolute;transform:translate(-50%,-100%);font-size:clamp(22px,7vw,34px);cursor:pointer;line-height:1;padding:6px;border:0;background:transparent;filter:drop-shadow(0 3px 2px rgba(90,55,25,.3))}
+.bowl{position:absolute;transform:translate(-50%,-100%);font-size:clamp(26px,8vw,40px);line-height:1;filter:drop-shadow(0 3px 2px rgba(90,55,25,.3))}
+.fx{position:absolute;pointer-events:none;font-size:clamp(16px,5vw,24px);animation:float 1.3s ease-out forwards;z-index:2500}
+@keyframes float{0%{opacity:0;transform:translate(-50%,0) scale(.6)}20%{opacity:1}100%{opacity:0;transform:translate(-50%,-70px) scale(1.15)}}
+.board{position:absolute;display:grid;grid-template-columns:repeat(3,1fr);gap:4%;padding:3%}
+.note{aspect-ratio:1;border:0;padding:6%;font-size:clamp(8px,2.2vw,11px);line-height:1.25;text-align:left;overflow:hidden;
+  box-shadow:0 2px 3px rgba(0,0,0,.18);color:#5a4030;display:flex;flex-direction:column;justify-content:space-between}
+.note small{font-size:.85em;opacity:.7;text-align:right}
+.note.empty{background:transparent!important;box-shadow:none;border:1.5px dashed rgba(122,90,64,.45);color:#8a6a50;align-items:center;justify-content:center;font-size:clamp(12px,3.4vw,16px)}
+.empty-home{position:absolute;left:50%;top:72%;transform:translate(-50%,-50%);background:rgba(255,250,238,.95);border:2px dashed var(--wood);border-radius:18px;padding:14px 18px;text-align:center;font-size:15px;line-height:1.6;width:70%}
+.empty-home button{margin-top:8px;border:0;background:var(--accent);color:#fff;border-radius:12px;padding:8px 14px}
+.actions{position:absolute;left:50%;bottom:2.4%;transform:translateX(-50%);display:flex;gap:8px;z-index:3000}
+.act{border:2px solid var(--wood);background:rgba(255,250,238,.95);border-radius:18px;padding:8px 13px;font-size:15px;box-shadow:0 3px 0 rgba(0,0,0,.15);white-space:nowrap}
+.act:active{transform:translateY(2px);box-shadow:0 1px 0 rgba(0,0,0,.15)}
+.famtools{position:absolute;right:12px;top:62px;display:flex;flex-direction:column;gap:8px;z-index:3000}
+.famtools .act{font-size:13px;padding:6px 10px}
+.petmenu{position:absolute;transform:translate(-50%,-100%);display:flex;gap:6px;background:#fff;padding:6px;border-radius:16px;box-shadow:0 3px 0 rgba(0,0,0,.15);z-index:2800}
+.petmenu button{border:0;background:#fff3e2;border-radius:12px;padding:7px 10px;font-size:14px;white-space:nowrap}
+/* modal */
+.modal{position:fixed;inset:0;background:rgba(40,25,15,.45);display:flex;align-items:flex-end;justify-content:center;z-index:5000}
+.sheet{background:var(--sheetbg,var(--cream));width:100%;max-width:520px;max-height:92vh;overflow:auto;border-radius:24px 24px 0 0;padding:18px 16px 24px}
+@media(min-width:600px){.modal{align-items:center}.sheet{border-radius:24px}}
+.sheet h3{margin:0 0 4px;font-weight:normal;font-size:20px;text-align:center;text-wrap:balance}
+.sheet .lead{text-align:center;color:var(--soft);font-size:14px;margin:0 0 14px;line-height:1.6}
+.field{margin-bottom:12px}
+.field label,.flabel{display:block;font-size:13px;color:var(--soft);margin:0 0 5px 4px}
+.field input,.field select,.field textarea{width:100%;font:inherit;font-size:16px;padding:10px 12px;border-radius:12px;border:2px solid var(--line);background:#fff;color:var(--ink)}
+.field input:focus,.field select:focus,.field textarea:focus{outline:none;border-color:var(--accent)}
+.field textarea{min-height:70px;resize:vertical}
+.field input{min-width:0;max-width:100%}
+.field input[type=date]{-webkit-appearance:none;appearance:none;display:block;min-height:46px;line-height:22px;text-align:left}
+.field input[type=date]::-webkit-date-and-time-value{text-align:left}
+.two{display:flex;gap:10px}.two>.field{flex:1;min-width:0}
+.hint{font-size:12px;color:#a08670;margin:4px 4px 0;line-height:1.5}
+.choices{display:flex;flex-wrap:wrap;gap:6px}
+.choices button{border:2px solid var(--line);background:#fff;border-radius:12px;padding:7px 11px;font-size:15px}
+.choices button.on{border-color:var(--accent);background:#fff0e8}
+.swatches{display:flex;gap:10px;flex-wrap:wrap}
+.swatches button{width:38px;height:38px;border-radius:50%;border:0;box-shadow:0 2px 0 rgba(0,0,0,.15)}
+.swatches button.on{outline:3px solid var(--ink);outline-offset:2px}
+.big3{display:grid;gap:10px;margin-top:6px}
+.big3 button{display:flex;gap:12px;align-items:center;text-align:left;border:2px solid var(--line);background:#fff;border-radius:16px;padding:12px 14px;font-size:16px}
+.big3 button .e{font-size:30px}
+.big3 button small{display:block;color:var(--soft);font-size:12px;margin-top:2px}
+.styles{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px}
+.styles button{min-width:0;overflow:hidden;position:relative;border:2px solid var(--line);background:#fff;border-radius:12px;padding:4px;aspect-ratio:1}
+.styles button img{display:block;width:100%;height:100%;min-width:0;object-fit:contain}
+.styles button.on{border-color:var(--accent);background:#fff0e8;box-shadow:0 0 0 2px var(--accent)}
+.styles button:disabled{opacity:.45;cursor:not-allowed}
+.styles button:disabled::after{content:"已有人住";position:absolute;left:50%;bottom:3px;transform:translateX(-50%);font-size:10px;background:#7a6050;color:#fff;border-radius:8px;padding:1px 6px;white-space:nowrap}
+.rooms{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.rooms button{min-width:0;border:2px solid var(--line);background:#fff;border-radius:12px;padding:4px;display:flex;flex-direction:column;gap:3px;font-size:12px;color:var(--soft)}
+.rooms button img{width:100%;aspect-ratio:3/4;object-fit:cover;border-radius:8px}
+.rooms button.on{border-color:var(--accent);box-shadow:0 0 0 2px var(--accent);color:var(--ink)}
+.steps{display:flex;justify-content:center;gap:6px;margin:6px 0 12px}
+.steps i{width:22px;height:5px;border-radius:3px;background:var(--line)}
+.steps i.on{background:var(--accent)}
+.row2{display:flex;gap:10px;margin-top:10px}
+.row2.sticky{position:sticky;bottom:-24px;margin:10px -16px -24px;padding:10px 16px 18px;background:var(--sheetbg,var(--cream));box-shadow:0 -6px 10px -8px rgba(90,60,30,.25);z-index:2}
+.row2 button{flex:1;padding:12px;border-radius:14px;font-size:16px;border:2px solid var(--line);background:#fff}
+.row2 .primary{background:var(--accent);border-color:var(--accent);color:#fff}
+.row2 .primary:disabled{background:#d9cbbb;border-color:#d9cbbb}
+.err{color:var(--danger);font-size:13px;min-height:18px;text-align:center;margin-top:4px}
+.count{font-size:12px;color:var(--soft);text-align:right;margin-top:4px}
+.photo{display:flex;gap:12px;align-items:center;background:#fff;border:2px solid var(--line);border-radius:14px;padding:10px}
+.photo .pv{width:72px;height:72px;flex:none;border-radius:12px;background:#f6ecdd;display:flex;align-items:center;justify-content:center;font-size:30px;overflow:hidden}
+.photo .pv.round{border-radius:50%}
+.photo .pv img{width:100%;height:100%;object-fit:contain}
+.photo .pv.round img{object-fit:cover;object-position:50% 15%}
+.photo .pv.check{background:repeating-conic-gradient(#eee 0 25%,#fff 0 50%) 0 0/14px 14px}
+.photo .info{flex:1;font-size:13px;color:var(--soft);line-height:1.5}
+.photo .btns{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}
+.photo .btns label,.photo .btns button{border:2px solid var(--line);background:#fffaf2;border-radius:10px;padding:5px 9px;font-size:13px;color:var(--ink);cursor:pointer}
+.prompt{background:#fff;border:2px dashed var(--line);border-radius:12px;padding:10px;font-size:12px;line-height:1.6;white-space:pre-wrap;color:#6b5545;max-height:180px;overflow:auto;user-select:text;-webkit-user-select:text}
+details{margin-top:6px}
+details summary{font-size:13px;color:var(--accent-d);cursor:pointer}
+/* 身分證主題色：整個畫面跟著換 */
+.sheet.themed{--sheetbg:color-mix(in srgb,var(--cc) 9%,#fffaf5)}
+.sheet.themed .sec,.sheet.themed .idcard{border-color:color-mix(in srgb,var(--cc) 35%,#fff)}
+.sheet.themed .idcard{box-shadow:0 3px 0 color-mix(in srgb,var(--cc) 40%,#fff)}
+.sheet.themed .sec h4{color:color-mix(in srgb,var(--cc) 70%,#3a2a20)}
+.sheet.themed .sec h4 button{background:color-mix(in srgb,var(--cc) 16%,#fff);color:color-mix(in srgb,var(--cc) 80%,#2a1a10)}
+.sheet.themed .rec{border-top-color:color-mix(in srgb,var(--cc) 25%,#fff)}
+.sheet.themed .row2 button{border-color:color-mix(in srgb,var(--cc) 30%,#fff)}
+.sheet.themed .row2 .primary,.sheet.themed .choices button.on{background:var(--cc);border-color:var(--cc);color:#fff}
+.sheet.themed .field input:focus,.sheet.themed .field select:focus,.sheet.themed .field textarea:focus{border-color:var(--cc)}
+.sheet.themed .idphoto{border-color:color-mix(in srgb,var(--cc) 35%,#fff);background:color-mix(in srgb,var(--cc) 12%,#fff)}
+.sheet.themed .idfields dt{color:color-mix(in srgb,var(--cc) 60%,#6a5a50)}
+/* id card */
+.idcard{background:#fff;border-radius:18px;overflow:hidden;box-shadow:0 3px 0 #e8d6bd;border:2px solid var(--line)}
+.idhead{background:var(--cc);color:#fff;display:flex;justify-content:space-between;align-items:center;padding:8px 14px;font-size:15px;letter-spacing:1px}
+.idhead span{font-size:12px;opacity:.9;font-variant-numeric:tabular-nums}
+.idbody{display:flex;gap:14px;padding:14px}
+.idphoto{width:36%;flex:none;aspect-ratio:1;align-self:flex-start;border-radius:10px;overflow:hidden;background:#fff1dc;border:2px solid var(--line);display:flex;align-items:center;justify-content:center;font-size:48px}
+.idphoto img{width:100%;height:100%;object-fit:cover}
+.idfields{flex:1;display:grid;grid-template-columns:auto 1fr;gap:5px 10px;font-size:14px;align-content:start;margin:0}
+.idfields dt{color:#a08670;font-size:12px;padding-top:2px}
+.idfields dd{margin:0}
+.idname{grid-column:1/-1;font-size:22px;margin-bottom:2px}
+.stamp{position:absolute;right:16px;bottom:12px;width:58px;height:58px;border:2.5px solid var(--cc);opacity:.6;border-radius:50%;color:var(--cc);
+  display:flex;align-items:center;justify-content:center;font-size:11px;transform:rotate(-14deg);text-align:center;line-height:1.2}
+.idbottom{position:relative;padding:0 14px 14px;font-size:14px;color:#7a6050;min-height:64px}
+.sec{margin-top:14px;background:#fff;border:2px solid var(--line);border-radius:16px;padding:10px 12px}
+.sec h4{margin:0 0 6px;font-weight:normal;font-size:15px;display:flex;justify-content:space-between;align-items:center}
+.sec h4 span{font-size:12px;color:#a08670}
+.sec h4 button{border:0;background:#fff0e8;color:var(--accent-d);border-radius:10px;padding:4px 10px;font-size:13px}
+.locked{color:#a08670;font-size:13px;text-align:center;padding:6px 0}
+.rec{display:flex;gap:10px;align-items:center;padding:8px 0;border-top:1px dashed var(--line);font-size:14px}
+.rec .d{font-size:12px;color:var(--soft);width:78px;flex:none;font-variant-numeric:tabular-nums}
+.rec .t{flex:1;min-width:0}
+.rec .t small{display:block;color:var(--soft);font-size:12px}
+.rec .v{white-space:nowrap;font-variant-numeric:tabular-nums}
+.rec .x{border:0;background:none;color:#c9b6a3;font-size:12px;padding:4px 6px;border-radius:8px}
+.rec .x.armed{background:var(--danger);color:#fff}
+.btn-d{width:100%;margin-top:12px;padding:11px;border-radius:14px;color:var(--danger);border:2px solid #f2c9c7;background:#fff}
+.btn-d.armed{background:var(--danger);color:#fff}
+#toast{position:fixed;left:50%;top:42%;transform:translate(-50%,-50%);background:rgba(70,50,35,.92);color:#fff;padding:12px 18px;
+  border-radius:16px;font-size:15px;opacity:0;pointer-events:none;transition:opacity .2s;text-align:center;max-width:80%;z-index:9000}
+#toast.show{opacity:1}
+#busy{position:fixed;left:50%;top:14px;transform:translateX(-50%);background:rgba(70,50,35,.9);color:#fff;padding:7px 14px;border-radius:999px;font-size:13px;z-index:9500}
+.foot{max-width:520px;margin:0 auto;padding:14px 16px 30px;color:#e9ddd0;font-size:13px;line-height:1.7}
+.foot button{border:1px solid #6a5a50;background:transparent;color:#e9ddd0;border-radius:10px;padding:4px 10px;font-size:12px;margin-top:6px}
+/* missions & gacha */
+.tk{display:flex;align-items:center;justify-content:space-between;background:#fff;border:2px solid var(--line);border-radius:16px;padding:12px 14px;margin-bottom:12px}
+.tk .n{font-size:28px;font-variant-numeric:tabular-nums}
+.tk button{border:0;background:var(--accent);color:#fff;border-radius:14px;padding:10px 16px;font-size:16px;box-shadow:0 3px 0 var(--accent-d)}
+.tk button:disabled{background:#d9cbbb;box-shadow:0 3px 0 #c4b4a2}
+.ms{display:grid;gap:8px}
+.m{display:grid;grid-template-columns:auto 1fr auto;gap:4px 10px;align-items:center;font-size:14px}
+.m .ic{font-size:20px;grid-row:span 2}
+.m .bar2{grid-column:2/4;height:8px;background:#f2e6d6;border-radius:4px;overflow:hidden}
+.m .bar2 i{display:block;height:100%;background:var(--accent);border-radius:4px}
+.m .num{font-variant-numeric:tabular-nums;color:var(--soft);font-size:13px}
+.m small{grid-column:2/4;color:#a08670;font-size:11px;margin-top:-2px}
+.coll{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.mini{aspect-ratio:3/4;border-radius:8px;overflow:hidden;position:relative;border:3px solid var(--rc);background:#f2e6d6;display:flex;align-items:center;justify-content:center;color:#a08670;padding:0}
+.mini .art{position:absolute;inset:0;font-size:26px}
+.mini.locked .art{filter:grayscale(1) brightness(.85);opacity:.35}
+.mini span{position:relative;font-size:18px}
+.gacha{position:fixed;inset:0;z-index:7000;background:radial-gradient(circle at 50% 40%,#5b4a7a,#231a33 70%);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;color:#fff;overflow:hidden}
+.gacha .hint2{font-size:15px;opacity:.85;min-height:22px;text-align:center}
+.pack{position:relative;width:min(54vw,230px);aspect-ratio:594/968;cursor:pointer;transition:transform .6s cubic-bezier(.5,-0.4,.6,1.4),opacity .5s}
+.pack .pbody{position:absolute;inset:0;background:url(assets/pack.webp) center/100% 100% no-repeat;clip-path:inset(12% 0 0 0);display:flex;align-items:flex-start;justify-content:center;overflow:hidden;filter:drop-shadow(0 10px 20px rgba(0,0,0,.4))}
+.pack .plogo{width:78%;margin-top:30%;position:relative;filter:drop-shadow(0 3px 2px rgba(60,35,15,.3))}
+.pack .pbody::before{content:"";position:absolute;inset:-50%;background:linear-gradient(115deg,transparent 40%,rgba(255,255,255,.45) 50%,transparent 60%);animation:shine 2.6s linear infinite}
+@keyframes shine{from{transform:translateX(-40%)}to{transform:translateX(40%)}}
+.pack .ptop{position:absolute;inset:0;background:url(assets/pack.webp) center/100% 100% no-repeat;clip-path:inset(0 0 88% 0);transform-origin:100% 12%;transition:transform .55s ease-in,opacity .55s}
+.pack .logo{font-size:clamp(26px,8vw,36px);letter-spacing:2px;text-shadow:0 3px 0 rgba(120,50,80,.45);position:relative}
+.pack .sub{font-size:13px;opacity:.95;position:relative}
+.pack .paw{font-size:44px;position:relative}
+.pack.shake{animation:shake .45s ease-in-out 2}
+@keyframes shake{0%,100%{transform:rotate(0)}25%{transform:rotate(-4deg)}75%{transform:rotate(4deg)}}
+.pack.torn .ptop{transform:translate(30%,-40%) rotate(24deg);opacity:0}
+.pack.gone{transform:translateY(120%) scale(.9);opacity:0}
+.card{position:absolute;width:min(58vw,240px);aspect-ratio:5/7;perspective:900px;cursor:pointer;transform:translateY(30%) scale(.8);opacity:0;transition:transform .7s cubic-bezier(.2,1.4,.4,1),opacity .4s}
+.card.up{transform:none;opacity:1}
+.card .in{position:absolute;inset:0;transform-style:preserve-3d;transition:transform .8s cubic-bezier(.3,1.3,.5,1)}
+.card.flip .in{transform:rotateY(180deg)}
+.face{position:absolute;inset:0;border-radius:14px;backface-visibility:hidden;-webkit-backface-visibility:hidden;overflow:hidden}
+.back{background:url(assets/card_back.webp) center/cover;border:4px solid #fff;box-shadow:0 10px 30px rgba(0,0,0,.4)}
+.front{transform:rotateY(180deg);background:#fff;border:6px solid var(--rc);box-shadow:0 0 0 2px rgba(255,255,255,.5),0 0 40px var(--glow);display:flex;flex-direction:column}
+.front .art{flex:1;position:relative;font-size:clamp(70px,24vw,104px)}
+.front .cap{background:var(--rc);color:#fff;text-align:center;padding:8px 6px 10px}
+.front .cap b{display:block;font-weight:normal;font-size:12px;letter-spacing:2px;opacity:.95}
+.front .cap span{font-size:20px}
+.rays{position:absolute;width:160vmax;height:160vmax;background:repeating-conic-gradient(from 0deg,rgba(255,255,255,.08) 0 10deg,transparent 10deg 20deg);animation:spin 18s linear infinite;opacity:0;transition:opacity .8s;pointer-events:none}
+.rays.on{opacity:1}
+@keyframes spin{to{transform:rotate(360deg)}}
+.gbtns{display:flex;gap:10px;min-height:48px;opacity:0;transition:opacity .4s}
+.gbtns.on{opacity:1}
+.gbtns button{border:0;border-radius:14px;padding:12px 18px;font-size:16px;background:#fff;color:var(--ink)}
+.gbtns .primary{background:var(--accent);color:#fff}
+.stage-area{position:relative;width:100%;display:flex;align-items:center;justify-content:center;min-height:min(82vw,350px)}
+.sp{position:absolute;font-size:22px;pointer-events:none;animation:pop 1.2s ease-out forwards}
+@keyframes pop{0%{opacity:0;transform:translate(0,0) scale(.4)}20%{opacity:1}100%{opacity:0;transform:translate(var(--dx),var(--dy)) scale(1.2)}}
+@media (prefers-reduced-motion:reduce){.bubble,.fx,.thing.pick,.rays,.pack .pbody::before{animation:none}.island .bg{transition:none}}
 </style>
 </head>
 <body>
-<canvas id="c"></canvas>
+<!-- ===== 小島 ===== -->
+<div class="stage island" id="island">
+  <img class="bg" data-p="dawn" src="assets/island_dawn.webp" alt="">
+  <img class="bg" data-p="day" src="assets/island_day.webp" alt="">
+  <img class="bg" data-p="sunset" src="assets/island_sunset.webp" alt="">
+  <img class="bg" data-p="night" src="assets/island_night.webp" alt="">
+  <div id="things"></div>
+  <div class="top" style="align-items:flex-start"><img class="logo" src="assets/logo.webp" alt="毛很多"><div class="topright">
+    <button class="circle" id="tix" aria-label="任務與抽卡">🎟️<span class="badge" id="tixn">0</span></button>
+    <button class="circle" id="me" aria-label="我的設定"></button></div></div>
+  <div class="ticker" id="ticker" role="button" aria-label="島上動態"></div>
+  <div class="pickbar hidden" id="pickbar">點一塊「＋」空地蓋房子<button id="pickcancel">取消</button></div>
+  <div class="bar" id="bar">
+    <button data-p="auto">自動</button><button data-p="dawn">清晨</button><button data-p="day">白天</button><button data-p="sunset">日落</button><button data-p="night">夜晚</button>
+  </div>
+</div>
+<!-- ===== 家裡 ===== -->
+<div class="stage home hidden" id="home">
+  <img class="bg" id="roombg" src="assets/room_basic1.webp" alt="">
+  <div class="board" id="board"></div>
+  <div id="floor"></div>
+  <div id="emptyhome"></div>
+  <div class="top"><button class="pill" id="back">← 小島</button><div class="pill housename" id="hname"></div><div style="width:76px"></div></div>
+  <div class="famtools" id="famtools"></div>
+  <div class="actions"><button class="act" id="feed">🍖 餵飯</button><button class="act" id="addnote">📝 貼便利貼</button></div>
+</div>
+<div class="foot" id="foot"></div>
+<div id="modal" class="modal hidden"><div class="sheet" id="sheet" role="dialog" aria-modal="true"></div></div>
+<div id="toast" role="status"></div>
+<div id="busy" class="hidden" role="status">⏳ 連線中…</div>
+
 <script>
-(() => {
-/* ============ 可調整的設定（改這裡就好） ============ */
-const TITLE = '喵喵太空跳';          // 遊戲名稱（顯示在 Logo 上）
-const CFG = {
-  gravity: 1500,      // 重力
-  jump: -820,         // 普通跳躍力道
-  spring: -1180,      // 彈簧平台力道
-  moveSpeed: 380,     // 左右移動速度
-  playerW: 104,       // 角色顯示寬度（px）
-  feetPad: 6,         // 角色腳底往上的空白（圖片底部有留白就調大）
-  platformW: 120      // 平台顯示寬度
+// ================= 常數 =================
+const SLOTS=[[560,370],[770,420],[430,470],[270,580],[160,680],[560,650],[770,710],[620,850],[850,860],[470,990],[270,970],[700,1070]];
+const STYLE_NAMES={1:'粉紅陽台屋',2:'紅屋頂木屋',3:'蘑菇屋',4:'藤蔓石屋',5:'藍屋頂小屋',6:'麵包坊',7:'魔法師小屋',8:'燈塔屋',9:'南瓜屋',10:'海邊小屋',11:'人魚貝殼屋',12:'綠頂莊園'};
+const SPECIES=[['狗','🐕'],['貓','🐈'],['兔','🐇'],['倉鼠','🐹'],['鳥','🐦'],['其他','🐾']];
+const spEmoji=s=>(SPECIES.find(x=>x[0]===s)||SPECIES[5])[1];
+const SPK={狗:'dog',貓:'cat',兔:'rabbit',倉鼠:'hamster',鳥:'bird',其他:'other'};
+const defHead=s=>`assets/pet_head_${SPK[s]||'other'}.webp`,defBody=s=>`assets/pet_body_${SPK[s]||'other'}.webp`;
+const petHead=p=>p.head||defHead(p.species),petBody=p=>p.body||defBody(p.species);
+const ROOMS=[['basic1','木質暖陽'],['basic2','復古木屋'],['basic3','森林小屋']];
+const roomImg=id=>`assets/room_${(ROOMS.find(r=>r[0]===id)||ROOMS[0])[0]}.webp`;
+const CARD_COLORS=[['蜜桃橘','#ff9a6b'],['櫻花粉','#f48fb1'],['天空藍','#64b5f6'],['薄荷綠','#5fbf95'],['薰衣草','#9b8cff'],['奶茶棕','#b98d62']];
+const NOTE_COLORS=['#ffe98a','#ffc7d4','#bfe3ff','#c9f0c0','#ffd6a8'];
+const MED_TYPES=['看診','疫苗','驅蟲','健檢','手術','用藥','其他'];
+const EXP_CATS=['飼料','零食','用品','醫療','美容','保險','其他'];
+const HOUR=3600e3;
+
+// ================= 本機資料（試做版存在這支手機的瀏覽器） =================
+const KEY='maohenduo_proto_v4';
+// ★ 接上 Google 試算表：把 Apps Script 部署網址（/exec 結尾）貼在這裡；留空＝試做模式（只存在這支手機）
+const API_URL='https://script.google.com/macros/s/AKfycbxPZVAM4VzgWgCmjhHfgi-o7JcJTyhkMUCIIxhF3OgDBQOTy-8C-XyUAZS0HEcy0Koq/exec';
+const ONLINE=!!API_URL;
+const OKEY='maohenduo_online_v1';
+let DB;
+function uid(){return Math.random().toString(36).slice(2,9)}
+function sha256(str){
+  const s=unescape(encodeURIComponent(str)),K=[],H=[];let p=2,n=0;
+  const isP=x=>{for(let f=2;f*f<=x;f++)if(x%f===0)return false;return true},fr=x=>((x-Math.floor(x))*4294967296)|0;
+  while(n<64){if(isP(p)){if(n<8)H[n]=fr(Math.pow(p,1/2));K[n]=fr(Math.pow(p,1/3));n++}p++}
+  const w=[],bl=s.length*8,words=[];for(let i=0;i<s.length;i++)words[i>>2]|=s.charCodeAt(i)<<((3-i%4)*8);
+  words[bl>>5]|=0x80<<(24-bl%32);words[((bl+64>>9)<<4)+15]=bl;
+  const rr=(v,a)=>(v>>>a)|(v<<(32-a));let h=H.slice();
+  for(let j=0;j<words.length;j+=16){const o=h.slice();
+    for(let i=0;i<64;i++){if(i<16)w[i]=words[j+i]|0;else{const a=w[i-15],b=w[i-2];w[i]=(w[i-16]+(rr(a,7)^rr(a,18)^(a>>>3))+w[i-7]+(rr(b,17)^rr(b,19)^(b>>>10)))|0}
+      const t1=(h[7]+(rr(h[4],6)^rr(h[4],11)^rr(h[4],25))+((h[4]&h[5])^(~h[4]&h[6]))+K[i]+w[i])|0,t2=((rr(h[0],2)^rr(h[0],13)^rr(h[0],22))+((h[0]&h[1])^(h[0]&h[2])^(h[1]&h[2])))|0;
+      h=[(t1+t2)|0].concat(h);h[4]=(h[4]+t1)|0;h.length=8}
+    for(let i=0;i<8;i++)h[i]=(h[i]+o[i])|0}
+  return h.map(x=>(x>>>0).toString(16).padStart(8,'0')).join('');
+}
+function hashPw(pw){return sha256('mhd:'+pw)}
+function todayTW(){try{return new Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Taipei'}).format(new Date())}catch(e){return new Date().toISOString().slice(0,10)}}
+function seed(){
+  const now=Date.now();const H=(slot,style,name,motto,pets)=>({id:uid(),slot,style,name,motto,pw:hashPw('1234'),room:'basic1',owned:['wood'],createdAt:now-86400e3*5,poops:[{id:uid(),x:220,y:1080},{id:uid(),x:640,y:990}],poopAt:now,_pets:pets});
+  const houses=[
+    H(1,2,'阿橘小屋','每天都在掉橘毛',[{name:'阿橘',species:'貓',breed:'橘貓',sex:'♂',birthday:'2020-04-01',color:'橘白',about:'飯量是別人的兩倍'}]),
+    H(2,3,'豆花蘑菇屋','',[{name:'豆花',species:'貓',breed:'玳瑁',sex:'♀',birthday:'2021-'+todayTW().slice(5),color:'黑橘玳瑁',about:'膽小但很愛吃，聽到罐頭聲會衝出來',card:'#f48fb1'}]),
+    H(3,4,'毛球莊','兩隻狗一隻貓',[{name:'毛球',species:'狗',breed:'博美',sex:'♂',birthday:'2019-12-24',color:'奶油',about:'看到鏡子會吵架'},{name:'黑糖',species:'貓',breed:'米克斯',sex:'♀',birthday:'2022-06-10',color:'黑',about:'夜行性'}]),
+    H(4,5,'小白窩','',[{name:'小白',species:'狗',breed:'柴犬',sex:'♀',birthday:'2021-09-09',color:'白柴',about:'不給摸屁股'}]),
+    H(5,6,'胖虎麵包坊','',[{name:'胖虎',species:'狗',breed:'法鬥',sex:'♂',birthday:'2022-01-15',color:'虎斑',about:'打呼很大聲'}]),
+    H(6,9,'南瓜家','',[{name:'南瓜',species:'兔',breed:'垂耳兔',sex:'♀',birthday:'2023-10-31',color:'橘',about:'會自己開籠子'}]),
+    H(8,10,'海風小屋','',[{name:'浪浪',species:'狗',breed:'米克斯',sex:'♂',birthday:'2024-03-03',color:'黑白',about:'剛被收編，還在適應'}]),
+    H(9,12,'可可莊園','',[{name:'可可',species:'倉鼠',breed:'黃金鼠',sex:'♀',birthday:'2025-05-05',color:'奶茶',about:'臉頰永遠塞滿'}]),
+  ];
+  const pets=[],weights=[];let no=1;
+  houses.forEach(h=>{h._pets.forEach(p=>{const id=uid();pets.push({id,houseId:h.id,no:no++,breed:'',fixed:'',chip:'',allergy:'',card:CARD_COLORS[(no)%6][1],createdAt:now-86400e3*4,...p});
+    const base={狗:6,貓:4.2,兔:1.8,倉鼠:0.12}[p.species]||3;
+    [['2026-05-01',0.92],['2026-07-01',0.96],['2026-09-01',0.99],['2026-11-01',1]].forEach(([d,k])=>weights.push({id:uid(),petId:id,date:d,kg:+(base*k).toFixed(2),createdAt:now}))});delete h._pets});
+  return {v:2,me:null,houses,pets,weights,medical:[],expenses:[],notes:[
+    {id:uid(),houseId:houses[1].id,by:'阿橘',text:'豆花今天好可愛！下次帶罐罐來',color:'#ffe98a',createdAt:now-HOUR*3},
+    {id:uid(),houseId:houses[1].id,by:'小白',text:'週末一起去狗公園嗎？',color:'#bfe3ff',createdAt:now-HOUR*2}],
+    feed:[{t:'阿橘 幫 豆花 清了大便 🧹',at:now-HOUR*0.2},{t:'小白 在 豆花蘑菇屋 貼了便利貼 📝',at:now-HOUR*2},{t:'胖虎 量了體重 ⚖️',at:now-HOUR*5},{t:'海風小屋 搬來了新成員「浪浪」🐾',at:now-86400e3}],
+    game:{tickets:1,prog:{poop:8,note:3,feed:4,weight:2},noteDay:['',0],feedAt:{},weightDay:''},owned:{},nextNo:no};
+}
+function emptyGame(){return {tickets:1,prog:{poop:0,note:0,feed:0,weight:0},noteDay:['',0],feedAt:{},weightDay:''}}
+function load(){
+  if(ONLINE){let o={};try{o=JSON.parse(localStorage.getItem(OKEY)||'{}')}catch(e){}
+    return {me:o.me||null,game:o.game||emptyGame(),houses:[],pets:[],weights:[],medical:[],expenses:[],notes:[],feed:[],owned:{},famOk:false}}
+  try{const s=localStorage.getItem(KEY);if(s)return JSON.parse(s)}catch(e){}return seed()}
+let pushT;
+function save(){
+  try{if(ONLINE)localStorage.setItem(OKEY,JSON.stringify({me:DB.me,game:DB.game}));else localStorage.setItem(KEY,JSON.stringify(DB))}catch(e){toast('手機空間不夠，這次的變更可能沒存到')}
+  if(ONLINE&&DB.me){clearTimeout(pushT);pushT=setTimeout(()=>api('savePlayer',{player:{id:DB.me.id,nick:DB.me.nick,game:DB.game}}).catch(()=>{}),1500)}
+}
+// ---------- 連線 ----------
+async function api(action,payload){
+  const res=await fetch(API_URL,{method:'POST',body:JSON.stringify(Object.assign({action},payload||{}))});
+  const j=await res.json();if(!j.ok)throw new Error(j.error||'連線失敗');return j.data;
+}
+let busyN=0;function busy(on){busyN+=on?1:-1;$('#busy').classList.toggle('hidden',busyN<=0)}
+const cred=()=>({playerId:DB.me&&DB.me.id,houseId:DB.me&&DB.me.houseId,pw:DB.me&&DB.me.pw});
+async function call(action,payload,quiet){
+  if(!ONLINE){const r=LOCAL[action](payload||{});save();return r}
+  if(!quiet)busy(true);
+  try{return await api(action,payload)}catch(e){if(/Failed to fetch|NetworkError|Load failed/.test(e.message))throw new Error('連不上小島，請檢查網路再試一次');throw e}
+  finally{if(!quiet)busy(false)}
+}
+let syncing=false;
+async function sync(quiet){
+  if(!ONLINE||syncing)return;syncing=true;
+  try{const d=await api('getState',cred());
+    Object.assign(DB,{houses:d.houses,pets:d.pets,weights:d.weights,medical:d.medical,expenses:d.expenses,notes:d.notes,feed:d.feed,famOk:d.famOk});
+    DB.houses.forEach(h=>{if(!Array.isArray(h.poops))h.poops=[]});
+    DB.owned={};d.houses.forEach(h=>DB.owned[h.id]=Array.isArray(h.owned)?h.owned:['wood']);
+    if(d.player&&DB.me){DB.me.houseId=d.player.houseId||null;if(!DB.gameSynced&&d.player.game&&d.player.game.prog&&!localStorage.getItem(OKEY+'_g')){DB.game=d.player.game}}
+    DB.gameSynced=true;try{localStorage.setItem(OKEY+'_g','1')}catch(e){}
+    save();rerender();
+  }catch(e){if(!quiet)toast('連不上小島：'+e.message)}
+  finally{syncing=false}
+}
+function rerender(){
+  if(home&&house(home.id)){$('#hname').textContent=house(home.id).name;$('#roombg').src=roomImg(house(home.id).room);const ids=petsOf(home.id).map(p=>p.id).join();if(ids!==home.pets.map(r=>r.id).join())openHome(home.id,true);else renderHome()}
+  else if(home){$('#back').click()}
+  else renderIsland();
+  tickerShow();
+}
+// ---------- 試做模式：在手機裡模擬後端 ----------
+const LOCAL={
+  savePlayer(){return true},
+  buildHouse({house:b,pw}){
+    if(DB.houses.some(h=>h.slot===b.slot))throw new Error('這塊地剛剛被別人蓋走了，換一塊吧');
+    if(DB.houses.some(h=>h.style===b.style))throw new Error('這款房子剛剛被選走了');
+    if(DB.houses.some(h=>h.name===b.name))throw new Error('島上已經有同名的家了');
+    const h={id:uid(),slot:b.slot,style:b.style,name:b.name,motto:b.motto,room:b.room,pw,owned:['wood'],poops:[],poopAt:Date.now(),createdAt:Date.now()};
+    DB.houses.push(h);feedPush(`${DB.me.nick} 在島上蓋了「${h.name}」🏡`);return {houseId:h.id}},
+  joinHouse({houseId,pw}){const h=house(houseId);if(!h||h.pw!==pw)throw new Error('密碼不對喔，再問一下家人');feedPush(`${DB.me.nick} 搬進了 ${h.name} 🏠`);return {houseId}},
+  leaveHouse(){return true},
+  updateHouse({houseId,pw,patch}){const h=house(houseId);if(h.pw!==pw)throw new Error('只有家人可以改');
+    if(patch.name!==undefined){if(DB.houses.some(x=>x.name===patch.name&&x.id!==h.id))throw new Error('島上已經有同名的家了');h.name=patch.name}
+    if(patch.motto!==undefined)h.motto=patch.motto;if(patch.room)h.room=patch.room;if(patch.newPw)h.pw=patch.newPw;return true},
+  savePet({houseId,pet:p}){let pet;
+    if(p.id){pet=DB.pets.find(x=>x.id===p.id);Object.assign(pet,p)}
+    else{pet=Object.assign({},p,{id:uid(),houseId,no:DB.nextNo++,createdAt:Date.now()});DB.pets.push(pet);feedPush(`${house(houseId).name} 搬來了新成員「${pet.name}」🐾`)}
+    return pet},
+  deletePet({petId}){DB.pets=DB.pets.filter(x=>x.id!==petId);['weights','medical','expenses'].forEach(k=>DB[k]=DB[k].filter(x=>x.petId!==petId));return true},
+  addRecord({kind,rec}){const r=Object.assign({},rec,{id:uid(),createdAt:Date.now()});DB[kind].push(r);if(kind==='weights')feedPush(`${pet(rec.petId).name} 量了體重 ⚖️`);return r},
+  deleteRecord({kind,id}){DB[kind]=DB[kind].filter(x=>x.id!==id);return true},
+  addNote({note}){const n={id:uid(),houseId:note.houseId,by:DB.me.nick,byId:DB.me.id,text:note.text,color:note.color,createdAt:Date.now()};DB.notes.push(n);feedPush(`${DB.me.nick} 在 ${house(note.houseId).name} 貼了便利貼 📝`);return n},
+  deleteNote({id}){DB.notes=DB.notes.filter(x=>x.id!==id);return true},
+  cleanPoop({houseId}){const h=house(houseId),nm=(petsOf(houseId)[0]||{}).name||h.name;feedPush(`${DB.me.nick} 幫 ${nm} 清了大便 🧹`);return {gone:false}},
+  feed({houseId}){feedPush(`${DB.me.nick} 在 ${house(houseId).name} 餵了飯 🍖`);return true},
+  drawCard({houseId,cardId,feedText}){const o=new Set(DB.owned[houseId]||['wood']);o.add(cardId);DB.owned[houseId]=[...o];if(feedText)feedPush(feedText);return {owned:DB.owned[houseId]}},
+  upload({dataUrl}){return {url:dataUrl}},
 };
-const IMG_DIR = 'images/';
-/* ================================================== */
+// ---------- 載入 ----------
+DB=load();
 
-const W = 480, H = 854;
-const canvas = document.getElementById('c');
-const ctx = canvas.getContext('2d');
-const DPR = 2;
-canvas.width = W * DPR; canvas.height = H * DPR;
-ctx.scale(DPR, DPR);
+// ================= 共用小工具 =================
+const $=s=>document.querySelector(s);
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+let tt;function toast(m){const t=$('#toast');t.textContent=m;t.classList.add('show');clearTimeout(tt);tt=setTimeout(()=>t.classList.remove('show'),2000)}
+let modalLocked=false;
+function openModal(html,locked,theme){const sh=$('#sheet');sh.classList.toggle('themed',!!theme);if(theme)sh.style.setProperty('--cc',theme);else sh.style.removeProperty('--cc');sh.innerHTML=html;$('#modal').classList.remove('hidden');modalLocked=!!locked;$('#sheet').scrollTop=0}
+function closeModal(){$('#modal').classList.add('hidden');$('#sheet').innerHTML='';$('#sheet').classList.remove('themed');modalLocked=false}
+$('#modal').addEventListener('click',e=>{if((e.target.id==='modal'&&!modalLocked)||e.target.closest('[data-close]'))closeModal()});
+const house=id=>DB.houses.find(h=>h.id===id);
+const pet=id=>DB.pets.find(p=>p.id===id);
+const petsOf=hid=>DB.pets.filter(p=>p.houseId===hid).sort((a,b)=>a.no-b.no);
+const myHouse=()=>DB.me&&DB.me.houseId?house(DB.me.houseId):null;
+const isFamily=hid=>!!(DB.me&&DB.me.houseId===hid&&DB.me.pw&&(!ONLINE||DB.famOk));
+function ageText(b){if(!b)return '—';const [y,m,d]=b.split('-').map(Number);const n=new Date();let mo=(n.getFullYear()-y)*12+(n.getMonth()+1-m);if(n.getDate()<d)mo--;
+  if(mo<0)return '—';const yy=Math.floor(mo/12),mm=mo%12;return yy?(yy+' 歲'+(mm?' '+mm+' 個月':'')):(mm?mm+' 個月':'未滿 1 個月')}
+function isBirthday(b){return b&&b.slice(5)===todayTW().slice(5)}
+function ago(ts){const s=(Date.now()-ts)/1000;if(s<60)return '剛剛';if(s<3600)return Math.floor(s/60)+' 分鐘前';if(s<86400)return Math.floor(s/3600)+' 小時前';return Math.floor(s/86400)+' 天前'}
+function feedPush(t){DB.feed.unshift({t,at:Date.now()});DB.feed=DB.feed.slice(0,60);save();fi=0;tickerShow()}
+function armBtn(btn,label){if(btn.classList.contains('armed'))return true;btn.classList.add('armed');const o=btn.textContent;btn.textContent=label||'再按一次確認';
+  setTimeout(()=>{if(btn.isConnected){btn.classList.remove('armed');btn.textContent=o}},3500);return false}
+const fld=(id,label,inner,hint)=>`<div class="field"><label for="${id}">${label}</label>${inner}${hint?`<div class="hint">${hint}</div>`:''}</div>`;
+function choiceGroup(id,opts,cur){return `<div class="choices" id="${id}" role="radiogroup">${opts.map(o=>`<button type="button" role="radio" data-v="${esc(o)}" class="${o===cur?'on':''}" aria-checked="${o===cur}">${esc(o)}</button>`).join('')}</div>`}
+function bindChoice(id,cb){const g=$('#'+id);g.onclick=e=>{const b=e.target.closest('button');if(!b)return;g.querySelectorAll('button').forEach(x=>{x.classList.toggle('on',x===b);x.setAttribute('aria-checked',x===b)});cb&&cb(b.dataset.v)}}
+const choiceVal=id=>{const b=$('#'+id+' button.on');return b?b.dataset.v:''};
 
-function fit() {
-  const s = Math.min(innerWidth / W, innerHeight / H);
-  canvas.style.width = W * s + 'px';
-  canvas.style.height = H * s + 'px';
-}
-addEventListener('resize', fit); fit();
-
-/* ---------- 圖片載入 ---------- */
-const NAMES = ['player_front','player_idle','player_jump','player_fall','player_land','player_dizzy','player_powerup',
-  'platform_normal','platform_spring','platform_fragile','platform_fragile_broken','platform_moving','platform_crystal',
-  'item_propeller','item_rocket','item_shield','item_star','enemy_alien','enemy_satellite',
-  'bg_space','bg_start_room','ui_btn_start','ui_btn_restart','ui_btn_home','ui_btn_pause','ui_btn_sound',
-  'ui_panel_score','ui_panel_gameover','ui_logo'];
-const imgs = {}; let loaded = 0;
-NAMES.forEach(n => {
-  const im = new Image();
-  im.onload = im.onerror = () => { loaded++; };
-  im.src = IMG_DIR + n + '.png';
-  imgs[n] = im;
-});
-const ok = n => imgs[n] && imgs[n].naturalWidth > 0;
-const asp = n => ok(n) ? imgs[n].naturalHeight / imgs[n].naturalWidth : 0.6;
-
-// 畫圖：x,y 是左上角，w 是寬度，高度依比例；找不到圖時畫洋紅色方塊提醒
-function draw(n, x, y, w, o = {}) {
-  const h = w * asp(n);
-  ctx.save();
-  if (o.alpha != null) ctx.globalAlpha = o.alpha;
-  if (!ok(n)) {
-    ctx.fillStyle = 'rgba(255,0,255,.45)'; ctx.fillRect(x, y, w, h);
-    ctx.fillStyle = '#fff'; ctx.font = '12px sans-serif'; ctx.textAlign = 'left';
-    ctx.fillText(n, x + 3, y + 14);
-  } else if (o.rot || o.flip) {
-    ctx.translate(x + w / 2, y + h / 2);
-    if (o.rot) ctx.rotate(o.rot);
-    if (o.flip) ctx.scale(-1, 1);
-    ctx.drawImage(imgs[n], -w / 2, -h / 2, w, h);
-  } else {
-    ctx.drawImage(imgs[n], x, y, w, h);
-  }
-  ctx.restore();
-  return h;
-}
-function text(s, x, y, size, color = '#5a4630', align = 'center', stroke) {
-  ctx.font = `bold ${size}px "PingFang TC","Microsoft JhengHei","Noto Sans TC",sans-serif`;
-  ctx.textAlign = align; ctx.textBaseline = 'middle';
-  if (stroke) { ctx.lineWidth = 5; ctx.strokeStyle = stroke; ctx.lineJoin = 'round'; ctx.strokeText(s, x, y); }
-  ctx.fillStyle = color; ctx.fillText(s, x, y);
-}
-const rand = (a, b) => a + Math.random() * (b - a);
-
-/* ---------- 音效（簡單電子音，免音檔） ---------- */
-let soundOn = true, actx;
-function beep(f, d = 0.1, type = 'sine', vol = 0.12) {
-  if (!soundOn) return;
-  try {
-    actx = actx || new (window.AudioContext || window.webkitAudioContext)();
-    const o = actx.createOscillator(), g = actx.createGain();
-    o.type = type; o.frequency.setValueAtTime(f, actx.currentTime);
-    o.frequency.exponentialRampToValueAtTime(f * 1.6, actx.currentTime + d);
-    g.gain.setValueAtTime(vol, actx.currentTime);
-    g.gain.exponentialRampToValueAtTime(0.001, actx.currentTime + d);
-    o.connect(g); g.connect(actx.destination); o.start(); o.stop(actx.currentTime + d);
-  } catch (e) {}
-}
-
-/* ---------- 狀態 ---------- */
-let state = 'start';   // start | play | pause | over
-let best = 0;
-try { best = +localStorage.getItem('catjump_best') || 0; } catch (e) {}
-let score, scrollTotal, bonus, bgOffset, plats, items, enemies, pieces, player, fx, dying, topY, newBest;
-const keys = {}; let touchDir = 0;
-let buttons = [];
-
-const PH = () => CFG.playerW * asp('player_idle');
-const TOP_OFF = { normal: .06, spring: .02, fragile: .06, moving: .32, crystal: .06 };
-
-function reset() {
-  score = 0; scrollTotal = 0; bonus = 0; bgOffset = 0; newBest = false;
-  plats = []; items = []; enemies = []; pieces = [];
-  player = { x: W / 2, y: H - 170, vx: 0, vy: CFG.jump, dir: -1, land: 0 };
-  fx = { prop: 0, rocket: 0, shield: 0 };
-  dying = false;
-  plats.push({ type: 'normal', x: W / 2 - CFG.platformW / 2, y: H - 160, vx: 0, a: 1 });
-  topY = H - 160;
-  fill();
-}
-function fill() {
-  while (topY > -300) {
-    const diff = Math.min(1, score / 6000);
-    topY -= rand(70, 110 + diff * 70);
-    const last = plats[plats.length - 1];
-    let type = 'normal'; const r = Math.random();
-    if (r < 0.07) type = 'spring';
-    else if (r < 0.14) type = 'crystal';
-    else if (r < 0.14 + 0.05 + 0.2 * diff) type = 'moving';
-    else if (r < 0.14 + 0.05 + 0.2 * diff + 0.08 + 0.12 * diff && last.type !== 'fragile') type = 'fragile';
-    const p = { type, x: rand(10, W - CFG.platformW - 10), y: topY, vx: type === 'moving' ? (Math.random() < .5 ? -1 : 1) * (60 + diff * 80) : 0, a: 1 };
-    plats.push(p);
-    const pw = CFG.platformW;
-    if (type === 'normal' && Math.random() < 0.18) {
-      const r2 = Math.random();
-      const t = r2 < 0.06 ? 'rocket' : r2 < 0.16 ? 'propeller' : r2 < 0.28 ? 'shield' : 'star';
-      const iw = t === 'star' ? 44 : 56;
-      items.push({ type: t, x: p.x + pw / 2, y: p.y + pw * asp('platform_normal') * TOP_OFF.normal, w: iw });
-    }
-    if (score > 400 && Math.random() < 0.05 + 0.07 * diff) {
-      enemies.push({ type: Math.random() < .5 ? 'alien' : 'satellite', x: rand(60, W - 60), y: topY - 70, t: rand(0, 6), vx: (Math.random() < .5 ? -1 : 1) * rand(30, 70), alive: true });
-    }
-  }
-}
-function startGame() { reset(); state = 'play'; beep(520, .15); }
-function gameOver() {
-  state = 'over';
-  if (score > best) { best = score; newBest = true; try { localStorage.setItem('catjump_best', best); } catch (e) {} }
-  beep(180, .4, 'triangle');
-}
-
-/* ---------- 更新 ---------- */
-function update(dt) {
-  if (state !== 'play') return;
-  const g = CFG.gravity;
-  // 碎片
-  pieces.forEach(p => { p.vy += g * dt; p.y += p.vy * dt; p.a -= dt * 0.8; p.rot += p.vr * dt; });
-  pieces = pieces.filter(p => p.a > 0 && p.y < H + 100);
-  plats.forEach(p => {
-    if (p.type === 'moving') { p.x += p.vx * dt; if (p.x < 5 || p.x > W - CFG.platformW - 5) p.vx *= -1; }
-    if (p.used) p.a -= dt * 3;
+// ================= 小島 =================
+const HOUSE_W=150,LOT_W=110;let mode='auto',picking=false;
+function taipeiHour(){try{return +new Intl.DateTimeFormat('en-US',{timeZone:'Asia/Taipei',hour:'numeric',hour12:false}).format(new Date())%24}catch(e){return new Date().getHours()}}
+function autoPeriod(){const h=taipeiHour();return h>=5&&h<7?'dawn':h>=7&&h<17?'day':h>=17&&h<19?'sunset':'night'}
+const period=()=>mode==='auto'?autoPeriod():mode;
+const ipct=(x,y)=>({left:(x/1024*100)+'%',top:(y/1536*100)+'%'});
+function renderIsland(){
+  const p=period();
+  document.querySelectorAll('#island .bg').forEach(b=>b.classList.toggle('on',b.dataset.p===p));
+  document.querySelectorAll('#bar button').forEach(b=>b.classList.toggle('on',b.dataset.p===mode));
+  const box=$('#things');box.innerHTML='';const used=new Map(DB.houses.map(h=>[h.slot,h]));
+  SLOTS.map((s,i)=>({s,i})).sort((a,b)=>a.s[1]-b.s[1]).forEach(({s:[x,y],i})=>{
+    const h=used.get(i);const el=document.createElement('div');el.className='thing'+(!h&&picking?' pick':'');
+    el.setAttribute('role','button');el.tabIndex=0;el.setAttribute('aria-label',h?h.name:'空地，可以蓋房子');
+    Object.assign(el.style,ipct(x,y),{width:((h?HOUSE_W:LOT_W)/1024*100)+'%',zIndex:y});
+    el.innerHTML=`<img src="assets/${h?'house'+h.style:'empty_lot'}_${p}.webp" alt="">`;
+    el.onclick=()=>h?openHome(h.id):lotClick(i);
+    box.appendChild(el);
+    const lb=document.createElement('div');lb.className='label'+(h?(isFamily(h.id)?' mine':''):' lot');lb.textContent=h?(isFamily(h.id)?'🏠 ':'')+h.name:'＋';
+    Object.assign(lb.style,ipct(x,y+6),{zIndex:2000});box.appendChild(lb);
+    if(h&&petsOf(h.id).some(pp=>isBirthday(pp.birthday))){const bb=document.createElement('div');bb.className='bubble';bb.textContent='🎂';Object.assign(bb.style,ipct(x+40,y-150),{zIndex:2001});box.appendChild(bb)}
   });
+  $('#pickbar').classList.toggle('hidden',!picking);$('#ticker').classList.toggle('hidden',picking);
+  renderMe();updTix();
+}
+function renderMe(){
+  const h=myHouse();const p=h&&petsOf(h.id)[0];
+  $('#me').innerHTML=p?`<img src="${petHead(p)}" alt="">`:'🙂';
+}
+$('#bar').onclick=e=>{const b=e.target.closest('button');if(!b)return;mode=b.dataset.p;renderIsland()};
+$('#pickcancel').onclick=()=>{picking=false;renderIsland()};
+function lotClick(slot){
+  if(!DB.me)return onboarding();
+  if(myHouse()){picking=false;renderIsland();return toast('你已經有家了，一個人只能住一間喔')}
+  picking=false;buildFlow(slot);
+}
 
-  if (dying) {
-    player.vy += g * dt; player.y += player.vy * dt;
-    if (player.y - 160 > H) gameOver();
-    return;
+// ================= 第一次打開 =================
+function onboarding(step){
+  if(!step){
+    openModal(`<h3>🏝️ 歡迎來到毛很多</h3><p class="lead">先取一個暱稱，大家在動態和便利貼上會看到這個名字</p>
+      ${fld('nick','你的暱稱',`<input id="nick" maxlength="12" placeholder="例如：小麥" value="${esc(DB.me?.nick||'')}">`)}
+      <div class="err" id="nerr"></div><div class="row2"><button class="primary" id="nnext">下一步</button></div>`,true);
+    $('#nnext').onclick=async()=>{const n=$('#nick').value.trim();if(!n){$('#nerr').textContent='請先輸入暱稱';return}
+      const me={id:DB.me?.id||(uid()+uid()),nick:n,houseId:DB.me?.houseId||null,pw:DB.me?.pw||''};
+      try{await call('savePlayer',{player:{id:me.id,nick:n,game:DB.game}})}catch(e){$('#nerr').textContent=e.message;return}
+      DB.me=me;save();onboarding(2)};
+    $('#nick').onkeydown=e=>{if(e.key==='Enter')$('#nnext').click()};
+    setTimeout(()=>$('#nick')?.focus(),60);return;
   }
+  openModal(`<h3>嗨，${esc(DB.me.nick)}！</h3><p class="lead">你想怎麼開始？之後都可以在右上角的設定裡改</p>
+    <div class="big3">
+      <button id="o1"><span class="e">🏠</span><span>蓋我自己的家<small>在島上選一塊空地，替你的毛孩建檔</small></span></button>
+      <button id="o2"><span class="e">🔑</span><span>加入家人的家<small>家人已經蓋好房子，你有家人密碼</small></span></button>
+      <button id="o3"><span class="e">👀</span><span>先逛逛<small>去朋友家看看毛孩、幫忙鏟屎</small></span></button>
+    </div>`,true);
+  $('#o1').onclick=()=>{closeModal();picking=true;renderIsland();toast('點一塊「＋」空地')};
+  $('#o2').onclick=()=>joinFlow();
+  $('#o3').onclick=()=>{closeModal();renderIsland();toast('逛逛吧！想蓋房子時點空地的「＋」')};
+}
+function joinFlow(hid){
+  const list=DB.houses.slice().sort((a,b)=>a.name.localeCompare(b.name,'zh-Hant'));
+  openModal(`<h3>🔑 加入家人的家</h3><p class="lead">選一個家，輸入家人告訴你的密碼</p>
+    ${fld('jh','哪一個家？',`<select id="jh">${list.map(h=>`<option value="${h.id}" ${h.id===hid?'selected':''}>${esc(h.name)}</option>`).join('')}</select>`)}
+    ${fld('jp','家人密碼',`<input id="jp" type="password" autocomplete="off">`,'試做版的示範家庭，密碼都是 1234')}
+    <div class="err" id="jerr"></div>
+    <div class="row2"><button data-close>取消</button><button class="primary" id="jok">加入</button></div>`);
+  $('#jok').onclick=async()=>{const h=house($('#jh').value),pw=hashPw($('#jp').value);
+    try{await call('joinHouse',{playerId:DB.me.id,houseId:h.id,pw})}catch(e){$('#jerr').textContent=e.message;return}
+    DB.me.houseId=h.id;DB.me.pw=pw;DB.famOk=true;save();closeModal();toast(`歡迎回家！你現在是「${h.name}」的家人`);
+    if(!$('#home').classList.contains('hidden'))openHome(h.id);else renderIsland();sync(true)};
+}
 
-  const dir = (keys.left ? -1 : 0) + (keys.right ? 1 : 0) || touchDir;
-  player.vx += (dir * CFG.moveSpeed - player.vx) * Math.min(1, 12 * dt);
-  player.x += player.vx * dt;
-  if (player.x < -20) player.x = W + 20;
-  if (player.x > W + 20) player.x = -20;
-  if (Math.abs(player.vx) > 25) player.dir = player.vx > 0 ? 1 : -1;
-  player.land = Math.max(0, player.land - dt);
-  fx.prop = Math.max(0, fx.prop - dt); fx.rocket = Math.max(0, fx.rocket - dt); fx.shield = Math.max(0, fx.shield - dt);
-
-  const flying = fx.prop > 0 || fx.rocket > 0;
-  if (fx.rocket > 0) player.vy = -1100; else if (fx.prop > 0) player.vy = -560; else player.vy += g * dt;
-  const prevFeet = player.y - CFG.feetPad;
-  player.y += player.vy * dt;
-  const feet = player.y - CFG.feetPad;
-
-  // 踩平台
-  if (player.vy > 0 && !flying) {
-    for (const p of plats) {
-      if (p.broken || p.used) continue;
-      const ph = CFG.platformW * asp('platform_' + p.type);
-      const top = p.y + ph * TOP_OFF[p.type];
-      if (prevFeet <= top + 6 && feet >= top && Math.abs(player.x - (p.x + CFG.platformW / 2)) < CFG.platformW / 2 + 18) {
-        player.y = top + CFG.feetPad; player.land = 0.14;
-        if (p.type === 'spring') { player.vy = CFG.spring; beep(700, .2, 'square', .08); }
-        else if (p.type === 'fragile') {
-          p.broken = true; player.vy = CFG.jump * 0.55; beep(160, .25, 'sawtooth', .08);
-          pieces.push({ x: p.x, y: p.y, vy: -150, vr: rand(-1, 1), rot: 0, a: 1 });
-        } else if (p.type === 'crystal') { p.used = true; player.vy = CFG.jump; beep(880, .15, 'triangle'); }
-        else { player.vy = CFG.jump; beep(440, .1); }
-        break;
-      }
-    }
+// ================= 蓋房子 =================
+function buildFlow(slot){
+  const B={slot,style:null,name:'',motto:'',room:'basic1'};
+  const taken=new Set(DB.houses.map(h=>h.style));
+  const steps=n=>`<div class="steps">${[1,2,3].map(i=>`<i class="${i<=n?'on':''}"></i>`).join('')}</div>`;
+  function s1(){
+    openModal(`<h3>🏠 選一款房子</h3>${steps(1)}<p class="lead">每款房子島上只有一間，被選走就沒了</p>
+      <div class="styles" id="sty">${Object.keys(STYLE_NAMES).map(n=>`<button data-s="${n}" ${taken.has(+n)?'disabled':''} class="${+n===B.style?'on':''}" aria-label="${STYLE_NAMES[n]}${taken.has(+n)?'（已有人住）':''}"><img src="assets/house${n}_day.webp" alt=""></button>`).join('')}</div>
+      <div class="hint" id="stn" style="text-align:center;margin:8px 0 14px">${B.style?STYLE_NAMES[B.style]:'點一間喜歡的'}</div>
+      <div class="row2 sticky"><button data-close>取消</button><button class="primary" id="b1" ${B.style?'':'disabled'}>下一步</button></div>`);
+    $('#sty').onclick=e=>{const b=e.target.closest('button');if(!b||b.disabled)return;B.style=+b.dataset.s;$('#sty').querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===b));$('#stn').textContent=STYLE_NAMES[B.style];$('#b1').disabled=false};
+    $('#b1').onclick=s2;
   }
-
-  // 捲動
-  const line = H * 0.42;
-  if (player.y < line) {
-    const d = line - player.y; player.y = line;
-    plats.forEach(p => p.y += d); items.forEach(i => i.y += d); enemies.forEach(e => e.y += d); pieces.forEach(p => p.y += d);
-    topY += d; scrollTotal += d; bgOffset += d * 0.25;
+  function s2(){
+    openModal(`<h3>🏷️ 幫你的家取名字</h3>${steps(2)}
+      ${fld('bn','家的名字',`<input id="bn" maxlength="10" value="${esc(B.name)}" placeholder="例如：麥麥的家">`,'會顯示在島上房子下面，10 個字以內')}
+      ${fld('bm','一句話介紹（可不填）',`<input id="bm" maxlength="20" value="${esc(B.motto)}" placeholder="例如：每天都在掉毛">`)}
+      <div class="field"><div class="flabel">家裡的房間</div>${roomPicker('brm',B.room)}</div>
+      <div class="err" id="berr"></div>
+      <div class="row2"><button id="bb">上一步</button><button class="primary" id="b2">下一步</button></div>`);
+    bindRoom('brm',v=>B.room=v);
+    $('#bb').onclick=()=>{B.name=$('#bn').value;B.motto=$('#bm').value;s1()};
+    $('#b2').onclick=()=>{B.name=$('#bn').value.trim();B.motto=$('#bm').value.trim();
+      if(!B.name){$('#berr').textContent='請幫你的家取個名字';return}
+      if(DB.houses.some(h=>h.name===B.name)){$('#berr').textContent='島上已經有同名的家了，換一個吧';return}s3()};
+    setTimeout(()=>$('#bn')?.focus(),60);
   }
-  score = Math.floor(scrollTotal / 8) + bonus;
-  plats = plats.filter(p => p.y < H + 120 && !(p.broken) && p.a > 0);
-  items = items.filter(i => i.y < H + 100);
-  enemies = enemies.filter(e => e.y < H + 100 && e.alive);
-  fill();
-
-  // 身體框
-  const body = { l: player.x - 26, r: player.x + 26, t: player.y - PH() * 0.85, b: player.y - CFG.feetPad };
-
-  // 道具
-  items = items.filter(it => {
-    const ih = it.w * asp('item_' + it.type);
-    const hit = body.r > it.x - it.w / 2 && body.l < it.x + it.w / 2 && body.b > it.y - ih && body.t < it.y;
-    if (!hit) return true;
-    if (it.type === 'star') { bonus += 100; beep(1000, .12, 'triangle'); }
-    else if (it.type === 'shield') { fx.shield = 9; beep(600, .2, 'triangle'); }
-    else if (it.type === 'propeller') { fx.prop = 4; beep(500, .3, 'square', .06); }
-    else if (it.type === 'rocket') { fx.rocket = 2.4; beep(300, .4, 'sawtooth', .07); }
-    return false;
-  });
-
-  // 敵人
-  for (const e of enemies) {
-    e.t += dt;
-    if (e.type === 'alien') { e.x += e.vx * dt; if (e.x < 50 || e.x > W - 50) e.vx *= -1; e.y += Math.sin(e.t * 2) * 0.6; }
-    else { e.x += Math.sin(e.t * 1.6) * 90 * dt; e.y += Math.cos(e.t * 1.2) * 0.8; }
-    const ew = e.type === 'alien' ? 84 : 84, eh = ew * asp('enemy_' + e.type);
-    const er = { l: e.x - ew * .42, r: e.x + ew * .42, t: e.y - eh / 2, b: e.y + eh / 2 };
-    if (body.r > er.l && body.l < er.r && body.b > er.t && body.t < er.b) {
-      if (flying) { e.alive = false; bonus += 50; beep(300, .2, 'square'); }
-      else if (player.vy > 0 && prevFeet <= e.y) { e.alive = false; player.vy = CFG.jump; bonus += 50; beep(760, .15, 'square', .08); }
-      else if (fx.shield > 0) { fx.shield = 0; e.alive = false; beep(300, .25, 'square'); }
-      else { dying = true; player.vy = -420; beep(150, .4, 'sawtooth'); break; }
-    }
+  function s3(){
+    openModal(`<h3>🔑 設定家人密碼</h3>${steps(3)}<p class="lead">一起照顧毛孩的家人輸入這組密碼，就能一起編輯資料、看醫療和支出紀錄</p>
+      ${fld('p1','家人密碼',`<input id="p1" type="password" minlength="4" autocomplete="new-password">`,'至少 4 個字，只告訴家人就好')}
+      ${fld('p2','再輸入一次',`<input id="p2" type="password" autocomplete="new-password">`)}
+      <div class="err" id="perr"></div>
+      <div class="row2"><button id="pb">上一步</button><button class="primary" id="b3">蓋好了！</button></div>`);
+    $('#pb').onclick=s2;
+    $('#b3').onclick=async()=>{const a=$('#p1').value,b=$('#p2').value;
+      if(a.length<4){$('#perr').textContent='密碼至少 4 個字';return}
+      if(a!==b){$('#perr').textContent='兩次輸入的密碼不一樣';return}
+      const pw=hashPw(a);let r;
+      try{r=await call('buildHouse',{playerId:DB.me.id,house:{slot:B.slot,style:B.style,name:B.name,motto:B.motto,room:B.room},pw})}catch(e){$('#perr').textContent=e.message;return}
+      DB.me.houseId=r.houseId;DB.me.pw=pw;DB.famOk=true;save();
+      if(ONLINE)await sync(true);
+      closeModal();renderIsland();openHome(r.houseId);setTimeout(()=>petForm(r.houseId),600)};
   }
-  if (!dying && player.y - 20 > H) gameOver();
+  s1();
 }
 
-/* ---------- 繪製 ---------- */
-function btn(n, cx, cy, w, fn, label, lsize = 26) {
-  const h = draw(n, cx - w / 2, cy - (w * asp(n)) / 2, w);
-  buttons.push({ x: cx - w / 2, y: cy - h / 2, w, h, fn });
-  if (label) text(label, cx, cy, lsize, '#5a4630');
-  return h;
+function roomPicker(id,cur){return `<div class="rooms" id="${id}">${ROOMS.map(([k,n])=>`<button type="button" data-v="${k}" class="${k===cur?'on':''}"><img src="assets/room_${k}.webp" alt=""><span>${n}</span></button>`).join('')}</div><div class="hint">抽卡可以解鎖更多房間（換房間功能之後加）</div>`}
+function bindRoom(id,cb){const g=$('#'+id);g.onclick=e=>{const b=e.target.closest('button');if(!b)return;g.querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===b));cb(b.dataset.v)}}
+// ================= 家裡 =================
+const RW=848,RH=1264,FLOOR={x0:90,x1:770,y0:830,y1:1170},BOARD={x:392,y:308,w:286,h:192};
+const hp=(x,y)=>({left:(x/RW*100)+'%',top:(y/RH*100)+'%'});
+let home=null,raf=0,last=0;
+function spawnPoops(h){
+  const n=petsOf(h.id).length;if(!n){h.poopAt=Date.now();return}
+  const every=2*HOUR,k=Math.floor((Date.now()-(h.poopAt||Date.now()))/every)*n;
+  for(let i=0;i<k&&h.poops.length<3*n;i++)h.poops.push({id:uid(),x:FLOOR.x0+60+Math.random()*(FLOOR.x1-FLOOR.x0-120),y:FLOOR.y0+60+Math.random()*(FLOOR.y1-FLOOR.y0-60)});
+  if(k)h.poopAt=Date.now();save();
 }
-function soundBtn(cx, cy, w = 52) {
-  btn('ui_btn_sound', cx, cy, w, () => { soundOn = !soundOn; });
-  if (!soundOn) {
-    ctx.save(); ctx.strokeStyle = '#c0392b'; ctx.lineWidth = 5; ctx.lineCap = 'round';
-    ctx.beginPath(); ctx.moveTo(cx - w * .32, cy - w * .32); ctx.lineTo(cx + w * .32, cy + w * .32); ctx.stroke(); ctx.restore();
-  }
+function openHome(hid,keep){
+  const h=house(hid);if(!h)return;
+  $('#island').classList.add('hidden');$('#home').classList.remove('hidden');
+  $('#hname').textContent=h.name;$('#roombg').src=roomImg(h.room);if(!ONLINE)spawnPoops(h);
+  const prev=home&&home.id===hid?home.pets:[];
+  home={id:hid,pets:petsOf(hid).map((p,i)=>{const o=prev.find(q=>q.id===p.id);return {id:p.id,x:o?o.x:240+(i%3)*200,y:o?o.y:940+(i%2)*120,tx:0,ty:0,state:'idle',until:performance.now()+600+i*700,facing:1,hop:0}}),bowl:null};
+  renderHome();cancelAnimationFrame(raf);last=performance.now();raf=requestAnimationFrame(tick);
+  if(ONLINE&&!keep)sync(true);
+  $('#foot').innerHTML=isFamily(hid)?'這是你家！右上角可以新增毛孩、編輯家的資料。點毛孩看身分證，可以記錄體重、醫療和支出。':'朋友家：點地上的 💩 幫忙清掉、點毛孩摸頭或看身分證、餵飯、在軟木板上貼便利貼。';
+  window.scrollTo(0,0);
 }
-function drawBg() {
-  const bh = W * asp('bg_space');
-  const off = bgOffset % bh;
-  if (!ok('bg_space')) { ctx.fillStyle = '#14234a'; ctx.fillRect(0, 0, W, H); }
-  for (let y = off - bh; y < H; y += bh) draw('bg_space', 0, y, W);
+function renderHome(){
+  const h=house(home.id);
+  $('#famtools').innerHTML=isFamily(h.id)?`<button class="act" id="ft1">＋ 毛孩</button><button class="act" id="ft2">⚙️ 家</button>`:(DB.me&&!DB.me.houseId?`<button class="act" id="ft3">🔑 我是家人</button>`:'');
+  if($('#ft1'))$('#ft1').onclick=()=>petForm(h.id);
+  if($('#ft2'))$('#ft2').onclick=()=>houseSettings(h.id);
+  if($('#ft3'))$('#ft3').onclick=()=>joinFlow(h.id);
+  const ps=petsOf(h.id);
+  $('#emptyhome').innerHTML=ps.length?'':`<div class="empty-home">${isFamily(h.id)?'家裡還沒有毛孩<br><button id="eh">＋ 新增第一隻毛孩</button>':'這個家還在準備中'}</div>`;
+  if($('#eh'))$('#eh').onclick=()=>petForm(h.id);
+  renderBoard();renderFloor();
 }
-function drawPlayer() {
-  const px = player.x, py = player.y;
-  let spr = 'player_fall';
-  if (dying) spr = 'player_dizzy';
-  else if (fx.prop > 0 || fx.rocket > 0) spr = 'player_powerup';
-  else if (player.land > 0) spr = 'player_land';
-  else if (player.vy < 0) spr = 'player_jump';
-  const w = CFG.playerW, h = w * asp(spr);
-  if (fx.rocket > 0 && !dying) draw('item_rocket', px - 30 - player.dir * -14, py - h * .62, 60);
-  draw(spr, px - w / 2, py - h, w, { flip: player.dir > 0 });
-  if (fx.prop > 0 && !dying) draw('item_propeller', px - 30, py - h * 1.0 - 4 + Math.sin(performance.now() / 60) * 2, 60);
-  if (fx.shield > 0 && !dying) draw('item_shield', px - 70, py - h * .55 - 70, 140, { alpha: fx.shield < 2 ? (Math.floor(performance.now() / 120) % 2 ? .3 : .8) : .8 });
+$('#back').onclick=()=>{cancelAnimationFrame(raf);home=null;if(ONLINE)sync(true);$('#home').classList.add('hidden');$('#island').classList.remove('hidden');renderIsland();renderFoot();window.scrollTo(0,0)};
+function renderBoard(){
+  const b=$('#board');Object.assign(b.style,hp(BOARD.x,BOARD.y),{width:(BOARD.w/RW*100)+'%',height:(BOARD.h/RH*100)+'%'});
+  const all=DB.notes.filter(n=>n.houseId===home.id).sort((a,c)=>a.createdAt-c.createdAt),list=all.slice(-5);
+  b.innerHTML=list.map((n,i)=>`<button class="note" data-id="${n.id}" style="background:${n.color};transform:rotate(${[-4,3,-2,5,-3][i%5]}deg)">
+    <span>${esc([...n.text].slice(0,14).join(''))}${[...n.text].length>14?'…':''}</span><small>— ${esc(n.by)}</small></button>`).join('')
+    +`<button class="note empty" id="boardadd" aria-label="貼便利貼">＋</button>`;
+  b.querySelectorAll('.note[data-id]').forEach(el=>el.onclick=()=>noteView(el.dataset.id));
+  $('#boardadd').onclick=noteForm;
 }
-function drawWorld() {
-  drawBg();
-  plats.forEach(p => draw('platform_' + p.type, p.x, p.y, CFG.platformW, { alpha: Math.max(0, p.a) }));
-  pieces.forEach(p => draw('platform_fragile_broken', p.x - 10, p.y, CFG.platformW + 20, { alpha: Math.max(0, p.a), rot: p.rot }));
-  items.forEach(i => { const bob = Math.sin(performance.now() / 300 + i.x) * 3; draw('item_' + i.type, i.x - i.w / 2, i.y - i.w * asp('item_' + i.type) + bob, i.w); });
-  enemies.forEach(e => { const ew = 84; draw('enemy_' + e.type, e.x - ew / 2, e.y - ew * asp('enemy_' + e.type) / 2, ew); });
-  if (state !== 'over') drawPlayer();
+function noteView(id){
+  const n=DB.notes.find(x=>x.id===id);const canTear=isFamily(n.houseId)||(DB.me&&n.byId===DB.me.id);
+  openModal(`<h3>📝 ${esc(n.by)} 的便利貼</h3><p class="lead">${ago(n.createdAt)}</p><div style="background:${n.color};padding:18px;border-radius:6px;font-size:18px;line-height:1.6;box-shadow:0 2px 4px rgba(0,0,0,.15);white-space:pre-wrap;user-select:text">${esc(n.text)}</div>
+    ${canTear?'<button class="btn-d" id="tear">撕掉這張</button>':''}<div class="row2"><button data-close>關閉</button></div>`);
+  if($('#tear'))$('#tear').onclick=async e=>{if(!armBtn(e.target,'確定要撕掉嗎？再按一次'))return;
+    try{await call('deleteNote',{id,playerId:DB.me.id,pw:isFamily(n.houseId)?DB.me.pw:''})}catch(err){toast(err.message);return}
+    DB.notes=DB.notes.filter(x=>x.id!==id);closeModal();renderBoard();toast('撕掉了')};
 }
-function hud() {
-  const pw = 170, ph = draw('ui_panel_score', 12, 12, pw);
-  text('分數 ' + score, 12 + pw / 2, 12 + ph / 2, 22);
-  text('最高 ' + Math.max(best, score), 16, 12 + ph + 16, 16, '#fff', 'left', 'rgba(0,0,0,.4)');
-  btn('ui_btn_pause', W - 40, 40, 52, () => { state = state === 'play' ? 'pause' : 'play'; });
-  soundBtn(W - 100, 40);
-  // 道具剩餘時間
-  let ty = 12 + ph + 44;
-  [['prop', '螺旋槳'], ['rocket', '火箭'], ['shield', '護盾']].forEach(([k, nm]) => {
-    if (fx[k] > 0) { text(nm + ' ' + fx[k].toFixed(1) + 's', 16, ty, 15, '#fff', 'left', 'rgba(0,0,0,.4)'); ty += 22; }
-  });
+function needMe(){if(!DB.me){onboarding();return false}return true}
+function noteForm(){
+  if(!needMe())return;let color=NOTE_COLORS[0];const h=house(home.id);
+  openModal(`<h3>📝 在「${esc(h.name)}」貼便利貼</h3>
+    ${fld('nt','想說的話（40 字以內）',`<textarea id="nt" maxlength="40" placeholder="例如：今天也好可愛！"></textarea>`)}<div class="count" id="ntc">0 / 40</div>
+    <div class="flabel">便利貼顏色</div><div class="swatches" id="ncol">${NOTE_COLORS.map((c,i)=>`<button style="background:${c}" data-c="${c}" class="${i?'':'on'}" aria-label="顏色 ${i+1}"></button>`).join('')}</div>
+    <div class="err" id="nerr"></div>
+    <div class="row2"><button data-close>取消</button><button class="primary" id="nsave">貼上去</button></div>`);
+  const ta=$('#nt');ta.oninput=()=>{$('#ntc').textContent=[...ta.value].length+' / 40';$('#nerr').textContent=''};
+  $('#ncol').onclick=e=>{const b=e.target.closest('button');if(!b)return;color=b.dataset.c;$('#ncol').querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===b))};
+  $('#nsave').onclick=async()=>{const t=ta.value.trim();if(!t){$('#nerr').textContent='先寫點什麼再貼喔';return}
+    let n;try{n=await call('addNote',{playerId:DB.me.id,note:{houseId:h.id,text:t,color}})}catch(e){$('#nerr').textContent=e.message;return}
+    if(ONLINE){DB.notes.push(n);feedPush(`${DB.me.nick} 在 ${h.name} 貼了便利貼 📝`)}
+    closeModal();renderBoard();toast('便利貼貼好了 📝');
+    if(!isFamily(h.id)){const g=DB.game,d=todayTW();if(g.noteDay[0]!==d)g.noteDay=[d,0];if(g.noteDay[1]<3){g.noteDay[1]++;progress('note')}}};
+  setTimeout(()=>ta.isConnected&&ta.focus(),60);
 }
-function dim(a = .5) { ctx.fillStyle = `rgba(8,14,34,${a})`; ctx.fillRect(0, 0, W, H); }
+$('#addnote').onclick=noteForm;
+const petScale=y=>0.78+0.32*(y-FLOOR.y0)/(FLOOR.y1-FLOOR.y0);
+function renderFloor(){
+  const f=$('#floor');f.innerHTML='';const h=house(home.id);
+  h.poops.forEach((p,i)=>{const el=document.createElement('button');el.className='poop';el.textContent='💩';el.setAttribute('aria-label','清大便');
+    Object.assign(el.style,hp(p.x,p.y),{zIndex:Math.round(p.y)});
+    el.onclick=()=>{if(!needMe())return;fx('✨',p.x,p.y-40);h.poops=h.poops.filter(x=>x.id!==p.id);renderFloor();const nm=(petsOf(h.id)[0]||{}).name||h.name;
+      call('cleanPoop',{playerId:DB.me.id,houseId:h.id,poopId:p.id},true).then(r=>{if(r&&r.gone)toast('有人比你早一步掃掉了 😆');else{toast(`你幫 ${nm} 清了大便 🧹`);progress('poop');if(ONLINE)feedPush(`${DB.me.nick} 幫 ${nm} 清了大便 🧹`)}}).catch(e=>toast(e.message))};f.appendChild(el)});
+  if(home.bowl){const el=document.createElement('div');el.className='bowl';el.textContent='🥣';Object.assign(el.style,hp(home.bowl.x,home.bowl.y),{zIndex:Math.round(home.bowl.y)});f.appendChild(el)}
+  home.pets.forEach(r=>{const p=pet(r.id);if(!p)return;
+    const el=document.createElement('div');el.className='pet';el.setAttribute('role','button');el.setAttribute('aria-label',p.name);el.tabIndex=0;
+    el.innerHTML=`<div class="body"><img src="${petBody(p)}" alt=""><div class="shadow"></div></div><span class="nm">${esc(p.name)}</span>`;
+    const im=el.querySelector('img');r.ar=1;im.onload=()=>{r.ar=im.naturalHeight/im.naturalWidth;placePet(r)};im.onerror=()=>{if(!im.dataset.fb){im.dataset.fb=1;im.src=defBody(p.species)}};
+    el.onclick=e=>{e.stopPropagation();petMenu(r,p)};r.el=el;r.img=true;f.appendChild(el);placePet(r)});
+}
+function placePet(r){
+  const s=petScale(r.y),w=215*s;
+  Object.assign(r.el.style,{left:((r.x-w/2)/RW*100)+'%',top:((r.y-w*(r.ar||1))/RH*100)+'%',width:(w/RW*100)+'%',zIndex:Math.round(r.y)});
+  const hop=r.state==='walk'?-Math.abs(Math.sin(r.hop))*14*s:0,sq=r.state==='happy'?1+Math.sin(r.hop*2)*0.06:1;
+  r.el.querySelector('.body').style.transform=`translateY(${hop*$('#home').clientHeight/RH}px) scaleX(${r.facing*sq}) scaleY(${2-sq})`;
+}
+function tick(now){
+  const dt=Math.min(0.05,(now-last)/1000);last=now;
+  home.pets.forEach(r=>{if(!r.el)return;
+    if(r.state==='idle'&&now>r.until){r.tx=FLOOR.x0+Math.random()*(FLOOR.x1-FLOOR.x0);r.ty=FLOOR.y0+Math.random()*(FLOOR.y1-FLOOR.y0);r.state='walk'}
+    if(r.state==='happy'&&now>r.until){r.state='idle';r.until=now+800}
+    if(r.state==='walk'){const dx=r.tx-r.x,dy=r.ty-r.y,dist=Math.hypot(dx,dy),sp=110*dt;if(Math.abs(dx)>2)r.facing=dx>0?1:-1;
+      if(dist<=sp){r.x=r.tx;r.y=r.ty;if(r.goal==='eat'){r.goal=null;r.state='happy';r.until=now+2200;fx('❤️',r.x,r.y-160*petScale(r.y));setTimeout(()=>fx('😋',r.x+30,r.y-170*petScale(r.y)),400)}else{r.state='idle';r.until=now+1500+Math.random()*3500}}
+      else{r.x+=dx/dist*sp;r.y+=dy/dist*sp;r.hop+=dt*11}}
+    if(r.state==='happy')r.hop+=dt*9;placePet(r)});
+  raf=requestAnimationFrame(tick);
+}
+function fx(ch,x,y){const el=document.createElement('div');el.className='fx';el.textContent=ch;Object.assign(el.style,hp(x,y));$('#floor').appendChild(el);setTimeout(()=>el.remove(),1400)}
+function petMenu(r,p){
+  document.querySelectorAll('.petmenu').forEach(m=>m.remove());
+  const m=document.createElement('div');m.className='petmenu';Object.assign(m.style,hp(r.x,r.y-215*(r.ar||1)*petScale(r.y)-10));
+  m.innerHTML=`<button data-a="pat">🤚 摸摸頭</button><button data-a="id">🪪 身分證</button>`;
+  m.onclick=e=>{const b=e.target.closest('button');if(!b)return;m.remove();
+    if(b.dataset.a==='pat'){r.state='happy';r.until=performance.now()+1600;fx('💕',r.x,r.y-180*petScale(r.y));toast(`${p.name} 被摸得好開心`)}else idCard(p.id)};
+  $('#floor').appendChild(m);setTimeout(()=>document.addEventListener('click',function c(ev){if(!m.contains(ev.target)){m.remove();document.removeEventListener('click',c)}}),0);
+}
+$('#feed').onclick=()=>{
+  if(!needMe())return;if(!home.pets.length)return toast('這個家還沒有毛孩');if(home.bowl)return toast('碗裡還有飯喔');
+  const h=house(home.id);home.bowl={x:430,y:1120};renderFloor();
+  home.pets.forEach((r,i)=>{r.tx=home.bowl.x+(i%2?70:-70)*(1+Math.floor(i/2));r.ty=home.bowl.y-10;r.state='walk';r.goal='eat'});
+  toast(`你餵了 ${h.name} 的毛孩 🍖`);call('feed',{playerId:DB.me.id,houseId:h.id},true).catch(()=>{});if(ONLINE)feedPush(`${DB.me.nick} 在 ${h.name} 餵了飯 🍖`);
+  const g=DB.game;if(!g.feedAt[h.id]||Date.now()-g.feedAt[h.id]>2*HOUR){g.feedAt[h.id]=Date.now();progress('feed')}
+  setTimeout(()=>{if(home){home.bowl=null;renderFloor()}},5500);
+};
+function houseSettings(hid){
+  const h=house(hid);
+  openModal(`<h3>⚙️ ${esc(h.name)}</h3>
+    ${fld('hn','家的名字',`<input id="hn" maxlength="10" value="${esc(h.name)}">`)}
+    ${fld('hm','一句話介紹',`<input id="hm" maxlength="20" value="${esc(h.motto||'')}">`)}
+    <div class="field"><div class="flabel">家裡的房間</div>${roomPicker('hrm',h.room||'basic1')}</div>
+    ${fld('hp1','新的家人密碼（不改就留空）',`<input id="hp1" type="password" autocomplete="new-password">`)}
+    <div class="err" id="herr"></div>
+    <div class="row2"><button data-close>取消</button><button class="primary" id="hok">儲存</button></div>
+    <button class="btn-d" id="hleave">我要退出這個家</button>`);
+  let room=h.room||'basic1';bindRoom('hrm',v=>room=v);
+  $('#hok').onclick=async()=>{const n=$('#hn').value.trim();if(!n){$('#herr').textContent='家的名字不能空白';return}
+    const pw=$('#hp1').value;if(pw&&pw.length<4){$('#herr').textContent='密碼至少 4 個字';return}
+    const patch={name:n,motto:$('#hm').value.trim(),room};if(pw)patch.newPw=hashPw(pw);
+    try{await call('updateHouse',Object.assign(cred(),{patch}))}catch(e){$('#herr').textContent=e.message;return}
+    Object.assign(h,{name:n,motto:patch.motto,room});if(pw){DB.me.pw=patch.newPw;if(!ONLINE)h.pw=patch.newPw;save()}
+    closeModal();$('#hname').textContent=h.name;$('#roombg').src=roomImg(h.room);toast(pw?'已儲存，密碼也改好了，記得告訴家人':'已儲存');sync(true)};
+  $('#hleave').onclick=async e=>{if(!armBtn(e.target,'退出後要重新輸入密碼才能回來，再按一次'))return;
+    try{await call('leaveHouse',{playerId:DB.me.id})}catch(err){toast(err.message);return}
+    DB.me.houseId=null;DB.me.pw='';save();closeModal();renderHome();toast('已退出這個家')};
+}
 
-function drawStart() {
-  draw('bg_start_room', 0, 0, W);
-  const lw = 330, lh = draw('ui_logo', W / 2 - lw / 2, 90, lw);
-  text(TITLE, W / 2, 90 + lh * .47, 38, '#5a7a4e');
-  const pw = 190, ph = pw * asp('player_front');
-  draw('player_front', W / 2 - pw / 2, H * 0.72 - ph, pw);
-  btn('ui_btn_start', W / 2, H * 0.865, 250, startGame, '開始遊戲', 30);
-  text('最高分 ' + best, W / 2, H * 0.94, 20, '#fff', 'center', 'rgba(0,0,0,.45)');
-  soundBtn(W - 40, 40);
-  text('點左 / 右半邊螢幕或用 ← → 移動', W / 2, H - 16, 13, '#fff', 'center', 'rgba(0,0,0,.45)');
+// ================= 毛孩表單 =================
+const PROMPT_BODY=p=>`請參考我附的寵物照片，把牠畫成 3D 黏土質感的 Q 版遊戲角色，保留牠的毛色、花紋和特徵。${p.species?`（牠是一隻${p.species}${p.breed?'，品種是'+p.breed:''}）`:''}
+
+【姿勢】
+- 全身入鏡，包括耳朵、四隻腳和尾巴，不能被切到
+- 站姿，身體朝向畫面右邊、臉微微轉向前方（3/4 側面）
+- 頭大身體小的 Q 版比例，大眼睛、表情可愛
+
+【背景（很重要）】
+- 背景必須是純綠色 #00FF00，整片均勻，不要漸層
+- 不要地板、不要陰影、不要任何其他物件
+- 寵物身上不要有綠色
+
+【規格】
+- 正方形 1:1
+- 寵物置中，腳底在畫面約 90% 高度的位置，四周留一點空白
+- 不要任何文字`;
+async function fileToImg(file){const url=URL.createObjectURL(file);try{return await new Promise((res,rej)=>{const i=new Image();i.onload=()=>res(i);i.onerror=rej;i.src=url})}finally{setTimeout(()=>URL.revokeObjectURL(url),1000)}}
+async function makeHead(file){
+  const img=await fileToImg(file);const side=Math.min(img.width,img.height),c=document.createElement('canvas');c.width=c.height=240;
+  c.getContext('2d').drawImage(img,(img.width-side)/2,(img.height-side)/2,side,side,0,0,240,240);return c.toDataURL('image/jpeg',0.82);
 }
-function drawPause() {
-  dim();
-  text('暫停', W / 2, H * 0.36, 48, '#fff', 'center', 'rgba(0,0,0,.4)');
-  btn('ui_btn_restart', W / 2 - 70, H * 0.5, 96, startGame);
-  btn('ui_btn_home', W / 2 + 70, H * 0.5, 96, () => { state = 'start'; });
-  text('再按右上角 ▮▮ 繼續', W / 2, H * 0.6, 18, '#fff', 'center', 'rgba(0,0,0,.4)');
+async function makeBody(file){
+  const img=await fileToImg(file);const W=Math.min(900,img.width),H=Math.round(img.height*W/img.width);
+  const c=document.createElement('canvas');c.width=W;c.height=H;const x=c.getContext('2d');x.drawImage(img,0,0,W,H);
+  const d=x.getImageData(0,0,W,H),a=d.data;
+  // 判斷：已透明？綠底？其他底色？
+  let tr=0,gr=0,cn=0;const corners=[[2,2],[W-3,2],[2,H-3],[W-3,H-3],[W>>1,2]];
+  for(const [cx,cy] of corners){const i=(cy*W+cx)*4;cn++;if(a[i+3]<30)tr++;else if(a[i+1]>150&&a[i+1]-Math.max(a[i],a[i+2])>70)gr++}
+  let mode='none';
+  if(tr>=3)mode='alpha';else if(gr>=3){mode='green';
+    for(let i=0;i<a.length;i+=4){const r=a[i],g=a[i+1],b=a[i+2],m=Math.max(r,b),k=(g-m)/255;
+      let al=1-(k-0.12)/0.2;al=Math.max(0,Math.min(1,al));a[i+3]=Math.round(a[i+3]*al);if(g>m)a[i+1]=Math.min(g,m+6)}
+    x.putImageData(d,0,0)}
+  // 裁掉透明邊
+  const d2=x.getImageData(0,0,W,H).data;let x0=W,y0=H,x1=0,y1=0;
+  for(let yy=0;yy<H;yy+=2)for(let xx=0;xx<W;xx+=2){if(d2[(yy*W+xx)*4+3]>40){if(xx<x0)x0=xx;if(xx>x1)x1=xx;if(yy<y0)y0=yy;if(yy>y1)y1=yy}}
+  if(x1<=x0||y1<=y0){x0=0;y0=0;x1=W-1;y1=H-1}
+  const cw=x1-x0+1,ch=y1-y0+1,OW=420,OH=Math.round(ch*OW/cw),o=document.createElement('canvas');o.width=OW;o.height=OH;
+  o.getContext('2d').drawImage(c,x0,y0,cw,ch,0,0,OW,OH);
+  let url=o.toDataURL('image/webp',0.85);if(!url.startsWith('data:image/webp'))url=o.toDataURL('image/png');
+  return {url,mode};
 }
-function drawOver() {
-  dim(.55);
-  const pw = 340, ph = pw * asp('ui_panel_gameover'), py = H * 0.5 - ph / 2 - 30;
-  draw('ui_panel_gameover', W / 2 - pw / 2, py, pw);
-  text('遊戲結束', W / 2, py + ph * .30, 38);
-  text('分數 ' + score, W / 2, py + ph * .52, 30);
-  text('最高 ' + best, W / 2, py + ph * .68, 24, '#8a6d3b');
-  if (newBest) text('★ 新紀錄！ ★', W / 2, py + ph * .84, 22, '#e08a00');
-  btn('ui_btn_restart', W / 2 - 70, py + ph + 66, 96, startGame);
-  btn('ui_btn_home', W / 2 + 70, py + ph + 66, 96, () => { state = 'start'; });
+function petForm(hid,pid){
+  if(!isFamily(hid))return toast('只有家人可以新增或編輯毛孩');
+  const p=pid?{...pet(pid)}:{species:'狗',sex:'',card:CARD_COLORS[0][1],head:'',body:''};const isNew=!pid;
+  openModal(`<h3>${isNew?'🐾 新增毛孩':'✏️ 編輯 '+esc(p.name)}</h3><p class="lead">打 * 的必填，其他之後再補也可以</p>
+    ${fld('pn','名字 *',`<input id="pn" maxlength="10" value="${esc(p.name||'')}">`)}
+    <div class="field"><div class="flabel">種類 *</div>${choiceGroup('psp',SPECIES.map(s=>s[0]),p.species)}</div>
+    <div class="two">${fld('pb','品種',`<input id="pb" maxlength="12" value="${esc(p.breed||'')}" placeholder="例如：米克斯">`)}
+      ${fld('pc','毛色',`<input id="pc" maxlength="10" value="${esc(p.color||'')}" placeholder="例如：黑橘玳瑁">`)}</div>
+    ${fld('pd','生日',`<input id="pd" type="date" max="${todayTW()}" value="${esc(p.birthday||'')}">`,'不確定就填大概')}
+    <div class="field"><div class="flabel">性別</div>${choiceGroup('psx',['♂ 男生','♀ 女生'],p.sex==='♂'?'♂ 男生':p.sex==='♀'?'♀ 女生':'')}</div>
+    <div class="field"><div class="flabel">是否結紮</div>${choiceGroup('pfx',['已結紮','未結紮','不確定'],p.fixed||'')}</div>
+    ${fld('pa','個性一句話',`<input id="pa" maxlength="30" value="${esc(p.about||'')}" placeholder="例如：聽到罐頭聲會衝出來">`,'會印在身分證上')}
+    <div class="two">${fld('pchip','晶片號碼 🔒',`<input id="pchip" maxlength="20" inputmode="numeric" value="${esc(p.chip||'')}">`)}
+      ${fld('pal','過敏／注意事項 🔒',`<input id="pal" maxlength="30" value="${esc(p.allergy||'')}">`)}</div>
+    <div class="hint" style="margin:-6px 4px 12px">🔒 只有家人看得到</div>
+    <div class="field"><div class="flabel">身分證顏色</div><div class="swatches" id="pcc">${CARD_COLORS.map(([n,c])=>`<button style="background:${c}" data-c="${c}" class="${c===p.card?'on':''}" aria-label="${n}" title="${n}"></button>`).join('')}</div></div>
+    <div class="field"><div class="flabel">身分證大頭照</div>
+      <div class="photo"><div class="pv round" id="hpv"><img src="${petHead(p)}" alt=""></div>
+      <div class="info">一般照片就可以，會自動裁成正方形。沒放的話用預設圖<div class="btns"><label>選照片<input type="file" accept="image/*" id="hin" hidden></label>${p.head?'<button id="hdel">移除</button>':''}</div></div></div></div>
+    <div class="field"><div class="flabel">在家裡走動的全身圖</div>
+      <div class="photo"><div class="pv check" id="bpv"><img src="${petBody(p)}" alt=""></div>
+      <div class="info" id="binfo">綠色背景或透明背景的 Q 版全身圖，會自動去背。沒放的話用預設圖<div class="btns"><label>選圖片<input type="file" accept="image/*" id="bin" hidden></label>${p.body?'<button id="bdel">移除</button>':''}</div></div></div>
+      <details><summary>還沒有全身圖？複製指令給 AI 畫</summary><div class="prompt" id="ptxt"></div><div class="row2"><button id="pcopy">📋 複製指令</button></div>
+      <div class="hint">把指令貼給 ChatGPT 或 Gemini，再附上毛孩的照片，畫好後回來這裡上傳</div></details></div>
+    <div class="err" id="perr"></div>
+    <div class="row2 sticky"><button data-close>取消</button><button class="primary" id="psave">${isNew?'加入這個家':'儲存'}</button></div>
+    ${isNew?'':'<button class="btn-d" id="pdel">刪除這隻毛孩的所有資料</button>'}`,false,p.card);
+  const upd=()=>{$('#ptxt').textContent=PROMPT_BODY({species:choiceVal('psp'),breed:$('#pb').value.trim()})};upd();$('#pb').oninput=upd;
+  bindChoice('psp',v=>{upd();if(!p.head)$('#hpv').innerHTML=`<img src="${defHead(v)}" alt="">`;if(!p.body)$('#bpv').innerHTML=`<img src="${defBody(v)}" alt="">`});bindChoice('psx');bindChoice('pfx');
+  $('#pcc').onclick=e=>{const b=e.target.closest('button');if(!b)return;p.card=b.dataset.c;$('#sheet').style.setProperty('--cc',p.card);$('#pcc').querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===b))};
+  $('#hin').onchange=async e=>{const f=e.target.files[0];if(!f)return;try{p.head=await makeHead(f);$('#hpv').innerHTML=`<img src="${p.head}" alt="">`}catch(err){toast('這張照片讀不了，換一張試試')}};
+  $('#bin').onchange=async e=>{const f=e.target.files[0];if(!f)return;$('#binfo').firstChild.textContent='處理中…';
+    try{const r=await makeBody(f);p.body=r.url;$('#bpv').innerHTML=`<img src="${p.body}" alt="">`;
+      $('#binfo').firstChild.textContent=r.mode==='green'?'✅ 已去掉綠色背景':r.mode==='alpha'?'✅ 透明背景':'⚠️ 這張圖有底色，毛孩走路時會帶著一塊方框。建議用綠底重畫'}
+    catch(err){$('#binfo').firstChild.textContent='這張圖讀不了，換一張試試'}};
+  if($('#hdel'))$('#hdel').onclick=()=>{p.head='';$('#hpv').innerHTML=`<img src="${defHead(choiceVal('psp'))}" alt="">`};
+  if($('#bdel'))$('#bdel').onclick=()=>{p.body='';$('#bpv').innerHTML=`<img src="${defBody(choiceVal('psp'))}" alt="">`};
+  $('#pcopy').onclick=async()=>{try{await navigator.clipboard.writeText($('#ptxt').textContent);toast('指令已複製 📋')}catch(e){const r=document.createRange();r.selectNodeContents($('#ptxt'));const s=getSelection();s.removeAllRanges();s.addRange(r);toast('已幫你選取，長按複製')}};
+  $('#psave').onclick=async e=>{
+    const name=$('#pn').value.trim();if(!name){$('#perr').textContent='請填毛孩的名字';$('#pn').focus();return}
+    const btn=e.target;if(btn.disabled)return;btn.disabled=true;btn.textContent='儲存中…';
+    try{
+      const data={name,species:choiceVal('psp')||'其他',breed:$('#pb').value.trim(),sex:(choiceVal('psx')||'').slice(0,1),birthday:$('#pd').value,color:$('#pc').value.trim(),
+        fixed:choiceVal('pfx'),about:$('#pa').value.trim(),chip:$('#pchip').value.trim(),allergy:$('#pal').value.trim(),card:p.card,head:p.head||'',body:p.body||''};
+      if(ONLINE)for(const k of ['head','body'])if(data[k].startsWith('data:')){btn.textContent=k==='head'?'上傳大頭照…':'上傳全身圖…';data[k]=(await call('upload',Object.assign(cred(),{dataUrl:data[k]}))).url}
+      if(!isNew)data.id=pid;
+      await call('savePet',Object.assign(cred(),{pet:data}));
+      if(ONLINE)await sync(true);
+      closeModal();toast(isNew?`${name} 搬進來了 🎉`:'已儲存');if(home&&home.id===hid)openHome(hid,true);renderMe();
+    }catch(err){$('#perr').textContent=err.message;btn.disabled=false;btn.textContent=isNew?'加入這個家':'儲存'}};
+  if($('#pdel'))$('#pdel').onclick=async e=>{if(!armBtn(e.target,'體重、醫療、支出紀錄都會刪掉，再按一次'))return;
+    try{await call('deletePet',Object.assign(cred(),{petId:pid}))}catch(err){toast(err.message);return}
+    if(ONLINE)await sync(true);closeModal();toast('已刪除');openHome(hid,true)};
 }
 
-function render() {
-  buttons = [];
-  ctx.clearRect(0, 0, W, H);
-  if (loaded < NAMES.length) { ctx.fillStyle = '#14234a'; ctx.fillRect(0, 0, W, H); text('載入中… ' + loaded + '/' + NAMES.length, W / 2, H / 2, 24, '#fff'); return; }
-  if (state === 'start') { drawStart(); return; }
-  drawWorld(); hud();
-  if (state === 'pause') drawPause();
-  if (state === 'over') drawOver();
+// ================= 身分證與紀錄 =================
+function sparkline(ws){
+  ws=ws.slice().sort((a,b)=>a.date.localeCompare(b.date)).slice(-12);
+  if(ws.length<2)return '';
+  const W=300,H=90,P=16,v=ws.map(w=>w.kg),pad=Math.max(0.05,(Math.max(...v)-Math.min(...v))*0.2),mn=Math.min(...v)-pad,mx=Math.max(...v)+pad;
+  const X=i=>P+(W-2*P)*i/(ws.length-1),Y=x=>H-P-(H-2*P)*(x-mn)/(mx-mn),L=ws.length-1;
+  const d=ws.map((w,i)=>(i?'L':'M')+X(i).toFixed(1)+' '+Y(w.kg).toFixed(1)).join(' ');
+  return `<svg viewBox="0 0 ${W} ${H}" style="width:100%;height:auto;display:block" role="img" aria-label="體重變化">
+    <path d="${d} L${X(L)} ${H-P} L${X(0)} ${H-P} Z" style="fill:color-mix(in srgb,var(--cc,#ff9a6b) 22%,#fff)"/><path d="${d}" style="fill:none;stroke:var(--cc,#ff9a6b)" stroke-width="2.5" stroke-linejoin="round"/>
+    <circle cx="${X(L)}" cy="${Y(ws[L].kg)}" r="4" style="fill:var(--cc,#ff9a6b)"/>
+    <text x="${X(0)}" y="${H-2}" font-size="10" fill="#a08670">${ws[0].date.slice(0,7)}</text><text x="${X(L)}" y="${H-2}" font-size="10" fill="#a08670" text-anchor="end">${ws[L].date.slice(0,7)}</text>
+    <text x="${X(L)-6}" y="${Y(ws[L].kg)-8}" font-size="12" fill="#5a4030" text-anchor="end">${ws[L].kg} kg</text></svg>`;
+}
+const money=n=>'$'+Math.round(n||0).toLocaleString('en-US');
+function recList(kind,items,fam){
+  if(!items.length)return '<div class="locked">還沒有紀錄</div>';
+  return items.slice(0,8).map(r=>{
+    let t='',v='';
+    if(kind==='weights'){v=r.kg+' kg';t=r.late?'<small>補登</small>':''}
+    if(kind==='medical'){t=`${esc(r.type)}${r.title?'：'+esc(r.title):''}<small>${[r.clinic&&'🏥 '+esc(r.clinic),r.next&&'⏰ 下次 '+esc(r.next)].filter(Boolean).join('　')}</small>`;v=r.cost?money(r.cost):''}
+    if(kind==='expenses'){t=`${esc(r.cat)}${r.note?`<small>${esc(r.note)}</small>`:''}`;v=money(r.amount)}
+    return `<div class="rec"><div class="d">${esc(r.date)}</div><div class="t">${t}</div><div class="v">${v}</div>${fam?`<button class="x" data-k="${kind}" data-id="${r.id}">刪除</button>`:''}</div>`}).join('');
+}
+function idCard(pid){
+  const p=pet(pid),h=house(p.houseId),fam=isFamily(p.houseId);
+  const ws=DB.weights.filter(w=>w.petId===pid).sort((a,b)=>b.date.localeCompare(a.date));
+  const md=DB.medical.filter(w=>w.petId===pid).sort((a,b)=>b.date.localeCompare(a.date));
+  const ex=DB.expenses.filter(w=>w.petId===pid).concat(md.filter(m=>m.cost).map(m=>({...m,cat:'醫療・'+m.type,amount:m.cost,note:m.title,fromMed:true}))).sort((a,b)=>b.date.localeCompare(a.date));
+  const ym=todayTW().slice(0,7),month=ex.filter(e=>e.date.startsWith(ym)).reduce((s,e)=>s+(+e.amount||0),0);
+  openModal(`<div class="idcard" style="--cc:${p.card||'#ff9a6b'}">
+    <div class="idhead">🐾 毛很多島 居民證<span>No.${String(p.no).padStart(4,'0')}</span></div>
+    <div class="idbody"><div class="idphoto"><img src="${petHead(p)}" alt="${esc(p.name)}"></div>
+      <dl class="idfields"><div class="idname">${esc(p.name)} ${p.sex?`<span style="color:${p.sex==='♀'?'#e86a92':'#5b9bd5'}">${p.sex}</span>`:''}</div>
+        <dt>種類</dt><dd>${esc(p.species)}${p.breed?'・'+esc(p.breed):''}</dd>
+        <dt>生日</dt><dd>${esc(p.birthday||'—')}${isBirthday(p.birthday)?' 🎂':''}</dd>
+        <dt>年紀</dt><dd>${ageText(p.birthday)}</dd>
+        ${p.color?`<dt>毛色</dt><dd>${esc(p.color)}</dd>`:''}
+        ${p.fixed?`<dt>結紮</dt><dd>${esc(p.fixed)}</dd>`:''}
+        <dt>住址</dt><dd>${esc(h.name)}</dd>
+        ${fam&&p.chip?`<dt>晶片 🔒</dt><dd style="font-variant-numeric:tabular-nums">${esc(p.chip)}</dd>`:''}
+        ${fam&&p.allergy?`<dt>注意 🔒</dt><dd>${esc(p.allergy)}</dd>`:''}
+      </dl></div>
+    <div class="idbottom">${p.about?'💬 '+esc(p.about):''}<div class="stamp">毛很多<br>認證</div></div>
+  </div>
+  ${fam?`<div class="row2"><button id="ied">✏️ 編輯資料</button></div>`:''}
+  <div class="sec"><h4>⚖️ 體重 ${fam?'<button data-add="weights">＋ 記錄</button>':'<span>公開</span>'}</h4>${sparkline(ws)}${fam?recList('weights',ws,fam):(ws.length?'':'<div class="locked">還沒有紀錄</div>')}</div>
+  <div class="sec"><h4>🩺 醫療紀錄 ${fam?'<button data-add="medical">＋ 新增</button>':'<span>🔒 家人限定</span>'}</h4>${fam?recList('medical',md,fam):'<div class="locked">家人才看得到</div>'}</div>
+  <div class="sec"><h4>💰 支出 ${fam?'<button data-add="expenses">＋ 記一筆</button>':'<span>🔒 家人限定</span>'}</h4>
+    ${fam?`<div style="font-size:13px;color:var(--soft);margin-bottom:4px">本月 ${money(month)}・醫療費用會自動算進來</div>${recList('expenses',ex.map(e=>e.fromMed?{...e,id:''}:e),fam).replace(/<button class="x" data-k="expenses" data-id="">刪除<\/button>/g,'')}`:'<div class="locked">家人才看得到</div>'}</div>
+  <div class="row2" style="margin-top:14px"><button data-close>關閉</button></div>`,false,p.card||'#ff9a6b');
+  if($('#ied'))$('#ied').onclick=()=>petForm(p.houseId,pid);
+  $('#sheet').querySelectorAll('[data-add]').forEach(b=>b.onclick=()=>recForm(pid,b.dataset.add));
+  $('#sheet').querySelectorAll('.rec .x').forEach(b=>b.onclick=async()=>{if(!armBtn(b,'確定？'))return;
+    try{await call('deleteRecord',Object.assign(cred(),{kind:b.dataset.k,id:b.dataset.id}))}catch(e){toast(e.message);return}
+    DB[b.dataset.k]=DB[b.dataset.k].filter(x=>x.id!==b.dataset.id);idCard(pid);toast('已刪除')});
+}
+function recForm(pid,kind){
+  const p=pet(pid),T=todayTW();let inner='',title='';
+  if(kind==='weights'){title=`⚖️ ${esc(p.name)} 的體重`;inner=`<div class="two">${fld('rd','日期',`<input id="rd" type="date" max="${T}" value="${T}">`)}${fld('rv','體重（公斤）',`<input id="rv" type="number" step="0.01" min="0" inputmode="decimal">`)}</div><div class="hint">今天登記今天的體重，才會算進「量體重」任務喔</div>`}
+  if(kind==='medical'){title=`🩺 ${esc(p.name)} 的醫療紀錄`;inner=`<div class="field"><div class="flabel">類型</div>${choiceGroup('rt',MED_TYPES,'看診')}</div>
+    <div class="two">${fld('rd','日期',`<input id="rd" type="date" value="${T}">`)}${fld('rc','費用（可不填）',`<input id="rc" type="number" min="0" inputmode="numeric">`)}</div>
+    ${fld('rti','內容',`<input id="rti" maxlength="30" placeholder="例如：三合一疫苗、皮膚過敏">`)}
+    <div class="two">${fld('rcl','醫院',`<input id="rcl" maxlength="20">`)}${fld('rn','下次回診',`<input id="rn" type="date">`)}</div>`}
+  if(kind==='expenses'){title=`💰 ${esc(p.name)} 的支出`;inner=`<div class="field"><div class="flabel">分類</div>${choiceGroup('rt',EXP_CATS,'飼料')}</div>
+    <div class="two">${fld('rd','日期',`<input id="rd" type="date" value="${T}">`)}${fld('rv','金額',`<input id="rv" type="number" min="0" inputmode="numeric">`)}</div>
+    ${fld('rno','備註',`<input id="rno" maxlength="30" placeholder="例如：主食罐一箱">`)}`}
+  openModal(`<h3>${title}</h3>${inner}<div class="err" id="rerr"></div><div class="row2"><button id="rback">返回</button><button class="primary" id="rok">儲存</button></div>`,false,p.card||'#ff9a6b');
+  if($('#rt'))bindChoice('rt');
+  $('#rback').onclick=()=>idCard(pid);
+  $('#rok').onclick=async()=>{const date=$('#rd').value||T,base={petId:pid,date,by:DB.me.nick};let rec,late=false;
+    if(kind==='weights'){const v=parseFloat($('#rv').value);if(!(v>0)){$('#rerr').textContent='請填體重';return}late=date!==T;rec={...base,kg:Math.round(v*100)/100,late:late?'1':''}}
+    if(kind==='medical')rec={...base,type:choiceVal('rt'),cost:Math.max(0,parseFloat($('#rc').value)||0),title:$('#rti').value.trim(),clinic:$('#rcl').value.trim(),next:$('#rn').value};
+    if(kind==='expenses'){const a=parseFloat($('#rv').value);if(!(a>0)){$('#rerr').textContent='請填金額';return}rec={...base,cat:choiceVal('rt'),amount:a,note:$('#rno').value.trim()}}
+    let saved;try{saved=await call('addRecord',Object.assign(cred(),{kind,rec}))}catch(e){$('#rerr').textContent=e.message;return}
+    if(ONLINE){DB[kind].push(saved);if(kind==='weights')feedPush(`${p.name} 量了體重 ⚖️`)}
+    if(kind==='weights'&&!late&&DB.game.weightDay!==T){DB.game.weightDay=T;progress('weight')}
+    toast('記好了 ✨');idCard(pid)};
 }
 
-/* ---------- 輸入 ---------- */
-function pos(e) { const r = canvas.getBoundingClientRect(); return { x: (e.clientX - r.left) / r.width * W, y: (e.clientY - r.top) / r.height * H }; }
-canvas.addEventListener('pointerdown', e => {
-  e.preventDefault();
-  try { actx = actx || new (window.AudioContext || window.webkitAudioContext)(); actx.resume(); } catch (er) {}
-  const p = pos(e);
-  for (const b of buttons) if (p.x >= b.x && p.x <= b.x + b.w && p.y >= b.y && p.y <= b.y + b.h) { b.fn(); return; }
-  if (state === 'play') touchDir = p.x < W / 2 ? -1 : 1;
-});
-canvas.addEventListener('pointermove', e => { if (state === 'play' && e.buttons) touchDir = pos(e).x < W / 2 ? -1 : 1; });
-['pointerup', 'pointercancel', 'pointerleave'].forEach(ev => canvas.addEventListener(ev, () => { touchDir = 0; }));
-addEventListener('keydown', e => {
-  if (e.key === 'ArrowLeft' || e.key === 'a') keys.left = true;
-  if (e.key === 'ArrowRight' || e.key === 'd') keys.right = true;
-  if (e.key === ' ' && (state === 'start' || state === 'over')) startGame();
-  if ((e.key === 'p' || e.key === 'Escape') && (state === 'play' || state === 'pause')) state = state === 'play' ? 'pause' : 'play';
-});
-addEventListener('keyup', e => {
-  if (e.key === 'ArrowLeft' || e.key === 'a') keys.left = false;
-  if (e.key === 'ArrowRight' || e.key === 'd') keys.right = false;
-});
-document.addEventListener('visibilitychange', () => { if (document.hidden && state === 'play') state = 'pause'; });
+// ================= 我的設定 =================
+$('#me').onclick=()=>{
+  if(!DB.me)return onboarding();
+  const h=myHouse();
+  openModal(`<h3>🙂 ${esc(DB.me.nick)}</h3><p class="lead">${h?`你是「${esc(h.name)}」的家人`:'你還沒有家，正在島上逛逛'}</p>
+    ${fld('mn','暱稱',`<input id="mn" maxlength="12" value="${esc(DB.me.nick)}">`)}
+    <div class="row2"><button class="primary" id="msave">儲存暱稱</button></div>
+    <div class="big3" style="margin-top:14px">
+      ${h?`<button id="mhome"><span class="e">🏠</span><span>回我家<small>${esc(h.name)}</small></span></button>`:`<button id="mbuild"><span class="e">🏠</span><span>蓋我的家<small>選一塊空地</small></span></button><button id="mjoin"><span class="e">🔑</span><span>加入家人的家<small>需要家人密碼</small></span></button>`}
+    </div>
+    <div class="row2" style="margin-top:14px"><button data-close>關閉</button></div>`);
+  $('#msave').onclick=async()=>{const n=$('#mn').value.trim();if(!n)return toast('暱稱不能空白');
+    try{await call('savePlayer',{player:{id:DB.me.id,nick:n,game:DB.game}})}catch(e){toast(e.message);return}DB.me.nick=n;save();closeModal();toast('暱稱改好了')};
+  if($('#mhome'))$('#mhome').onclick=()=>{closeModal();openHome(h.id)};
+  if($('#mbuild'))$('#mbuild').onclick=()=>{closeModal();picking=true;renderIsland();toast('點一塊「＋」空地')};
+  if($('#mjoin'))$('#mjoin').onclick=()=>joinFlow();
+};
 
-/* ---------- 主迴圈 ---------- */
-let last = performance.now();
-function loop(now) {
-  const dt = Math.min(0.033, (now - last) / 1000); last = now;
-  update(dt); render();
-  requestAnimationFrame(loop);
+// ================= 任務・抽卡 =================
+const RAR={N:{name:'普通',color:'#c9a47a',glow:'rgba(255,230,190,.5)',w:70},R:{name:'稀有',color:'#5b9bd5',glow:'rgba(120,190,255,.8)',w:25},SSR:{name:'超稀有',color:'#e8a400',glow:'rgba(255,215,90,1)',w:5}};
+const CARDS=[
+  {id:'wood',name:'木質暖陽',r:'N',img:'assets/room_basic1.webp'},
+  {id:'study',name:'午後書房',r:'N',emoji:'📚',bg:'linear-gradient(160deg,#f6e3c4,#d9b48a)'},
+  {id:'garden',name:'陽光花園房',r:'N',emoji:'🌻',bg:'linear-gradient(160deg,#fff3b0,#9fd47a)'},
+  {id:'cafe',name:'貓咪咖啡廳',r:'N',emoji:'☕',bg:'linear-gradient(160deg,#f3d9c2,#b98d62)'},
+  {id:'beach',name:'海邊小木屋',r:'N',emoji:'🏖️',bg:'linear-gradient(160deg,#bfe9f5,#f6e3b4)'},
+  {id:'sakura',name:'櫻花和室',r:'R',emoji:'🌸',bg:'linear-gradient(160deg,#ffe0ea,#f7a8c0)'},
+  {id:'forest',name:'蘑菇森林房',r:'R',emoji:'🍄',bg:'linear-gradient(160deg,#d9f0c4,#6fae5c)'},
+  {id:'cloud',name:'雲朵房間',r:'R',emoji:'☁️',bg:'linear-gradient(160deg,#eaf6ff,#b9d8ff)'},
+  {id:'xmas',name:'聖誕小屋',r:'R',emoji:'🎄',bg:'linear-gradient(160deg,#ffe3e3,#c94a4a)'},
+  {id:'ocean',name:'海底房間',r:'SSR',emoji:'🐠',bg:'linear-gradient(160deg,#5fd0e8,#1b4f8a)'},
+  {id:'star',name:'星空閣樓',r:'SSR',emoji:'🌌',bg:'linear-gradient(160deg,#6b5bb5,#1d1a4a)'},
+];
+const MISSIONS=[
+  {k:'poop',ic:'💩',name:'鏟屎',goal:10,rule:'清任何人家的大便'},
+  {k:'note',ic:'📝',name:'留言',goal:5,rule:'在別人家貼便利貼・每天最多算 3 則'},
+  {k:'feed',ic:'🍖',name:'餵飯',goal:5,rule:'同一個家每 2 小時算 1 次'},
+  {k:'weight',ic:'⚖️',name:'量體重',goal:5,rule:'當天登記才算・一天算 1 次'},
+];
+const owned=hid=>new Set(DB.owned[hid]||['wood']);
+function cardArt(c){return c.img?`<img src="${c.img}" alt="" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover">`:`<div style="position:absolute;inset:0;background:${c.bg};display:flex;align-items:center;justify-content:center">${c.emoji}</div>`}
+function updTix(){const n=DB.game.tickets;$('#tixn').textContent=n;$('#tixn').style.display=n?'flex':'none'}
+function progress(k){const m=MISSIONS.find(x=>x.k===k),g=DB.game;g.prog[k]=(g.prog[k]||0)+1;
+  if(g.prog[k]>=m.goal){g.prog[k]=0;g.tickets++;setTimeout(()=>toast(`🎟️ ${m.name}任務完成！獲得 1 張抽卡券`),1200)}save();updTix()}
+function missionsSheet(){
+  if(!DB.me)return onboarding();
+  const h=myHouse(),own=h?owned(h.id):new Set(),g=DB.game;
+  openModal(`<h3>🎟️ 任務與抽卡</h3>
+  <div class="tk"><div><div style="font-size:13px;color:var(--soft)">我的抽卡券</div><div class="n">${g.tickets} 張</div></div><button id="draw" ${g.tickets&&h?'':'disabled'}>開卡包</button></div>
+  ${h?'':'<div class="hint" style="text-align:center;margin:-4px 0 10px">有家之後才能開卡包，券會先幫你存著</div>'}
+  <div class="sec" style="margin-top:0"><h4>📋 任務<span>完成就送 1 張券</span></h4><div class="ms">
+  ${MISSIONS.map(m=>`<div class="m"><span class="ic">${m.ic}</span><span>${m.name} ${m.goal} 次</span><span class="num">${g.prog[m.k]||0} / ${m.goal}</span>
+    <div class="bar2"><i style="width:${(g.prog[m.k]||0)/m.goal*100}%"></i></div><small>${m.rule}</small></div>`).join('')}</div></div>
+  ${h?`<div class="sec"><h4>🏠 ${esc(h.name)}・房間收藏<span>${own.size} / ${CARDS.length}</span></h4>
+  <div class="coll">${CARDS.map(c=>{const o=own.has(c.id);return `<div class="mini ${o?'':'locked'}" style="--rc:${RAR[c.r].color}" title="${o?c.name:'未收集'}"><div class="art">${cardArt(c)}</div>${o?'':'<span>？</span>'}</div>`}).join('')}</div>
+  <div class="hint">外框：<span style="color:${RAR.N.color}">■ 普通</span>　<span style="color:${RAR.R.color}">■ 稀有</span>　<span style="color:${RAR.SSR.color}">■ 超稀有</span>・不會抽到重複的・換房間功能之後加</div></div>`:''}
+  <div class="row2" style="margin-top:14px"><button data-close>關閉</button></div>`);
+  $('#draw').onclick=()=>{closeModal();openPack()};
 }
-reset(); requestAnimationFrame(loop);
-})();
+function openPack(){
+  const h=myHouse();if(!h)return;const own=owned(h.id),left=CARDS.filter(c=>!own.has(c.id));
+  if(!left.length)return toast('房間全部收集完了！券先幫你存著 🎉');
+  const avail=Object.keys(RAR).filter(r=>left.some(c=>c.r===r));let x=Math.random()*avail.reduce((a,r)=>a+RAR[r].w,0),r=avail[0];
+  for(const k of avail){if((x-=RAR[k].w)<0){r=k;break}}
+  const pool=left.filter(c=>c.r===r),c=pool[Math.floor(Math.random()*pool.length)];
+  const ftxt=`${DB.me.nick} 為 ${h.name} 抽到了 ${c.r==='SSR'?'✨超稀有・':c.r==='R'?'稀有・':''}${c.name}${c.r==='SSR'?'✨':''}`;
+  DB.game.tickets--;own.add(c.id);DB.owned[h.id]=[...own];save();updTix();
+  call('drawCard',Object.assign(cred(),{cardId:c.id,feedText:ftxt}),true).catch(e=>toast('收藏沒存到：'+e.message));
+  const ov=document.createElement('div');ov.className='gacha';ov.innerHTML=`<div class="rays" id="rays"></div><div class="hint2" id="gh">點卡包撕開</div>
+    <div class="stage-area"><div class="pack" id="pk" role="button" aria-label="撕開卡包"><div class="pbody"><img class="plogo" src="assets/logo.webp" alt=""></div><div class="ptop"></div></div>
+      <div class="card" id="cd" style="--rc:${RAR[c.r].color};--glow:${RAR[c.r].glow}"><div class="in"><div class="face back"></div>
+        <div class="face front"><div class="art">${cardArt(c)}</div><div class="cap"><b>${'★'.repeat(c.r==='SSR'?3:c.r==='R'?2:1)} ${RAR[c.r].name}</b><span>${c.name}</span></div></div></div></div></div>
+    <div class="gbtns" id="gb"><button id="gok" class="primary">收進收藏</button><button id="gmore">再抽一次</button></div>`;
+  document.body.appendChild(ov);const pk=ov.querySelector('#pk'),cd=ov.querySelector('#cd'),gh=ov.querySelector('#gh');let st=0;
+  pk.onclick=()=>{if(st)return;st=1;gh.textContent='';pk.classList.add('shake');setTimeout(()=>{pk.classList.remove('shake');pk.classList.add('torn')},900);setTimeout(()=>{pk.classList.add('gone');cd.classList.add('up');gh.textContent='點卡片翻開';st=2},1500)};
+  cd.onclick=()=>{if(st!==2)return;st=3;gh.textContent='';cd.classList.add('flip');
+    setTimeout(()=>{if(c.r!=='N'){ov.querySelector('#rays').classList.add('on');burst(ov,c.r==='SSR'?28:14)}
+      gh.textContent=c.r==='SSR'?'✨ 超稀有！ ✨':c.r==='R'?'稀有卡！':'抽到新房間';ov.querySelector('#gb').classList.add('on');ov.querySelector('#gmore').style.display=DB.game.tickets?'':'none';
+      if(ONLINE)feedPush(ftxt)},700)};
+  ov.querySelector('#gok').onclick=()=>{ov.remove();toast(`已收進「${h.name}」的房間收藏`)};
+  ov.querySelector('#gmore').onclick=()=>{ov.remove();openPack()};
+}
+function burst(ov,n){for(let i=0;i<n;i++){const s=document.createElement('div');s.className='sp';s.textContent=['✨','⭐','💖','🌟'][i%4];
+  const a=Math.random()*Math.PI*2,d=120+Math.random()*120;s.style.left='50%';s.style.top='50%';s.style.setProperty('--dx',Math.cos(a)*d+'px');s.style.setProperty('--dy',Math.sin(a)*d+'px');
+  s.style.animationDelay=(Math.random()*.3)+'s';ov.appendChild(s);setTimeout(()=>s.remove(),1700)}}
+$('#tix').onclick=missionsSheet;
+
+// ================= 動態 =================
+let fi=0;
+function tickerShow(){const el=$('#ticker');if(!DB.feed.length){el.style.display='none';return}el.style.display='';el.style.opacity=0;
+  setTimeout(()=>{const f=DB.feed[fi%Math.min(DB.feed.length,8)];el.textContent='📣 '+f.t;el.style.opacity=1},300)}
+setInterval(()=>{fi++;tickerShow()},3500);
+$('#ticker').onclick=()=>openModal(`<h3>📣 島上動態</h3><div style="background:#fff;border:2px solid var(--line);border-radius:16px;padding:2px 12px;margin-top:10px">
+  ${DB.feed.slice(0,40).map(f=>`<div style="display:flex;justify-content:space-between;gap:10px;padding:11px 0;border-bottom:1px dashed var(--line);font-size:14px"><span>${esc(f.t)}</span><span style="color:#a08670;font-size:12px;white-space:nowrap">${ago(f.at)}</span></div>`).join('')}
+  </div><div class="row2" style="margin-top:14px"><button data-close>關閉</button></div>`);
+
+document.addEventListener('error',e=>{const t=e.target;if(t.tagName==='IMG'&&!t.dataset.fb&&/googleusercontent/.test(t.src)){t.dataset.fb=1;t.src='assets/pet_head_other.webp'}},true);
+// ================= 頁尾與啟動 =================
+function renderFoot(){
+  if(ONLINE){$('#foot').innerHTML='毛很多・資料存在雲端，朋友之間會互相看到。畫面不是即時的，回到小島或過一分鐘會自動更新。';return}
+  $('#foot').innerHTML=`試做版：資料只存在這支手機的瀏覽器裡，別人看不到，之後接上 Google 試算表才會共用。示範家庭的家人密碼都是 1234。<br><button id="reset">清除試做資料、從頭開始</button>`;
+  $('#reset').onclick=e=>{if(!armBtn(e.target,'所有試做資料都會清掉，再按一次'))return;try{localStorage.removeItem(KEY)}catch(err){}DB=seed();save();picking=false;renderIsland();renderFoot();onboarding()};
+}
+renderIsland();renderFoot();tickerShow();setInterval(()=>{if(mode==='auto'&&!$('#island').classList.contains('hidden'))renderIsland()},60000);
+if(ONLINE){
+  busy(true);sync().finally(()=>{busy(false);if(!DB.me)onboarding()});
+  setInterval(()=>{if(document.visibilityState==='visible'&&$('#modal').classList.contains('hidden'))sync(true)},45000);
+  document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')sync(true)});
+}else if(!DB.me)setTimeout(onboarding,400);
 </script>
 </body>
 </html>
