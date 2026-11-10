@@ -390,8 +390,8 @@ b.dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:#ff
 .coinbig{font-size:34px;color:#c98a00;margin:4px 0}
 .hud{position:absolute;right:12px;top:66px;z-index:3000;display:flex;align-items:center;gap:6px;padding:3px 10px 3px 4px;border:2px solid var(--wood);border-radius:999px;background:rgba(255,250,238,.94);box-shadow:0 2px 0 rgba(0,0,0,.12);font-size:12px;color:#6b4b33;font-family:inherit}
 .hud img{display:block}
-.hud .lvb{position:relative;width:30px;height:34px;flex:none}.hud .lvb img{width:100%;height:100%;object-fit:contain}
-.hud .lvb b{position:absolute;left:0;right:0;top:5px;text-align:center;font-size:13px;line-height:16px;color:#8a5a20;font-weight:bold}
+.hud .hlv{position:relative;width:30px;height:34px;flex:none}.hud .hlv img{width:100%;height:100%;object-fit:contain}
+.hud .hlv b{position:absolute;left:0;right:0;top:5px;text-align:center;font-size:13px;line-height:16px;color:#8a5a20;font-weight:bold}
 .hud .xpw{display:flex;flex-direction:column;gap:2px;min-width:64px}.hud .xpl{display:flex;align-items:center;gap:3px;font-size:10px;color:#b0708a;white-space:nowrap}.hud .xpl img{width:13px;height:13px}
 .hud .xpb{height:6px;border-radius:3px;background:#f3dfe6;overflow:hidden}.hud .xpb i{display:block;height:100%;background:linear-gradient(90deg,#ffa8c4,#ff6f9b);border-radius:3px}
 .hud .cn{display:flex;align-items:center;gap:3px;font-size:14px;color:#a06a00}.hud .cn img{width:18px;height:18px}
@@ -411,28 +411,81 @@ button.danger{color:#d0453a!important;border-color:#f0b8b0!important}
 @keyframes gpulse{0%,100%{filter:brightness(1)}50%{filter:brightness(1.15)}}
 @media (prefers-reduced-motion:reduce){.card.gold .back,.card.gold .back::after,.card.gold .front::after,.gift.coin{animation:none}}
 .adm h4{justify-content:flex-start!important;gap:6px}.adm input:not([type=number]):not([type=password]),.adm input[type=password]{width:100%;box-sizing:border-box;border:1.5px solid #e6d3bd;border-radius:12px;padding:9px 10px;font-size:16px;background:#fff;margin-top:6px}.adm .row2{margin-top:8px}
+
+/* ---- 小島滿版版面 ---- */
+.island{width:100%;max-width:none!important;height:100vh;height:100dvh;aspect-ratio:auto!important;background:#173a5c}
+.iback{position:absolute;inset:-40px;background-size:cover;background-position:center;filter:blur(22px) saturate(1.1);transition:background-image 1s}
+.imap{position:absolute;left:50%;top:0;width:min(100%,calc(100dvh * 1024 / 2076));aspect-ratio:1024/2076;transform:translateX(-50%)}
+.imap #things{position:absolute;left:0;right:0;top:12.524%;height:73.988%}
+.icol{position:absolute;top:0;bottom:0;left:50%;transform:translateX(-50%);width:min(100%,520px);pointer-events:none;z-index:3000}
+.icol>*{pointer-events:auto}.icol .top{pointer-events:none}.icol .top>*{pointer-events:auto}
+.ibot{position:absolute;left:0;right:0;bottom:6px;align-items:flex-start!important;display:flex;flex-direction:column;align-items:center;gap:7px;padding:0 14px;pointer-events:none}
+.ibot>*{pointer-events:auto}
+.trow{display:flex;gap:8px;align-items:center;width:100%;max-width:300px;pointer-events:none}.trow>*{pointer-events:auto}
+.trow .ticker{position:relative;left:auto;right:auto;bottom:auto;flex:1;min-width:0}
+.trow .cam2{flex:none;width:40px;height:40px;font-size:18px}
+.ibot .bar{position:relative;left:auto;bottom:auto;transform:none}
+.ibot .bar button{padding:5px 9px}
+.inote{font-size:11px;color:rgba(255,255,255,.8);text-shadow:0 1px 2px rgba(0,0,0,.5);text-align:center;pointer-events:none}
+#island:not(.hidden)~#foot{display:none}
+#me .lvb{display:none}
+.icol .hud{top:66px}
+
+/* ---- 不要整頁上下捲動 ---- */
+html,body{height:100%;overflow:hidden;overscroll-behavior:none}
+#homewrap{position:relative;height:100vh;height:100dvh;overflow:hidden;justify-content:flex-start}
+#homewrap:has(#home.hidden){display:none}
+.hback{position:absolute;inset:-40px;background-size:cover;background-position:center;filter:blur(22px) brightness(.55);z-index:0}
+#homewrap>*:not(.hback){position:relative;z-index:1}
+#homewrap .home{max-width:min(100%,520px,calc((100dvh - 215px) * 2 / 3))!important;flex:none}
+#homewrap .top.hbar{padding:8px 14px 6px}
+#homewrap .actions.hbar{margin-top:8px}
+#homewrap .hudH{margin-top:8px}
+#homewrap #foot{padding:8px 16px 0;font-size:12px;line-height:1.5;text-align:center;max-width:520px;margin:0 auto}
+#home.hidden~#foot{display:none}
+.shakebag{animation:shake .5s ease-in-out infinite}
+.xclose{position:sticky;top:0;float:right;margin:-6px -4px -34px 0;width:34px;height:34px;border-radius:50%;border:1.5px solid #e6d3bd;background:#fff;color:#8a6a50;font-size:16px;line-height:1;z-index:5;box-shadow:0 2px 6px rgba(0,0,0,.08)}
+
+.irows{position:absolute;left:0;right:0;top:75.5%;display:flex;flex-direction:column;align-items:center;gap:8px;padding:0 14px;z-index:3000}
+.irows .trow{max-width:330px;justify-content:center}
+.irows .bar{position:relative;left:auto;bottom:auto;transform:none}
+.irows .bar button{padding:5px 8px}
+.ibot{bottom:calc(8px + env(safe-area-inset-bottom))!important;align-items:center!important;padding:0 22px}
+.inote{line-height:1.55;font-size:12px}
+.topright{gap:8px!important}
+@media (max-width:360px){.topright .circle{width:38px;height:38px;font-size:17px}}
+
+.irows{top:78.6%!important;gap:10px!important}
+.irows .trow{max-width:none!important;width:min(300px,78%)!important;align-self:flex-start;justify-content:flex-start!important;gap:10px!important}
+.irows .ticker{background:linear-gradient(90deg,rgba(255,250,238,.95) 0%,rgba(255,250,238,.85) 55%,rgba(255,250,238,0) 100%)!important;border:0!important;box-shadow:none!important;padding-right:18px}
+.irows .camb{flex:none;width:50px;height:50px;font-size:24px}
+.irows .camb .ii.ic{width:30px!important;height:30px!important}
 </style>
 </head>
 <body>
 <!-- ===== 小島 ===== -->
 <div class="stage island" id="island">
+  <div class="iback" id="iback"></div>
+  <div class="imap" id="imap">
   <img class="bg" data-p="dawn" src="assets/island2_dawn.webp" alt="">
   <img class="bg" data-p="day" src="assets/island2_day.webp" alt="">
   <img class="bg" data-p="sunset" src="assets/island2_sunset.webp" alt="">
   <img class="bg" data-p="night" src="assets/island2_night.webp" alt="">
   <div id="things"></div>
+  <div class="irows"><div class="trow"><div class="ticker" id="ticker" role="button" aria-label="島上動態"></div><button class="circle camb" id="cami" aria-label="拍照">📷</button></div><div class="bar" id="bar"><button data-p="auto">自動</button><button data-p="dawn">清晨</button><button data-p="day">白天</button><button data-p="sunset">日落</button><button data-p="night">夜晚</button></div></div>
+  </div>
+  <div class="icol" id="icol">
   <div class="top" style="align-items:flex-start"><img class="logo" src="assets/logo.webp" alt="毛很多"><div class="topright">
     <button class="circle" id="bell" aria-label="通知">🔔<span class="badge" id="belln"></span></button>
     <button class="circle" id="tix" aria-label="任務與抽卡">🎟️<span class="badge" id="tixn">0</span></button>
     <button class="circle" id="me" aria-label="我的設定"></button></div></div>
-  <div class="ticker" id="ticker" role="button" aria-label="島上動態"></div>
   <div class="pickbar hidden" id="pickbar">點一塊「＋」空地蓋房子<button id="pickcancel">取消</button></div>
-  <div class="bar" id="bar">
-    <button data-p="auto">自動</button><button data-p="dawn">清晨</button><button data-p="day">白天</button><button data-p="sunset">日落</button><button data-p="night">夜晚</button><button id="cami" aria-label="拍照">📷</button>
+  <div class="ibot"><div class="inote" id="inote"></div></div>
   </div>
 </div>
 <!-- ===== 家裡 ===== -->
 <div id="homewrap">
+<div class="hback" id="hback"></div>
 <div class="stage home hidden" id="home">
   <img class="bg" id="roombg" src="assets/room_basic1.webp" alt="">
   <div class="nightdim" id="nightdim"></div>
@@ -637,7 +690,7 @@ const $=s=>document.querySelector(s);
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 let tt;function toast(m){const t=$('#toast');t.textContent=m;t.classList.add('show');clearTimeout(tt);tt=setTimeout(()=>t.classList.remove('show'),2000)}
 let modalLocked=false;
-function openModal(html,locked,theme){const sh=$('#sheet');sh.classList.toggle('themed',!!theme);if(theme)sh.style.setProperty('--cc',theme);else sh.style.removeProperty('--cc');sh.innerHTML=html;$('#modal').classList.remove('hidden');modalLocked=!!locked;$('#sheet').scrollTop=0}
+function openModal(html,locked,theme){const sh=$('#sheet');sh.classList.toggle('themed',!!theme);if(theme)sh.style.setProperty('--cc',theme);else sh.style.removeProperty('--cc');sh.innerHTML=(locked?'':'<button class="xclose noic" data-close aria-label="關閉">✕</button>')+html;$('#modal').classList.remove('hidden');modalLocked=!!locked;$('#sheet').scrollTop=0}
 function closeModal(){$('#modal').classList.add('hidden');$('#sheet').innerHTML='';$('#sheet').classList.remove('themed');modalLocked=false}
 $('#modal').addEventListener('click',e=>{if((e.target.id==='modal'&&!modalLocked)||e.target.closest('[data-close]'))closeModal()});
 const house=id=>DB.houses.find(h=>h.id===id);
@@ -665,7 +718,7 @@ const period=()=>mode==='auto'?autoPeriod():mode;
 const ipct=(x,y)=>({left:(x/1024*100)+'%',top:(y/1536*100)+'%'});
 function renderIsland(){
   const p=period();
-  document.querySelectorAll('#island .bg').forEach(b=>b.classList.toggle('on',b.dataset.p===p));
+  document.querySelectorAll('#island .bg').forEach(b=>b.classList.toggle('on',b.dataset.p===p));$('#iback').style.backgroundImage=`url(assets/island2_${p}.webp)`;
   document.querySelectorAll('#bar button').forEach(b=>b.classList.toggle('on',b.dataset.p===mode));
   const box=$('#things');box.innerHTML='';const used=new Map(DB.houses.map(h=>[h.slot,h]));
   SLOTS.map((s,i)=>({s,i})).sort((a,b)=>a.s[1]-b.s[1]).forEach(({s:[x,y],i})=>{
@@ -828,7 +881,7 @@ function canEat(p){const f=fullness(p),n=mealsToday(p);if(sleepState(p))return '
 function openHome(hid,keep){
   const h=house(hid);if(!h)return;
   $('#island').classList.add('hidden');$('#home').classList.remove('hidden');
-  $('#hname').textContent=h.name+(isAdminHouse(h)?' 👑':'');$('#roombg').src=roomImg(h.room);if(!ONLINE)spawnPoops(h);
+  $('#hname').textContent=h.name+(isAdminHouse(h)?' 👑':'');$('#roombg').src=roomImg(h.room);$('#hback').style.backgroundImage=`url(${roomImg(h.room)})`;if(!ONLINE)spawnPoops(h);
   const prev=home&&home.id===hid?home.pets:[];
   const plist=petsOf(hid).filter(p=>!outAt(p.id)||outAt(p.id).id===hid).concat(guestsOf(hid).map(g=>pet(g.petId)).filter(p=>p.houseId!==hid));
   home={id:hid,pets:plist.map((p,i)=>{const o=prev.find(q=>q.id===p.id);
@@ -1358,9 +1411,10 @@ $('#me').onclick=()=>{
     </div>
     <div class="row2" style="margin-top:10px"><button id="mguide">📲 加到主畫面</button><button id="minv">🔗 複製邀請連結</button></div>
     ${ONLINE?`<div class="codebox"><div><small>我的轉移碼（換手機時用，截圖存起來）</small><b>${esc(DB.me.code||'同步後就會出現')}</b></div><button id="mcode">複製</button></div>`:''}
+    ${ONLINE?'<div class="row2" style="margin-top:8px"><button id="mrec">🔑 用轉移碼登入其他帳號</button></div>':''}
     ${adminPw()?'<div class="row2" style="margin-top:10px"><button id="madmin">👑 島主後台</button></div>':''}
     <div class="row2" style="margin-top:10px"><button data-close>關閉</button></div>`);
-  $('#mguide').onclick=()=>homeGuide(false);if($('#madmin'))$('#madmin').onclick=adminSheet;
+  $('#mguide').onclick=()=>homeGuide(false);if($('#madmin'))$('#madmin').onclick=adminSheet;if($('#mrec'))$('#mrec').onclick=recoverSheet;
   if($('#mcode'))$('#mcode').onclick=async()=>{const c=DB.me.code;if(!c)return;try{await navigator.clipboard.writeText(c);toast('轉移碼已複製 🔑')}catch(e){toast(c)}};
   $('#minv').onclick=async()=>{const u=inviteUrl();try{await navigator.clipboard.writeText(u);toast('邀請連結已複製，貼到 LINE 給朋友吧 🔗')}catch(e){toast(u)}};
   $('#msave').onclick=async()=>{const n=$('#mn').value.trim();if(!n)return toast('暱稱不能空白');
@@ -1647,8 +1701,8 @@ $('#home').addEventListener('click',async e=>{
   const rect=$('#home').getBoundingClientRect(),x=clamp((e.clientX-rect.left)/rect.width*RW,FLOOR.x0,FLOOR.x1),y=clamp((e.clientY-rect.top)/rect.height*RH,FLOOR.y0+20,FLOOR.y1);
   const h=house(home.id),P=placing;placing=null;
   if(P.toy){P.toy.x=Math.round(x);P.toy.y=Math.round(y);renderFloor();call('moveToy',Object.assign(cred(),{toyId:P.toy.id,x:P.toy.x,y:P.toy.y,flip:!!P.toy.flip}),true).catch(err=>toast(err.message));return}
-  let t;try{t=await call('placeToy',Object.assign(cred(),{item:P.item,x:Math.round(x),y:Math.round(y)}),true)}catch(err){return toast(err.message)}
-  bagAdd(P.item,-1);(h.toys=h.toys||[]).push(t);renderFloor();toast('擺好了 🧸');
+  const tmp={id:'tmp'+uid(),item:P.item,x:Math.round(x),y:Math.round(y)};bagAdd(P.item,-1);(h.toys=h.toys||[]).push(tmp);renderFloor();toast('擺好了 🧸');
+  call('placeToy',Object.assign(cred(),{item:P.item,x:tmp.x,y:tmp.y}),true).then(t=>{Object.assign(tmp,t)}).catch(err=>{h.toys=(h.toys||[]).filter(x=>x!==tmp);bagAdd(P.item,1);renderFloor();toast(err.message)});
 });
 // ---------- 掃把 ----------
 $('#sweep').onclick=async()=>{
@@ -1846,6 +1900,7 @@ async function takePhoto(){
 document.addEventListener('error',e=>{const t=e.target;if(t.tagName==='IMG'&&!t.dataset.fb&&/googleusercontent/.test(t.src)){t.dataset.fb=1;t.src='assets/pet_head_other.webp'}},true);
 // ================= 頁尾與啟動 =================
 function renderFoot(){
+  $('#inote').textContent=ONLINE?'毛很多・資料存在雲端，朋友之間會互相看到。畫面不是即時的，回到小島或過一分鐘會自動更新。':'試做版：資料只存在這支手機的瀏覽器裡，別人看不到。';
   if(ONLINE){$('#foot').innerHTML='毛很多・資料存在雲端，朋友之間會互相看到。畫面不是即時的，回到小島或過一分鐘會自動更新。';return}
   $('#foot').innerHTML=`試做版：資料只存在這支手機的瀏覽器裡，別人看不到，之後接上 Google 試算表才會共用。示範家庭的家人密碼都是 1234。<br><button id="reset">清除試做資料、從頭開始</button>`;
   $('#reset').onclick=e=>{if(!armBtn(e.target,'所有試做資料都會清掉，再按一次'))return;try{localStorage.removeItem(KEY)}catch(err){}DB=seed();save();picking=false;renderIsland();renderFoot();onboarding()};
@@ -1871,20 +1926,26 @@ iconize(document.body);
 
 // ================= 💰 撿錢 =================
 let pickBusy=false;
-async function pickCoin(d,el){if(!needMe()||pickBusy)return;pickBusy=true;el.classList.add('grab');
-  let r;try{r=await call('pickCoin',{playerId:DB.me.id,dropId:d.id},true)}catch(e){pickBusy=false;PICKED.add(d.id);DB.drops=(DB.drops||[]).filter(x=>x.id!==d.id);renderFloor();return toast(e.message)}
-  pickBusy=false;PICKED.add(d.id);DB.drops=(DB.drops||[]).filter(x=>x.id!==d.id);
-  const g=DB.game;g.coins=(g.coins||0)+r.amt;save();updTix();rewardPop(0,r.amt);fx('✨',d.x,d.y-50);renderFloor();
+async function pickCoin(d,el){if(!needMe()||pickBusy)return;pickBusy=true;
+  PICKED.add(d.id);DB.drops=(DB.drops||[]).filter(x=>x.id!==d.id);fx('✨',d.x,d.y-50);renderFloor();
+  const bag=`<span class="ii huge"><img src="assets/money_bag.webp" alt="" onerror="this.remove()"><b>💰</b></span>`;
+  openModal(`<div style="text-align:center"><div class="giftopen shakebag">${bag}</div><h3 id="cth">打開錢袋…</h3><p class="coinbig" id="cta">？？</p><p class="lead" id="ctl">看看裡面有多少</p></div><div class="row2"><button data-close>好</button></div>`);
+  let r;try{r=await call('pickCoin',{playerId:DB.me.id,dropId:d.id},true)}catch(e){pickBusy=false;
+    if($('#cth')){$('.shakebag').classList.remove('shakebag');$('#cth').textContent='慢了一步 😆';$('#cta').textContent='';$('#ctl').textContent=/撿走/.test(e.message)?'錢被別人先撿走了，去別家巡巡看吧':e.message}else toast(e.message);return}
+  pickBusy=false;const g=DB.game;g.coins=(g.coins||0)+r.amt;save();updTix();rewardPop(0,r.amt);
   const big=r.amt>=100;
-  openModal(`<div style="text-align:center"><div class="giftopen"><span class="ii huge"><img src="assets/money_bag.webp" alt="" onerror="this.remove()"><b>💰</b></span></div><h3>${big?'🧧 大紅包！':'撿到錢了！'}</h3><p class="coinbig">+${r.amt} 🪙</p><p class="lead">${DB.dbl===todayTW()?'雙倍日加碼中 ✨':'繼續去別人家巡巡看吧'}</p></div><div class="row2"><button data-close>好耶</button></div>`);
+  if($('#cth')){$('.shakebag')&&$('.shakebag').classList.remove('shakebag');$('#cth').textContent=big?'🧧 大紅包！':'撿到錢了！';$('#cta').textContent=`+${r.amt} 🪙`;$('#ctl').textContent=DB.dbl===todayTW()?'雙倍日加碼中 ✨':'繼續去別人家巡巡看吧'}
+  else toast(`撿到 ${r.amt} 金幣！`);
   if(ONLINE)feedPush(`${DB.me.nick} 在 ${house(d.houseId).name} 撿到 ${r.amt} 金幣 💰`)}
 
 // ================= 狀態列（等級・經驗・金幣） =================
-function hudHTML(){const g=DB.game||{},lv=g.lv||1,xp=g.xp||0;return `<span class="lvb"><img src="assets/lv_badge.webp" alt="" onerror="this.remove()"><b>${lv}</b></span><span class="xpw"><span class="xpl"><img src="assets/icon_xp.webp" alt="" onerror="this.remove()">${xp} / ${XP_LV}</span><span class="xpb"><i style="width:${Math.min(100,xp/XP_LV*100)}%"></i></span></span><span class="cn"><img src="assets/icon_coin.webp" alt="" onerror="this.remove()">${g.coins||0}</span>${DB.dbl===todayTW()?'<span class="dbl">×2</span>':''}`}
+function hudHTML(){const g=DB.game||{},lv=g.lv||1,xp=g.xp||0;return `<span class="hlv"><img src="assets/lv_badge.webp" alt="" onerror="this.remove()"><b>${lv}</b></span><span class="xpw"><span class="xpl"><img src="assets/icon_xp.webp" alt="" onerror="this.remove()">${xp} / ${XP_LV}</span><span class="xpb"><i style="width:${Math.min(100,xp/XP_LV*100)}%"></i></span></span><span class="cn"><img src="assets/icon_coin.webp" alt="" onerror="this.remove()">${g.coins||0}</span>${DB.dbl===todayTW()?'<span class="dbl">×2</span>':''}`}
 function updHud(){document.querySelectorAll('.hud').forEach(h=>{if(!DB.me){h.style.display='none';return}h.style.display='';h.innerHTML=hudHTML()})}
-(function(){const a=document.createElement('button');a.className='hud noic';a.id='hudI';a.setAttribute('aria-label','等級與金幣');$('#island').appendChild(a);
+new MutationObserver(()=>{$('#hback').style.backgroundImage=`url(${$('#roombg').getAttribute('src')})`}).observe($('#roombg'),{attributes:true,attributeFilter:['src']});
+(function(){const a=document.createElement('button');a.className='hud noic';a.id='hudI';a.setAttribute('aria-label','等級與金幣');$('#icol').appendChild(a);
   const b=document.createElement('button');b.className='hud hudH noic';b.id='hudH';b.setAttribute('aria-label','等級與金幣');$('#homewrap').appendChild(b);
   [a,b].forEach(x=>x.onclick=()=>{if(DB.me)missionsSheet()});updHud()})();
+$('#homewrap').appendChild($('#foot'));
 const updTix0=updTix;updTix=function(){updTix0();updHud()};
 
 // ================= 👑 島主 =================
@@ -1941,7 +2002,7 @@ function recoverSheet(){
     DB.gameSynced=true;try{localStorage.setItem(OKEY+'_g','1')}catch(e){}save();closeModal();updTix();toast(`歡迎回來，${p.nick}！🎉`);await sync(true);renderIsland()}}
 
 // ================= 自動更新：發現新版本就重新載入 =================
-const APP_VER='2026-11-11d';
+const APP_VER='2026-11-11h';
 function checkUpdate(){
   if(!/^https?:/.test(location.protocol)||!API_URL)return;
   if(!$('#modal').classList.contains('hidden'))return; // 正在填表單時不打斷
