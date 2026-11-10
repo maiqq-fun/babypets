@@ -811,7 +811,8 @@ function renderMe(){
   const h=myHouse();const p=h&&petsOf(h.id)[0];
   $('#me').innerHTML=(p?`<img src="${petHead(p)}" alt="">`:'🙂')+(DB.me?`<span class="lvb">Lv${DB.game.lv||1}</span>`:'');
 }
-$('#bar').onclick=e=>{const b=e.target.closest('button');if(!b)return;if(b.id==='cami')return takePhoto();mode=b.dataset.p;renderIsland()};
+$('#bar').onclick=e=>{const b=e.target.closest('button');if(!b||!b.dataset.p)return;mode=b.dataset.p;renderIsland()};
+$('#cami').onclick=e=>{e.stopPropagation();takePhoto()};
 $('#pickcancel').onclick=()=>{picking=false;renderIsland()};
 function lotClick(slot){
   if(!DB.me)return onboarding();
@@ -2206,7 +2207,7 @@ async function loadWx(){try{const c=JSON.parse(localStorage.getItem('mhd_wx')||'
 drawWx();loadWx();setInterval(loadWx,30*60e3);
 
 // ================= 自動更新：發現新版本就重新載入 =================
-const APP_VER='2026-11-11r';
+const APP_VER='2026-11-11s';
 function checkUpdate(){
   if(!/^https?:/.test(location.protocol)||!API_URL)return;
   if(!$('#modal').classList.contains('hidden'))return; // 正在填表單時不打斷
