@@ -591,16 +591,18 @@ html,body,button,.island,.imap,.logo{touch-action:manipulation}
 .lgrow .t small{display:block;font-size:11px;color:var(--soft)}.lgrow .dot{width:8px;height:8px;border-radius:50%;background:#ff6f6f;flex:none}
 .lgmore{border:0;background:none;color:var(--accent-d);font-size:13px;padding:6px 0 0}
 .lglist{max-height:60vh;overflow:auto;margin-bottom:10px}
-.letter{background:#fffaf0;border:2px solid #f0d6bc;border-radius:18px;padding:16px 18px 18px;margin:4px 0 12px;color:#5a4030;background-image:repeating-linear-gradient(transparent 0 33px,#f3e3d0 33px 34px);background-position:0 92px}
-.lghead{display:flex;gap:10px;align-items:center;margin:0 0 12px;padding-bottom:10px;border-bottom:2px dashed #f0d6bc;background:#fffaf0}.lghead img{width:46px;height:46px;object-fit:contain}
+.letter{border-style:solid;border-width:56px 18px 60px;border-image:url(assets/letter_paper.webp) 100 34 110 34 fill stretch;padding:4px 10px 0;margin:4px 0 12px;color:#5a4030;min-height:220px}
+.lghead{display:flex;gap:10px;align-items:center;margin:0 0 12px;padding-bottom:10px;border-bottom:2px dashed #ecc9a8}.lghead img{width:46px;height:46px;object-fit:contain}
 .lghead b{display:block;font-size:17px}.lghead small{display:block;font-size:11px;color:#a08670}
-.lgbody{font-size:15px;line-height:34px;white-space:normal;word-break:break-word;min-height:80px}
+.lgbody{font-size:15px;line-height:1.8;white-space:normal;word-break:break-word;min-height:80px}
 .lgatt{margin-top:12px;padding:10px 12px;border:2px dashed #f0c8a8;border-radius:14px;background:rgba(255,250,238,.85);font-size:13px;display:flex;flex-direction:column;gap:8px}
 .lgatt button{border-radius:12px;padding:9px;font:inherit;border:1.5px solid #e6d3bd;background:#fff}.lgatt button.primary{background:var(--accent);color:#fff;border-color:var(--accent)}
 .lgpop img{width:110px;height:110px;object-fit:contain;animation:lgpop 1.2s ease-in-out infinite}
 @keyframes lgpop{0%,100%{transform:translateY(0) rotate(-3deg)}50%{transform:translateY(-8px) rotate(3deg)}}
 .adm textarea{width:100%;box-sizing:border-box;border:1.5px solid #e6d3bd;border-radius:12px;padding:9px 10px;font:inherit;font-size:16px;margin-top:6px;resize:vertical}
 .invl{max-height:220px;overflow:auto}.invl .code{font-weight:normal;letter-spacing:1px;font-size:15px}.invl small{display:block;font-size:11px;color:var(--soft)}
+#guestbar{position:absolute;left:14px;top:118px;z-index:3001;border:2px solid var(--wood);background:rgba(255,250,238,.95);border-radius:999px;padding:5px 12px;font-size:13px;color:#6b4b33;box-shadow:0 2px 0 rgba(0,0,0,.12)}
+.mini.danger{color:#d0453a;border-color:#f0b8b0}
 </style>
 </head>
 <body>
@@ -769,7 +771,7 @@ async function sync(quiet){
     Object.assign(DB,{houses:d.houses,pets:d.pets,weights:d.weights,medical:d.medical,expenses:d.expenses,notes:d.notes,feed:d.feed,famOk:d.famOk,players:d.players||[],tlogs:d.tlogs||[]});
     DB.houses.forEach(h=>{if(!Array.isArray(h.poops))h.poops=[]});
     keepPending();DB.letters=(d.letters||[]).filter(l=>!LGONE[l.id]).map(l=>Object.assign(l,LSTATE[l.id]||{}));DB.drops=(d.drops||[]).filter(x=>!PICKED.has(x.id));DB.notice=d.notice||null;DB.dbl=d.dbl||'';DB.adminId=d.adminId||'';
-    setTimeout(announceLetters,0);
+    setTimeout(announceLetters,0);setTimeout(updGuestBar,0);
     if(d.player&&DB.me){DB.me.code=d.player.code||DB.me.code;const ml=Array.isArray(d.player.mail)?d.player.mail:[];if(ml.length)claimMail(ml)}
     DB.owned={};d.houses.forEach(h=>DB.owned[h.id]=Array.isArray(h.owned)?h.owned:[]);
     if(d.player&&DB.me){DB.me.houseId=d.player.houseId||null;if(!DB.gameSynced&&d.player.game&&d.player.game.prog&&!localStorage.getItem(OKEY+'_g')){DB.game=d.player.game}}
@@ -910,39 +912,60 @@ function lotClick(slot){
 }
 
 // ================= 第一次打開 =================
-function onboarding(step){
-  if(!step){
-    openModal(`<div class="deco"><img src="assets/logo_deco.webp" alt=""><span>歡迎來到毛很多</span></div><p class="lead">先取一個暱稱，大家在動態和便利貼上會看到這個名字</p>
-      ${fld('nick','你的暱稱',`<input id="nick" maxlength="12" placeholder="例如：小麥" value="${esc(DB.me?.nick||'')}">`)}
-      <div class="err" id="nerr"></div><div class="row2"><button class="primary" id="nnext">下一步</button></div>${ONLINE?'<div class="row2" style="margin-top:8px"><button id="nold">🔑 我是老玩家（換手機）</button></div>':''}`,true);
-    if($('#nold'))$('#nold').onclick=recoverSheet;
-    $('#nnext').onclick=async()=>{const n=$('#nick').value.trim();if(!n){$('#nerr').textContent='請先輸入暱稱';return}
-      const me={id:DB.me?.id||(uid()+uid()),nick:n,houseId:DB.me?.houseId||null,pw:DB.me?.pw||''};
-      try{await call('savePlayer',{player:{id:me.id,nick:n,game:DB.game}})}catch(e){$('#nerr').textContent=e.message;return}
-      DB.me=me;save();dailyLogin();onboarding(2)};
-    $('#nick').onkeydown=e=>{if(e.key==='Enter')$('#nnext').click()};
-    setTimeout(()=>$('#nick')?.focus(),60);return;
-  }
-  openModal(`<h3>嗨，${esc(DB.me.nick)}！</h3><p class="lead">你想怎麼開始？之後都可以在右上角的設定裡改</p>
+let PENDING_INVITE='';
+const isGuest=()=>{try{return localStorage.getItem('mhd_guest')==='1'}catch(e){return false}};
+function setGuest(on){try{on?localStorage.setItem('mhd_guest','1'):localStorage.removeItem('mhd_guest')}catch(e){}updGuestBar()}
+function onboarding(){
+  openModal(`<div class="deco"><img src="assets/logo_deco.webp" alt=""><span>歡迎來到毛很多</span></div><p class="lead">${ONLINE?'這是一座私人小島，有島主的邀請碼或家人密碼才能加入':'你想怎麼開始？'}</p>
     <div class="big3">
-      <button id="o1"><span class="e">🏠</span><span>蓋我自己的家<small>${ONLINE?'需要島主給的邀請碼・':''}在島上選一塊空地，替你的毛孩建檔</small></span></button>
-      <button id="o2"><span class="e">🔑</span><span>加入家人的家<small>家人已經蓋好房子，你有家人密碼</small></span></button>
-      <button id="o3"><span class="e">👀</span><span>先逛逛<small>去朋友家看看毛孩、幫忙鏟屎</small></span></button>
+      <button id="o1"><span class="e">🏠</span><span>${ONLINE?'我有邀請碼，要蓋房子':'蓋我自己的家'}<small>在島上選一塊空地，替你的毛孩建檔</small></span></button>
+      <button id="o2"><span class="e">🔑</span><span>${ONLINE?'我有家人密碼':'加入家人的家'}<small>家人已經蓋好房子，一起照顧毛孩</small></span></button>
+      ${ONLINE?'<button id="o4"><span class="e">🔄</span><span>我是老玩家<small>換手機了，用轉移碼找回帳號</small></span></button>':''}
+      <button id="o3"><span class="e">👀</span><span>先看看<small>參觀小島和大家的毛孩，不用取名字</small></span></button>
     </div>`,true);
-  $('#o1').onclick=()=>{closeModal();picking=true;renderIsland();toast('點一塊「＋」空地')};
-  try{if(!localStorage.getItem('mhd_homeguide'))setTimeout(()=>{if($('#modal').classList.contains('hidden'))homeGuide(true)},20000)}catch(e){}
+  $('#o1').onclick=inviteStep;
   $('#o2').onclick=()=>joinFlow();
-  $('#o3').onclick=()=>{closeModal();renderIsland();toast('逛逛吧！想蓋房子時點空地的「＋」');setTimeout(()=>homeGuide(true),2200)};
+  if($('#o4'))$('#o4').onclick=recoverSheet;
+  $('#o3').onclick=()=>{setGuest(true);closeModal();renderIsland();toast('參觀中，想加入隨時點上面的「🔒 參觀中」')};
 }
+function inviteStep(){
+  if(!ONLINE)return nameStep(()=>{picking=true;renderIsland();toast('點一塊「＋」空地')});
+  openModal(`<h3>🏠 輸入邀請碼</h3><p class="lead">跟島主拿到的邀請碼，一組只能用一次</p>
+    ${fld('ivc','邀請碼',`<input id="ivc" placeholder="例如：MAO-4821" autocapitalize="characters" autocomplete="off" value="${esc(PENDING_INVITE)}">`)}
+    <div class="err" id="iverr"></div><div class="row2"><button id="ivb">返回</button><button class="primary" id="ivok">下一步</button></div>`,true);
+  $('#ivb').onclick=onboarding;
+  $('#ivok').onclick=async()=>{const c=$('#ivc').value.trim();if(!c){$('#iverr').textContent='請輸入邀請碼';return}
+    try{await call('checkInvite',{invite:c})}catch(e){$('#iverr').textContent=e.message;return}
+    PENDING_INVITE=c;nameStep(()=>{picking=true;renderIsland();toast('點一塊「＋」空地，蓋你的家')})};
+}
+function nameStep(next,back){
+  openModal(`<div class="deco"><img src="assets/logo_deco.webp" alt=""><span>取一個暱稱</span></div><p class="lead">大家在動態和便利貼上會看到這個名字</p>
+    ${fld('nick','你的暱稱',`<input id="nick" maxlength="12" placeholder="例如：小麥" value="${esc(DB.me?.nick||'')}">`)}
+    <div class="err" id="nerr"></div><div class="row2"><button id="nback">返回</button><button class="primary" id="nnext">下一步</button></div>`,true);
+  $('#nback').onclick=back||onboarding;
+  $('#nnext').onclick=async()=>{const n=$('#nick').value.trim();if(!n){$('#nerr').textContent='請先輸入暱稱';return}
+    const me={id:DB.me?.id||(uid()+uid()),nick:n,houseId:DB.me?.houseId||null,pw:DB.me?.pw||''};
+    try{await call('savePlayer',{player:{id:me.id,nick:n,game:DB.game}})}catch(e){$('#nerr').textContent=e.message;return}
+    DB.me=me;save();setGuest(false);closeModal();next()};
+  $('#nick').onkeydown=e=>{if(e.key==='Enter')$('#nnext').click()};
+  setTimeout(()=>$('#nick')?.focus(),60);
+}
+function updGuestBar(){let g=$('#guestbar');if(!g){g=document.createElement('button');g.id='guestbar';g.className='noic';g.onclick=()=>onboarding();$('#icol').appendChild(g)}
+  const show=ONLINE&&!myHouse();g.style.display=show?'':'none';g.textContent=DB.me?'🔒 還沒有家・點這裡加入':'🔒 參觀中・點這裡加入'}
 function joinFlow(hid){
-  const mine=myHouse();if(mine){toast(`你已經是「${mine.name}」的家人，要先退出才能加入別的家`);return}
+  const fresh=!DB.me;const mine=myHouse();if(mine){toast(`你已經是「${mine.name}」的家人，要先退出才能加入別的家`);return}
   const list=DB.houses.slice().sort((a,b)=>a.name.localeCompare(b.name,'zh-Hant'));
   openModal(`<h3>🔑 加入家人的家</h3><p class="lead">選一個家，輸入家人告訴你的密碼</p>
     ${fld('jh','哪一個家？',`<select id="jh">${list.map(h=>`<option value="${h.id}" ${h.id===hid?'selected':''}>${esc(h.name)}（${membersOf(h.id).length}/${MAX_MEMBERS}）</option>`).join('')}</select>`)}
     ${fld('jp','家人密碼',`<input id="jp" type="password" autocomplete="off">`,'試做版的示範家庭，密碼都是 1234')}
     <div class="err" id="jerr"></div>
-    <div class="row2"><button data-close>取消</button><button class="primary" id="jok">加入</button></div>`);
+    <div class="row2"><button ${fresh?'id="jback"':'data-close'}>${fresh?'返回':'取消'}</button><button class="primary" id="jok">${fresh?'下一步':'加入'}</button></div>`,fresh);
+  if($('#jback'))$('#jback').onclick=onboarding;
   $('#jok').onclick=async()=>{const h=house($('#jh').value),pw=hashPw($('#jp').value);
+    if(fresh&&ONLINE){try{await call('checkJoin',{houseId:h.id,pw})}catch(e){$('#jerr').textContent=e.message;return}
+      return nameStep(async()=>{try{await call('joinHouse',{playerId:DB.me.id,houseId:h.id,pw})}catch(e){toast(e.message);return}
+        DB.me.houseId=h.id;DB.me.pw=pw;DB.famOk=true;save();toast(`歡迎回家！你現在是「${h.name}」的家人`);await sync(true);updGuestBar();openHome(h.id)},()=>joinFlow(h.id))}
+    if(fresh)return nameStep(()=>joinFlow(h.id));
     try{await call('joinHouse',{playerId:DB.me.id,houseId:h.id,pw})}catch(e){$('#jerr').textContent=e.message;return}
     DB.me.houseId=h.id;DB.me.pw=pw;DB.famOk=true;const mp=(DB.players||[]).find(x=>x.id===DB.me.id);if(mp)mp.houseId=h.id;else (DB.players=DB.players||[]).push({id:DB.me.id,nick:DB.me.nick,houseId:h.id});save();closeModal();toast(`歡迎回家！你現在是「${h.name}」的家人`);
     if(!$('#home').classList.contains('hidden'))openHome(h.id);else renderIsland();sync(true)};
@@ -977,7 +1000,7 @@ function buildFlow(slot){
   }
   function s3(){
     openModal(`<h3>🔑 設定家人密碼</h3>${steps(3)}<p class="lead">一起照顧毛孩的家人輸入這組密碼，就能一起編輯資料、看醫療和支出紀錄</p>
-      ${ONLINE?fld('pinv','島主給的邀請碼',`<input id="pinv" placeholder="例如：MAO-4821" autocapitalize="characters" autocomplete="off" value="${esc(B.invite||'')}">`,'這是私人小島，要有邀請碼才能蓋房子'):''}
+      ${ONLINE?fld('pinv','島主給的邀請碼',`<input id="pinv" placeholder="例如：MAO-4821" autocapitalize="characters" autocomplete="off" value="${esc(B.invite||PENDING_INVITE||'')}">`,'這是私人小島，要有邀請碼才能蓋房子'):''}
       ${fld('p1','家人密碼',`<input id="p1" type="password" minlength="4" autocomplete="new-password">`,'至少 4 個字，只告訴家人就好')}
       ${fld('p2','再輸入一次',`<input id="p2" type="password" autocomplete="new-password">`)}
       <div class="err" id="perr"></div>
@@ -989,7 +1012,7 @@ function buildFlow(slot){
       if(a!==b){$('#perr').textContent='兩次輸入的密碼不一樣';return}
       const pw=hashPw(a);let r;
       try{r=await call('buildHouse',{playerId:DB.me.id,house:{slot:B.slot,style:B.style,name:B.name,motto:B.motto,room:B.room},pw,invite:inv})}catch(e){$('#perr').textContent=e.message;return}
-      DB.me.houseId=r.houseId;DB.me.pw=pw;DB.famOk=true;save();
+      DB.me.houseId=r.houseId;DB.me.pw=pw;DB.famOk=true;PENDING_INVITE='';save();setTimeout(updGuestBar,0);
       if(ONLINE)await sync(true);
       closeModal();renderIsland();openHome(r.houseId);setTimeout(()=>petForm(r.houseId),600)};
   }
@@ -1036,7 +1059,7 @@ function sleepState(p,now){
 }
 const isNight=()=>{const m=twMin(Date.now());return m>=23*60||m<6*60};
 const guestHere=(pid,now)=>DB.houses.some(h=>(h.guests||[]).some(g=>g.petId===pid&&+g.until>(now||Date.now())));
-function canEat(p){const f=fullness(p),n=mealsToday(p);if(sleepState(p))return 'sleep';if(n>=4)return 'max';if(p.lastFed&&Date.now()-p.lastFed<2*HOUR)return 'cool';if(f>=80)return 'full';return ''}
+function canEat(p){const f=fullness(p),n=mealsToday(p);if(sleepState(p))return 'sleep';if(f<30)return '';if(n>=4)return 'max';if(p.lastFed&&Date.now()-p.lastFed<2*HOUR)return 'cool';if(f>=80)return 'full';return ''}
 // ---------- 開門 ----------
 function openHome(hid,keep){
   const h=house(hid);if(!h)return;
@@ -1239,7 +1262,9 @@ $('#feed').onclick=()=>{
   if(!needMe())return;if(!home.pets.length)return toast('這個家還沒有毛孩');if(home.bowl)return toast('碗裡還有飯喔');
   const h=house(home.id),why={},eat=[];
   home.pets.forEach(r=>{if(r.guest)return;const p=pet(r.id);const c=canEat(p);if(c)why[c]=(why[c]||[]).concat(p.name);else eat.push(r)});
-  if(!eat.length){const msg=why.sleep&&why.sleep.length===home.pets.length?'大家都在睡覺，等牠們醒來再餵吧 💤':why.full||why.cool?`${(why.full||why.cool||[]).join('、')} 吃不下了～肚子還飽飽的`:why.max?`${why.max.join('、')} 今天已經吃滿 4 餐囉`:'現在沒有毛孩要吃飯';return toast(msg)}
+  if(!eat.length){const parts=[];if(why.sleep)parts.push(`${why.sleep.join('、')} 在睡覺 💤`);const fl=(why.full||[]).concat(why.cool||[]);if(fl.length)parts.push(`${fl.join('、')} 還飽飽的`);if(why.max)parts.push(`${why.max.join('、')} 今天吃滿 4 餐了`);
+    const away=petsOf(h.id).filter(p=>{const o=outAt(p.id);return o&&o.id!==h.id&&fullness(p)<30});if(away.length)parts.push(`${away.map(p=>p.name).join('、')} 在外面玩，叫牠回家才能吃`);
+    return toast(parts.join('；')||'現在沒有毛孩要吃飯')}
   home.bowl={empty:false};renderFloor();
   eat.forEach((r,i)=>{r.tx=BOWL.x+(i%2?75:-75)*(1+Math.floor(i/2));r.ty=BOWL.y-10;r.state='walk';r.goal='eat';r.fast=false;r.anim=null});
   const names=eat.map(r=>pet(r.id).name).join('、');
@@ -1716,7 +1741,7 @@ $('#ticker').onclick=()=>{
 // ================= 通知中心 =================
 function notices(){
   const h=myHouse(),out=[];if(!h)return out;const now=Date.now();
-  petsOf(h.id).forEach(p=>{if(!sleepState(p)&&fullness(p)<30)out.push({ic:'🍖',t:`${p.name} 肚子餓了，快去餵牠`,go:'home'});
+  petsOf(h.id).forEach(p=>{if(!sleepState(p)&&fullness(p)<30){const o=outAt(p.id);out.push({ic:'🍖',t:o&&o.id!==h.id?`${p.name} 在「${o.name}」玩到肚子餓了，叫牠回家吃飯`:`${p.name} 肚子餓了，快去餵牠`,go:'home'})}
     if(p.birthday){const b=p.birthday.slice(5),days=[0,1,2,3,4,5,6,7].find(k=>twDay(now+k*86400e3).slice(5)===b);if(days!==undefined)out.push({ic:'🎂',t:days?`${p.name} 再 ${days} 天生日`:`今天是 ${p.name} 的生日！`,go:'home'})}});
   const pp=(h.poops||[]).length;if(pp)out.push({ic:'💩',t:`家裡有 ${pp} 坨便便等人清`,go:'home'});
   (DB.medical||[]).forEach(m=>{if(m.next){const d=(new Date(m.next)-new Date(todayTW()))/86400e3;const p=pet(m.petId);if(p&&d>=0&&d<=7)out.push({ic:'🩺',t:`${p.name} ${d?d+' 天後':'今天'}要回診（${m.type}${m.title?'・'+m.title:''}）`,go:'home'})}});
@@ -1927,7 +1952,7 @@ function reward(k,mult){
 function earn(k){return reward(k)}
 function progress(){}
 function rewardPop(x,c){if(!x&&!c)return;if(c)sfx('coin');if(flyReward(x,c))return;const el=document.createElement('div');el.className='coinpop';el.textContent=`${x?`+${x} 💗`:''}${c?` +${c} 🪙`:''}`;document.body.appendChild(el);setTimeout(()=>el.remove(),1500)}
-function dailyLogin(){if(!DB.me)return;const g=DB.game,d=todayTW();g.loginDay=d;save();
+function dailyLogin(){if(!DB.me||(ONLINE&&!myHouse()))return;const g=DB.game,d=todayTW();g.loginDay=d;save();
   if(((g.ci||{}).last)!==d){let tries=0;const t=setInterval(()=>{if(++tries>60)return clearInterval(t);if($('#modal').classList.contains('hidden')&&!picking&&!document.querySelector('.gacha')){clearInterval(t);checkinSheet()}},2500)}}
 function visitReward(hid){if(!DB.me||isFamily(hid))return;const g=DB.game,d=todayTW();if(!g.vd||g.vd.d!==d)g.vd={d,l:[]};if(g.vd.l.includes(hid))return;g.vd.l.push(hid);reward('visit')}
 // ================= 限定玩具 =================
@@ -2129,7 +2154,7 @@ function renderFoot(){
 }
 renderIsland();renderFoot();tickerShow();setInterval(()=>{if(mode==='auto'&&!$('#island').classList.contains('hidden'))renderIsland()},60000);
 if(ONLINE){
-  busy(true);sync().finally(()=>{busy(false);if(!DB.me)onboarding()});
+  busy(true);sync().finally(()=>{busy(false);updGuestBar();if(!DB.me&&!isGuest())onboarding()});
   setInterval(()=>{if(document.visibilityState==='visible'&&$('#modal').classList.contains('hidden'))sync(true)},45000);
   document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')sync(true)});
 }else if(!DB.me)setTimeout(onboarding,400);
@@ -2244,7 +2269,7 @@ async function adminSheet(){
     <div class="row2"><input id="alc" type="number" min="0" placeholder="金幣"><input id="alk" type="number" min="0" placeholder="抽卡券"></div>
     <div class="row2"><select id="ali"><option value="">（不附道具）</option>${its}</select><input id="aln" type="number" min="0" placeholder="數量" style="max-width:80px"></div>
     <div class="row2"><button id="alsend">寄出</button></div></div>
-  <div class="sec adm"><h4>🙋 玩家列表・轉移碼</h4><div class="plist">${d.players.map(p=>`<div class="frow"><span>${esc(p.nick)}<small>${p.house?esc(p.house):'沒有家'}・Lv.${p.lv}・🪙${p.coins}${p.createdAt?'・'+new Date(p.createdAt).toLocaleDateString('zh-TW',{month:'numeric',day:'numeric'})+' 加入':''}</small></span><button class="mini" data-code="${esc(p.code)}">${esc(p.code)||'（下次登入後產生）'}</button></div>`).join('')}</div><p class="lead">點轉移碼可以複製，傳給換手機的朋友</p></div>
+  <div class="sec adm"><h4>🙋 玩家列表・轉移碼</h4><div class="plist">${d.players.map(p=>`<div class="frow"><span>${esc(p.nick)}<small>${p.house?esc(p.house):'沒有家'}・Lv.${p.lv}・🪙${p.coins}${p.createdAt?'・'+new Date(p.createdAt).toLocaleDateString('zh-TW',{month:'numeric',day:'numeric'})+' 加入':''}</small></span><span>${p.house?'':`<button class="mini danger" data-dpl="${p.id}">刪除</button> `}<button class="mini" data-code="${esc(p.code)}">${esc(p.code)||'—'}</button></span></div>`).join('')}</div><p class="lead">點轉移碼可以複製，傳給換手機的朋友</p></div>
   <div class="sec adm"><h4>🏠 家的管理</h4><div class="row2"><select id="ahh">${hs}</select></div>
     <div class="row2"><input id="ahp" type="password" placeholder="新的家人密碼（4 字以上）"><button id="ahpb">重設密碼</button></div>
     <div class="row2"><button id="ahrb" class="danger">收回成空地</button></div><p class="lead">收回會刪掉這個家的毛孩和紀錄，不能復原</p></div>
@@ -2261,6 +2286,7 @@ async function adminSheet(){
   $('#ainb').onclick=async()=>{try{const r=await adminCall('adminInviteNew',{n:1,note:$('#ainn').value.trim()});const c=r&&r[0];try{await navigator.clipboard.writeText(c)}catch(e){}toast(`邀請碼 ${c} 已複製 🔑`);adminSheet()}catch(e){toast(e.message)}};
   S.querySelectorAll('[data-icp]').forEach(b=>b.onclick=async()=>{try{await navigator.clipboard.writeText(b.dataset.icp);toast('已複製 '+b.dataset.icp)}catch(e){toast(b.dataset.icp)}});
   S.querySelectorAll('[data-ivd]').forEach(b=>b.onclick=async()=>{if(!armBtn(b,'確定？'))return;try{await adminCall('adminInviteVoid',{code:b.dataset.ivd});toast('作廢了');adminSheet()}catch(e){toast(e.message)}});
+  S.querySelectorAll('[data-dpl]').forEach(b=>b.onclick=async()=>{if(!armBtn(b,'確定？'))return;try{await adminCall('adminDeletePlayer',{id:b.dataset.dpl});toast('刪掉了');adminSheet()}catch(e){toast(e.message)}});
   $('#alsend').onclick=async()=>{const o={to:$('#alto').value,title:$('#alt').value.trim(),body:$('#alb').value.trim(),coins:+$('#alc').value||0,tickets:+$('#alk').value||0,item:$('#ali').value,n:+$('#aln').value||0};
     if(!o.title)return toast('信要有標題喔');try{await adminCall('adminLetter',o);toast(o.to==='*'?'信寄給全部島民了 ✉️':'信寄出了 ✉️');['alt','alb','alc','alk','aln'].forEach(k=>$('#'+k).value='');$('#ali').value='';sync(true)}catch(e){toast(e.message)}};
   $('#aout').onclick=()=>{try{localStorage.removeItem('mhd_admin')}catch(e){}closeModal();toast('已登出島主')};
@@ -2484,7 +2510,7 @@ function announceLetters(){if(!DB.me)return;let seen=[];try{seen=JSON.parse(loca
     sfx('gift');$('#lgopen').onclick=()=>openLetter(nw[0].id,()=>$('#bell').click())};
   setTimeout(go,1800)}
 // ================= 自動更新：發現新版本就重新載入 =================
-const APP_VER='v1.33';
+const APP_VER='v1.35';
 function checkUpdate(){
   if(!/^https?:/.test(location.protocol)||!API_URL)return;
   if(!$('#modal').classList.contains('hidden'))return; // 正在填表單時不打斷
