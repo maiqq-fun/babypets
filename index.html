@@ -2049,14 +2049,15 @@ async function snapshot(){
     const bg=await loadImg(roomImg(h.room));if(bg){const s=Math.max(W/bg.naturalWidth,H/bg.naturalHeight);x.drawImage(bg,(W-bg.naturalWidth*s)/2,(H-bg.naturalHeight*s)/2,bg.naturalWidth*s,bg.naturalHeight*s)}
     const B=BOARDS[h.room]||BOARDS.basic1,ns=DB.notes.filter(n=>n.houseId===h.id).sort((a,c)=>a.createdAt-c.createdAt).slice(-6),bw=(B[2]-B[0]-20)/3,bh=(B[3]-B[1]-20)/2;
     ns.forEach((n,i)=>{const cx=B[0]+10+(i%3)*bw+bw/2,cy=B[1]+10+Math.floor(i/3)*bh+bh/2,s=Math.min(bw,bh)*0.86;x.save();x.translate(cx,cy);x.rotate([-4,3,-2,5,-3,2][i]*Math.PI/180);x.fillStyle=n.color;x.shadowColor='rgba(0,0,0,.2)';x.shadowBlur=4;x.fillRect(-s/2,-s/2,s,s);x.shadowBlur=0;x.fillStyle='#5a4030';x.font=`${Math.round(s/6)}px ${FONT}`;x.textAlign='left';x.textBaseline='top';x.fillText([...n.text].slice(0,6).join(''),-s/2+6,-s/2+6);x.restore()});
-    const ents=[];
-    (h.toys||[]).forEach(t=>ents.push({y:t.y-300,f:async()=>{const im=await loadImg(`assets/item_${t.item}.webp`);if(im)drawFit(im,t.x,t.y+6,60*1.1,t.flip);else{x.font=`52px ${FONT}`;x.textAlign='center';x.fillText((ITEMS[t.item]||{}).emo||'',t.x,t.y)}}}));
-    (h.gifts||[]).forEach(g=>ents.push({y:g.y,f:async()=>{const im=await loadImg('assets/gift_box.webp');if(im)drawFit(im,g.x,g.y+6,64);else{x.font=`52px ${FONT}`;x.textAlign='center';x.fillText('🎁',g.x,g.y)}}}));
+    const ents=[],rw=$('#home').clientWidth||390,TB=Math.min(64,Math.max(40,rw*0.12))*848/rw;
+    (h.toys||[]).forEach(t=>{const it=ITEMS[t.item]||{};ents.push({y:it.flat?-1e6:t.y-300,f:async()=>{const im=await loadImg(`assets/item_${t.item}.webp`);if(im)drawFit(im,t.x,t.y+6,TB*(it.sz||1),t.flip);else{x.font=`52px ${FONT}`;x.textAlign='center';x.fillText(it.emo||'',t.x,t.y)}}})});
+    (h.gifts||[]).filter(g=>!(g.admin&&DB.me&&(g.opened||[]).includes(DB.me.id))).forEach(g=>ents.push({y:g.y,f:async()=>{const im=await loadImg(g.admin?'assets/gift_admin.webp':'assets/gift_box.webp');if(im){if(g.admin){x.save();x.shadowColor='rgba(255,210,90,.9)';x.shadowBlur=18}drawFit(im,g.x,g.y+6,TB*(g.admin?1.25:1));if(g.admin)x.restore()}else{x.font=`52px ${FONT}`;x.textAlign='center';x.fillText('🎁',g.x,g.y)}}}));
     home.pets.forEach(r=>{const p=pet(r.id);if(!p)return;
       if(r.sleep&&r.tent){ents.push({y:r.tent.y,f:async()=>{const sc=petScale(r.tent.y),im=await loadImg(`assets/tent_${(p.card||'#ff9a6b').slice(1)}.webp`)||await loadImg('assets/tent.webp');drawFit(im,r.tent.x,r.tent.y,230*sc);pill(`${p.name}・${r.sleep.label}`,r.tent.x,r.tent.y+8,18,'rgba(255,250,238,.92)','#b98d62','#5a4030')}});return}
       ents.push({y:r.y,f:async()=>{const sc=petScale(r.y),im=await loadImg(petBody(p))||await loadImg(defBody(p.species));
         x.fillStyle='rgba(90,55,25,.2)';x.beginPath();x.ellipse(r.x,r.y,80*sc,14*sc,0,0,Math.PI*2);x.fill();
         drawFit(im,r.x,r.y,215*sc,r.facing<0);pill((r.guest?'🐾 ':'')+p.name,r.x,r.y+6,18,'rgba(255,250,238,.9)','rgba(185,141,98,.6)','#5a4030')}})});
+    (DB.drops||[]).filter(d=>d.houseId===h.id&&!PICKED.has(d.id)).forEach(d=>ents.push({y:d.y,f:async()=>{const im=await loadImg('assets/money_bag.webp');if(im)drawFit(im,d.x,d.y+6,TB)}}));
     (h.poops||[]).forEach(pp=>ents.push({y:pp.y+1000,f:async()=>{const im=await loadImg('assets/poop.webp');drawFit(im,pp.x,pp.y,44)}}));
     ents.sort((a,b)=>a.y-b.y);for(const e of ents)await e.f();
     if(isNight()){x.fillStyle='rgba(20,25,60,.3)';x.fillRect(0,0,W,H)}
@@ -2395,7 +2396,7 @@ function recallSheet(p,o){
     call('walkHome',{playerId:DB.me.id,petId:p.id},true).catch(()=>{});closeModal();openHome(home.id,true);toast(`${p.name} 回家了 🏠`);
     setTimeout(()=>{const r=home&&home.pets.find(x=>x.id===p.id);if(r)petSay(r,null,'我回來了～')},900)}}
 // ================= 自動更新：發現新版本就重新載入 =================
-const APP_VER='v1.30';
+const APP_VER='v1.31';
 function checkUpdate(){
   if(!/^https?:/.test(location.protocol)||!API_URL)return;
   if(!$('#modal').classList.contains('hidden'))return; // 正在填表單時不打斷
