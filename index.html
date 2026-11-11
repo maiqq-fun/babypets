@@ -576,6 +576,31 @@ html,body,button,.island,.imap,.logo{touch-action:manipulation}
 .rch{width:96px;height:96px;border-radius:50%;object-fit:cover;border:3px solid #fff;box-shadow:0 2px 8px rgba(0,0,0,.15)}
 .hud .hlv b{top:calc(43.75% - 8px)!important;line-height:16px!important;left:1px!important;font-size:13px;color:#7a4a14!important;font-weight:bold}
 .hud .hlv b.d2{font-size:11.5px}.hud .hlv b.d3{font-size:9.5px;letter-spacing:-.5px}
+
+#busy{top:0!important;left:0!important;right:0;bottom:0;transform:none!important;background:rgba(40,28,18,.35)!important;border-radius:0!important;padding:0!important;display:flex;align-items:center;justify-content:center}
+#busy.hidden{display:none}
+#busy .bbox{background:#fffaf0;color:#6b4b33;border:2px solid var(--wood);border-radius:18px;padding:14px 22px;text-align:center;font-size:24px;box-shadow:0 6px 20px rgba(0,0,0,.18)}
+#busy .bbox div{font-size:14px;margin-top:4px}
+#cap{position:fixed;left:50%;top:calc(132px + env(safe-area-inset-top));transform:translateX(-50%);background:#fffaf0;color:#6b4b33;border:1.5px solid var(--wood);border-radius:999px;padding:5px 14px;font-size:13px;z-index:9500;box-shadow:0 2px 6px rgba(0,0,0,.12)}
+#cap.hidden{display:none}
+.lgsec h4 .lgu{font-weight:normal;font-size:11px;background:#ff6f6f;color:#fff;border-radius:8px;padding:1px 6px;margin-left:4px}
+.lgrow{display:flex;align-items:center;gap:10px;width:100%;text-align:left;border:0;border-top:1px dashed #efdcc4;background:none;padding:8px 2px;font:inherit;color:inherit}
+.lgsec .lgrow:first-of-type,.lglist .lgrow:first-child{border-top:0}
+.lgrow .lgi{width:30px;height:30px;object-fit:contain;flex:none}.lgrow .t{flex:1;min-width:0}
+.lgrow .t b{display:block;font-weight:normal;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.lgrow.unread .t b{font-weight:bold;color:#5a3a20}
+.lgrow .t small{display:block;font-size:11px;color:var(--soft)}.lgrow .dot{width:8px;height:8px;border-radius:50%;background:#ff6f6f;flex:none}
+.lgmore{border:0;background:none;color:var(--accent-d);font-size:13px;padding:6px 0 0}
+.lglist{max-height:60vh;overflow:auto;margin-bottom:10px}
+.letter{background:#fffaf0;border:2px solid #f0d6bc;border-radius:18px;padding:16px 18px 18px;margin:4px 0 12px;color:#5a4030;background-image:repeating-linear-gradient(transparent 0 33px,#f3e3d0 33px 34px);background-position:0 92px}
+.lghead{display:flex;gap:10px;align-items:center;margin:0 0 12px;padding-bottom:10px;border-bottom:2px dashed #f0d6bc;background:#fffaf0}.lghead img{width:46px;height:46px;object-fit:contain}
+.lghead b{display:block;font-size:17px}.lghead small{display:block;font-size:11px;color:#a08670}
+.lgbody{font-size:15px;line-height:34px;white-space:normal;word-break:break-word;min-height:80px}
+.lgatt{margin-top:12px;padding:10px 12px;border:2px dashed #f0c8a8;border-radius:14px;background:rgba(255,250,238,.85);font-size:13px;display:flex;flex-direction:column;gap:8px}
+.lgatt button{border-radius:12px;padding:9px;font:inherit;border:1.5px solid #e6d3bd;background:#fff}.lgatt button.primary{background:var(--accent);color:#fff;border-color:var(--accent)}
+.lgpop img{width:110px;height:110px;object-fit:contain;animation:lgpop 1.2s ease-in-out infinite}
+@keyframes lgpop{0%,100%{transform:translateY(0) rotate(-3deg)}50%{transform:translateY(-8px) rotate(3deg)}}
+.adm textarea{width:100%;box-sizing:border-box;border:1.5px solid #e6d3bd;border-radius:12px;padding:9px 10px;font:inherit;font-size:16px;margin-top:6px;resize:vertical}
+.invl{max-height:220px;overflow:auto}.invl .code{font-weight:normal;letter-spacing:1px;font-size:15px}.invl small{display:block;font-size:11px;color:var(--soft)}
 </style>
 </head>
 <body>
@@ -624,7 +649,7 @@ html,body,button,.island,.imap,.logo{touch-action:manipulation}
 <div class="foot" id="foot"></div>
 <div id="modal" class="modal hidden"><div class="sheet" id="sheet" role="dialog" aria-modal="true"></div></div>
 <div id="toast" role="status"></div>
-<div id="busy" class="hidden" role="status">⏳ 連線中…</div>
+<div id="busy" class="hidden" role="status"><div class="bbox">⏳<div>處理中…</div></div></div><div id="cap" class="hidden" role="status">⏳ 更新中…</div>
 
 <script>
 // ================= 常數 =================
@@ -708,7 +733,7 @@ async function api(action,payload){
 let lastTap=null;document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest('#sheet button');if(b)lastTap=b},true);
 function lockSheet(on){const sh=$('#sheet');if(!sh)return;if(lastTap&&sh.contains(lastTap)&&!lastTap.classList.contains('primary'))lastTap.classList.toggle('sending',on);if(!on)lastTap=null;sh.querySelectorAll('button').forEach(b=>{if(on){b.dataset.wd=b.disabled?'1':'';b.disabled=true}else if(b.dataset.wd!==undefined){b.disabled=b.dataset.wd==='1';delete b.dataset.wd}});
   const pr=sh.querySelector('.row2 .primary');if(pr){if(on){if(!pr.dataset.txt){pr.dataset.txt=pr.textContent;pr.textContent='送出中…'}}else if(pr.dataset.txt){pr.textContent=pr.dataset.txt;delete pr.dataset.txt}}}
-let busyN=0;function busy(on){busyN+=on?1:-1;$('#busy').classList.toggle('hidden',busyN<=0)}
+let busyN=0,busyT=null;function busy(on){busyN+=on?1:-1;clearTimeout(busyT);if(busyN>0)busyT=setTimeout(()=>{if(busyN>0)$('#busy').classList.remove('hidden')},350);else $('#busy').classList.add('hidden')}
 const cred=()=>({playerId:DB.me&&DB.me.id,houseId:DB.me&&DB.me.houseId,pw:DB.me&&DB.me.pw});
 async function call(action,payload,quiet){
   if(!ONLINE){const r=LOCAL[action](payload||{});save();return r}
@@ -743,7 +768,8 @@ async function sync(quiet){
   try{const d=await api('getState',cred());
     Object.assign(DB,{houses:d.houses,pets:d.pets,weights:d.weights,medical:d.medical,expenses:d.expenses,notes:d.notes,feed:d.feed,famOk:d.famOk,players:d.players||[],tlogs:d.tlogs||[]});
     DB.houses.forEach(h=>{if(!Array.isArray(h.poops))h.poops=[]});
-    keepPending();DB.drops=(d.drops||[]).filter(x=>!PICKED.has(x.id));DB.notice=d.notice||null;DB.dbl=d.dbl||'';DB.adminId=d.adminId||'';
+    keepPending();DB.letters=(d.letters||[]).filter(l=>!LGONE[l.id]).map(l=>Object.assign(l,LSTATE[l.id]||{}));DB.drops=(d.drops||[]).filter(x=>!PICKED.has(x.id));DB.notice=d.notice||null;DB.dbl=d.dbl||'';DB.adminId=d.adminId||'';
+    setTimeout(announceLetters,0);
     if(d.player&&DB.me){DB.me.code=d.player.code||DB.me.code;const ml=Array.isArray(d.player.mail)?d.player.mail:[];if(ml.length)claimMail(ml)}
     DB.owned={};d.houses.forEach(h=>DB.owned[h.id]=Array.isArray(h.owned)?h.owned:[]);
     if(d.player&&DB.me){DB.me.houseId=d.player.houseId||null;if(!DB.gameSynced&&d.player.game&&d.player.game.prog&&!localStorage.getItem(OKEY+'_g')){DB.game=d.player.game}}
@@ -806,7 +832,7 @@ const LOCAL={
   adminLogin(){return {players:(DB.players||[]).map(p=>({id:p.id,nick:p.nick,code:'MH-DEMO00',house:(house(p.houseId)||{}).name||'',houseId:p.houseId||'',lv:1,coins:0,tickets:0})),houses:DB.houses.map(h=>({id:h.id,name:h.name})),drops:(DB.drops||[]).length,notice:DB.notice,dbl:DB.dbl}},
   adminNotice({text}){DB.notice=text?{t:text,at:Date.now()}:null;return true},adminDouble({on}){DB.dbl=on?todayTW():'';return true},
   adminRain({houseId,n}){for(let i=0;i<(+n||1);i++){const h=houseId?house(houseId):DB.houses[~~(Math.random()*DB.houses.length)];(DB.drops=DB.drops||[]).push({id:uid(),houseId:h.id,x:Math.round(FLOOR.x0+40+Math.random()*(FLOOR.x1-FLOOR.x0-80)),y:Math.round(FLOOR.y0+20+Math.random()*(FLOOR.y1-FLOOR.y0-40))})}return true},
-  adminGive(){return true},adminGiftHouse({houseId,coins,tickets,item,n,msg}){const h=house(houseId);(h.gifts=h.gifts||[]).push({id:uid(),admin:true,from:'島主',coins,tickets,item,n,msg,opened:[],at:Date.now(),x:Math.round(FLOOR.x0+60+Math.random()*(FLOOR.x1-FLOOR.x0-120)),y:Math.round(FLOOR.y0+40+Math.random()*150)});return true},adminResetPw(){return true},adminRemoveHouse({houseId}){return LOCAL.deleteHouse({houseId})},
+  adminGive(){return true},readLetter(){return true},hideLetter(){return true},claimLetter({letterId}){const l=(DB.letters||[]).find(x=>x.id===letterId)||{};return {coins:l.coins,tickets:l.tickets,item:l.item,n:l.n}},adminLetter(o){(DB.letters=DB.letters||[]).unshift({id:uid(),title:o.title,body:o.body,at:Date.now(),coins:+o.coins||0,tickets:+o.tickets||0,item:o.item||'',n:+o.n||0,read:false,claimed:false,all:o.to==='*'});return true},adminGiftHouse({houseId,coins,tickets,item,n,msg}){const h=house(houseId);(h.gifts=h.gifts||[]).push({id:uid(),admin:true,from:'島主',coins,tickets,item,n,msg,opened:[],at:Date.now(),x:Math.round(FLOOR.x0+60+Math.random()*(FLOOR.x1-FLOOR.x0-120)),y:Math.round(FLOOR.y0+40+Math.random()*150)});return true},adminResetPw(){return true},adminRemoveHouse({houseId}){return LOCAL.deleteHouse({houseId})},
   addTLog({log}){const l=Object.assign({},log,{id:uid(),createdAt:Date.now(),by:DB.me.nick});(DB.tlogs=DB.tlogs||[]).push(l);return l},
   deleteTLog({id}){DB.tlogs=(DB.tlogs||[]).filter(x=>x.id!==id);return true},
   visit(){return true},
@@ -899,7 +925,7 @@ function onboarding(step){
   }
   openModal(`<h3>嗨，${esc(DB.me.nick)}！</h3><p class="lead">你想怎麼開始？之後都可以在右上角的設定裡改</p>
     <div class="big3">
-      <button id="o1"><span class="e">🏠</span><span>蓋我自己的家<small>在島上選一塊空地，替你的毛孩建檔</small></span></button>
+      <button id="o1"><span class="e">🏠</span><span>蓋我自己的家<small>${ONLINE?'需要島主給的邀請碼・':''}在島上選一塊空地，替你的毛孩建檔</small></span></button>
       <button id="o2"><span class="e">🔑</span><span>加入家人的家<small>家人已經蓋好房子，你有家人密碼</small></span></button>
       <button id="o3"><span class="e">👀</span><span>先逛逛<small>去朋友家看看毛孩、幫忙鏟屎</small></span></button>
     </div>`,true);
@@ -951,16 +977,18 @@ function buildFlow(slot){
   }
   function s3(){
     openModal(`<h3>🔑 設定家人密碼</h3>${steps(3)}<p class="lead">一起照顧毛孩的家人輸入這組密碼，就能一起編輯資料、看醫療和支出紀錄</p>
+      ${ONLINE?fld('pinv','島主給的邀請碼',`<input id="pinv" placeholder="例如：MAO-4821" autocapitalize="characters" autocomplete="off" value="${esc(B.invite||'')}">`,'這是私人小島，要有邀請碼才能蓋房子'):''}
       ${fld('p1','家人密碼',`<input id="p1" type="password" minlength="4" autocomplete="new-password">`,'至少 4 個字，只告訴家人就好')}
       ${fld('p2','再輸入一次',`<input id="p2" type="password" autocomplete="new-password">`)}
       <div class="err" id="perr"></div>
       <div class="row2"><button id="pb">上一步</button><button class="primary" id="b3">蓋好了！</button></div>`);
     $('#pb').onclick=s2;
-    $('#b3').onclick=async()=>{const a=$('#p1').value,b=$('#p2').value;
+    $('#b3').onclick=async()=>{const a=$('#p1').value,b=$('#p2').value,inv=$('#pinv')?$('#pinv').value.trim():'';B.invite=inv;
+      if(ONLINE&&!inv){$('#perr').textContent='請輸入島主給的邀請碼';return}
       if(a.length<4){$('#perr').textContent='密碼至少 4 個字';return}
       if(a!==b){$('#perr').textContent='兩次輸入的密碼不一樣';return}
       const pw=hashPw(a);let r;
-      try{r=await call('buildHouse',{playerId:DB.me.id,house:{slot:B.slot,style:B.style,name:B.name,motto:B.motto,room:B.room},pw})}catch(e){$('#perr').textContent=e.message;return}
+      try{r=await call('buildHouse',{playerId:DB.me.id,house:{slot:B.slot,style:B.style,name:B.name,motto:B.motto,room:B.room},pw,invite:inv})}catch(e){$('#perr').textContent=e.message;return}
       DB.me.houseId=r.houseId;DB.me.pw=pw;DB.famOk=true;save();
       if(ONLINE)await sync(true);
       closeModal();renderIsland();openHome(r.houseId);setTimeout(()=>petForm(r.houseId),600)};
@@ -1081,7 +1109,9 @@ function noteView(id,fromBook){
     const bak=n;GONE[id]=Date.now();DB.notes=DB.notes.filter(x=>x.id!==id);renderBoard();toast('撕掉了');if(fromBook)noteBook();else closeModal();
     call('deleteNote',{id,playerId:DB.me.id,pw:isFamily(n.houseId)?DB.me.pw:''},true).catch(err=>{delete GONE[id];DB.notes.push(bak);renderBoard();toast('沒撕成功：'+err.message)})};
 }
-function needMe(){if(!DB.me){onboarding();return false}return true}
+function needMe(){if(!DB.me){onboarding();return false}if(ONLINE&&!myHouse()){privateNote();return false}return true}
+function privateNote(){openModal(`<div style="text-align:center"><div class="giftopen">🔒</div><h3>這是私人小島</h3><p class="lead">要島主邀請才能加入，加入之後就可以摸毛孩、留言、送禮囉</p></div>
+  <div class="row2"><button data-close>先逛逛</button><button class="primary" id="pvj">我有邀請碼／家人密碼</button></div>`);$('#pvj').onclick=()=>{closeModal();onboarding()}}
 function noteForm(){
   if(!needMe())return;let color=NOTE_COLORS[0];const h=house(home.id);
   openModal(`<h3>📝 在「${esc(h.name)}」貼便利貼</h3>
@@ -1694,7 +1724,7 @@ function notices(){
 }
 function bellItems(){const seen=+(localStorage.getItem('mhd_bellseen')||0);return DB.feed.filter(f=>aboutMe(f.t)&&Date.now()-f.at<3*86400e3).map(f=>({...f,isNew:f.at>seen}))}
 function noticeSig(){return notices().map(x=>x.t.replace(/\d+/g,'#')).join('|')}
-function updBell(){let sig='';try{sig=localStorage.getItem('mhd_bellsig')||''}catch(e){}const n=bellItems().filter(x=>x.isNew).length,st=notices().length&&noticeSig()!==sig?1:0,b=$('#belln');b.textContent=n?(n>99?'99+':n):st?'•':'';b.style.display=n||st?'flex':'none'}
+function updBell(){let sig='';try{sig=localStorage.getItem('mhd_bellsig')||''}catch(e){}const n=bellItems().filter(x=>x.isNew).length+unreadLetters(),st=notices().length&&noticeSig()!==sig?1:0,b=$('#belln');b.textContent=n?(n>99?'99+':n):st?'•':'';b.style.display=n||st?'flex':'none'}
 $('#bell').onclick=()=>{
   if(!DB.me)return onboarding();if(ONLINE&&!$('#bell').dataset.r){$('#bell').dataset.r=1;sync(true).then(()=>{delete $('#bell').dataset.r;updBell()}).catch(()=>{delete $('#bell').dataset.r})}
   const st=notices(),it=bellItems();
@@ -1702,9 +1732,11 @@ $('#bell').onclick=()=>{
   openModal(`<h3>🔔 通知</h3>
     ${myHouse()?'':'<p class="lead">有家之後，這裡會通知你家的大小事</p>'}
     ${st.length?`<div class="sec" style="margin-top:0"><h4>📌 現在</h4>${st.map(x=>`<div class="frow"><span>${x.ic} ${esc(x.t)}</span></div>`).join('')}</div>`:''}
+    ${lettersSec()}
     <div class="sec"><h4>🏠 你家的新鮮事<span>最近 3 天</span></h4>${it.length?it.map(f=>`<div class="frow${f.isNew?' mine':''}"><span>${f.isNew?'<b class="dot"></b>':''}${esc(f.t)}</span><span class="ago">${ago(f.at)}</span></div>`).join(''):'<div class="locked">還沒有新鮮事</div>'}</div>
     <div class="row2" style="margin-top:14px">${myHouse()?'<button id="bhome">🏠 回我家</button>':''}<button data-close>關閉</button></div>`);
   if($('#bhome'))$('#bhome').onclick=()=>{closeModal();openHome(myHouse().id)};
+  bindLetters(()=>$('#bell').click());
   updBell();
 };
 // ================= 加到主畫面 =================
@@ -2182,7 +2214,7 @@ function setHname(h){const mh=myHouse();$('#gohome').style.display=mh&&h&&mh.id!
 function isAdminHouse(h){return !!(DB.adminId&&h&&(DB.players||[]).some(p=>p.id===DB.adminId&&p.houseId===h.id))}
 let logoTaps=0,logoT=0;
 (function(){const lg=document.querySelector('#island .logo');lg.style.setProperty('pointer-events','auto','important');
-  lg.addEventListener('click',()=>{const n=Date.now();logoTaps=n-logoT<800?logoTaps+1:1;logoT=n;if(logoTaps>=5){logoTaps=0;adminSheet()}});
+  let lgT=null;lg.addEventListener('click',()=>{const n=Date.now();logoTaps=n-logoT<800?logoTaps+1:1;logoT=n;clearTimeout(lgT);if(logoTaps>=5){logoTaps=0;adminSheet();return}lgT=setTimeout(()=>{if(logoTaps===1)manualRefresh()},700)});
   let lpT=null;lg.addEventListener('touchstart',()=>{lpT=setTimeout(()=>{lpT=null;adminSheet()},1500)},{passive:true});['touchend','touchmove','touchcancel'].forEach(ev=>lg.addEventListener(ev,()=>{if(lpT){clearTimeout(lpT);lpT=null}},{passive:true}));lg.addEventListener('contextmenu',e=>e.preventDefault())})();
 const adminPw=()=>{try{return localStorage.getItem('mhd_admin')||''}catch(e){return ''}};
 async function adminCall(a,o){return call(a,Object.assign({adminPw:adminPw(),playerId:DB.me&&DB.me.id},o||{}))}
@@ -2194,6 +2226,9 @@ async function adminSheet(){
   DB.adminId=DB.me.id;
   const hs=d.houses.map(h=>`<option value="${h.id}">${esc(h.name)}</option>`).join(''),its=Object.entries(ITEMS).map(([id,i])=>`<option value="${id}">${i.emo} ${esc(i.name)}</option>`).join('');
   openModal(`<h3>👑 島主後台</h3>
+  <div class="sec adm"><h4>🔑 邀請碼<span>${(d.invites||[]).filter(x=>!x.usedBy&&!x.void).length} 組可用</span></h4><p class="lead">每組只能用一次，給要蓋房子的朋友</p>
+    <div class="row2"><input id="ainn" maxlength="20" placeholder="備註（例如：給小明）"><button id="ainb">產生 1 組</button></div>
+    <div class="invl">${(d.invites||[]).slice(0,30).map(x=>`<div class="frow"><span><b class="code">${esc(x.code)}</b><small>${x.usedBy?`已被 ${esc(x.usedNick||'')} 使用`:x.void?'已作廢':'未使用'}${x.note?'・'+esc(x.note):''}</small></span>${!x.usedBy&&!x.void?`<span><button class="mini" data-icp="${esc(x.code)}">複製</button> <button class="mini" data-ivd="${esc(x.code)}">作廢</button></span>`:''}</div>`).join('')||'<div class="locked">還沒有邀請碼</div>'}</div></div>
   <div class="sec adm"><h4>📣 公告（跑馬燈置頂）</h4><input id="an" maxlength="60" placeholder="留空＝取消公告" value="${esc(d.notice&&d.notice.t||'')}"><div class="row2"><button id="anb">更新公告</button></div></div>
   <div class="sec adm"><h4>✨ 雙倍日</h4><p class="lead">今天${d.dbl===todayTW()?'<b>是</b>':'不是'}雙倍日（金幣、愛心值、撿到的錢都 ×2，到半夜 12 點結束）</p><div class="row2"><button id="adb">${d.dbl===todayTW()?'關掉雙倍日':'今天開雙倍日'}</button></div></div>
   <div class="sec adm"><h4>💰 撒錢</h4><p class="lead">島上現在有 ${d.drops} 個錢袋還沒被撿</p>
@@ -2203,7 +2238,13 @@ async function adminSheet(){
     <div class="row2"><input id="agc" type="number" min="0" placeholder="金幣"><input id="agt" type="number" min="0" placeholder="抽卡券"></div>
     <div class="row2"><select id="agi"><option value="">（不送道具）</option>${its}</select><input id="agn" type="number" min="0" placeholder="數量" style="max-width:80px"></div>
     <input id="agm" maxlength="40" placeholder="想說的話（可以不填）"><div class="row2"><button id="agb">送出</button></div></div>
-  <div class="sec adm"><h4>🙋 玩家列表・轉移碼</h4><div class="plist">${d.players.map(p=>`<div class="frow"><span>${esc(p.nick)}<small>${p.house?esc(p.house):'沒有家'}・Lv.${p.lv}・🪙${p.coins}</small></span><button class="mini" data-code="${esc(p.code)}">${esc(p.code)||'（下次登入後產生）'}</button></div>`).join('')}</div><p class="lead">點轉移碼可以複製，傳給換手機的朋友</p></div>
+  <div class="sec adm"><h4>✉️ 寫信</h4><div class="row2"><select id="alto"><option value="*">📣 全部島民</option>${d.players.map(p=>`<option value="${p.id}">${esc(p.nick)}${p.house?'（'+esc(p.house)+'）':''}</option>`).join('')}</select></div>
+    <input id="alt" maxlength="30" placeholder="標題（例如：週末活動開始囉）"><textarea id="alb" rows="4" maxlength="500" placeholder="想說的話"></textarea>
+    <p class="lead" style="margin:6px 0 0">附上禮物（可以不填，收件人要按「領取」）</p>
+    <div class="row2"><input id="alc" type="number" min="0" placeholder="金幣"><input id="alk" type="number" min="0" placeholder="抽卡券"></div>
+    <div class="row2"><select id="ali"><option value="">（不附道具）</option>${its}</select><input id="aln" type="number" min="0" placeholder="數量" style="max-width:80px"></div>
+    <div class="row2"><button id="alsend">寄出</button></div></div>
+  <div class="sec adm"><h4>🙋 玩家列表・轉移碼</h4><div class="plist">${d.players.map(p=>`<div class="frow"><span>${esc(p.nick)}<small>${p.house?esc(p.house):'沒有家'}・Lv.${p.lv}・🪙${p.coins}${p.createdAt?'・'+new Date(p.createdAt).toLocaleDateString('zh-TW',{month:'numeric',day:'numeric'})+' 加入':''}</small></span><button class="mini" data-code="${esc(p.code)}">${esc(p.code)||'（下次登入後產生）'}</button></div>`).join('')}</div><p class="lead">點轉移碼可以複製，傳給換手機的朋友</p></div>
   <div class="sec adm"><h4>🏠 家的管理</h4><div class="row2"><select id="ahh">${hs}</select></div>
     <div class="row2"><input id="ahp" type="password" placeholder="新的家人密碼（4 字以上）"><button id="ahpb">重設密碼</button></div>
     <div class="row2"><button id="ahrb" class="danger">收回成空地</button></div><p class="lead">收回會刪掉這個家的毛孩和紀錄，不能復原</p></div>
@@ -2217,6 +2258,11 @@ async function adminSheet(){
   S.querySelectorAll('[data-code]').forEach(b=>b.onclick=async()=>{const c=b.dataset.code;if(!c)return;try{await navigator.clipboard.writeText(c);toast('轉移碼已複製：'+c)}catch(e){toast(c)}});
   $('#ahpb').onclick=async()=>{const v=$('#ahp').value;if(v.length<4)return toast('密碼至少 4 個字');try{await adminCall('adminResetPw',{houseId:$('#ahh').value,pw:await hashPw(v)});toast('密碼重設好了，記得告訴他們家 🔑')}catch(e){toast(e.message)}};
   $('#ahrb').onclick=async()=>{const h=house($('#ahh').value);if(!h||!window.confirm(`確定要把「${h.name}」收回成空地嗎？毛孩和紀錄都會刪掉，不能復原。`))return;try{await adminCall('adminRemoveHouse',{houseId:h.id});closeModal();ok('收回了')}catch(e){toast(e.message)}};
+  $('#ainb').onclick=async()=>{try{const r=await adminCall('adminInviteNew',{n:1,note:$('#ainn').value.trim()});const c=r&&r[0];try{await navigator.clipboard.writeText(c)}catch(e){}toast(`邀請碼 ${c} 已複製 🔑`);adminSheet()}catch(e){toast(e.message)}};
+  S.querySelectorAll('[data-icp]').forEach(b=>b.onclick=async()=>{try{await navigator.clipboard.writeText(b.dataset.icp);toast('已複製 '+b.dataset.icp)}catch(e){toast(b.dataset.icp)}});
+  S.querySelectorAll('[data-ivd]').forEach(b=>b.onclick=async()=>{if(!armBtn(b,'確定？'))return;try{await adminCall('adminInviteVoid',{code:b.dataset.ivd});toast('作廢了');adminSheet()}catch(e){toast(e.message)}});
+  $('#alsend').onclick=async()=>{const o={to:$('#alto').value,title:$('#alt').value.trim(),body:$('#alb').value.trim(),coins:+$('#alc').value||0,tickets:+$('#alk').value||0,item:$('#ali').value,n:+$('#aln').value||0};
+    if(!o.title)return toast('信要有標題喔');try{await adminCall('adminLetter',o);toast(o.to==='*'?'信寄給全部島民了 ✉️':'信寄出了 ✉️');['alt','alb','alc','alk','aln'].forEach(k=>$('#'+k).value='');$('#ali').value='';sync(true)}catch(e){toast(e.message)}};
   $('#aout').onclick=()=>{try{localStorage.removeItem('mhd_admin')}catch(e){}closeModal();toast('已登出島主')};
 }
 
@@ -2395,8 +2441,50 @@ function recallSheet(p,o){
   $('#rcgo').onclick=()=>{o.guests=(o.guests||[]).filter(x=>x.petId!==p.id);PEND.home[p.id]={t:Date.now()};delete PEND.walk[p.id];
     call('walkHome',{playerId:DB.me.id,petId:p.id},true).catch(()=>{});closeModal();openHome(home.id,true);toast(`${p.name} 回家了 🏠`);
     setTimeout(()=>{const r=home&&home.pets.find(x=>x.id===p.id);if(r)petSay(r,null,'我回來了～')},900)}}
+
+// ================= 🔄 手動更新（點 logo） =================
+let refreshing=false;
+async function manualRefresh(){if(refreshing)return;if(!ONLINE){toast('試做版不用更新喔 ✨');return}refreshing=true;$('#cap').classList.remove('hidden');
+  try{await sync(true);if(typeof renderIsland==='function'&&$('#home').classList.contains('hidden'))renderIsland();toast('已更新 ✨')}catch(e){toast('更新失敗，請檢查網路')}
+  finally{refreshing=false;$('#cap').classList.add('hidden')}}
+
+// ================= ✉️ 島主信箱（在通知裡） =================
+const LGONE={},LSTATE={};
+function unreadLetters(){return (DB.letters||[]).filter(l=>!l.read).length}
+function lgIcon(l){return `<img class="lgi" src="assets/${l.read?'icon_mail_open':'icon_mail'}.webp" alt="" onerror="this.replaceWith('✉️')">`}
+function lgGift(l){const a=[];if(+l.coins)a.push(`🪙 ${l.coins}`);if(+l.tickets)a.push(`🎟️ ${l.tickets}`);if(l.item&&ITEMS[l.item]&&+l.n)a.push(`${ITEMS[l.item].name} ×${l.n}`);return a}
+function lettersSec(){const L=DB.letters||[];if(!L.length)return '';const u=unreadLetters();
+  return `<div class="sec lgsec"><h4><span class="noic">✉️</span> 信箱${u?`<b class="lgu">${u} 封未讀</b>`:''}<span>${L.length} 封</span></h4>
+    ${L.slice(0,3).map(l=>`<button class="lgrow${l.read?'':' unread'}" data-lg="${l.id}">${lgIcon(l)}<span class="t"><b>👑 島主｜${esc(l.title)}</b><small>${ago(l.at)}${lgGift(l).length&&!l.claimed?'・附禮物 🎁':''}</small></span>${l.read?'':'<i class="dot"></i>'}</button>`).join('')}
+    ${L.length>3?'<button class="lgmore" id="lgall">▸ 看全部信件</button>':''}</div>`}
+function bindLetters(back){const S=$('#sheet');S.querySelectorAll('[data-lg]').forEach(b=>b.onclick=()=>openLetter(b.dataset.lg,back));if($('#lgall'))$('#lgall').onclick=()=>allLetters(back)}
+function allLetters(back){const L=DB.letters||[];
+  openModal(`<h3>✉️ 信箱</h3><div class="lglist">${L.map(l=>`<button class="lgrow${l.read?'':' unread'}" data-lg="${l.id}">${lgIcon(l)}<span class="t"><b>👑 島主｜${esc(l.title)}</b><small>${new Date(l.at).toLocaleDateString('zh-TW')}${lgGift(l).length&&!l.claimed?'・附禮物 🎁':''}</small></span>${l.read?'':'<i class="dot"></i>'}</button>`).join('')||'<div class="locked">還沒有信</div>'}</div>
+    <div class="row2"><button id="lgback">返回</button></div>`);
+  $('#lgback').onclick=back;bindLetters(back)}
+function openLetter(id,back){const l=(DB.letters||[]).find(x=>x.id===id);if(!l)return;
+  if(!l.read){l.read=true;LSTATE[id]=Object.assign(LSTATE[id]||{},{read:true});updBell();if(ONLINE)call('readLetter',{playerId:DB.me.id,letterId:id},true).catch(()=>{})}
+  const g=lgGift(l);
+  openModal(`<div class="letter"><div class="lghead"><img src="assets/icon_mail_admin.webp" alt="" onerror="this.remove()"><div><b>${esc(l.title)}</b><small>島主・${new Date(l.at).toLocaleString('zh-TW',{month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit'})}${l.all?'・寄給全部島民':''}</small></div></div>
+    <div class="lgbody">${esc(l.body||'').replace(/\n/g,'<br>')}</div>
+    ${g.length?`<div class="lgatt"><div>🎁 附上的禮物：${g.join('、')}</div>${l.claimed?'<button disabled>已經領過了</button>':'<button class="primary" id="lgclaim">領取禮物</button>'}</div>`:''}</div>
+    <div class="row2"><button id="lgdel" class="danger">刪除這封信</button><button id="lgb">返回</button></div>`);
+  $('#lgb').onclick=back;
+  $('#lgdel').onclick=e=>{if(!armBtn(e.target,'確定刪除？'))return;LGONE[id]=1;DB.letters=DB.letters.filter(x=>x.id!==id);updBell();toast('信刪掉了');back();if(ONLINE)call('hideLetter',{playerId:DB.me.id,letterId:id},true).catch(()=>{})};
+  if($('#lgclaim'))$('#lgclaim').onclick=()=>{const G=DB.game;l.claimed=true;LSTATE[id]=Object.assign(LSTATE[id]||{},{claimed:true});
+    if(+l.tickets)G.tickets=(G.tickets||0)+ +l.tickets;if(l.item&&ITEMS[l.item]&&+l.n)bagAdd(l.item,+l.n);const b=$('#lgclaim').getBoundingClientRect();grant(0,+l.coins||0,{x:b.left+b.width/2,y:b.top});save();updTix();sfx('gift');
+    toast(`領到了：${g.join('、')} 🎉`);openLetter(id,back);
+    call('claimLetter',{playerId:DB.me.id,letterId:id},true).catch(e=>{if(/領過/.test(e.message))return;l.claimed=false;delete LSTATE[id].claimed;G.coins=Math.max(0,(G.coins||0)-(+l.coins||0));if(+l.tickets)G.tickets-= +l.tickets;if(l.item&&+l.n)bagAdd(l.item,-l.n);save();updTix();toast('領取沒成功：'+e.message)})}}
+// 有新信時跳出提示（每封只跳一次）
+function announceLetters(){if(!DB.me)return;let seen=[];try{seen=JSON.parse(localStorage.getItem('mhd_lgseen')||'[]')}catch(e){}
+  const nw=(DB.letters||[]).filter(l=>!l.read&&!seen.includes(l.id));if(!nw.length)return;
+  const go=()=>{if(!$('#modal').classList.contains('hidden'))return setTimeout(go,2500);try{localStorage.setItem('mhd_lgseen',JSON.stringify(seen.concat(nw.map(l=>l.id)).slice(-100)))}catch(e){}
+    openModal(`<div style="text-align:center"><div class="lgpop"><img src="assets/icon_mail_admin.webp" alt="" onerror="this.replaceWith('✉️')"></div><h3>你有 ${nw.length>1?nw.length+' 封':'一封'}島主的信 ✉️</h3><p class="lead">${esc(nw[0].title)}</p></div>
+      <div class="row2"><button data-close>等等再看</button><button class="primary" id="lgopen">打開看看</button></div>`);
+    sfx('gift');$('#lgopen').onclick=()=>openLetter(nw[0].id,()=>$('#bell').click())};
+  setTimeout(go,1800)}
 // ================= 自動更新：發現新版本就重新載入 =================
-const APP_VER='v1.31';
+const APP_VER='v1.33';
 function checkUpdate(){
   if(!/^https?:/.test(location.protocol)||!API_URL)return;
   if(!$('#modal').classList.contains('hidden'))return; // 正在填表單時不打斷
