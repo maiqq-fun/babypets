@@ -563,6 +563,12 @@ html,body,button,.island,.imap,.logo{touch-action:manipulation}
 #homewrap .top.hbar #hname{max-width:46%}
 .topright .circle{flex:none}
 @media (max-width:380px){.topright{gap:6px!important}.topright .circle{width:40px;height:40px}}
+
+#homewrap .hrow{display:flex;align-items:center;justify-content:center;gap:10px;margin:8px auto 0;width:100%;max-width:520px}
+#homewrap .hrow .hudH{margin:0!important}
+#homewrap .hrow .circle{width:42px;height:42px;flex:none;display:flex;align-items:center;justify-content:center;padding:0}
+#homewrap .hrow .gohome .ii.ic{width:26px;height:26px}
+#homewrap .top.hbar #hname{max-width:62%!important}
 </style>
 </head>
 <body>
@@ -604,8 +610,9 @@ html,body,button,.island,.imap,.logo{touch-action:manipulation}
   <div class="visits" id="visits"></div>
   <div class="petheads" id="petheads"></div>
 </div>
-  <div class="top hbar"><button class="pill" id="back">← 小島</button><button class="pill gohome" id="gohome" aria-label="回我家">🏠</button><div class="pill housename" id="hname"></div><button class="pill sndb noic" id="sndH" aria-label="音效開關"></button><button class="pill cam" id="camh" aria-label="拍照">📷</button></div>
+  <div class="top hbar"><button class="pill" id="back">← 小島</button><div class="pill housename" id="hname"></div><button class="pill cam" id="camh" aria-label="拍照">📷</button></div>
   <div class="actions hbar"><button class="act" id="feed">🍖 餵飯</button><button class="act" id="addnote">📝 留言</button><button class="act" id="giftbtn">🎁 送禮</button><button class="act" id="walkbtn">🦮 遛遛</button><button class="act" id="sweep">🧹 打掃</button><button class="act" id="notebook">📒</button></div>
+  <div class="hrow hbar" id="hrow"><button class="circle sndb noic" id="sndH" aria-label="音效開關"></button><span id="hudslot"></span><button class="circle gohome" id="gohome" aria-label="回我家">🏠</button></div>
 </div>
 <div class="foot" id="foot"></div>
 <div id="modal" class="modal hidden"><div class="sheet" id="sheet" role="dialog" aria-modal="true"></div></div>
@@ -2132,7 +2139,7 @@ function flyReward(x,c,from){const h=hudTarget();if(!h)return false;
 
 new MutationObserver(()=>{$('#hback').style.backgroundImage=`url(${$('#roombg').getAttribute('src')})`}).observe($('#roombg'),{attributes:true,attributeFilter:['src']});
 (function(){const a=document.createElement('button');a.className='hud noic';a.id='hudI';a.setAttribute('aria-label','等級與金幣');$('#icol').appendChild(a);
-  const b=document.createElement('button');b.className='hud hudH noic';b.id='hudH';b.setAttribute('aria-label','等級與金幣');$('#homewrap').appendChild(b);
+  const b=document.createElement('button');b.className='hud hudH noic';b.id='hudH';b.setAttribute('aria-label','等級與金幣');$('#hudslot').appendChild(b);
   [a,b].forEach(x=>x.onclick=()=>{if(DB.me)missionsSheet()});updHud()})();
 $('#homewrap').appendChild($('#foot'));
 const updTix0=updTix;updTix=function(){updTix0();updHud()};
@@ -2347,7 +2354,7 @@ function updSndBtns(){document.querySelectorAll('.sndb').forEach(b=>{b.innerHTML
 document.querySelectorAll('.sndb').forEach(b=>b.onclick=e=>{e.stopPropagation();sndOn=!sndOn;try{localStorage.setItem('mhd_snd',sndOn?'1':'0')}catch(x){}updSndBtns();toast(sndOn?'音效打開了 🔊':'音效關掉了 🔇');if(sndOn)sfx('tap')});
 updSndBtns();
 // ================= 自動更新：發現新版本就重新載入 =================
-const APP_VER='2026-11-11z';
+const APP_VER='2026-11-12a';
 function checkUpdate(){
   if(!/^https?:/.test(location.protocol)||!API_URL)return;
   if(!$('#modal').classList.contains('hidden'))return; // 正在填表單時不打斷
