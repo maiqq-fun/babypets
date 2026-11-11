@@ -550,7 +550,7 @@ html,body,button,.island,.imap,.logo{touch-action:manipulation}
 #homewrap .top.hbar #hname{margin:0 auto}
 
 #me .meic{width:100%;height:100%;object-fit:contain;padding:3px;box-sizing:border-box;border-radius:50%}
-.lvt{display:inline-block;font-weight:normal;font-size:.78em;line-height:1.3;color:#fff;background:#ff8fab;border-radius:6px;padding:0 4px;margin-left:2px;vertical-align:1px}
+.lvtag{display:inline-block;font-weight:normal;font-size:.78em;line-height:1.3;color:#fff;background:#ff8fab;border-radius:6px;padding:0 4px;margin-left:2px;vertical-align:1px}
 .visits{cursor:pointer;padding-right:20px!important;position:relative}
 .visits::after{content:'›';position:absolute;right:8px;top:50%;transform:translateY(-50%);color:#b98d62;font-size:16px}
 .visits div{max-width:100%}
@@ -569,6 +569,8 @@ html,body,button,.island,.imap,.logo{touch-action:manipulation}
 #homewrap .hrow .circle{width:42px;height:42px;flex:none;display:flex;align-items:center;justify-content:center;padding:0}
 #homewrap .hrow .gohome .ii.ic{width:26px;height:26px}
 #homewrap .top.hbar #hname{max-width:62%!important}
+.cbx{display:inline-block;width:18px;height:18px;border:2px solid #e6c9a6;border-radius:6px;background:#fff;vertical-align:middle;position:relative}.cbx.on{background:#ffb27a;border-color:#ff9a6b}.cbx.on::after{content:'';position:absolute;left:5px;top:1px;width:5px;height:10px;border:solid #fff;border-width:0 2.5px 2.5px 0;transform:rotate(45deg)}
+.dm h4{justify-content:flex-start!important;gap:6px}.dm h4>small{margin-left:auto}
 </style>
 </head>
 <body>
@@ -2325,7 +2327,7 @@ function dmTick(k){if(!DB.me)return;if(k==='treatFav')k='treat';const st=dmState
     if(!st.all&&L.every(x=>st.done[x.k])){st.all=true;DB.game.tickets=(DB.game.tickets||0)+1;setTimeout(()=>{toast('🎉 今日任務全部完成！送你 1 張抽卡券 🎟️');sfx('levelup');updTix()},2200)}}
   save()}
 function dmHTML(){const st=dmState(),L=dmToday(),n=L.filter(x=>st.done[x.k]).length;
-  return `<div class="dm"><h4>📋 今日任務<small>${n} / 3・每個 +${DM_RW.c} 🪙</small></h4>${L.map(m=>{const p=Math.min(m.n,st.p[m.k]||0),ok=st.done[m.k];return `<div class="dmi ${ok?'done':''}"><span class="ok">${ok?'✅':'⬜'}</span><span class="t">${m.t}<small>${p} / ${m.n}</small></span><span class="pb"><i style="width:${p/m.n*100}%"></i></span></div>`}).join('')}<div class="all">${st.all?'🎉 今天全部完成了，明天會有新任務':'3 個全部完成再送 1 張抽卡券 🎟️'}</div></div>`}
+  return `<div class="dm"><h4>📋 今日任務<small>${n} / 3・每個 +${DM_RW.c} 🪙</small></h4>${L.map(m=>{const p=Math.min(m.n,st.p[m.k]||0),ok=st.done[m.k];return `<div class="dmi ${ok?'done':''}"><span class="ok"><i class="cbx${ok?' on':''}"></i></span><span class="t">${m.t}<small>${p} / ${m.n}</small></span><span class="pb"><i style="width:${p/m.n*100}%"></i></span></div>`}).join('')}<div class="all">${st.all?'🎉 今天全部完成了，明天會有新任務':'3 個全部完成再送 1 張抽卡券 🎟️'}</div></div>`}
 
 
 // ================= 🏠 從別人家直接回自己家 =================
@@ -2342,7 +2344,7 @@ $('#gohome').onclick=()=>{const mh=myHouse();if(!mh||!home)return;const h=house(
 
 // ================= 👥 家人與訪客（等級） =================
 function lvOf(id){const p=(DB.players||[]).find(x=>x.id===id);return p&&+p.lv?+p.lv:0}
-function lvTag(id){const n=lvOf(id);return n?`<b class="lvt">Lv${n}</b>`:''}
+function lvTag(id){const n=lvOf(id);return n?`<b class="lvtag">Lv${n}</b>`:''}
 function peopleSheet(hid){const h=house(hid),M=membersOf(hid),L=h.visits&&h.visits.day===todayTW()?(h.visits.list||[]).slice().reverse():[];
   openModal(`<h3>🏠 ${esc(h.name)}</h3>
     <div class="sec"><h4>👥 家人<span>${M.length} / ${MAX_MEMBERS}</span></h4>${M.length?M.map(m=>`<div class="frow"><span>${esc(m.nick)}</span><span>${lvTag(m.id)||''}</span></div>`).join(''):'<div class="locked">還沒有家人</div>'}</div>
@@ -2354,7 +2356,7 @@ function updSndBtns(){document.querySelectorAll('.sndb').forEach(b=>{b.innerHTML
 document.querySelectorAll('.sndb').forEach(b=>b.onclick=e=>{e.stopPropagation();sndOn=!sndOn;try{localStorage.setItem('mhd_snd',sndOn?'1':'0')}catch(x){}updSndBtns();toast(sndOn?'音效打開了 🔊':'音效關掉了 🔇');if(sndOn)sfx('tap')});
 updSndBtns();
 // ================= 自動更新：發現新版本就重新載入 =================
-const APP_VER='2026-11-12a';
+const APP_VER='2026-11-12b';
 function checkUpdate(){
   if(!/^https?:/.test(location.protocol)||!API_URL)return;
   if(!$('#modal').classList.contains('hidden'))return; // 正在填表單時不打斷
