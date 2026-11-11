@@ -571,6 +571,11 @@ html,body,button,.island,.imap,.logo{touch-action:manipulation}
 #homewrap .top.hbar #hname{max-width:62%!important}
 .cbx{display:inline-block;width:18px;height:18px;border:2px solid #e6c9a6;border-radius:6px;background:#fff;vertical-align:middle;position:relative}.cbx.on{background:#ffb27a;border-color:#ff9a6b}.cbx.on::after{content:'';position:absolute;left:5px;top:1px;width:5px;height:10px;border:solid #fff;border-width:0 2.5px 2.5px 0;transform:rotate(45deg)}
 .dm h4{justify-content:flex-start!important;gap:6px}.dm h4>small{margin-left:auto}
+
+.ph1.away img{opacity:.5;filter:grayscale(.3)}
+.rch{width:96px;height:96px;border-radius:50%;object-fit:cover;border:3px solid #fff;box-shadow:0 2px 8px rgba(0,0,0,.15)}
+.hud .hlv b{top:calc(43.75% - 8px)!important;line-height:16px!important;left:1px!important;font-size:13px;color:#7a4a14!important;font-weight:bold}
+.hud .hlv b.d2{font-size:11.5px}.hud .hlv b.d3{font-size:9.5px;letter-spacing:-.5px}
 </style>
 </head>
 <body>
@@ -1028,8 +1033,8 @@ function renderFoot2(){
   $('#visits').innerHTML=(M.length?`<div>👥 家人 ${M.length}/${MAX_MEMBERS}：${M.map(m=>esc(m.nick)+lvTag(m.id)).join('、')}</div>`:'')+(L.length?`<div>🐾 今天來過：${L.slice().reverse().slice(0,5).map(v=>esc(v.nick)+lvTag(v.id)).join('、')}${L.length>5?` 等 ${L.length} 人`:''}</div>`:'');
   $('#visits').onclick=()=>peopleSheet(h.id);
   const own=petsOf(h.id),gs=guestsOf(h.id).map(g=>pet(g.petId)).filter(p=>p.houseId!==h.id);
-  const heads=own.concat(gs).map(p=>{const o=outAt(p.id),away=o&&o.id!==h.id,sl=!away&&sleepState(p);return `<button class="ph1" data-pid="${p.id}" title="${esc(p.name)}"><img src="${petHead(p)}" alt="">${away?'<i>🐾</i>':sl?'<i>💤</i>':p.houseId!==h.id?'<i>🏠</i>':''}</button>`}).join('');
-  $('#petheads').innerHTML=heads;$('#petheads').querySelectorAll('[data-pid]').forEach(b=>b.onclick=()=>{const o=outAt(b.dataset.pid);if(o&&o.id!==h.id)toast(`${pet(b.dataset.pid).name} 出門去 ${o.name} 玩了 🐾`);idCard(b.dataset.pid)});
+  const heads=own.concat(gs).map(p=>{const o=outAt(p.id),away=o&&o.id!==h.id,sl=!away&&sleepState(p);return `<button class="ph1${away?' away':''}" data-pid="${p.id}" title="${esc(p.name)}"><img src="${petHead(p)}" alt="">${away?'<i>🐾</i>':sl?'<i>💤</i>':p.houseId!==h.id?'<i>🏠</i>':''}</button>`}).join('');
+  $('#petheads').innerHTML=heads;$('#petheads').querySelectorAll('[data-pid]').forEach(b=>b.onclick=()=>{const pid=b.dataset.pid,pp=pet(pid),o=outAt(pid);if(o&&o.id!==h.id){if(pp.houseId===h.id&&isFamily(h.id))return recallSheet(pp,o);toast(`${pp.name} 出門去 ${o.name} 玩了 🐾`)}idCard(pid)});
   $('#visits').style.display=M.length||L.length?'':'none';
   $('#nightdim').classList.toggle('on',isNight());
 }
@@ -1398,7 +1403,7 @@ function trackerBlock(p,t,fam){
   if(t.type==='count'){const days=daysBack(7),cnt=d=>logs.filter(l=>l.date===d).reduce((a,l)=>a+(+l.value||1),0),mx=Math.max(1,...days.map(cnt));
     body=`<div class="cnt"><b>${cnt(T)}</b><span>今天</span></div><div class="bars">${days.map(d=>`<span><i style="height:${cnt(d)/mx*100}%"></i><em>${+d.slice(8)}</em></span>`).join('')}</div>`}
   const act=!fam?`<span>${t.vis==='family'?'🔒 家人限定':'公開'}</span>`:t.type==='num'?`<button data-tadd="${t.id}">＋ 記錄</button>`:t.type==='check'?`<button data-tchk="${t.id}">${logs.some(l=>l.date===T)?'✅ 今天完成':'☐ 今天打勾'}</button>`:`<button data-tcnt="${t.id}">＋1 次</button>`;
-  return `<div class="sec"><h4><span class="noic">${esc(t.icon||'📌')}</span> ${esc(t.name)}${t.vis==='family'&&fam?' <small>🔒</small>':''} ${act}</h4>${body}</div>`;
+  return `<div class="sec"><h4>${esc(t.icon||'📌')} ${esc(t.name)}${t.vis==='family'&&fam?' <small>🔒</small>':''} ${act}</h4>${body}</div>`;
 }
 async function addTLog(p,t,value,date){
   const log={petId:p.id,tid:t.id,date:date||todayTW(),value:String(value)};
@@ -1409,13 +1414,13 @@ async function addTLog(p,t,value,date){
 function trackerManager(pid){
   const p=pet(pid);let list=trackersOf(p).map(t=>({...t}));
   const draw=()=>{openModal(`<h3>⚙️ ${esc(p.name)} 的紀錄項目</h3><p class="lead">用不到的可以隱藏，資料會保留</p>
-    ${list.length?list.map((t,i)=>`<div class="tm"><span class="ic noic">${esc(t.icon)}</span><span class="nm2">${esc(t.name)}<small>${TTYPES[t.type]}${t.unit?'・'+esc(t.unit):''}</small></span>
+    ${list.length?list.map((t,i)=>`<div class="tm"><span class="ic">${esc(t.icon)}</span><span class="nm2">${esc(t.name)}<small>${TTYPES[t.type]}${t.unit?'・'+esc(t.unit):''}</small></span>
       <button data-vis="${i}">${t.vis==='family'?'🔒 家人':'🌐 公開'}</button><button data-hide="${i}">${t.hidden?'🙈 已隱藏':'👀 顯示'}</button><button data-del="${i}" class="x2">刪除</button></div>`).join(''):'<div class="locked">還沒有自訂項目</div>'}
     <div class="flabel" style="margin-top:12px">常用範本（點一下加入）</div>
-    <div class="choices" id="tpl">${TEMPLATES.filter(x=>!list.some(t=>t.name===x.name)).map((x,i)=>`<button type="button" data-i="${TEMPLATES.indexOf(x)}"><span class="noic">${x.icon}</span> ${x.name}</button>`).join('')}</div>
+    <div class="choices" id="tpl">${TEMPLATES.filter(x=>!list.some(t=>t.name===x.name)).map((x,i)=>`<button type="button" data-i="${TEMPLATES.indexOf(x)}">${x.icon} ${x.name}</button>`).join('')}</div>
     <details style="margin-top:12px"><summary>自己建立新項目</summary>
       ${fld('tn','名稱',`<input id="tn" maxlength="8" placeholder="例如：吃保健品">`)}
-      <div class="field"><div class="flabel">圖示</div><div class="choices noic" id="tic">${ICONS.map((c,i)=>`<button type="button" data-v="${c}" class="${i?'':'on'}">${c}</button>`).join('')}</div></div>
+      <div class="field"><div class="flabel">圖示</div><div class="choices" id="tic">${ICONS.map((c,i)=>`<button type="button" data-v="${c}" class="${i?'':'on'}">${c}</button>`).join('')}</div></div>
       <div class="field"><div class="flabel">類型</div>${choiceGroup('tty',Object.values(TTYPES),TTYPES.num)}</div>
       ${fld('tu','單位（數字類才需要）',`<input id="tu" maxlength="6" placeholder="例如：ml、g、次">`)}
       <div class="row2"><button id="tnew">＋ 加入</button></div></details>
@@ -1503,7 +1508,7 @@ function idCard(pid){
     else if(await addTLog(p,t,1))toast(`${t.icon} ${t.name} 打勾了`);idCard(pid)});
   S.querySelectorAll('[data-tcnt]').forEach(b=>b.onclick=async()=>{const t=tr(b.dataset.tcnt);b.disabled=true;if(await addTLog(p,t,1))toast(`${t.icon} ${t.name} +1`);idCard(pid)});
   S.querySelectorAll('[data-tadd]').forEach(b=>b.onclick=()=>{const t=tr(b.dataset.tadd),T=todayTW();
-    openModal(`<h3><span class="noic">${esc(t.icon)}</span> ${esc(p.name)} 的${esc(t.name)}</h3><div class="two">${fld('td','日期',`<input id="td" type="date" max="${T}" value="${T}">`)}${fld('tv',`數值${t.unit?'（'+esc(t.unit)+'）':''}`,`<input id="tv" type="number" step="any" inputmode="decimal">`)}</div>
+    openModal(`<h3>${esc(t.icon)} ${esc(p.name)} 的${esc(t.name)}</h3><div class="two">${fld('td','日期',`<input id="td" type="date" max="${T}" value="${T}">`)}${fld('tv',`數值${t.unit?'（'+esc(t.unit)+'）':''}`,`<input id="tv" type="number" step="any" inputmode="decimal">`)}</div>
       <div class="err" id="tverr"></div><div class="row2"><button id="tvb">返回</button><button class="primary" id="tvok">儲存</button></div>`,false,p.card);
     $('#tvb').onclick=()=>idCard(pid);
     $('#tvok').onclick=async e=>{const v=parseFloat($('#tv').value);if(isNaN(v)){$('#tverr').textContent='請填數值';return}e.target.disabled=true;e.target.textContent='送出中…';
@@ -2098,10 +2103,11 @@ if(ONLINE){
 else setTimeout(dailyLogin,800);
 
 // ================= 圖示：自動把 emoji 換成素材 =================
-const ICMAP={'👥':'family','🐾':'paws','🏠':'home','←':'back','＋':'add','🙂':'me','📲':'install','🔗':'link','🔊':'sound','🔇':'mute','📅':'calendar','📋':'tasks','🔑':'key','👑':'crown','💬':'chat','💛':'mood','✏':'pencil','⚖':'scale','🩺':'medical','🧾':'wallet','🎂':'cake','🍖':'bowl','📝':'note','🎁':'gift','🦮':'leash','🧹':'broom','📒':'book','🧸':'toy','📷':'camera','🔔':'bell','🎟':'ticket','🪙':'coin','💗':'heart','🏪':'shop','⚙':'gear','🤚':'hand','🪪':'id'};
-const ICRE=new RegExp('('+Object.keys(ICMAP).join('|')+')️?','gu');
+const ICMAP={'📣':'megaphone','🔒':'lock','🌐':'globe','♂':'male','♀':'female','🎒':'bag','✅':'check','⚠':'warn','🏷':'tag','🎴':'pack','⏳':'hourglass','🛏':'bed','🌙':'moon','☀':'sun','🏥':'clinic','⏰':'alarm','☁':'cloud','🧧':'redpacket','📌':'pin','💧':'drop','🌡':'thermo','💉':'syringe','💊':'pill','🪥':'toothbrush','👁':'eye','🪮':'comb','🚶':'walk','💦':'pee','🤢':'vomit','🛁':'bath','✂':'scissors','🏃':'shoes','😴':'sleep','🔢':'number','🔁':'repeat','🐕':'dog','🐈':'cat','🐇':'rabbit','🐹':'hamster','🐦':'bird',
+  '✨':'assets/fx_star.webp','⭐':'assets/fx_star.webp','★':'assets/fx_star.webp','🎉':'assets/fx_firework.webp','💕':'assets/fx_heart.webp','💖':'assets/fx_heart.webp','❤':'assets/fx_heart.webp','💤':'assets/fx_z.webp','🎵':'assets/fx_notes.webp','💰':'assets/money_bag.webp','💩':'assets/poop.webp','🍤':'assets/item_cookie.webp','🍚':'bowl','🦴':'assets/item_bone.webp','🏡':'home','🙋':'family','👥':'family','🐾':'paws','🏠':'home','←':'back','＋':'add','🙂':'me','📲':'install','🔗':'link','🔊':'sound','🔇':'mute','📅':'calendar','📋':'tasks','🔑':'key','👑':'crown','💬':'chat','💛':'mood','✏':'pencil','⚖':'scale','🩺':'medical','🧾':'wallet','🎂':'cake','🍖':'bowl','📝':'note','🎁':'gift','🦮':'leash','🧹':'broom','📒':'book','🧸':'toy','📷':'camera','🔔':'bell','🎟':'ticket','🪙':'coin','💗':'heart','🏪':'shop','⚙':'gear','🤚':'hand','🪪':'id'};
+const ICRE=new RegExp('('+Object.keys(ICMAP).sort((a,b)=>b.length-a.length).join('|')+')️?','gu');
 function iconizeNode(t){const v=t.nodeValue;if(!v||!ICRE.test(v))return;ICRE.lastIndex=0;const pa=t.parentNode;if(!pa||pa.closest('.ii,textarea,script,style,.noic,option,title'))return;
-  const f=document.createDocumentFragment();let last=0;v.replace(ICRE,(m,k,i)=>{if(i>last)f.appendChild(document.createTextNode(v.slice(last,i)));const sp=document.createElement('span');sp.className='ii ic';sp.innerHTML=`<img src="assets/icon_${ICMAP[k]}.webp" alt="" onerror="this.remove()"><b>${m}</b>`;f.appendChild(sp);last=i+m.length;return m});
+  const f=document.createDocumentFragment();let last=0;v.replace(ICRE,(m,k,i)=>{if(i>last)f.appendChild(document.createTextNode(v.slice(last,i)));const sp=document.createElement('span');sp.className='ii ic';const v0=ICMAP[k];sp.innerHTML=`<img src="${v0.includes('/')?v0:'assets/icon_'+v0+'.webp'}" alt="" onerror="this.remove()"><b>${m}</b>`;f.appendChild(sp);last=i+m.length;return m});
   if(last<v.length)f.appendChild(document.createTextNode(v.slice(last)));pa.replaceChild(f,t)}
 function iconize(root){if(root.nodeType===3)return iconizeNode(root);if(root.nodeType!==1)return;const w=document.createTreeWalker(root,NodeFilter.SHOW_TEXT);const a=[];while(w.nextNode())a.push(w.currentNode);a.forEach(iconizeNode)}
 new MutationObserver(ms=>{for(const m of ms){if(m.type==='characterData')iconizeNode(m.target);else m.addedNodes.forEach(iconize)}}).observe(document.body,{childList:true,subtree:true,characterData:true});
@@ -2134,7 +2140,7 @@ setInterval(()=>{if(!home||$('#home').classList.contains('hidden')||document.hid
   })},1000);
 
 // ================= 狀態列（等級・經驗・金幣） =================
-function hudHTML(v){const lv=v.lv,xp=v.xp;return `<span class="hlv"><img src="assets/lv_badge.webp" alt="" onerror="this.remove()"><b class="lvv">${lv}</b></span><span class="xpw"><span class="xpl"><img src="assets/icon_xp.webp" alt="" onerror="this.remove()"><b class="xpv">${xp}</b> / ${XP_LV}</span><span class="xpb"><i style="width:${Math.min(100,xp/XP_LV*100)}%"></i></span></span><span class="cn"><img src="assets/icon_coin.webp" alt="" onerror="this.remove()"><b class="cnv">${v.coins}</b></span>${DB.dbl===todayTW()?'<span class="dbl">×2</span>':''}`}
+function hudHTML(v){const lv=v.lv,xp=v.xp;return `<span class="hlv"><img src="assets/lv_badge.webp" alt="" onerror="this.remove()"><b class="lvv d${String(lv).length}">${lv}</b></span><span class="xpw"><span class="xpl"><img src="assets/icon_xp.webp" alt="" onerror="this.remove()"><b class="xpv">${xp}</b> / ${XP_LV}</span><span class="xpb"><i style="width:${Math.min(100,xp/XP_LV*100)}%"></i></span></span><span class="cn"><img src="assets/icon_coin.webp" alt="" onerror="this.remove()"><b class="cnv">${v.coins}</b></span>${DB.dbl===todayTW()?'<span class="dbl">×2</span>':''}`}
 let HUDV=null,hudHold=0,hudT=null;
 function updHud(){const g=DB.game||{},T={coins:g.coins||0,xp:g.xp||0,lv:g.lv||1};
   if(!DB.me){document.querySelectorAll('.hud').forEach(h=>h.style.display='none');return}
@@ -2379,8 +2385,17 @@ function peopleSheet(hid){const h=house(hid),M=membersOf(hid),L=h.visits&&h.visi
 function updSndBtns(){document.querySelectorAll('.sndb').forEach(b=>{b.innerHTML=`<img src="assets/icon_${sndOn?'sound':'mute'}.webp" alt="" onerror="this.replaceWith('${sndOn?'🔊':'🔇'}')">`;b.classList.toggle('off',!sndOn);b.setAttribute('aria-label',sndOn?'音效：開（點一下關掉）':'音效：關（點一下打開）')})}
 document.querySelectorAll('.sndb').forEach(b=>b.onclick=e=>{e.stopPropagation();sndOn=!sndOn;try{localStorage.setItem('mhd_snd',sndOn?'1':'0')}catch(x){}updSndBtns();toast(sndOn?'音效打開了 🔊':'音效關掉了 🔇');if(sndOn)sfx('tap')});
 updSndBtns();
+
+// ================= 📣 叫在外面玩的毛孩回家 =================
+function recallSheet(p,o){
+  openModal(`<div style="text-align:center"><div class="giftopen"><img class="rch" src="${petHead(p)}" alt=""></div><h3>${esc(p.name)} 正在「${esc(o.name)}」玩</h3><p class="lead">要叫牠回家嗎？</p></div>
+    <div class="row2"><button id="rcid">看身分證</button><button class="primary" id="rcgo">叫回家 🏠</button></div>`);
+  $('#rcid').onclick=()=>idCard(p.id);
+  $('#rcgo').onclick=()=>{o.guests=(o.guests||[]).filter(x=>x.petId!==p.id);PEND.home[p.id]={t:Date.now()};delete PEND.walk[p.id];
+    call('walkHome',{playerId:DB.me.id,petId:p.id},true).catch(()=>{});closeModal();openHome(home.id,true);toast(`${p.name} 回家了 🏠`);
+    setTimeout(()=>{const r=home&&home.pets.find(x=>x.id===p.id);if(r)petSay(r,null,'我回來了～')},900)}}
 // ================= 自動更新：發現新版本就重新載入 =================
-const APP_VER='2026-11-12d';
+const APP_VER='v1.30';
 function checkUpdate(){
   if(!/^https?:/.test(location.protocol)||!API_URL)return;
   if(!$('#modal').classList.contains('hidden'))return; // 正在填表單時不打斷
