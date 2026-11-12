@@ -699,7 +699,7 @@ html,body,button,.island,.imap,.logo{touch-action:manipulation}
 .acci.buy img{opacity:.55}.acci.buy em{color:#8a5a10}.acci.armed{border-color:#f0a33a;background:#fff6e2}.acci.armed em{color:#c46a00;font-weight:bold}
 .adjbox{position:absolute;transform:translate(-50%,-50%);border:2px dashed #4a90e2;border-radius:6px;cursor:move;touch-action:none}
 .adjh{position:absolute;right:-11px;bottom:-11px;width:22px;height:22px;border-radius:50%;background:#4a90e2;border:2px solid #fff;cursor:nwse-resize}
-.irow2{position:absolute;left:14px;top:calc(min(40vw,210px)*.42 + 18px);display:flex;align-items:center;gap:8px;z-index:3001;pointer-events:auto}
+.irow2{position:absolute;left:14px;display:flex;align-items:center;gap:8px;z-index:3001;pointer-events:auto}
 .irow2.hidden{display:none}
 .rankb img{width:72%;height:72%;object-fit:contain}
 .onpill{display:inline-flex;align-items:center;gap:6px;border:2px solid var(--wood);background:rgba(255,250,238,.94);border-radius:999px;padding:5px 11px;font-size:13px;color:#4f7a3a;font-weight:bold;box-shadow:0 2px 0 rgba(0,0,0,.12)}
@@ -721,6 +721,15 @@ html,body,button,.island,.imap,.logo{touch-action:manipulation}
 .codein{display:flex;align-items:center;gap:6px}.codein span{font-weight:bold;color:#7a5a40;letter-spacing:1px}.codein input{letter-spacing:2px;text-transform:uppercase}
 .pet .nm .crownk{margin-left:2px}
 .plist .mini{aspect-ratio:auto;height:auto}.plist .frow>span:last-child{display:flex;gap:4px;align-items:center;flex:none}
+.acci.try{border-color:#4a90e2;background:#eef5ff}.acci.try em{color:#2f6fbf;font-weight:bold}
+.trybar{display:flex;flex-direction:column;gap:6px;margin:-2px 0 10px}
+.tryrow{display:flex;align-items:center;gap:8px;background:#eef5ff;border:2px solid #b9d4f5;border-radius:12px;padding:6px 8px;font-size:13px;color:#2f5f9f}
+.tryrow span{flex:1;min-width:0}.tryrow button{flex:none;border-radius:10px;padding:6px 10px;font-size:13px}.tryrow button[data-untry]{border:1.5px solid #b9d4f5;background:#fff;color:#6b8bb5;padding:6px 9px}
+/* v1.43b 版面：小島往下、🏆 那排往下 */
+.imap{top:min(5.5dvh,calc(100dvh - min(calc(100vw * 2.02734),100dvh)))}
+.irows{top:calc(78.6% + min(5.5dvh,calc(100dvh - min(calc(100vw * 2.02734),100dvh))) * .5)!important}
+.inote:empty{display:none}
+.irow2{top:calc(min(40vw,210px)*.6 + 20px)}
 .chk{display:flex;align-items:center;gap:6px;font-size:13px;color:var(--soft);margin:6px 0}.chk input{width:18px;height:18px}
 .codebox .cbtns{display:flex;gap:4px;flex:none}
 </style>
@@ -1019,9 +1028,9 @@ const DEF_ADJ={貓:{head:{x:30,y:6,w:46},face:{x:30,y:31,w:40},neck:{x:31,y:53,w
   鳥:{head:{x:48,y:11,w:40},face:{x:48,y:36,w:38},neck:{x:47,y:55,w:38}},其他:{head:{x:50,y:12,w:46},face:{x:50,y:36,w:40},neck:{x:50,y:58,w:40}}};
 const accImg=id=>`assets/acc_${id}.webp`;
 function petAdj(p,s){const a=p.wadj&&p.wadj[s];if(a&&a.w)return a;const d=p.body?{head:{x:50,y:10,w:46},face:{x:50,y:32,w:40},neck:{x:50,y:55,w:40}}:(DEF_ADJ[p.species]||DEF_ADJ.其他);return d[s]}
-function accBox(p,s,id){const a=petAdj(p,s),it=ACC[id]||{};return {x:a.x+(it.ox||0)*a.w/100,y:a.y+(it.oy||0)*a.w/100*.9,w:a.w*(it.ow||1)}}
+function accBox(p,s,id){const a=petAdj(p,s),it=ACC[id]||{},f=!!a.f;return {x:a.x+(f?-1:1)*(it.ox||0)*a.w/100,y:a.y+(it.oy||0)*a.w/100*.9,w:a.w*(it.ow||1),f}}
 function wearHTML(p,only){const w=p.wear||{};let o='';SLOTS3.forEach(s=>{const id=w[s];if(!id||!ACC[id]||(only&&only!==s&&only!=='all'))return;const b=accBox(p,s,id);
-  o+=`<img class="acc a-${s}" data-s="${s}" src="${accImg(id)}" alt="" style="left:${b.x}%;top:${b.y}%;width:${b.w}%">`});return o?`<div class="wear">${o}</div>`:''}
+  o+=`<img class="acc a-${s}" data-s="${s}" src="${accImg(id)}" alt="" style="left:${b.x}%;top:${b.y}%;width:${b.w}%${b.f?';transform:translate(-50%,-50%) scaleX(-1)':''}">`});return o?`<div class="wear">${o}</div>`:''}
 const accOwn=hid=>new Set((house(hid)||{}).acc||[]);
 const accLeft=hid=>Object.keys(ACC).filter(id=>!accOwn(hid).has(id));
 const WPEND={},APEND={};let wq=Promise.resolve();
@@ -1032,32 +1041,43 @@ function addAccLocal(hid,ids){const h=house(hid);if(!h)return;h.acc=[...new Set(
 let wearT={};
 function saveWearSoon(p){WPEND[p.id]={wear:Object.assign({},p.wear||{}),wadj:JSON.parse(JSON.stringify(p.wadj||{})),t:Date.now()};clearTimeout(wearT[p.id]);
   wearT[p.id]=setTimeout(()=>{wq=wq.then(()=>call('saveWear',Object.assign(cred(),{petId:p.id,wear:p.wear||{},wadj:p.wadj||{}}),true)).catch(e=>toast('打扮沒存到：'+e.message))},600)}
-let closetTab='head';
-function closetSheet(pid,tab){const p=pet(pid);if(!p||!isFamily(p.houseId))return;if(tab)closetTab=tab;const hid=p.houseId,own=accOwn(hid),g=DB.game,w=p.wear||{};
-  const ids=Object.keys(ACC).filter(id=>ACC[id].s===closetTab).sort((a,b)=>(own.has(b)-own.has(a))||ACC[a].p-ACC[b].p);
-  openModal(`<h3>👗 ${esc(p.name)} 的衣櫃</h3><p class="lead">我的金幣：<b class="coinv">🪙 ${g.coins||0}</b>・頭、臉、脖子各戴 1 個</p>
-    <div class="clprev"><div class="clbody" id="clb"><img src="${petBody(p)}" alt="" onerror="this.src='${defBody(p.species)}'">${wearHTML(p)}</div></div>
-    <div class="tabs3">${['head','face','neck'].map(s=>`<button data-ct="${s}" class="${s===closetTab?'on':''}">${SLOT_N[s]}${w[s]?' ✓':''}</button>`).join('')}</div>
-    <div class="accgrid">${ids.map(id=>{const on=w[closetTab]===id,has=own.has(id);return `<button class="acci${on?' on':''}${has?'':' buy'}" data-acc="${id}"><img src="${accImg(id)}" alt=""><span>${ACC[id].n}</span><em>${on?'戴著':has?'&nbsp;':'🪙 '+ACC[id].p}</em></button>`}).join('')}</div>
-    <div class="row2" style="margin-top:10px"><button id="cladj" ${w[closetTab]?'':'disabled'}>✋ 調整位置</button><button id="cloff" ${Object.keys(w).length?'':'disabled'}>全部脫掉</button></div>
-    <div class="hint">沒有的配件點一下買、再點一次確認；抽卡券的卡包也有機會抽到</div>
-    <div class="row2"><button data-close>關閉</button></div>`);
-  const S=$('#sheet');
-  S.querySelectorAll('[data-ct]').forEach(b=>b.onclick=()=>closetSheet(pid,b.dataset.ct));
-  S.querySelectorAll('[data-acc]').forEach(b=>b.onclick=()=>{const id=b.dataset.acc,it=ACC[id];
-    if(!accOwn(hid).has(id)){if((g.coins||0)<it.p)return toast(`金幣不夠，還差 ${it.p-(g.coins||0)} 🪙`);const em=b.querySelector('em');if(!b.classList.contains('armed')){b.classList.add('armed');em.textContent='再按一次買';setTimeout(()=>{if(b.isConnected){b.classList.remove('armed');em.textContent='🪙 '+it.p}},3000);return}
-      g.coins-=it.p;save();updHud&&updHud();addAccLocal(hid,[id]);sfx&&sfx('tap');toast(`買了${it.n}，放進衣櫃了 👗`)}
-    p.wear=Object.assign({},p.wear||{});if(p.wear[it.s]===id)delete p.wear[it.s];else p.wear[it.s]=id;saveWearSoon(p);rewearHome(p.id);const st=S.scrollTop;closetSheet(pid);$('#sheet').scrollTop=st});
-  $('#cladj').onclick=()=>adjustSheet(pid,closetTab);
-  $('#cloff').onclick=()=>{p.wear={};saveWearSoon(p);rewearHome(p.id);closetSheet(pid);toast('都脫掉了')};
+let closetTab='head',closetShop=false;const TRY={};
+function tryOf(pid){return TRY[pid]||(TRY[pid]={})}
+function closetSheet(pid,tab,o){o=o||{};const p=pet(pid);if(!p)return;if(!isFamily(p.houseId))return toast(ONLINE&&DB.me&&DB.me.houseId===p.houseId?'正在跟小島同步，等一下再試':'只能幫自己家的毛孩換裝喔');if(tab)closetTab=tab;if(!o.keep){for(const k in TRY)delete TRY[k];if(o.shop!==undefined)closetShop=!!o.shop;else closetShop=false}
+  const hid=p.houseId,own=accOwn(hid),g=DB.game,w=p.wear||{},T=tryOf(pid),view=Object.assign({},w,T),sibs=petsOf(hid);
+  const ids=Object.keys(ACC).filter(id=>ACC[id].s===closetTab).sort((a,b)=>closetShop?ACC[a].p-ACC[b].p:((own.has(b)-own.has(a))||ACC[a].p-ACC[b].p));
+  const tried=SLOTS3.slice().reverse().filter(s=>T[s]);
+  openModal(`<h3>${closetShop?'👗 毛毛服飾店':`👗 ${esc(p.name)} 的衣櫃`}</h3><p class="lead">我的金幣：<b class="coinv">🪙 ${g.coins||0}</b>・頭、臉、脖子各戴 1 個</p>
+    ${sibs.length>1?`<div class="sibs">${sibs.map(s=>`<button data-sib="${s.id}" class="${s.id===pid?'on':''}"><img src="${petHead(s)}" alt=""><span>${esc(s.name)}</span></button>`).join('')}</div>`:''}
+    <div class="clprev"><div class="clbody" id="clb"><img src="${petBody(p)}" alt="" onerror="this.src='${defBody(p.species)}'">${wearHTML(Object.assign({},p,{wear:view}))}</div></div>
+    ${tried.length?`<div class="trybar">${tried.map(s=>`<div class="tryrow"><span>試穿中：${ACC[T[s]].n}</span><button class="primary" data-buy="${s}">🪙 ${ACC[T[s]].p} 買下</button><button data-untry="${s}" aria-label="不要">✕</button></div>`).join('')}</div>`:''}
+    <div class="tabs3">${['head','face','neck'].map(s=>`<button data-ct="${s}" class="${s===closetTab?'on':''}">${SLOT_N[s]}${view[s]?' ✓':''}</button>`).join('')}</div>
+    <div class="accgrid">${ids.map(id=>{const on=w[closetTab]===id,tr=T[closetTab]===id,has=own.has(id);return `<button class="acci${on?' on':''}${tr?' try':''}${has?'':' buy'}" data-acc="${id}"><img src="${accImg(id)}" alt=""><span>${ACC[id].n}</span><em>${on?'戴著':tr?'試穿中':has?'已擁有':'🪙 '+ACC[id].p}</em></button>`}).join('')}</div>
+    <div class="row2" style="margin-top:10px"><button id="cladj">✋ 調整位置</button><button id="cloff">全部脫掉</button></div>
+    <div class="hint">沒有的配件點一下可以先試穿，喜歡再按「買下」；不買的話關掉就會自動拿掉。抽卡券的卡包也有機會抽到</div>
+    <div class="row2">${closetShop?'<button id="clshop">← 商店</button>':''}<button data-close>關閉</button></div>`);
+  const S=$('#sheet'),again=t=>{const st=S.scrollTop;closetSheet(pid,t||closetTab,{keep:1});$('#sheet').scrollTop=st};
+  S.querySelectorAll('[data-sib]').forEach(b=>b.onclick=()=>{for(const k in TRY)delete TRY[k];closetSheet(b.dataset.sib,closetTab,{keep:1})});
+  S.querySelectorAll('[data-ct]').forEach(b=>b.onclick=()=>again(b.dataset.ct));
+  S.querySelectorAll('[data-acc]').forEach(b=>b.onclick=()=>{const id=b.dataset.acc,it=ACC[id];sfx&&sfx('tap');
+    if(!accOwn(hid).has(id)){if(T[it.s]===id)delete T[it.s];else T[it.s]=id;return again()}
+    delete T[it.s];p.wear=Object.assign({},p.wear||{});if(p.wear[it.s]===id)delete p.wear[it.s];else p.wear[it.s]=id;saveWearSoon(p);rewearHome(p.id);again()});
+  S.querySelectorAll('[data-untry]').forEach(b=>b.onclick=()=>{delete T[b.dataset.untry];again()});
+  S.querySelectorAll('[data-buy]').forEach(b=>b.onclick=()=>{const s=b.dataset.buy,id=T[s],it=ACC[id];if(!it)return;
+    if((g.coins||0)<it.p)return toast(`金幣不夠，還差 ${it.p-(g.coins||0)} 🪙`);
+    g.coins-=it.p;save();updHud&&updHud();addAccLocal(hid,[id]);delete T[s];p.wear=Object.assign({},p.wear||{},{[s]:id});saveWearSoon(p);rewearHome(p.id);toast(`買了${it.n}，幫 ${p.name} 戴上了 👗`);again(s)});
+  $('#cladj').onclick=()=>{if(!view[closetTab])return toast(`先幫 ${p.name} 戴上一個${SLOT_N[closetTab]}的配件，再來調位置`);adjustSheet(pid,closetTab)};
+  $('#cloff').onclick=()=>{if(!Object.keys(view).length)return toast(`${p.name} 身上沒有戴東西`);for(const k in T)delete T[k];p.wear={};saveWearSoon(p);rewearHome(p.id);again();toast('都脫掉了')};
+  if($('#clshop'))$('#clshop').onclick=()=>shopSheet('treat');
 }
 function rewearHome(pid){if(!home)return;const r=home.pets.find(x=>x.id===pid),p=pet(pid);if(!r||!r.el||!p)return;const bd=r.el.querySelector('.body');if(!bd)return;const old=bd.querySelector('.wear');if(old)old.remove();if(!r.demon)bd.insertAdjacentHTML('beforeend',wearHTML(p))}
-function adjustSheet(pid,s){const p=pet(pid),id=(p.wear||{})[s];if(!id)return closetSheet(pid);const base=JSON.parse(JSON.stringify(petAdj(p,s)));let a=Object.assign({},base);
+function adjustSheet(pid,s){const p=pet(pid),view=Object.assign({},p.wear||{},tryOf(pid)),id=view[s];if(!id)return closetSheet(pid,s,{keep:1});const base=JSON.parse(JSON.stringify(petAdj(p,s)));let a=Object.assign({f:false},base);
   openModal(`<h3>✋ 調整${SLOT_N[s]}的位置</h3><p class="lead">拖曳配件移動，拉右下角的圓點縮放。這隻毛孩之後換別的${SLOT_N[s]}部配件也會用這個位置</p>
-    <div class="clprev big"><div class="clbody" id="clb"><img src="${petBody(p)}" alt="" onerror="this.src='${defBody(p.species)}'">${wearHTML(p)}<div class="adjbox" id="adjb"><i class="adjh" id="adjh"></i></div></div></div>
-    <div class="row2"><button id="adjr">還原預設</button><button class="primary" id="adjok">完成</button></div>`);
+    <div class="clprev big"><div class="clbody" id="clb"><img src="${petBody(p)}" alt="" onerror="this.src='${defBody(p.species)}'">${wearHTML(Object.assign({},p,{wear:view}))}<div class="adjbox" id="adjb"><i class="adjh" id="adjh"></i></div></div></div>
+    <div class="row2"><button id="adjf">↔️ 左右翻轉</button><button id="adjr">還原預設</button></div>
+    <div class="row2"><button id="adjx">取消</button><button class="primary" id="adjok">完成</button></div>`);
   const cb=$('#clb'),box=$('#adjb'),img=cb.querySelector(`.acc[data-s="${s}"]`);
-  const put=()=>{const it=ACC[id]||{},w=a.w*(it.ow||1),x=a.x+(it.ox||0)*a.w/100,y=a.y+(it.oy||0)*a.w/100*.9;if(img)Object.assign(img.style,{left:x+'%',top:y+'%',width:w+'%'});
+  const put=()=>{const it=ACC[id]||{},w=a.w*(it.ow||1),x=a.x+(a.f?-1:1)*(it.ox||0)*a.w/100,y=a.y+(it.oy||0)*a.w/100*.9;if(img){Object.assign(img.style,{left:x+'%',top:y+'%',width:w+'%'});img.style.transform=a.f?'translate(-50%,-50%) scaleX(-1)':''}
     requestAnimationFrame(()=>{const ih=img?img.getBoundingClientRect().height/cb.getBoundingClientRect().height*100:w;Object.assign(box.style,{left:x+'%',top:y+'%',width:w+'%',height:ih+'%'})})};
   put();if(img&&!img.complete)img.onload=put;
   let drag=null;const R=()=>cb.getBoundingClientRect();
@@ -1065,9 +1085,12 @@ function adjustSheet(pid,s){const p=pet(pid),id=(p.wear||{})[s];if(!id)return cl
   box.onpointermove=e=>{if(!drag)return;const r=R(),dx=(e.clientX-drag.x0)/r.width*100,dy=(e.clientY-drag.y0)/r.height*100;
     if(drag.mode==='move'){a.x=clamp(drag.a0.x+dx,-10,110);a.y=clamp(drag.a0.y+dy,-30,120)}else a.w=clamp(drag.a0.w+dx*2,10,150);put()};
   box.onpointerup=box.onpointercancel=()=>{drag=null};
-  $('#adjr').onclick=()=>{const d=JSON.parse(JSON.stringify(petAdj(Object.assign({},p,{wadj:{}}),s)));a=d;put()};
-  $('#adjok').onclick=()=>{a={x:Math.round(a.x*10)/10,y:Math.round(a.y*10)/10,w:Math.round(a.w*10)/10};p.wadj=Object.assign({},p.wadj||{},{[s]:a});saveWearSoon(p);rewearHome(pid);toast('位置調好了 ✨');closetSheet(pid,s)};
+  $('#adjf').onclick=()=>{a.f=!a.f;put()};
+  $('#adjr').onclick=()=>{a=Object.assign({f:false},JSON.parse(JSON.stringify(petAdj(Object.assign({},p,{wadj:{}}),s))));put()};
+  $('#adjx').onclick=()=>closetSheet(pid,s,{keep:1});
+  $('#adjok').onclick=()=>{const o={x:Math.round(a.x*10)/10,y:Math.round(a.y*10)/10,w:Math.round(a.w*10)/10};if(a.f)o.f=1;p.wadj=Object.assign({},p.wadj||{},{[s]:o});saveWearSoon(p);rewearHome(pid);toast('位置調好了 ✨');closetSheet(pid,s,{keep:1})};
 }
+function shopCloset(){const h=myHouse(),ps=h?petsOf(h.id):[];if(!h)return toast('有家之後才能買衣服喔');if(!ps.length)return toast('家裡還沒有毛孩，先新增一隻吧');closetSheet(ps[0].id,'head',{shop:true})}
 // ---------- 🏆 排行榜 ----------
 const RB={coin:{t:'💰財神爺欽點',d:'這週撿最多錢的人',u:v=>'$'+v.toLocaleString()},poop:{t:'💩專業鏟屎官',d:'這週清最多便便的人',u:v=>v+' 坨'},
   visit:{t:'🚪社牛里長伯',d:'這週去最多家串門子的人（每天每家算 1 次）',u:v=>v+' 家次'},pop:{t:'🐾本週人氣王',d:'這週最受朋友疼愛的毛孩（朋友摸、餵、請零食才算）',u:v=>v+' 分'}};
@@ -1858,7 +1881,7 @@ function idCard(pid){
       ${(()=>{const s=sleepState(p);return s?`<div class="idstat">${s.icon} 現在${s.label==='賴床中'?'賴床中':'在睡'+(s.label==='晚安'?'覺':s.label)}</div>`:''})()}
       <div class="stamp">毛很多<br>認證</div></div>
   </div>
-  ${fam?`<div class="row2"><button id="ied">✏️ 編輯資料</button><button id="itm">⚙️ 紀錄項目</button></div>`:''}
+  ${fam?`<div class="row2"><button id="ied">✏️ 編輯資料</button><button id="itm">⚙️ 紀錄項目</button></div><div class="row2"><button id="icl">👗 衣櫃・換裝</button></div>`:''}
   ${ph.length||fam?`<div class="sec"><h4>📷 生活照 <span>${ph.length} / 5</span></h4><div class="photos">${ph.map((u,i)=>`<button data-ph="${i}"><img src="${u}" alt=""></button>`).join('')}
     ${fam&&ph.length<5?`<label class="phadd">＋<input type="file" accept="image/*" id="phin" hidden></label>`:''}</div></div>`:''}
   <div class="sec"><h4>⚖️ 體重 ${fam?'<button data-add="weights">＋ 記錄</button>':'<span>公開</span>'}</h4>${sparkline(ws)}${fam?recList('weights',ws,fam):(ws.length?'':'<div class="locked">還沒有紀錄</div>')}</div>
@@ -1869,7 +1892,7 @@ function idCard(pid){
   <div class="row2" style="margin-top:14px"><button data-close>關閉</button></div>`,false,p.card||'#ff9a6b');
   const S=$('#sheet');
   S.querySelectorAll('[data-sib]').forEach(b=>b.onclick=()=>idCard(b.dataset.sib));
-  if($('#ied'))$('#ied').onclick=()=>petForm(p.houseId,pid);
+  if($('#ied'))$('#ied').onclick=()=>petForm(p.houseId,pid);if($('#icl'))$('#icl').onclick=()=>closetSheet(pid);
   if($('#itm'))$('#itm').onclick=()=>trackerManager(pid);
   S.querySelectorAll('[data-ph]').forEach(b=>b.onclick=()=>photoView(pid,+b.dataset.ph));
   if($('#phin'))$('#phin').onchange=async e=>{const f=e.target.files[0];if(!f)return;const lab=e.target.parentElement;lab.textContent='…';
@@ -2152,7 +2175,7 @@ let shopTab='treat';
 function shopSheet(tab){
   if(!DB.me)return onboarding();if(tab)shopTab=tab;
   const g=DB.game,coins=g.coins||0,bd=DB.pets.some(p=>isBirthday(p.birthday));
-  if(shopTab==='ticket')shopTab='kuji';const tabs=[['treat','🍤 零食'],['toy','🧸 玩具'],['kuji','<img class="tabic" src="assets/kuji_icon.webp" alt="">一番賞'],['bag','🎒 背包']];
+  if(shopTab==='ticket')shopTab='kuji';const tabs=[['treat','🍤 零食'],['toy','🧸 玩具'],['kuji','<img class="tabic" src="assets/kuji_icon.webp" alt="">一番賞'],['acc','👗 服飾'],['bag','🎒 背包']];
   let body='';
   if(shopTab==='treat'||shopTab==='toy'){
     const list=Object.entries(ITEMS).filter(([id,it])=>it.kind===shopTab&&!it.limited&&(!it.bday||bd));
@@ -2167,7 +2190,7 @@ function shopSheet(tab){
     <div class="tabs3">${tabs.map(([k,n])=>`<button data-tab="${k}" class="${k===shopTab?'on':''}">${n}</button>`).join('')}</div>${body}
     <div class="row2" style="margin-top:12px"><button data-close>關閉</button></div>`);
   const S=$('#sheet');
-  S.querySelectorAll('[data-tab]').forEach(b=>b.onclick=()=>shopSheet(b.dataset.tab));
+  S.querySelectorAll('[data-tab]').forEach(b=>b.onclick=()=>b.dataset.tab==='acc'?shopCloset():shopSheet(b.dataset.tab));
   S.querySelectorAll('[data-buy]').forEach(b=>b.onclick=()=>{const it=ITEMS[b.dataset.buy];if((g.coins||0)<it.price)return;g.coins-=it.price;bagAdd(b.dataset.buy,1);dmTick('buy');toast(`買了 ${it.emo} ${it.name}，放進背包了`);const st=S.scrollTop;shopSheet();$('#sheet').scrollTop=st});
   if(shopTab==='kuji')kujiBind(S);
   const t=S.querySelector('[data-ticket]');if(t)t.onclick=()=>{if((g.coins||0)<PACK_PRICE)return;g.coins-=PACK_PRICE;g.tickets++;save();updTix();toast('換到 1 張抽卡券 🎟️');shopSheet()};
@@ -2378,17 +2401,19 @@ $('#sweep').onclick=async()=>{
 };
 
 // ================= 愛心值・金幣（統一獎勵） =================
-const REW={visit:{x:3,c:2,cap:5,after:{x:1,c:0},n:'串門子'},pat:{x:2,c:1,cap:20,after:{x:1,c:0},n:'摸摸頭'},
-  feed:{x:5,c:3,cap:10,after:{x:2,c:1},n:'餵飯'},poop:{x:5,c:2,cap:10,after:{x:1,c:0},n:'鏟屎'},treat:{x:10,c:0,n:'餵零食'},treatFav:{x:15,c:0,n:'餵到最愛的零食'},
-  gift:{x:20,c:0,n:'送禮物'},open:{x:5,c:5,n:'拆禮物'},note:{x:10,c:5,cap:3,after:{x:3,c:0},n:'在別人家留言'},rec:{x:5,c:3,cap:10,n:'記錄體重／紀錄項目'},
-  walk:{x:10,c:5,cap:3,after:{x:3,c:1},n:'遛遛（帶毛孩去別人家）'},wake:{x:2,c:1,cap:10,after:{x:1,c:0},n:'叫醒／蓋被子'},guest:{x:2,c:1,cap:20,n:'你的毛孩在別人家被照顧'}};
+const REW={visit:{x:3,c:2,cap:5,after:{x:0,c:0},n:'串門子'},pat:{x:2,c:1,cap:20,after:{x:0,c:0},n:'摸摸頭'},
+  feed:{x:5,c:3,cap:10,after:{x:0,c:0},n:'餵飯'},poop:{x:5,c:2,cap:10,after:{x:0,c:0},n:'鏟屎'},treat:{x:10,c:0,n:'餵零食'},treatFav:{x:15,c:0,n:'餵到最愛的零食'},
+  gift:{x:20,c:0,n:'送禮物'},open:{x:5,c:5,n:'拆禮物'},note:{x:10,c:5,cap:3,after:{x:0,c:0},n:'在別人家留言'},rec:{x:5,c:3,cap:10,n:'記錄體重／紀錄項目'},
+  walk:{x:10,c:5,cap:3,after:{x:0,c:0},n:'遛遛（帶毛孩去別人家）'},wake:{x:2,c:1,cap:10,after:{x:0,c:0},n:'叫醒／蓋被子'},guest:{x:2,c:1,cap:20,n:'你的毛孩在別人家被照顧'}};
 const XP_LV=100;
+// v1.45：越高級越難升（Lv.1→2 要 100，之後每級多 20）
+const xpNeed=lv=>100+20*(Math.max(1,+lv||1)-1);
 function reward(k,mult){
   const e=REW[k];if(!e)return false;const g=DB.game,d=todayTW();
   dmTick(k);
   if(!g.rd||g.rd.d!==d)g.rd={d};const n=g.rd[k]||0;let bx=e.x,bc=e.c;if(e.cap&&n>=e.cap){if(!e.after)return false;bx=e.after.x;bc=e.after.c}g.rd[k]=n+1;
   const dm=DB.dbl===todayTW()?2:1,x=bx*(mult||1)*dm,c=capCoins(bc*(mult||1)*dm);if(!x&&!c)return true;g.xp=(g.xp||0)+x;g.coins=(g.coins||0)+c;g.lv=g.lv||1;let up=0;
-  while(g.xp>=XP_LV){g.xp-=XP_LV;g.lv++;g.tickets++;up++}
+  while(g.xp>=xpNeed(g.lv)){g.xp-=xpNeed(g.lv);g.lv++;g.tickets++;up++}
   save();updTix();rewardPop(x,c);
   if(up)setTimeout(()=>{toast(`🎉 升到 Lv.${g.lv}！送你 ${up} 張抽卡券 🎟️`);sfx('levelup')},900);
   return true;
@@ -2469,11 +2494,11 @@ function missionsSheet(){
   const h=myHouse(),own=h?owned(h.id):new Set(),g=DB.game,xp=g.xp||0,lv=g.lv||1;
   openModal(`<h3>🎟️ 抽卡與等級</h3>
   ${dmHTML()}
-  <div class="lvbox"><div class="lvt"><b>Lv.${lv}</b><span>${xp} / ${XP_LV} 💗</span></div><div class="xpbar"><i style="width:${xp/XP_LV*100}%"></i></div><small>任何互動都會加愛心值，集滿 ${XP_LV} 升一級，送 1 張抽卡券</small></div>
+  <div class="lvbox"><div class="lvt"><b>Lv.${lv}</b><span>${xp} / ${xpNeed(lv)} 💗</span></div><div class="xpbar"><i style="width:${Math.min(100,xp/xpNeed(lv)*100)}%"></i></div><small>任何互動都會加愛心值，集滿就升一級、送 1 張抽卡券；等級越高，需要的愛心值越多。摸頭、鏟屎這些互動每天有上限，到了就不再加</small></div>
   <div class="tk"><div><div style="font-size:13px;color:var(--soft)">我的抽卡券</div><div class="n">${g.tickets} 張</div></div><button id="draw" ${g.tickets&&h?'':'disabled'}>開卡包</button></div>
   ${h?'':'<div class="hint" style="text-align:center;margin:-4px 0 10px">有家之後才能開卡包，券會先幫你存著</div>'}
   <div class="tk coin"><div><div style="font-size:13px;color:var(--soft)">我的金幣</div><div class="n">🪙 ${g.coins||0}</div></div><button id="toshop">🏪 去商店</button></div>
-  <details class="earn" open><summary>做什麼可以拿獎勵？</summary><div class="frow"><span>每日簽到</span><span>見簽到卡・連續 7 天送抽卡券</span></div><div class="frow"><span>🪙 每日金幣上限</span><span>互動＋任務一天最多 ${COIN_CAP}<small class="aft">簽到、撿錢不算（今天已賺 ${(g.cc&&g.cc.d===todayTW()?g.cc.n:0)}）</small></span></div>${Object.values(REW).map(e=>`<div class="frow"><span>${e.n}</span><span>${e.x?`+${e.x} 💗`:''}${e.c?` +${e.c} 🪙`:''}${e.cap?`・前 ${e.cap} 次`:''}${e.cap&&e.after?`<small class="aft">之後 ${e.after.x?`+${e.after.x} 💗`:''}${e.after.c?` +${e.after.c} 🪙`:''}</small>`:e.cap?'<small class="aft">之後沒有</small>':''}</span></div>`).join('')}</details>
+  <details class="earn" open><summary>做什麼可以拿獎勵？</summary><div class="frow"><span>每日簽到</span><span>見簽到卡・連續 7 天送抽卡券</span></div><div class="frow"><span>🪙 每日金幣上限</span><span>互動＋任務一天最多 ${COIN_CAP}<small class="aft">簽到、撿錢不算（今天已賺 ${(g.cc&&g.cc.d===todayTW()?g.cc.n:0)}）</small></span></div>${Object.values(REW).map(e=>`<div class="frow"><span>${e.n}</span><span>${e.x?`+${e.x} 💗`:''}${e.c?` +${e.c} 🪙`:''}${e.cap?`・前 ${e.cap} 次`:''}${e.cap&&e.after&&(e.after.x||e.after.c)?`<small class="aft">之後 ${e.after.x?`+${e.after.x} 💗`:''}${e.after.c?` +${e.after.c} 🪙`:''}</small>`:e.cap?'<small class="aft">之後沒有</small>':''}</span></div>`).join('')}</details>
   <div class="sec"><h4>🎴 卡包裡有什麼<span>保底：每 10 抽至少 1 間新房間</span></h4>
     <div class="frow"><span>🍤 零食包（隨機 3 個）</span><span>50%</span></div><div class="frow"><span>🧸 玩具</span><span>30%</span></div>
     <div class="frow"><span>🏠 房間（不會重複）</span><span>15%</span></div><div class="frow"><span>✨ 限定玩具（商店不賣）</span><span>5%</span></div>
@@ -2549,9 +2574,9 @@ function sleepMenu(r,p){
     <div class="big3"><button id="swake"><span class="e">🔔</span><span>叫醒牠<small>醒來後會陪大家玩 ${p.trait==='愛睡'?15:30} 分鐘</small></span></button>
     <button id="stuck"><span class="e">🛏️</span><span>輕輕蓋被子<small>讓牠繼續睡</small></span></button>
     ${r.guest?'':'<button id="sfeed"><span class="e">🍚</span><span>幫牠留飯<small>放在帳篷旁，不會吵醒牠</small></span></button>'}
-    <button id="sid"><span class="e">🪪</span><span>看身分證</span></button></div>
+    ${!r.guest&&isFamily(p.houseId)?'<button id="scl"><span class="e">👗</span><span>衣櫃・換裝<small>不會吵醒牠</small></span></button>':''}<button id="sid"><span class="e">🪪</span><span>看身分證</span></button></div>
     <div class="row2" style="margin-top:12px"><button data-close>關閉</button></div>`,false,p.card);
-  $('#sid').onclick=()=>idCard(p.id);
+  $('#sid').onclick=()=>idCard(p.id);if($('#scl'))$('#scl').onclick=()=>closetSheet(p.id);
   if($('#sfeed'))$('#sfeed').onclick=()=>{closeModal();feedNow(r)};
   $('#stuck').onclick=()=>{closeModal();if(r.tentEl){r.tentEl.classList.add('tuck');setTimeout(()=>r.tentEl&&r.tentEl.classList.remove('tuck'),900)}fx('💕',r.tent.x,r.tent.y-120);if(DB.me)reward('wake');toast(`幫 ${p.name} 蓋好被子了 🛏️`)};
   $('#swake').onclick=async()=>{if(!needMe())return;const mins=p.trait==='愛睡'?15:30;p.wakeUntil=Date.now()+mins*60000;PEND.wake[p.id]={v:p.wakeUntil,t:Date.now()};setTimeout(()=>{const rr=home&&home.pets.find(x=>x.id===p.id);if(rr)petSay(rr,'woke')},1600);closeModal();
@@ -2641,7 +2666,7 @@ async function takePhoto(){
 document.addEventListener('error',e=>{const t=e.target;if(t.tagName==='IMG'&&!t.dataset.fb&&/googleusercontent/.test(t.src)){t.dataset.fb=1;t.src='assets/pet_head_other.webp'}},true);
 // ================= 頁尾與啟動 =================
 function renderFoot(){
-  $('#inote').textContent=ONLINE?'毛很多・資料存在雲端，朋友之間會互相看到。畫面不是即時的，回到小島或過一分鐘會自動更新。':'試做版：資料只存在這支手機的瀏覽器裡，別人看不到。';
+  $('#inote').textContent=ONLINE?'':'試做版：資料只存在這支手機的瀏覽器裡，別人看不到。';
   if(ONLINE){$('#foot').innerHTML='毛很多・資料存在雲端，朋友之間會互相看到。畫面不是即時的，回到小島或過一分鐘會自動更新。';return}
   $('#foot').innerHTML=`試做版：資料只存在這支手機的瀏覽器裡，別人看不到，之後接上 Google 試算表才會共用。示範家庭的家人密碼都是 1234。<br><button id="reset">清除試做資料、從頭開始</button>`;
   $('#reset').onclick=e=>{if(!armBtn(e.target,'所有試做資料都會清掉，再按一次'))return;try{localStorage.removeItem(KEY)}catch(err){}DB=seed();save();picking=false;renderIsland();renderFoot();onboarding()};
@@ -2694,7 +2719,7 @@ setInterval(()=>{if(!home||$('#home').classList.contains('hidden')||document.hid
   })},1000);
 
 // ================= 狀態列（等級・經驗・金幣） =================
-function hudHTML(v){const lv=v.lv,xp=v.xp;return `<span class="hlv"><img src="assets/lv_badge.webp" alt="" onerror="this.remove()"><b class="lvv d${String(lv).length}">${lv}</b></span><span class="xpw"><span class="xpl"><img src="assets/icon_xp.webp" alt="" onerror="this.remove()"><b class="xpv">${xp}</b> / ${XP_LV}</span><span class="xpb"><i style="width:${Math.min(100,xp/XP_LV*100)}%"></i></span></span><span class="cn"><img src="assets/icon_coin.webp" alt="" onerror="this.remove()"><b class="cnv">${v.coins}</b></span>${DB.dbl===todayTW()?'<span class="dbl">×2</span>':''}`}
+function hudHTML(v){const lv=v.lv,xp=v.xp;return `<span class="hlv"><img src="assets/lv_badge.webp" alt="" onerror="this.remove()"><b class="lvv d${String(lv).length}">${lv}</b></span><span class="xpw"><span class="xpl"><img src="assets/icon_xp.webp" alt="" onerror="this.remove()"><b class="xpv">${xp}</b> / ${xpNeed(lv)}</span><span class="xpb"><i style="width:${Math.min(100,xp/xpNeed(lv)*100)}%"></i></span></span><span class="cn"><img src="assets/icon_coin.webp" alt="" onerror="this.remove()"><b class="cnv">${v.coins}</b></span>${DB.dbl===todayTW()?'<span class="dbl">×2</span>':''}`}
 let HUDV=null,hudHold=0,hudT=null;
 function updHud(){const g=DB.game||{},T={coins:g.coins||0,xp:g.xp||0,lv:g.lv||1};
   if(!DB.me){document.querySelectorAll('.hud').forEach(h=>h.style.display='none');return}
@@ -2702,7 +2727,7 @@ function updHud(){const g=DB.game||{},T={coins:g.coins||0,xp:g.xp||0,lv:g.lv||1}
   if(!HUDV||(F.coins===T.coins&&F.xp===T.xp&&F.lv===T.lv)){HUDV=T;if(HUDV!==F)document.querySelectorAll('.hud').forEach(h=>h.innerHTML=hudHTML(T));return}
   clearTimeout(hudT);hudT=setTimeout(()=>{const t0=performance.now(),D=500,from={...HUDV};HUDV=T;
     document.querySelectorAll('.hud').forEach(h=>{if(T.lv!==from.lv){h.innerHTML=hudHTML(T);h.classList.add('lvup');setTimeout(()=>h.classList.remove('lvup'),900);return}
-      const bar=h.querySelector('.xpb i');if(bar)bar.style.width=Math.min(100,T.xp/XP_LV*100)+'%';
+      const bar=h.querySelector('.xpb i');if(bar)bar.style.width=Math.min(100,T.xp/xpNeed(T.lv)*100)+'%';
       if(T.coins!==from.coins){const c=h.querySelector('.cn');c.classList.remove('bump');void c.offsetWidth;c.classList.add('bump')}
       if(T.xp!==from.xp){const c=h.querySelector('.xpw');c.classList.remove('bump');void c.offsetWidth;c.classList.add('bump')}});
     if(T.lv!==from.lv)return;
@@ -2899,7 +2924,7 @@ drawWx();loadWx();setInterval(loadWx,30*60e3);
   addEventListener('resize',()=>apply())})();
 
 // ================= 獎勵共用 =================
-function grant(x,c,from){const g=DB.game;g.xp=(g.xp||0)+x;g.coins=(g.coins||0)+c;g.lv=g.lv||1;let up=0;while(g.xp>=XP_LV){g.xp-=XP_LV;g.lv++;g.tickets++;up++}
+function grant(x,c,from){const g=DB.game;g.xp=(g.xp||0)+x;g.coins=(g.coins||0)+c;g.lv=g.lv||1;let up=0;while(g.xp>=xpNeed(g.lv)){g.xp-=xpNeed(g.lv);g.lv++;g.tickets++;up++}
   save();updTix();if(x||c){if(c)sfx('coin');flyReward(x,c,from)}if(up)setTimeout(()=>{toast(`🎉 升到 Lv.${g.lv}！送你 ${up} 張抽卡券 🎟️`);sfx('levelup')},900)}
 function randItems(kind,n){const L=Object.entries(ITEMS).filter(([,i])=>i.kind===kind&&!i.limited&&!i.bday).map(([id])=>id);const out=[];for(let i=0;i<n;i++)out.push(L[Math.floor(Math.random()*L.length)]);return out}
 
@@ -3044,7 +3069,7 @@ function announceLetters(){if(!DB.me)return;let seen=[];try{seen=JSON.parse(loca
     sfx('gift');$('#lgopen').onclick=()=>openLetter(nw[0].id,()=>$('#bell').click())};
   setTimeout(go,1800)}
 // ================= 自動更新：發現新版本就重新載入 =================
-const APP_VER='v1.43';
+const APP_VER='v1.45';
 function checkUpdate(){
   if(!/^https?:/.test(location.protocol)||!API_URL)return;
   if(!$('#modal').classList.contains('hidden'))return; // 正在填表單時不打斷
