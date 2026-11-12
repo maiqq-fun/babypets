@@ -730,6 +730,24 @@ html,body,button,.island,.imap,.logo{touch-action:manipulation}
 .irows{top:calc(78.6% + min(5.5dvh,calc(100dvh - min(calc(100vw * 2.02734),100dvh))) * .5)!important}
 .inote:empty{display:none}
 .irow2{top:calc(min(40vw,210px)*.6 + 20px)}
+/* v1.46 直接在預覽上調整 */
+.clstick{position:sticky;top:-18px;z-index:6;background:var(--sheetbg,var(--cream));margin:-18px -16px 8px;padding:18px 16px 6px;box-shadow:0 6px 8px -6px rgba(90,60,30,.25)}
+.clstick h3{display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:6px}.clstick h3 small{font-size:13px;color:#8a5a10;font-weight:bold}
+.clstick .clprev{margin-bottom:6px;padding:10px 0 8px}
+.clstick .clbody{width:44%;max-width:200px}
+.clstick .sibs{margin-bottom:6px}
+.edbox{position:absolute;border:2px dashed #4a90e2;border-radius:6px;touch-action:none;pointer-events:auto;cursor:move}
+.edh{position:absolute;width:24px;height:24px;border-radius:50%;background:#4a90e2;border:2px solid #fff;box-shadow:0 1px 3px rgba(0,0,0,.3);pointer-events:auto}
+.edh.sz{right:-13px;bottom:-13px;cursor:nwse-resize}
+.edh.rt{left:50%;top:-34px;transform:translateX(-50%);background:#f0a33a;cursor:grab}
+.edh.rt::after{content:'';position:absolute;left:50%;top:22px;width:2px;height:12px;background:#f0a33a;transform:translateX(-50%)}
+.edbar{background:#eef5ff;border:2px solid #b9d4f5;border-radius:12px;padding:6px 10px;margin-bottom:6px}
+.edrow{display:flex;align-items:center;gap:6px;font-size:13px;color:#2f5f9f}.edrow b{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.edrow button{flex:none;border:1.5px solid #b9d4f5;background:#fff;border-radius:10px;padding:5px 9px;font-size:12.5px;color:#2f5f9f}
+.edsl{display:flex;align-items:center;gap:8px;font-size:12px;color:#2f5f9f;margin-top:2px}.edsl span{flex:none;width:58px}.edsl input{flex:1;accent-color:#4a90e2}
+.edhint{font-size:12px;color:var(--soft);text-align:center;margin:0 0 6px}
+.clstick .tabs3{margin-bottom:0}
+.clstick .trybar{margin:0 0 6px}
 .chk{display:flex;align-items:center;gap:6px;font-size:13px;color:var(--soft);margin:6px 0}.chk input{width:18px;height:18px}
 .codebox .cbtns{display:flex;gap:4px;flex:none}
 </style>
@@ -1028,9 +1046,11 @@ const DEF_ADJ={貓:{head:{x:30,y:6,w:46},face:{x:30,y:31,w:40},neck:{x:31,y:53,w
   鳥:{head:{x:48,y:11,w:40},face:{x:48,y:36,w:38},neck:{x:47,y:55,w:38}},其他:{head:{x:50,y:12,w:46},face:{x:50,y:36,w:40},neck:{x:50,y:58,w:40}}};
 const accImg=id=>`assets/acc_${id}.webp`;
 function petAdj(p,s){const a=p.wadj&&p.wadj[s];if(a&&a.w)return a;const d=p.body?{head:{x:50,y:10,w:46},face:{x:50,y:32,w:40},neck:{x:50,y:55,w:40}}:(DEF_ADJ[p.species]||DEF_ADJ.其他);return d[s]}
-function accBox(p,s,id){const a=petAdj(p,s),it=ACC[id]||{},f=!!a.f;return {x:a.x+(f?-1:1)*(it.ox||0)*a.w/100,y:a.y+(it.oy||0)*a.w/100*.9,w:a.w*(it.ow||1),f}}
+function slotBox(p,s,id){const a=petAdj(p,s),it=ACC[id]||{},f=!!a.f;return {x:a.x+(f?-1:1)*(it.ox||0)*a.w/100,y:a.y+(it.oy||0)*a.w/100*.9,w:a.w*(it.ow||1),f,r:0,tx:0,ty:0}}
+function accBox(p,s,id){const o=p.wadj&&p.wadj[id];return o&&o.w?Object.assign({f:false,r:0,tx:0,ty:0},o):slotBox(p,s,id)}
+const accT=b=>`translate(-50%,-50%) perspective(260px) rotate(${b.r||0}deg) rotateY(${b.ty||0}deg) rotateX(${b.tx||0}deg)${b.f?' scaleX(-1)':''}`;
 function wearHTML(p,only){const w=p.wear||{};let o='';SLOTS3.forEach(s=>{const id=w[s];if(!id||!ACC[id]||(only&&only!==s&&only!=='all'))return;const b=accBox(p,s,id);
-  o+=`<img class="acc a-${s}" data-s="${s}" src="${accImg(id)}" alt="" style="left:${b.x}%;top:${b.y}%;width:${b.w}%${b.f?';transform:translate(-50%,-50%) scaleX(-1)':''}">`});return o?`<div class="wear">${o}</div>`:''}
+  o+=`<img class="acc a-${s}" data-s="${s}" src="${accImg(id)}" alt="" style="left:${b.x}%;top:${b.y}%;width:${b.w}%;transform:${accT(b)}">`});return o?`<div class="wear">${o}</div>`:''}
 const accOwn=hid=>new Set((house(hid)||{}).acc||[]);
 const accLeft=hid=>Object.keys(ACC).filter(id=>!accOwn(hid).has(id));
 const WPEND={},APEND={};let wq=Promise.resolve();
@@ -1041,55 +1061,75 @@ function addAccLocal(hid,ids){const h=house(hid);if(!h)return;h.acc=[...new Set(
 let wearT={};
 function saveWearSoon(p){WPEND[p.id]={wear:Object.assign({},p.wear||{}),wadj:JSON.parse(JSON.stringify(p.wadj||{})),t:Date.now()};clearTimeout(wearT[p.id]);
   wearT[p.id]=setTimeout(()=>{wq=wq.then(()=>call('saveWear',Object.assign(cred(),{petId:p.id,wear:p.wear||{},wadj:p.wadj||{}}),true)).catch(e=>toast('打扮沒存到：'+e.message))},600)}
-let closetTab='head',closetShop=false;const TRY={};
+let closetTab='head',closetShop=false,closetSel=null;const TRY={},TRYADJ={};
 function tryOf(pid){return TRY[pid]||(TRY[pid]={})}
-function closetSheet(pid,tab,o){o=o||{};const p=pet(pid);if(!p)return;if(!isFamily(p.houseId))return toast(ONLINE&&DB.me&&DB.me.houseId===p.houseId?'正在跟小島同步，等一下再試':'只能幫自己家的毛孩換裝喔');if(tab)closetTab=tab;if(!o.keep){for(const k in TRY)delete TRY[k];if(o.shop!==undefined)closetShop=!!o.shop;else closetShop=false}
-  const hid=p.houseId,own=accOwn(hid),g=DB.game,w=p.wear||{},T=tryOf(pid),view=Object.assign({},w,T),sibs=petsOf(hid);
+function baseFrom(b,id){const it=ACC[id]||{},w=b.w/(it.ow||1);return {x:Math.round((b.x-(b.f?-1:1)*(it.ox||0)*w/100)*10)/10,y:Math.round((b.y-(it.oy||0)*w/100*.9)*10)/10,w:Math.round(w*10)/10,f:b.f?1:0}}
+function viewPet(p){const T=tryOf(p.id);return Object.assign({},p,{wear:Object.assign({},p.wear||{},T),wadj:Object.assign({},p.wadj||{},TRYADJ[p.id]||{})})}
+function commitAdj(p,s,id,b){const box={x:Math.round(b.x*10)/10,y:Math.round(b.y*10)/10,w:Math.round(b.w*10)/10};if(b.f)box.f=1;['r','tx','ty'].forEach(k=>{const v=Math.round(b[k]||0);if(v)box[k]=v});
+  if(tryOf(p.id)[s]===id){(TRYADJ[p.id]=TRYADJ[p.id]||{})[id]=box;return}
+  p.wadj=Object.assign({},p.wadj||{},{[id]:box,[s]:baseFrom(box,id)});saveWearSoon(p);rewearHome(p.id)}
+function closetSheet(pid,tab,o){o=o||{};const p=pet(pid);if(!p)return;if(!isFamily(p.houseId))return toast(ONLINE&&DB.me&&DB.me.houseId===p.houseId?'正在跟小島同步，等一下再試':'只能幫自己家的毛孩換裝喔');
+  if(tab)closetTab=tab;if(!o.keep){for(const k in TRY)delete TRY[k];for(const k in TRYADJ)delete TRYADJ[k];closetShop=!!o.shop;closetSel=null}
+  const hid=p.houseId,own=accOwn(hid),g=DB.game,w=p.wear||{},T=tryOf(pid),VP=viewPet(p),view=VP.wear,sibs=petsOf(hid);
+  if(o.sel!==undefined)closetSel=o.sel;if(closetSel&&!view[closetSel])closetSel=null;if(!closetSel&&view[closetTab])closetSel=closetTab;
   const ids=Object.keys(ACC).filter(id=>ACC[id].s===closetTab).sort((a,b)=>closetShop?ACC[a].p-ACC[b].p:((own.has(b)-own.has(a))||ACC[a].p-ACC[b].p));
-  const tried=SLOTS3.slice().reverse().filter(s=>T[s]);
-  openModal(`<h3>${closetShop?'👗 毛毛服飾店':`👗 ${esc(p.name)} 的衣櫃`}</h3><p class="lead">我的金幣：<b class="coinv">🪙 ${g.coins||0}</b>・頭、臉、脖子各戴 1 個</p>
+  const tried=SLOTS3.slice().reverse().filter(s=>T[s]),sid=closetSel&&view[closetSel],sb=sid?accBox(VP,closetSel,sid):null;
+  openModal(`<div class="clstick"><h3>${closetShop?'👗 毛毛服飾店':`👗 ${esc(p.name)} 的衣櫃`}<small class="coinv">🪙 ${g.coins||0}</small></h3>
     ${sibs.length>1?`<div class="sibs">${sibs.map(s=>`<button data-sib="${s.id}" class="${s.id===pid?'on':''}"><img src="${petHead(s)}" alt=""><span>${esc(s.name)}</span></button>`).join('')}</div>`:''}
-    <div class="clprev"><div class="clbody" id="clb"><img src="${petBody(p)}" alt="" onerror="this.src='${defBody(p.species)}'">${wearHTML(Object.assign({},p,{wear:view}))}</div></div>
+    <div class="clprev"><div class="clbody" id="clb"><img src="${petBody(p)}" alt="" onerror="this.src='${defBody(p.species)}'">${wearHTML(VP)}${sb?`<div class="edbox" id="edb"><i class="edh rt" data-h="rt"></i><i class="edh sz" data-h="sz"></i></div>`:''}</div></div>
+    ${sb?`<div class="edbar"><div class="edrow"><b>${ACC[sid].n}</b><button id="edf">↔️ 翻轉</button><button id="edr">↺ 還原</button></div>
+      <label class="edsl"><span>左右傾斜</span><input type="range" id="edty" min="-50" max="50" step="1" value="${sb.ty||0}"></label>
+      <label class="edsl"><span>上下傾斜</span><input type="range" id="edtx" min="-50" max="50" step="1" value="${sb.tx||0}"></label></div>`:`<div class="edhint">點下面的配件戴上去，就能直接在毛孩身上拖曳、縮放、旋轉</div>`}
     ${tried.length?`<div class="trybar">${tried.map(s=>`<div class="tryrow"><span>試穿中：${ACC[T[s]].n}</span><button class="primary" data-buy="${s}">🪙 ${ACC[T[s]].p} 買下</button><button data-untry="${s}" aria-label="不要">✕</button></div>`).join('')}</div>`:''}
-    <div class="tabs3">${['head','face','neck'].map(s=>`<button data-ct="${s}" class="${s===closetTab?'on':''}">${SLOT_N[s]}${view[s]?' ✓':''}</button>`).join('')}</div>
+    <div class="tabs3">${['head','face','neck'].map(s=>`<button data-ct="${s}" class="${s===closetTab?'on':''}">${SLOT_N[s]}${view[s]?' ✓':''}</button>`).join('')}</div></div>
     <div class="accgrid">${ids.map(id=>{const on=w[closetTab]===id,tr=T[closetTab]===id,has=own.has(id);return `<button class="acci${on?' on':''}${tr?' try':''}${has?'':' buy'}" data-acc="${id}"><img src="${accImg(id)}" alt=""><span>${ACC[id].n}</span><em>${on?'戴著':tr?'試穿中':has?'已擁有':'🪙 '+ACC[id].p}</em></button>`}).join('')}</div>
-    <div class="row2" style="margin-top:10px"><button id="cladj">✋ 調整位置</button><button id="cloff">全部脫掉</button></div>
-    <div class="hint">沒有的配件點一下可以先試穿，喜歡再按「買下」；不買的話關掉就會自動拿掉。抽卡券的卡包也有機會抽到</div>
-    <div class="row2">${closetShop?'<button id="clshop">← 商店</button>':''}<button data-close>關閉</button></div>`);
-  const S=$('#sheet'),again=t=>{const st=S.scrollTop;closetSheet(pid,t||closetTab,{keep:1});$('#sheet').scrollTop=st};
-  S.querySelectorAll('[data-sib]').forEach(b=>b.onclick=()=>{for(const k in TRY)delete TRY[k];closetSheet(b.dataset.sib,closetTab,{keep:1})});
-  S.querySelectorAll('[data-ct]').forEach(b=>b.onclick=()=>again(b.dataset.ct));
+    <div class="hint">拖曳配件移動、拉右下角縮放、拉上方圓點旋轉，也可以用兩根手指同時縮放和旋轉。沒有的配件可以先試穿，喜歡再按「買下」</div>
+    <div class="row2"><button id="cloff">全部脫掉</button>${closetShop?'<button id="clshop">← 商店</button>':''}<button data-close>關閉</button></div>`);
+  const S=$('#sheet'),again=(t,ex)=>{const st=S.scrollTop;closetSheet(pid,t||closetTab,Object.assign({keep:1},ex||{}));$('#sheet').scrollTop=st};
+  S.querySelectorAll('[data-sib]').forEach(b=>b.onclick=()=>{for(const k in TRY)delete TRY[k];for(const k in TRYADJ)delete TRYADJ[k];closetSel=null;closetSheet(b.dataset.sib,closetTab,{keep:1})});
+  S.querySelectorAll('[data-ct]').forEach(b=>b.onclick=()=>again(b.dataset.ct,{sel:view[b.dataset.ct]?b.dataset.ct:null}));
   S.querySelectorAll('[data-acc]').forEach(b=>b.onclick=()=>{const id=b.dataset.acc,it=ACC[id];sfx&&sfx('tap');
-    if(!accOwn(hid).has(id)){if(T[it.s]===id)delete T[it.s];else T[it.s]=id;return again()}
-    delete T[it.s];p.wear=Object.assign({},p.wear||{});if(p.wear[it.s]===id)delete p.wear[it.s];else p.wear[it.s]=id;saveWearSoon(p);rewearHome(p.id);again()});
-  S.querySelectorAll('[data-untry]').forEach(b=>b.onclick=()=>{delete T[b.dataset.untry];again()});
+    if(!accOwn(hid).has(id)){if(T[it.s]===id){delete T[it.s];return again(null,{sel:null})}T[it.s]=id;return again(null,{sel:it.s})}
+    delete T[it.s];p.wear=Object.assign({},p.wear||{});if(p.wear[it.s]===id){delete p.wear[it.s];saveWearSoon(p);rewearHome(p.id);return again(null,{sel:null})}
+    p.wear[it.s]=id;saveWearSoon(p);rewearHome(p.id);again(null,{sel:it.s})});
+  S.querySelectorAll('[data-untry]').forEach(b=>b.onclick=()=>{delete T[b.dataset.untry];again(null,{sel:null})});
   S.querySelectorAll('[data-buy]').forEach(b=>b.onclick=()=>{const s=b.dataset.buy,id=T[s],it=ACC[id];if(!it)return;
     if((g.coins||0)<it.p)return toast(`金幣不夠，還差 ${it.p-(g.coins||0)} 🪙`);
-    g.coins-=it.p;save();updHud&&updHud();addAccLocal(hid,[id]);delete T[s];p.wear=Object.assign({},p.wear||{},{[s]:id});saveWearSoon(p);rewearHome(p.id);toast(`買了${it.n}，幫 ${p.name} 戴上了 👗`);again(s)});
-  $('#cladj').onclick=()=>{if(!view[closetTab])return toast(`先幫 ${p.name} 戴上一個${SLOT_N[closetTab]}的配件，再來調位置`);adjustSheet(pid,closetTab)};
-  $('#cloff').onclick=()=>{if(!Object.keys(view).length)return toast(`${p.name} 身上沒有戴東西`);for(const k in T)delete T[k];p.wear={};saveWearSoon(p);rewearHome(p.id);again();toast('都脫掉了')};
+    g.coins-=it.p;save();updHud&&updHud();addAccLocal(hid,[id]);delete T[s];p.wear=Object.assign({},p.wear||{},{[s]:id});
+    const ta=TRYADJ[pid]&&TRYADJ[pid][id];if(ta){delete TRYADJ[pid][id];commitAdj(p,s,id,ta)}saveWearSoon(p);rewearHome(p.id);toast(`買了${it.n}，幫 ${p.name} 戴上了 👗`);again(s,{sel:s})});
+  $('#cloff').onclick=()=>{if(!Object.keys(view).length)return toast(`${p.name} 身上沒有戴東西`);for(const k in T)delete T[k];p.wear={};saveWearSoon(p);rewearHome(p.id);again(null,{sel:null});toast('都脫掉了')};
   if($('#clshop'))$('#clshop').onclick=()=>shopSheet('treat');
+  // ---- 直接在預覽上調整 ----
+  const cb=$('#clb');
+  cb.querySelectorAll('img.acc').forEach(im=>im.style.pointerEvents='auto');
+  let cur=sb?Object.assign({},sb):null,img=sid?cb.querySelector(`img.acc[data-s="${closetSel}"]`):null,box=$('#edb');
+  const R=()=>cb.getBoundingClientRect();
+  const live=()=>{if(!cur||!img)return;Object.assign(img.style,{left:cur.x+'%',top:cur.y+'%',width:cur.w+'%',transform:accT(cur)});
+    if(box){const r=R(),ar=img.naturalWidth?img.naturalHeight/img.naturalWidth:1,hp=cur.w*r.width/100*ar/r.height*100;Object.assign(box.style,{left:cur.x+'%',top:cur.y+'%',width:cur.w+'%',height:hp+'%',transform:`translate(-50%,-50%) rotate(${cur.r||0}deg)`})}};
+  if(img){if(img.complete)live();else img.onload=live}
+  const commit=()=>{if(cur)commitAdj(p,closetSel,sid,cur)};
+  const P=new Map();let mode=null,st=null;
+  const ctr=()=>{const r=R();return {x:r.left+cur.x/100*r.width,y:r.top+cur.y/100*r.height}};
+  cb.onpointerdown=e=>{const t=e.target;
+    if(t.matches&&t.matches('img.acc')&&t.dataset.s!==closetSel){e.preventDefault();return again(ACC[view[t.dataset.s]].s,{sel:t.dataset.s})}
+    if(!cur)return;e.preventDefault();try{cb.setPointerCapture(e.pointerId)}catch(x){}P.set(e.pointerId,{x:e.clientX,y:e.clientY});
+    if(P.size===2){const [a,b]=[...P.values()];mode='pinch';st={c:Object.assign({},cur),d:Math.hypot(b.x-a.x,b.y-a.y)||1,an:Math.atan2(b.y-a.y,b.x-a.x),mx:(a.x+b.x)/2,my:(a.y+b.y)/2};return}
+    const h=t.dataset&&t.dataset.h,c=ctr();st={c:Object.assign({},cur),x0:e.clientX,y0:e.clientY,d0:Math.hypot(e.clientX-c.x,e.clientY-c.y)||1,a0:Math.atan2(e.clientY-c.y,e.clientX-c.x)};
+    mode=h==='sz'?'size':h==='rt'?'rot':'move'};
+  cb.onpointermove=e=>{if(!mode||!P.has(e.pointerId))return;P.set(e.pointerId,{x:e.clientX,y:e.clientY});const r=R(),c0=st.c;
+    if(mode==='pinch'&&P.size>=2){const [a,b]=[...P.values()],d=Math.hypot(b.x-a.x,b.y-a.y),an=Math.atan2(b.y-a.y,b.x-a.x);
+      cur.w=clamp(c0.w*d/st.d,8,160);cur.r=Math.round(c0.r+(an-st.an)*180/Math.PI);cur.x=clamp(c0.x+((a.x+b.x)/2-st.mx)/r.width*100,-15,115);cur.y=clamp(c0.y+((a.y+b.y)/2-st.my)/r.height*100,-35,125)}
+    else if(mode==='move'){cur.x=clamp(c0.x+(e.clientX-st.x0)/r.width*100,-15,115);cur.y=clamp(c0.y+(e.clientY-st.y0)/r.height*100,-35,125)}
+    else if(mode==='size'){const c=ctr();cur.w=clamp(c0.w*Math.hypot(e.clientX-c.x,e.clientY-c.y)/st.d0,8,160)}
+    else if(mode==='rot'){const c=ctr();let r2=c0.r+(Math.atan2(e.clientY-c.y,e.clientX-c.x)-st.a0)*180/Math.PI;r2=((r2+540)%360)-180;if(Math.abs(r2)<4)r2=0;cur.r=Math.round(r2)}
+    live()};
+  cb.onpointerup=cb.onpointercancel=e=>{P.delete(e.pointerId);if(mode==='pinch'&&P.size===1){const [a]=[...P.values()];mode='move';st={c:Object.assign({},cur),x0:a.x,y0:a.y};return}if(!P.size&&mode){mode=null;commit()}};
+  if($('#edf'))$('#edf').onclick=()=>{cur.f=!cur.f;live();commit()};
+  if($('#edr'))$('#edr').onclick=()=>{const d=slotBox(Object.assign({},p,{wadj:{}}),closetSel,sid);cur=d;$('#edty').value=0;$('#edtx').value=0;live();
+    if(T[closetSel]===sid){if(TRYADJ[pid])delete TRYADJ[pid][sid]}else{const wa=Object.assign({},p.wadj||{});delete wa[sid];delete wa[closetSel];p.wadj=wa;saveWearSoon(p);rewearHome(pid)}toast('還原了')};
+  ['edty','edtx'].forEach(k=>{const el=$('#'+k);if(!el)return;el.oninput=()=>{cur[k.slice(2)]=+el.value;live()};el.onchange=()=>commit()});
 }
 function rewearHome(pid){if(!home)return;const r=home.pets.find(x=>x.id===pid),p=pet(pid);if(!r||!r.el||!p)return;const bd=r.el.querySelector('.body');if(!bd)return;const old=bd.querySelector('.wear');if(old)old.remove();if(!r.demon)bd.insertAdjacentHTML('beforeend',wearHTML(p))}
-function adjustSheet(pid,s){const p=pet(pid),view=Object.assign({},p.wear||{},tryOf(pid)),id=view[s];if(!id)return closetSheet(pid,s,{keep:1});const base=JSON.parse(JSON.stringify(petAdj(p,s)));let a=Object.assign({f:false},base);
-  openModal(`<h3>✋ 調整${SLOT_N[s]}的位置</h3><p class="lead">拖曳配件移動，拉右下角的圓點縮放。這隻毛孩之後換別的${SLOT_N[s]}部配件也會用這個位置</p>
-    <div class="clprev big"><div class="clbody" id="clb"><img src="${petBody(p)}" alt="" onerror="this.src='${defBody(p.species)}'">${wearHTML(Object.assign({},p,{wear:view}))}<div class="adjbox" id="adjb"><i class="adjh" id="adjh"></i></div></div></div>
-    <div class="row2"><button id="adjf">↔️ 左右翻轉</button><button id="adjr">還原預設</button></div>
-    <div class="row2"><button id="adjx">取消</button><button class="primary" id="adjok">完成</button></div>`);
-  const cb=$('#clb'),box=$('#adjb'),img=cb.querySelector(`.acc[data-s="${s}"]`);
-  const put=()=>{const it=ACC[id]||{},w=a.w*(it.ow||1),x=a.x+(a.f?-1:1)*(it.ox||0)*a.w/100,y=a.y+(it.oy||0)*a.w/100*.9;if(img){Object.assign(img.style,{left:x+'%',top:y+'%',width:w+'%'});img.style.transform=a.f?'translate(-50%,-50%) scaleX(-1)':''}
-    requestAnimationFrame(()=>{const ih=img?img.getBoundingClientRect().height/cb.getBoundingClientRect().height*100:w;Object.assign(box.style,{left:x+'%',top:y+'%',width:w+'%',height:ih+'%'})})};
-  put();if(img&&!img.complete)img.onload=put;
-  let drag=null;const R=()=>cb.getBoundingClientRect();
-  box.onpointerdown=e=>{e.preventDefault();box.setPointerCapture(e.pointerId);drag={mode:e.target.id==='adjh'?'size':'move',x0:e.clientX,y0:e.clientY,a0:Object.assign({},a)}};
-  box.onpointermove=e=>{if(!drag)return;const r=R(),dx=(e.clientX-drag.x0)/r.width*100,dy=(e.clientY-drag.y0)/r.height*100;
-    if(drag.mode==='move'){a.x=clamp(drag.a0.x+dx,-10,110);a.y=clamp(drag.a0.y+dy,-30,120)}else a.w=clamp(drag.a0.w+dx*2,10,150);put()};
-  box.onpointerup=box.onpointercancel=()=>{drag=null};
-  $('#adjf').onclick=()=>{a.f=!a.f;put()};
-  $('#adjr').onclick=()=>{a=Object.assign({f:false},JSON.parse(JSON.stringify(petAdj(Object.assign({},p,{wadj:{}}),s))));put()};
-  $('#adjx').onclick=()=>closetSheet(pid,s,{keep:1});
-  $('#adjok').onclick=()=>{const o={x:Math.round(a.x*10)/10,y:Math.round(a.y*10)/10,w:Math.round(a.w*10)/10};if(a.f)o.f=1;p.wadj=Object.assign({},p.wadj||{},{[s]:o});saveWearSoon(p);rewearHome(pid);toast('位置調好了 ✨');closetSheet(pid,s,{keep:1})};
-}
 function shopCloset(){const h=myHouse(),ps=h?petsOf(h.id):[];if(!h)return toast('有家之後才能買衣服喔');if(!ps.length)return toast('家裡還沒有毛孩，先新增一隻吧');closetSheet(ps[0].id,'head',{shop:true})}
 // ---------- 🏆 排行榜 ----------
 const RB={coin:{t:'💰財神爺欽點',d:'這週撿最多錢的人',u:v=>'$'+v.toLocaleString()},poop:{t:'💩專業鏟屎官',d:'這週清最多便便的人',u:v=>v+' 坨'},
@@ -3069,7 +3109,7 @@ function announceLetters(){if(!DB.me)return;let seen=[];try{seen=JSON.parse(loca
     sfx('gift');$('#lgopen').onclick=()=>openLetter(nw[0].id,()=>$('#bell').click())};
   setTimeout(go,1800)}
 // ================= 自動更新：發現新版本就重新載入 =================
-const APP_VER='v1.45';
+const APP_VER='v1.46';
 function checkUpdate(){
   if(!/^https?:/.test(location.protocol)||!API_URL)return;
   if(!$('#modal').classList.contains('hidden'))return; // 正在填表單時不打斷
