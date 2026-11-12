@@ -682,6 +682,47 @@ html,body,button,.island,.imap,.logo{touch-action:manipulation}
 .cointag{display:inline-flex;align-items:center;gap:3px;font-weight:bold;color:#8a5a10;font-size:14px}
 .cointag img{width:18px;height:18px;object-fit:contain}
 @keyframes tfloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
+/* v1.43 衣櫃・排行榜・上線 */
+.pet .body{position:relative}
+.wear{position:absolute;inset:0;pointer-events:none}
+.wear .acc{position:absolute;transform:translate(-50%,-50%);height:auto;max-width:none;pointer-events:none;filter:drop-shadow(0 1px 1px rgba(80,50,20,.25))}
+.clprev{display:flex;justify-content:center;background:radial-gradient(circle at 50% 60%,#fff7e6,#f3e2c8);border-radius:18px;padding:14px 0 10px;margin-bottom:10px}
+.clbody{position:relative;width:46%;max-width:190px;touch-action:none}
+.clprev.big .clbody{width:70%;max-width:280px}
+.clbody>img{display:block;width:100%;height:auto}
+.accgrid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px}
+.acci{display:flex;flex-direction:column;align-items:center;gap:1px;background:#fff;border:2px solid var(--line);border-radius:12px;padding:6px 2px 4px;min-width:0;font-size:11px;color:var(--ink)}
+.acci img{width:78%;aspect-ratio:1;object-fit:contain}
+.acci span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+.acci em{font-style:normal;font-size:10.5px;color:var(--soft);min-height:1.2em}
+.acci.on{border-color:#ff8fab;background:#fff0f4}.acci.on em{color:#e0607e;font-weight:bold}
+.acci.buy img{opacity:.55}.acci.buy em{color:#8a5a10}.acci.armed{border-color:#f0a33a;background:#fff6e2}.acci.armed em{color:#c46a00;font-weight:bold}
+.adjbox{position:absolute;transform:translate(-50%,-50%);border:2px dashed #4a90e2;border-radius:6px;cursor:move;touch-action:none}
+.adjh{position:absolute;right:-11px;bottom:-11px;width:22px;height:22px;border-radius:50%;background:#4a90e2;border:2px solid #fff;cursor:nwse-resize}
+.irow2{position:absolute;left:14px;top:calc(min(40vw,210px)*.42 + 18px);display:flex;align-items:center;gap:8px;z-index:3001;pointer-events:auto}
+.irow2.hidden{display:none}
+.rankb img{width:72%;height:72%;object-fit:contain}
+.onpill{display:inline-flex;align-items:center;gap:6px;border:2px solid var(--wood);background:rgba(255,250,238,.94);border-radius:999px;padding:5px 11px;font-size:13px;color:#4f7a3a;font-weight:bold;box-shadow:0 2px 0 rgba(0,0,0,.12)}
+.ondot{display:inline-block;width:9px;height:9px;border-radius:50%;border:1.5px solid #b9a58c;background:transparent;vertical-align:1px;flex:none}
+.ondot.on{background:#46c35a;border-color:#2f9a42;box-shadow:0 0 0 2px rgba(70,195,90,.25)}
+.ttag{display:inline-block;font-weight:normal;font-size:.72em;line-height:1.35;color:#8a5a10;background:#ffe8a3;border-radius:6px;padding:0 4px;margin-left:3px;vertical-align:1px;white-space:nowrap}
+.h3ic{width:26px;height:26px;object-fit:contain;vertical-align:-6px;margin-right:4px}
+.rtabs{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px;margin-bottom:6px}
+.rtabs button{border:2px solid var(--line);background:#fff;border-radius:12px;padding:7px 4px;font-size:13px;color:var(--soft)}
+.rtabs button.on{border-color:#f0b84a;background:#fff4d6;color:#7a4f10;font-weight:bold}
+.rlist{display:flex;flex-direction:column;gap:3px}
+.rrow{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:12px;font-size:14px}
+.rrow.r1{background:#fff1c7}.rrow.r2{background:#f1f1f4}.rrow.r3{background:#fbe6d8}
+.rrow.me{outline:2px solid #ff8fab}
+.rrow .rk{width:24px;text-align:center;font-weight:bold;color:var(--soft)}
+.rrow .rn{flex:1;min-width:0}.rrow .rn small{display:block;font-size:11px;color:var(--soft)}
+.rrow .rv{font-weight:bold;color:#7a5a40}
+.rmine{margin-top:8px;padding:9px 12px;border-radius:12px;background:#fff0f4;color:#c0506e;font-weight:bold;font-size:14px;text-align:center}
+.codein{display:flex;align-items:center;gap:6px}.codein span{font-weight:bold;color:#7a5a40;letter-spacing:1px}.codein input{letter-spacing:2px;text-transform:uppercase}
+.pet .nm .crownk{margin-left:2px}
+.plist .mini{aspect-ratio:auto;height:auto}.plist .frow>span:last-child{display:flex;gap:4px;align-items:center;flex:none}
+.chk{display:flex;align-items:center;gap:6px;font-size:13px;color:var(--soft);margin:6px 0}.chk input{width:18px;height:18px}
+.codebox .cbtns{display:flex;gap:4px;flex:none}
 </style>
 </head>
 <body>
@@ -831,7 +872,7 @@ function keepLists(){const nw=Date.now();for(const id in GONE)if(nw-GONE[id]>5*6
 function optAdd(k,o){o._t=Date.now();(DB[k]=DB[k]||[]).push(o);ADDS[k].push(o);return o}
 function optDone(k,o,r){if(r&&r.id){Object.assign(o,r)}}
 function optFail(k,o){DB[k]=(DB[k]||[]).filter(x=>x!==o);ADDS[k]=ADDS[k].filter(x=>x!==o)}
-function keepPending(){keepToys();keepLists();keepDemon();const nw=Date.now();for(const id in GONEPOOP)if(nw-GONEPOOP[id]>5*60e3)delete GONEPOOP[id];DB.houses.forEach(h=>{if(Array.isArray(h.poops))h.poops=h.poops.filter(x=>!GONEPOOP[x.id])});for(const id in GONEGIFT)if(nw-GONEGIFT[id]>5*60e3)delete GONEGIFT[id];DB.houses.forEach(h=>{if(Array.isArray(h.gifts)){h.gifts=h.gifts.filter(x=>!(GONEGIFT[x.id]&&!x.admin));h.gifts.forEach(x=>{if(x.admin&&GONEGIFT[x.id]&&DB.me)x.opened=[...new Set([...(Array.isArray(x.opened)?x.opened:[]),DB.me.id])]})}});const now=Date.now(),T=120000;
+function keepPending(){keepToys();keepLists();keepDemon();keepWear();const nw=Date.now();for(const id in GONEPOOP)if(nw-GONEPOOP[id]>5*60e3)delete GONEPOOP[id];DB.houses.forEach(h=>{if(Array.isArray(h.poops))h.poops=h.poops.filter(x=>!GONEPOOP[x.id])});for(const id in GONEGIFT)if(nw-GONEGIFT[id]>5*60e3)delete GONEGIFT[id];DB.houses.forEach(h=>{if(Array.isArray(h.gifts)){h.gifts=h.gifts.filter(x=>!(GONEGIFT[x.id]&&!x.admin));h.gifts.forEach(x=>{if(x.admin&&GONEGIFT[x.id]&&DB.me)x.opened=[...new Set([...(Array.isArray(x.opened)?x.opened:[]),DB.me.id])]})}});const now=Date.now(),T=120000;
   DB.pets.forEach(p=>{const w=PEND.wake[p.id];if(w&&now-w.t<T&&!(+p.wakeUntil>=w.v))p.wakeUntil=w.v});
   for(const pid in PEND.walk){const w=PEND.walk[pid];if(now-w.t>T)continue;DB.houses.forEach(h=>{if(h.id!==w.hid)h.guests=(h.guests||[]).filter(g=>g.petId!==pid)});const h=house(w.hid);if(h&&!(h.guests||[]).some(g=>g.petId===pid))(h.guests=h.guests||[]).push(w.g)}
   for(const pid in PEND.home){const w=PEND.home[pid];if(now-w.t>T)continue;DB.houses.forEach(h=>h.guests=(h.guests||[]).filter(g=>g.petId!==pid))}}
@@ -840,6 +881,7 @@ function keepToys(){for(const hid in TOYP){const o=TOYP[hid],h=house(hid);if(!h|
   o.add.forEach(a=>{if(!o.rm[a.id]&&!T.some(x=>x.id===a.id))T.push(a)});T.forEach(x=>{const m=o.mv[x.id];if(m)Object.assign(x,m)});h.toys=T}}
 const MAILDONE=new Set();
 function claimMail(ml){const g=DB.game,ids=[];ml.forEach(m=>{ids.push(m.id);if(MAILDONE.has(m.id))return;MAILDONE.add(m.id);const msg=[];
+    if(m.setCoins!=null){g.coins=Math.max(0,+m.setCoins||0);setTimeout(()=>{updHud();openModal(`<div style="text-align:center"><div class="giftopen">👑</div><h3>島主調整了你的金幣</h3><p class="lead">現在有 🪙 ${g.coins}</p></div><div class="row2"><button data-close>知道了</button></div>`)},900);return}
     if(+m.coins){g.coins=(g.coins||0)+ +m.coins;msg.push(`${m.coins} 金幣`)}if(+m.tickets){g.tickets=(g.tickets||0)+ +m.tickets;msg.push(`${m.tickets} 張抽卡券`)}
     if(m.item&&ITEMS[m.item]&&+m.n){bagAdd(m.item,+m.n);msg.push(`${ITEMS[m.item].name} ×${m.n}`)}
     if(msg.length)setTimeout(()=>openModal(`<div style="text-align:center"><div class="giftopen">👑</div><h3>島主送你禮物！</h3>${m.msg?`<p class="lead">「${esc(m.msg)}」</p>`:''}<p class="lead">${msg.join('、')}</p></div><div class="row2"><button data-close>謝謝島主 🎉</button></div>`),900)});
@@ -847,10 +889,10 @@ function claimMail(ml){const g=DB.game,ids=[];ml.forEach(m=>{ids.push(m.id);if(M
 let syncing=false;
 async function sync(quiet){
   if(!ONLINE||syncing)return;syncing=true;
-  try{const d=await api('getState',cred());
+  try{const d=await api('getState',Object.assign(cred(),{where:curWhere()}));
     Object.assign(DB,{houses:d.houses,pets:d.pets,weights:d.weights,medical:d.medical,expenses:d.expenses,notes:d.notes,feed:d.feed,famOk:d.famOk,players:d.players||[],tlogs:d.tlogs||[]});
     DB.houses.forEach(h=>{if(!Array.isArray(h.poops))h.poops=[]});
-    keepPending();DB.letters=(d.letters||[]).filter(l=>!LGONE[l.id]).map(l=>Object.assign(l,LSTATE[l.id]||{},CLAIMED['l:'+l.id]?{claimed:true}:{}));DB.drops=(d.drops||[]).filter(x=>!PICKED.has(x.id));DB.notice=d.notice||null;DB.kuji=d.kuji||DB.kuji||null;setTimeout(noticePop,1200);DB.dbl=d.dbl||'';DB.adminId=d.adminId||'';
+    keepPending();DB.letters=(d.letters||[]).filter(l=>!LGONE[l.id]).map(l=>Object.assign(l,LSTATE[l.id]||{},CLAIMED['l:'+l.id]?{claimed:true}:{}));DB.drops=(d.drops||[]).filter(x=>!PICKED.has(x.id));DB.notice=d.notice||null;DB.kuji=d.kuji||DB.kuji||null;DB.online=d.online||[];DB.rank=d.rank||DB.rank||null;osLogin();setTimeout(noticePop,1200);DB.dbl=d.dbl||'';DB.adminId=d.adminId||'';
     setTimeout(announceLetters,0);setTimeout(updGuestBar,0);
     if(d.player&&DB.me){DB.me.code=d.player.code||DB.me.code;const ml=Array.isArray(d.player.mail)?d.player.mail:[];if(ml.length)claimMail(ml)}
     DB.owned={};d.houses.forEach(h=>DB.owned[h.id]=Array.isArray(h.owned)?h.owned:[]);
@@ -917,7 +959,10 @@ const LOCAL={
   adminGive(){return true},readLetter(){return true},hideLetter(){return true},claimLetter({letterId}){const l=(DB.letters||[]).find(x=>x.id===letterId)||{};return {coins:l.coins,tickets:l.tickets,item:l.item,n:l.n}},adminLetter(o){(DB.letters=DB.letters||[]).unshift({id:uid(),title:o.title,body:o.body,at:Date.now(),coins:+o.coins||0,tickets:+o.tickets||0,item:o.item||'',n:+o.n||0,read:false,claimed:false,all:o.to==='*'});return true},adminGiftHouse({houseId,coins,tickets,item,n,msg}){const h=house(houseId);(h.gifts=h.gifts||[]).push({id:uid(),admin:true,from:'島主',coins,tickets,item,n,msg,opened:[],at:Date.now(),x:Math.round(FLOOR.x0+60+Math.random()*(FLOOR.x1-FLOOR.x0-120)),y:Math.round(FLOOR.y0+40+Math.random()*150)});return true},adminResetPw(){return true},adminRemoveHouse({houseId}){return LOCAL.deleteHouse({houseId})},
   addTLog({log}){const l=Object.assign({},log,{id:uid(),createdAt:Date.now(),by:DB.me.nick});(DB.tlogs=DB.tlogs||[]).push(l);return l},
   deleteTLog({id}){DB.tlogs=(DB.tlogs||[]).filter(x=>x.id!==id);return true},
-  visit(){return true},
+  visit(){return true},ping(){return true},
+  setCode({code}){DB.me.code='MH-'+code;return {code:'MH-'+code}},adminSetCode({code}){return {code:'MH-'+(code||'NEW123')}},adminSetCoins({coins}){return {coins}},
+  addAcc({houseId,acc}){const h=house(houseId);h.acc=[...new Set([...(h.acc||[]),...acc])];return {acc:h.acc}},
+  saveWear({petId,wear,wadj}){const p=pet(petId);p.wear=wear;p.wadj=wadj;return {wear,wadj}},
   kujiDraw({houseId}){const RM={A:['party'],B:['ocean','star','space'],C:['sakura','forest','cloud','xmas','arcade','washitsu','circus'],D:['study','garden','cafe','beach','dessert','library','cabin']},PL={A:1,B:2,C:3,D:4};
     const nb=no=>{const it=[];for(const g in PL)RM[g].slice().sort(()=>Math.random()-.5).slice(0,PL[g]).forEach(room=>it.push({g,room,t:false}));return {no,items:it,log:[]}};
     let k=DB.kuji&&DB.kuji.items?DB.kuji:nb(1);const pool=k.items.filter(x=>!x.t),t=pool[Math.floor(Math.random()*pool.length)];t.t=true;
@@ -957,6 +1002,153 @@ function choiceGroup(id,opts,cur){return `<div class="choices" id="${id}" role="
 function bindChoice(id,cb){const g=$('#'+id);g.onclick=e=>{const b=e.target.closest('button');if(!b)return;g.querySelectorAll('button').forEach(x=>{x.classList.toggle('on',x===b);x.setAttribute('aria-checked',x===b)});cb&&cb(b.dataset.v)}}
 const choiceVal=id=>{const b=$('#'+id+' button.on');return b?b.dataset.v:''};
 
+
+// ================= v1.43：衣櫃打扮・排行榜・上線名單・推播・轉移碼 =================
+// ---------- 👗 配件 ----------
+const ACC={
+  beanie:{n:'紅色毛線帽',s:'head',p:200},bow:{n:'粉紅蝴蝶結',s:'head',p:150},crown:{n:'金色小皇冠',s:'head',p:300},flower:{n:'小花圈',s:'head',p:200,oy:-2},chef:{n:'廚師帽',s:'head',p:180,oy:-3},
+  bunny:{n:'兔耳髮箍',s:'head',p:180,oy:-6},catear:{n:'貓耳髮箍',s:'head',p:180,oy:-3},straw:{n:'小草帽',s:'head',p:200,ow:1.15},wizard:{n:'星星巫師帽',s:'head',p:250,oy:-5,ow:1.1},santa:{n:'聖誕帽',s:'head',p:200,oy:-2},
+  party:{n:'派對尖帽',s:'head',p:150,oy:-6,ow:.8},halo:{n:'天使光環',s:'head',p:300,oy:-8},dino:{n:'恐龍帽',s:'head',p:250,oy:-3,ow:1.05},berry:{n:'草莓帽',s:'head',p:220,oy:-3,ow:1.05},
+  glasses:{n:'圓框眼鏡',s:'face',p:150},sun:{n:'墨鏡',s:'face',p:180},heartgl:{n:'愛心眼鏡',s:'face',p:180},stargl:{n:'星星眼鏡',s:'face',p:180},monocle:{n:'單片眼鏡',s:'face',p:220,ox:12,ow:.42,oy:3},
+  stache:{n:'翹鬍子',s:'face',p:150,oy:12,ow:.62},mask:{n:'小口罩',s:'face',p:120,oy:13,ow:.8},pirate:{n:'海盜眼罩',s:'face',p:200},goggle:{n:'潛水蛙鏡',s:'face',p:220,ow:1.05},blush:{n:'腮紅貼紙',s:'face',p:120,oy:8,ow:1.05},
+  bell:{n:'鈴鐺領結',s:'neck',p:180,ow:.75},pearl:{n:'珍珠項鍊',s:'neck',p:250},lei:{n:'夏威夷花環',s:'neck',p:200},tie:{n:'小領帶',s:'neck',p:150,oy:8,ow:.55},bib:{n:'小鴨口水巾',s:'neck',p:150,oy:5},
+  cape:{n:'紅色小披風',s:'neck',p:250,oy:4,ow:1.1},sailor:{n:'水手領巾',s:'neck',p:200,oy:5},collar:{n:'愛心項圈',s:'neck',p:200,oy:4},medal:{n:'金牌項鍊',s:'neck',p:300,oy:8,ow:.7},sakura:{n:'櫻花圍巾',s:'neck',p:200,oy:3}};
+const SLOT_N={head:'頭',face:'臉',neck:'脖子'},SLOTS3=['neck','face','head'];
+const DEF_ADJ={貓:{head:{x:30,y:6,w:46},face:{x:30,y:31,w:40},neck:{x:31,y:53,w:40}},狗:{head:{x:47,y:4,w:48},face:{x:47,y:27,w:42},neck:{x:47,y:50,w:44}},
+  兔:{head:{x:44,y:24,w:38},face:{x:44,y:43,w:32},neck:{x:45,y:60,w:34}},倉鼠:{head:{x:55,y:6,w:50},face:{x:57,y:32,w:42},neck:{x:55,y:51,w:42}},
+  鳥:{head:{x:48,y:11,w:40},face:{x:48,y:36,w:38},neck:{x:47,y:55,w:38}},其他:{head:{x:50,y:12,w:46},face:{x:50,y:36,w:40},neck:{x:50,y:58,w:40}}};
+const accImg=id=>`assets/acc_${id}.webp`;
+function petAdj(p,s){const a=p.wadj&&p.wadj[s];if(a&&a.w)return a;const d=p.body?{head:{x:50,y:10,w:46},face:{x:50,y:32,w:40},neck:{x:50,y:55,w:40}}:(DEF_ADJ[p.species]||DEF_ADJ.其他);return d[s]}
+function accBox(p,s,id){const a=petAdj(p,s),it=ACC[id]||{};return {x:a.x+(it.ox||0)*a.w/100,y:a.y+(it.oy||0)*a.w/100*.9,w:a.w*(it.ow||1)}}
+function wearHTML(p,only){const w=p.wear||{};let o='';SLOTS3.forEach(s=>{const id=w[s];if(!id||!ACC[id]||(only&&only!==s&&only!=='all'))return;const b=accBox(p,s,id);
+  o+=`<img class="acc a-${s}" data-s="${s}" src="${accImg(id)}" alt="" style="left:${b.x}%;top:${b.y}%;width:${b.w}%">`});return o?`<div class="wear">${o}</div>`:''}
+const accOwn=hid=>new Set((house(hid)||{}).acc||[]);
+const accLeft=hid=>Object.keys(ACC).filter(id=>!accOwn(hid).has(id));
+const WPEND={},APEND={};let wq=Promise.resolve();
+function keepWear(){const now=Date.now();for(const id in WPEND){const w=WPEND[id],p=pet(id);if(now-w.t>120000){delete WPEND[id];continue}if(p){p.wear=w.wear;p.wadj=w.wadj}}
+  for(const hid in APEND){const a=APEND[hid],h=house(hid);if(now-a.t>120000){delete APEND[hid];continue}if(h)h.acc=[...new Set([...(h.acc||[]),...a.ids])]}}
+function addAccLocal(hid,ids){const h=house(hid);if(!h)return;h.acc=[...new Set([...(h.acc||[]),...ids])];const a=APEND[hid]||(APEND[hid]={ids:[],t:0});a.ids=[...new Set(a.ids.concat(ids))];a.t=Date.now();
+  wq=wq.then(()=>call('addAcc',Object.assign(cred(),{acc:ids}),true)).catch(e=>toast('衣櫃沒存到：'+e.message))}
+let wearT={};
+function saveWearSoon(p){WPEND[p.id]={wear:Object.assign({},p.wear||{}),wadj:JSON.parse(JSON.stringify(p.wadj||{})),t:Date.now()};clearTimeout(wearT[p.id]);
+  wearT[p.id]=setTimeout(()=>{wq=wq.then(()=>call('saveWear',Object.assign(cred(),{petId:p.id,wear:p.wear||{},wadj:p.wadj||{}}),true)).catch(e=>toast('打扮沒存到：'+e.message))},600)}
+let closetTab='head';
+function closetSheet(pid,tab){const p=pet(pid);if(!p||!isFamily(p.houseId))return;if(tab)closetTab=tab;const hid=p.houseId,own=accOwn(hid),g=DB.game,w=p.wear||{};
+  const ids=Object.keys(ACC).filter(id=>ACC[id].s===closetTab).sort((a,b)=>(own.has(b)-own.has(a))||ACC[a].p-ACC[b].p);
+  openModal(`<h3>👗 ${esc(p.name)} 的衣櫃</h3><p class="lead">我的金幣：<b class="coinv">🪙 ${g.coins||0}</b>・頭、臉、脖子各戴 1 個</p>
+    <div class="clprev"><div class="clbody" id="clb"><img src="${petBody(p)}" alt="" onerror="this.src='${defBody(p.species)}'">${wearHTML(p)}</div></div>
+    <div class="tabs3">${['head','face','neck'].map(s=>`<button data-ct="${s}" class="${s===closetTab?'on':''}">${SLOT_N[s]}${w[s]?' ✓':''}</button>`).join('')}</div>
+    <div class="accgrid">${ids.map(id=>{const on=w[closetTab]===id,has=own.has(id);return `<button class="acci${on?' on':''}${has?'':' buy'}" data-acc="${id}"><img src="${accImg(id)}" alt=""><span>${ACC[id].n}</span><em>${on?'戴著':has?'&nbsp;':'🪙 '+ACC[id].p}</em></button>`}).join('')}</div>
+    <div class="row2" style="margin-top:10px"><button id="cladj" ${w[closetTab]?'':'disabled'}>✋ 調整位置</button><button id="cloff" ${Object.keys(w).length?'':'disabled'}>全部脫掉</button></div>
+    <div class="hint">沒有的配件點一下買、再點一次確認；抽卡券的卡包也有機會抽到</div>
+    <div class="row2"><button data-close>關閉</button></div>`);
+  const S=$('#sheet');
+  S.querySelectorAll('[data-ct]').forEach(b=>b.onclick=()=>closetSheet(pid,b.dataset.ct));
+  S.querySelectorAll('[data-acc]').forEach(b=>b.onclick=()=>{const id=b.dataset.acc,it=ACC[id];
+    if(!accOwn(hid).has(id)){if((g.coins||0)<it.p)return toast(`金幣不夠，還差 ${it.p-(g.coins||0)} 🪙`);const em=b.querySelector('em');if(!b.classList.contains('armed')){b.classList.add('armed');em.textContent='再按一次買';setTimeout(()=>{if(b.isConnected){b.classList.remove('armed');em.textContent='🪙 '+it.p}},3000);return}
+      g.coins-=it.p;save();updHud&&updHud();addAccLocal(hid,[id]);sfx&&sfx('tap');toast(`買了${it.n}，放進衣櫃了 👗`)}
+    p.wear=Object.assign({},p.wear||{});if(p.wear[it.s]===id)delete p.wear[it.s];else p.wear[it.s]=id;saveWearSoon(p);rewearHome(p.id);const st=S.scrollTop;closetSheet(pid);$('#sheet').scrollTop=st});
+  $('#cladj').onclick=()=>adjustSheet(pid,closetTab);
+  $('#cloff').onclick=()=>{p.wear={};saveWearSoon(p);rewearHome(p.id);closetSheet(pid);toast('都脫掉了')};
+}
+function rewearHome(pid){if(!home)return;const r=home.pets.find(x=>x.id===pid),p=pet(pid);if(!r||!r.el||!p)return;const bd=r.el.querySelector('.body');if(!bd)return;const old=bd.querySelector('.wear');if(old)old.remove();if(!r.demon)bd.insertAdjacentHTML('beforeend',wearHTML(p))}
+function adjustSheet(pid,s){const p=pet(pid),id=(p.wear||{})[s];if(!id)return closetSheet(pid);const base=JSON.parse(JSON.stringify(petAdj(p,s)));let a=Object.assign({},base);
+  openModal(`<h3>✋ 調整${SLOT_N[s]}的位置</h3><p class="lead">拖曳配件移動，拉右下角的圓點縮放。這隻毛孩之後換別的${SLOT_N[s]}部配件也會用這個位置</p>
+    <div class="clprev big"><div class="clbody" id="clb"><img src="${petBody(p)}" alt="" onerror="this.src='${defBody(p.species)}'">${wearHTML(p)}<div class="adjbox" id="adjb"><i class="adjh" id="adjh"></i></div></div></div>
+    <div class="row2"><button id="adjr">還原預設</button><button class="primary" id="adjok">完成</button></div>`);
+  const cb=$('#clb'),box=$('#adjb'),img=cb.querySelector(`.acc[data-s="${s}"]`);
+  const put=()=>{const it=ACC[id]||{},w=a.w*(it.ow||1),x=a.x+(it.ox||0)*a.w/100,y=a.y+(it.oy||0)*a.w/100*.9;if(img)Object.assign(img.style,{left:x+'%',top:y+'%',width:w+'%'});
+    requestAnimationFrame(()=>{const ih=img?img.getBoundingClientRect().height/cb.getBoundingClientRect().height*100:w;Object.assign(box.style,{left:x+'%',top:y+'%',width:w+'%',height:ih+'%'})})};
+  put();if(img&&!img.complete)img.onload=put;
+  let drag=null;const R=()=>cb.getBoundingClientRect();
+  box.onpointerdown=e=>{e.preventDefault();box.setPointerCapture(e.pointerId);drag={mode:e.target.id==='adjh'?'size':'move',x0:e.clientX,y0:e.clientY,a0:Object.assign({},a)}};
+  box.onpointermove=e=>{if(!drag)return;const r=R(),dx=(e.clientX-drag.x0)/r.width*100,dy=(e.clientY-drag.y0)/r.height*100;
+    if(drag.mode==='move'){a.x=clamp(drag.a0.x+dx,-10,110);a.y=clamp(drag.a0.y+dy,-30,120)}else a.w=clamp(drag.a0.w+dx*2,10,150);put()};
+  box.onpointerup=box.onpointercancel=()=>{drag=null};
+  $('#adjr').onclick=()=>{const d=JSON.parse(JSON.stringify(petAdj(Object.assign({},p,{wadj:{}}),s)));a=d;put()};
+  $('#adjok').onclick=()=>{a={x:Math.round(a.x*10)/10,y:Math.round(a.y*10)/10,w:Math.round(a.w*10)/10};p.wadj=Object.assign({},p.wadj||{},{[s]:a});saveWearSoon(p);rewearHome(pid);toast('位置調好了 ✨');closetSheet(pid,s)};
+}
+// ---------- 🏆 排行榜 ----------
+const RB={coin:{t:'💰財神爺欽點',d:'這週撿最多錢的人',u:v=>'$'+v.toLocaleString()},poop:{t:'💩專業鏟屎官',d:'這週清最多便便的人',u:v=>v+' 坨'},
+  visit:{t:'🚪社牛里長伯',d:'這週去最多家串門子的人（每天每家算 1 次）',u:v=>v+' 家次'},pop:{t:'🐾本週人氣王',d:'這週最受朋友疼愛的毛孩（朋友摸、餵、請零食才算）',u:v=>v+' 分'}};
+let rankTab='coin';
+function titlesOf(pid){const L=DB.rank&&DB.rank.last&&DB.rank.last.win;if(!L||!pid)return [];return ['coin','poop','visit'].filter(b=>L[b]&&L[b][0]&&L[b][0].id===pid).map(b=>RB[b].t)}
+function popKing(petId){const L=DB.rank&&DB.rank.last&&DB.rank.last.win;return !!(L&&L.pop&&L.pop[0]&&L.pop[0].id===petId)}
+function titleTag(pid){return titlesOf(pid).map(t=>`<b class="ttag">${t}</b>`).join('')}
+const nickOf=id=>((DB.players||[]).find(p=>p.id===id)||{}).nick||(DB.me&&DB.me.id===id?DB.me.nick:'（已離開）');
+function rankName(b,id){if(b==='pop'){const p=pet(id);return p?`${esc(p.name)}<small>${esc((house(p.houseId)||{}).name||'')}</small>`:'（已離開）'}return esc(nickOf(id))}
+function rankSheet(tab){if(tab)rankTab=tab;const R=DB.rank,b=rankTab,B=RB[b];
+  if(!R){openModal(`<h3><img class="h3ic" src="assets/icon_rank.webp" alt="">排行榜</h3><div class="locked">${ONLINE?'排行榜同步中，等一下再看看':'試做版沒有排行榜，連上小島才會開始統計'}</div><div class="row2"><button data-close>關閉</button></div>`);return}
+  const L=(R.s&&R.s[b])||[],left=Math.max(0,R.ends-Date.now()),dd=Math.floor(left/86400e3),hh=Math.floor(left%86400e3/HOUR);
+  let mine='';if(DB.me){if(b==='pop'){const my=myHouse()?petsOf(myHouse().id).map(p=>p.id):[];const i=L.findIndex(x=>my.includes(x.id));mine=i>=0?`${esc(pet(L[i].id).name)}：第 ${i+1} 名`:(my.length?'你家毛孩還沒上榜，請朋友來摸摸':'')}
+    else{const i=L.findIndex(x=>x.id===DB.me.id);mine=i>=0?(i<3?`你：第 ${i+1} 名 🎉`:`你：第 ${i+1} 名・差 ${B.u(L[2].v-L[i].v+1)} 進前三`):'你還沒上榜，加油！'}}
+  const W=R.last&&R.last.win;
+  openModal(`<h3><img class="h3ic" src="assets/icon_rank.webp" alt="">排行榜・本週</h3><p class="lead">結算倒數 ${dd} 天 ${hh} 小時（每週一 00:00 結算）</p>
+    <div class="rtabs">${Object.keys(RB).map(k=>`<button data-rt="${k}" class="${k===b?'on':''}">${RB[k].t}</button>`).join('')}</div>
+    <p class="lead" style="margin:4px 0 6px">${B.d}</p>
+    <div class="rlist">${L.length?L.slice(0,10).map((x,i)=>`<div class="rrow r${i+1}${DB.me&&(x.id===DB.me.id||(b==='pop'&&pet(x.id)&&isFamily(pet(x.id).houseId)))?' me':''}"><span class="rk">${i<3?['🥇','🥈','🥉'][i]:i+1}</span><span class="rn">${rankName(b,x.id)}</span><span class="rv">${B.u(x.v)}</span></div>`).join(''):'<div class="locked">這週還沒有人上榜，搶第一！</div>'}</div>
+    ${mine?`<div class="rmine">${mine}</div>`:''}
+    <div class="sec"><h4>🎁 獎勵</h4><div class="frow"><span>🥇 第 1 名</span><span>稱號掛一週・🪙150・🎟️1</span></div><div class="frow"><span>🥈 第 2 名</span><span>🪙80</span></div><div class="frow"><span>🥉 第 3 名</span><span>🪙40</span></div><p class="lead" style="margin-top:6px">獎勵會寄到 ✉️ 信箱；人氣王的獎勵寄給毛孩的全家，冠軍毛孩頭上會有 🏅</p></div>
+    ${W&&Object.keys(RB).some(k=>W[k]&&W[k][0])?`<div class="sec"><h4>👑 上週冠軍</h4>${Object.keys(RB).filter(k=>W[k]&&W[k][0]).map(k=>`<div class="frow"><span>${RB[k].t}</span><span>${k==='pop'?esc(W[k][0].name||(pet(W[k][0].id)||{}).name||''):esc(nickOf(W[k][0].id))}</span></div>`).join('')}</div>`:''}
+    <div class="row2"><button data-close>關閉</button></div>`);
+  $('#sheet').querySelectorAll('[data-rt]').forEach(x=>x.onclick=()=>{const st=$('#sheet').scrollTop;rankSheet(x.dataset.rt);$('#sheet').scrollTop=st});
+}
+// ---------- 🟢 上線名單 ----------
+const ONSET=()=>new Set((DB.online||[]).map(o=>o.id).concat(DB.me&&myHouse()?[DB.me.id]:[]));
+const isOn=id=>ONLINE&&ONSET().has(id);
+const onDot=id=>ONLINE?(isOn(id)?'<i class="ondot on" aria-label="在線上"></i>':'<i class="ondot" aria-label="不在線上"></i>'):'';
+function lastOn(id){const p=(DB.players||[]).find(x=>x.id===id);return p&&+p.on?ago(+p.on):''}
+function curWhere(){return home&&!$('#home').classList.contains('hidden')?home.id:'island'}
+let pingT;function pingWhere(){if(!ONLINE||!DB.me||!myHouse())return;clearTimeout(pingT);pingT=setTimeout(()=>api('ping',{playerId:DB.me.id,where:curWhere()}).catch(()=>{}),300)}
+function whereText(o){const w=o.where;if(!w||w==='island')return '在島上逛逛';const h=house(w),p=(DB.players||[]).find(x=>x.id===o.id);if(!h)return '在島上逛逛';
+  if(p&&p.houseId===w)return o.id===(DB.me&&DB.me.id)?'在自己家':'在自己家';if(DB.me&&DB.me.houseId===w)return '在你家 👀';return `在 ${h.name}`}
+function onlineSheet(){const L=(DB.online||[]).slice();if(DB.me&&myHouse()&&!L.some(o=>o.id===DB.me.id))L.unshift({id:DB.me.id,where:curWhere()});
+  L.sort((a,b)=>(b.id===(DB.me&&DB.me.id))-(a.id===(DB.me&&DB.me.id)));
+  openModal(`<h3>🟢 ${L.length} 人在島上</h3><p class="lead">3 分鐘內有打開毛很多的人</p>
+    ${L.map(o=>`<div class="frow"><span>${onDot(o.id)} ${esc(nickOf(o.id))}${o.id===(DB.me&&DB.me.id)?'（我）':''} ${lvTag(o.id)}</span><span class="ago">${esc(o.id===(DB.me&&DB.me.id)?(curWhere()==='island'?'在島上逛逛':whereText({id:o.id,where:curWhere()})):whereText(o))}</span></div>`).join('')}
+    <div class="row2"><button data-close>關閉</button></div>`)}
+function updOnline(){let r=$('#irow2');if(!r){r=document.createElement('div');r.id='irow2';r.className='irow2';r.innerHTML=`<button class="circle rankb noic" id="rankb" aria-label="排行榜"><img src="assets/icon_rank.webp" alt="" onerror="this.replaceWith('🏆')"></button><button class="onpill noic" id="onpill"></button>`;$('#icol').appendChild(r);
+    $('#rankb').onclick=()=>{sfx&&sfx('tap');rankSheet()};$('#onpill').onclick=onlineSheet}
+  const n=ONSET().size,pl=$('#onpill');pl.style.display=ONLINE&&n?'':'none';pl.innerHTML=`<i class="ondot on"></i>${n} 人在島上`;r.classList.toggle('hidden',picking)}
+// ---------- 🔑 改轉移碼 ----------
+function codeSheet(){const cur=String(DB.me.code||'').replace(/^MH-/,'');
+  openModal(`<h3>🔑 改我的轉移碼</h3><p class="lead">改成好記的，換手機時比較方便。改完之後舊的轉移碼就不能用了</p>
+    ${fld('cc','新的轉移碼',`<div class="codein"><span>MH-</span><input id="cc" maxlength="12" value="${esc(cur)}" autocapitalize="characters" autocomplete="off"></div>`,'6～12 個字，要同時有英文和數字，例如 MAIMAI88')}<div class="err" id="cerr"></div>
+    <div class="row2"><button data-close>取消</button><button class="primary" id="cgo">儲存</button></div>`);
+  const ip=$('#cc');ip.oninput=()=>{ip.value=ip.value.toUpperCase().replace(/[^A-Z0-9]/g,'');$('#cerr').textContent=''};
+  $('#cgo').onclick=async()=>{const v=ip.value.trim();if(!/^[A-Z0-9]{6,12}$/.test(v))return $('#cerr').textContent='要 6～12 個英文或數字';if(!/[A-Z]/.test(v)||!/[0-9]/.test(v))return $('#cerr').textContent='要同時有英文和數字';
+    try{const r=await call('setCode',{playerId:DB.me.id,code:v});DB.me.code=r.code;save();closeModal();toast('轉移碼改好了：'+r.code+' 🔑')}catch(e){$('#cerr').textContent=e.message}};
+  setTimeout(()=>ip.isConnected&&ip.focus(),60)}
+// ---------- 🔔 推播通知（OneSignal） ----------
+const OS_APP='d95f593b-a072-4dd2-a00c-a057b8467137',OS_ON=ONLINE&&/github\.io$/.test(location.hostname);let osLogged='';
+if(OS_ON){window.OneSignalDeferred=window.OneSignalDeferred||[];const sc=document.createElement('script');sc.src='https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js';sc.defer=true;document.head.appendChild(sc);
+  OneSignalDeferred.push(async OS=>{try{await OS.init({appId:OS_APP,notifyButton:{enable:false},autoResubscribe:true});osLogin()}catch(e){}})}
+function osLogin(){if(!OS_ON||!DB.me||osLogged===DB.me.id)return;osLogged=DB.me.id;OneSignalDeferred.push(async OS=>{try{await OS.login(DB.me.id)}catch(e){osLogged=''}})}
+const PUSH_KINDS=['🍚 毛孩肚子餓了','😈 毛孩變成餓魔','🎁 有人送你們家禮物','💩 家裡好臭該打掃了','💰 島上掉了好多錢','✨ 出現金色福袋','🏆 每週排行榜出爐','📢 島主公告'];
+function pushSheet(){const kinds=`<div class="sec"><h4>會通知你的事</h4>${PUSH_KINDS.map(k=>`<div class="frow"><span>${k}</span></div>`).join('')}<p class="lead" style="margin-top:6px">晚上 11 點到早上 8 點不吵你；正在玩的時候不推；每天最多 10 則</p></div>`;
+  if(!ONLINE)return toast('試做版沒有推播');
+  if(isIOS&&!isStandalone()){openModal(`<div style="text-align:center"><div class="giftopen">🔔</div><h3>iPhone 要先加到主畫面</h3><p class="lead">把毛很多加到主畫面，再從主畫面的圖示打開，才能開啟通知（需要 iOS 16.4 以上）</p></div>${kinds}<div class="row2"><button data-close>關閉</button><button class="primary" id="pgd">📲 教我加到主畫面</button></div>`);$('#pgd').onclick=()=>homeGuide(false);return}
+  if(!('Notification' in window)||!OS_ON){openModal(`<h3>🔔 通知</h3><p class="lead">這個瀏覽器不支援通知，換成手機的 Safari（加到主畫面）或 Chrome 試試看</p><div class="row2"><button data-close>關閉</button></div>`);return}
+  const on=Notification.permission==='granted';
+  openModal(`<div style="text-align:center"><div class="giftopen">🔔</div><h3>${on?'通知已開啟 ✅':'開啟通知'}</h3><p class="lead">${on?'毛孩有事會第一時間告訴你':Notification.permission==='denied'?'通知被關掉了，要到手機的「設定 → 通知 → 毛很多」打開':'毛孩肚子餓、有人送禮的時候，會傳通知給你'}</p></div>${kinds}
+    <div class="row2"><button data-close>關閉</button>${on?'<button id="poff">關閉通知</button>':Notification.permission==='denied'?'':'<button class="primary" id="pon">開啟通知</button>'}</div>`);
+  if($('#pon'))$('#pon').onclick=()=>{osLogged='';OneSignalDeferred.push(async OS=>{try{await OS.Notifications.requestPermission();await OS.login(DB.me.id);osLogged=DB.me.id;if(OS.User.PushSubscription.optedIn===false)await OS.User.PushSubscription.optIn()}catch(e){}
+    setTimeout(()=>{toast(Notification.permission==='granted'?'通知開好了 🔔':'沒有開成功，再試一次');pushSheet()},400)})};
+  if($('#poff'))$('#poff').onclick=()=>OneSignalDeferred.push(async OS=>{try{await OS.User.PushSubscription.optOut()}catch(e){}toast('通知關掉了');closeModal()});
+}
+// ---------- 👑 島主：玩家金幣、轉移碼 ----------
+function adminPlayerSheet(p){
+  openModal(`<h3>👑 ${esc(p.nick)}</h3><p class="lead">${p.house?esc(p.house):'沒有家'}・Lv.${p.lv}</p>
+    <div class="sec adm"><h4>🪙 金幣</h4><p class="lead">現在 ${p.coins}。改了之後，他下次打開 App 就會變成新的數字</p><div class="row2"><input id="apc" type="number" min="0" value="${+p.coins||0}"><button id="apcb">設定</button></div></div>
+    <div class="sec adm"><h4>🔑 轉移碼</h4><p class="lead">現在是 <b class="code">${esc(p.code||'—')}</b>，改掉後舊的立刻失效</p><input id="apk" maxlength="12" placeholder="新的轉移碼（6～12 個英文和數字）" autocapitalize="characters"><div class="row2"><button id="apkb">改成這個</button><button id="apkr">🎲 重新產生</button></div></div>
+    <div class="row2"><button id="apback">← 島主後台</button></div>`);
+  $('#apback').onclick=adminSheet;
+  $('#apcb').onclick=async()=>{const v=Math.max(0,Math.round(+$('#apc').value||0));try{await adminCall('adminSetCoins',{id:p.id,coins:v});p.coins=v;toast(`${p.nick} 的金幣設定成 ${v} 了`);adminSheet()}catch(e){toast(e.message)}};
+  const setc=async code=>{try{const r=await adminCall('adminSetCode',{id:p.id,code});try{await navigator.clipboard.writeText(r.code)}catch(e){}toast('新的轉移碼 '+r.code+' 已複製');adminSheet()}catch(e){toast(e.message)}};
+  $('#apkb').onclick=()=>{const v=$('#apk').value.trim().toUpperCase().replace(/^MH-?/,'');if(!v)return toast('先輸入新的轉移碼');setc(v)};
+  $('#apkr').onclick=e=>{if(!armBtn(e.target,'確定重新產生？'))return;setc('')};
+}
+
 // ================= 小島 =================
 const HOUSE_W=150,LOT_W=110,SHOP_IMG=true;let mode='auto',picking=false;
 function taipeiHour(){try{return +new Intl.DateTimeFormat('en-US',{timeZone:'Asia/Taipei',hour:'numeric',hour12:false}).format(new Date())%24}catch(e){return new Date().getHours()}}
@@ -986,7 +1178,7 @@ function renderIsland(){
     Object.assign(el.style,ipct(sp.x,sp.y),{width:(HOUSE_W/1024*100)+'%',zIndex:sp.y});el.innerHTML=`<img src="assets/${SHOP_IMG?'shop':'house'+sp.style}_${p}.webp" alt="" onerror="this.src='assets/house${sp.style}_${p}.webp'">`;el.onclick=()=>shopSheet();box.appendChild(el);
     const lb=document.createElement('div');lb.className='label shop';lb.textContent='🏪 毛毛商店';Object.assign(lb.style,ipct(sp.x,sp.y+6),{zIndex:2000});box.appendChild(lb)}
   $('#pickbar').classList.toggle('hidden',!picking);$('#ticker').classList.toggle('hidden',picking);
-  renderMe();updTix();if(typeof updBell==='function')updBell();
+  renderMe();updTix();if(typeof updBell==='function')updBell();updOnline();
 }
 function renderMe(){
   const h=myHouse();const p=h&&petsOf(h.id)[0];
@@ -1178,7 +1370,7 @@ function openHome(hid,keep){
   if(!keep&&DB.me&&!isFamily(hid)){const v={id:DB.me.id,nick:DB.me.nick,at:Date.now()};const day=todayTW();
     if(!h.visits||h.visits.day!==day)h.visits={day,list:[]};const L=h.visits.list;const i=L.findIndex(x=>x.id===v.id);if(i>=0)L[i]=v;else L.push(v);
     call('visit',{playerId:DB.me.id,houseId:hid},true).catch(()=>{});visitReward(hid);renderFoot2()}
-  if(ONLINE&&!keep)sync(true);
+  if(ONLINE&&!keep){sync(true);pingWhere()}
   if(!keep&&isFamily(hid)&&demonOf(h))setTimeout(()=>{if(home&&home.id===hid&&demonOf(house(hid)))demonWelcome(house(hid))},1400);
   $('#foot').innerHTML=isFamily(hid)?'這是你家！右上可以新增毛孩、編輯家。點毛孩可以摸頭、看身分證、記錄體重醫療支出。':'朋友家：清地上的便便、餵飯、點毛孩摸頭、在軟木板貼便利貼。睡覺中的毛孩不能打擾喔。';
   window.scrollTo(0,0);
@@ -1186,7 +1378,7 @@ function openHome(hid,keep){
 function renderFoot2(){
   const h=house(home.id),L=h.visits&&h.visits.day===todayTW()?h.visits.list||[]:[];
   const M=membersOf(h.id);
-  $('#visits').innerHTML=(M.length?`<div>👥 家人 ${M.length}/${MAX_MEMBERS}：${M.map(m=>esc(m.nick)+lvTag(m.id)).join('、')}</div>`:'')+(L.length?`<div>🐾 今天來過：${L.slice().reverse().slice(0,5).map(v=>esc(v.nick)+lvTag(v.id)).join('、')}${L.length>5?` 等 ${L.length} 人`:''}</div>`:'');
+  $('#visits').innerHTML=(M.length?`<div>👥 家人 ${M.length}/${MAX_MEMBERS}：${M.map(m=>(isOn(m.id)?'🟢':'')+esc(m.nick)+lvTag(m.id)).join('、')}</div>`:'')+(L.length?`<div>🐾 今天來過：${L.slice().reverse().slice(0,5).map(v=>esc(v.nick)+lvTag(v.id)).join('、')}${L.length>5?` 等 ${L.length} 人`:''}</div>`:'');
   $('#visits').onclick=()=>peopleSheet(h.id);
   const own=petsOf(h.id),gs=guestsOf(h.id).map(g=>pet(g.petId)).filter(p=>p.houseId!==h.id);
   const heads=own.concat(gs).map(p=>{const o=outAt(p.id),away=o&&o.id!==h.id,sl=!away&&sleepState(p);return `<button class="ph1${away?' away':''}" data-pid="${p.id}" title="${esc(p.name)}"><img src="${!away&&petDemon(p)?'assets/demon_head.webp':petHead(p)}" alt="">${away?'<i>🐾</i>':sl?'<i>💤</i>':p.houseId!==h.id?'<i>🏠</i>':''}</button>`}).join('');
@@ -1207,7 +1399,7 @@ function renderHome(){
   if($('#eh'))$('#eh').onclick=()=>petForm(h.id);
   renderBoard();renderFloor();renderFoot2();
 }
-$('#back').onclick=()=>{cancelAnimationFrame(raf);home=null;if(ONLINE)sync(true);$('#home').classList.add('hidden');$('#island').classList.remove('hidden');renderIsland();renderFoot();window.scrollTo(0,0)};
+$('#back').onclick=()=>{cancelAnimationFrame(raf);home=null;if(ONLINE){sync(true);pingWhere()}$('#home').classList.add('hidden');$('#island').classList.remove('hidden');renderIsland();renderFoot();window.scrollTo(0,0)};
 // ---------- 留言板 ----------
 function renderBoard(){
   const h=house(home.id),B=BOARDS[h.room]||BOARDS.basic1,ins=10;
@@ -1269,10 +1461,11 @@ function renderFloor(){
   (h.toys||[]).forEach(t=>{const it=ITEMS[t.item]||{},el=document.createElement('button');el.className='toy'+(t.flip?' flip':'')+(it.an?' an-'+it.an:'')+(it.flat?' flat':'');el.innerHTML=itemIcon(t.item,'toyi');el.setAttribute('aria-label',it.name||'玩具');
     if(it.sz)el.style.setProperty('--sz',it.sz);el.dataset.tid=t.id;
     Object.assign(el.style,hp(t.x,t.y),{zIndex:it.flat?1:Math.round(t.y)-300});el.onclick=e=>{e.stopPropagation();if(placing){if(placing.toy===t){placing=null;if($('#gcancel'))$('#gcancel').remove();renderFloor();return toast('沒有移動')}toast('這格已經有家具了，換一格放吧');return}toyMenu(t)};f.appendChild(el)});
-  (DB.drops||[]).filter(d=>d.houseId===h.id&&!PICKED.has(d.id)).forEach(d=>{const el=document.createElement('button');el.className='gift coin'+(d.gold?' gold':'');el.innerHTML=`<span class="ii toyi"><img src="assets/money_bag.webp" alt="" onerror="this.remove()"><b>💰</b></span>`;el.setAttribute('aria-label',d.gold?'金色福袋':'錢袋');
-    Object.assign(el.style,hp(d.x,d.y),{zIndex:Math.round(d.y)});el.onclick=e=>{e.stopPropagation();pickCoin(d,el)};f.appendChild(el)});
+  const GV=(h.gifts||[]).filter(g=>giftVisible(g,h));
+  (DB.drops||[]).filter(d=>d.houseId===h.id&&!PICKED.has(d.id)).forEach(d=>{const el=document.createElement('button');let dx=d.x,dz=Math.round(d.y)+4;GV.forEach(g=>{if(Math.abs(g.x-dx)<80&&Math.abs(g.y-d.y)<70){dx=g.x+(d.x>=g.x?90:-90);if(dx<FLOOR.x0+30||dx>FLOOR.x1-30)dx=g.x+(d.x>=g.x?-90:90);dz=Math.max(dz,Math.round(g.y)+4)}});el.className='gift coin'+(d.gold?' gold':'');el.innerHTML=`<span class="ii toyi"><img src="assets/money_bag.webp" alt="" onerror="this.remove()"><b>💰</b></span>`;el.setAttribute('aria-label',d.gold?'金色福袋':'錢袋');
+    Object.assign(el.style,hp(dx,d.y),{zIndex:dz});el.onclick=e=>{e.stopPropagation();pickCoin(d,el)};f.appendChild(el)});
   (h.gifts||[]).filter(g=>giftVisible(g,h)).forEach(g=>{const el=document.createElement('button');el.className='gift'+(g.admin?' gadmin':'');el.innerHTML=`<span class="ii toyi"><img src="assets/${g.admin?'gift_admin':'gift_box'}.webp" alt="" onerror="this.remove()"><b>🎁</b></span>`;el.setAttribute('aria-label',g.admin?'島主的禮物':'禮物');
-    Object.assign(el.style,hp(g.x,g.y),{zIndex:Math.round(g.y)});el.onclick=e=>{e.stopPropagation();openGift(g.id)};f.appendChild(el)});
+    Object.assign(el.style,hp(g.x,g.y),{zIndex:Math.round(g.y)-4});el.onclick=e=>{e.stopPropagation();openGift(g.id)};f.appendChild(el)});
   (h.poops||[]).forEach(p=>{const el=document.createElement('button');el.className='poop';el.innerHTML='<img src="assets/poop.webp" alt="">';el.setAttribute('aria-label','清便便');
     Object.assign(el.style,hp(p.x,p.y),{zIndex:2600});
     el.onclick=e=>{e.stopPropagation();if(!needMe())return;fx('✨',p.x,p.y-40);GONEPOOP[p.id]=Date.now();h.poops=h.poops.filter(x=>x.id!==p.id);renderFloor();const nm=(petsOf(h.id)[0]||{}).name||h.name;
@@ -1283,7 +1476,7 @@ function renderFloor(){
     const el=document.createElement('div');el.className='pet';el.setAttribute('role','button');el.setAttribute('aria-label',p.name);el.tabIndex=0;
     const dm=!r.guest&&demonShown(h);r.demon=dm;if(dm){r.di=r.di||DEMON_IMG[Math.floor(Math.random()*2)];r.dw=r.dw||DEMON_WALK[Math.floor(Math.random()*2)]}r.dsrc=dm?r.di:null;
     const dd=demonOf(h),bar=dm&&!isFamily(h.id)&&dd?`<span class="dbar"><i style="width:${Math.min(100,(+dd.prog||0)/DEMON_GOAL*100)}%"></i><b>解救 ${+dd.prog||0}/${DEMON_GOAL}</b></span>`:'';
-    el.innerHTML=`<div class="body"><img src="${dm?r.di:petBody(p)}" alt=""><div class="shadow"></div></div><span class="nm">${r.guest?'🐾 ':''}${dm?'餓魔':''}${esc(p.name)}</span>${bar}`;if(dm)el.classList.add('demon');
+    el.innerHTML=`<div class="body"><img src="${dm?r.di:petBody(p)}" alt=""><div class="shadow"></div>${dm?'':wearHTML(p)}</div><span class="nm">${r.guest?'🐾 ':''}${dm?'餓魔':''}${esc(p.name)}${!dm&&popKing(p.id)?'<span class="crownk">🏅</span>':''}</span>${bar}`;if(dm)el.classList.add('demon');
     const im=el.querySelector('img');r.ar=r.ar||1;im.onload=()=>{r.ar=im.naturalHeight/im.naturalWidth;placePet(r)};im.onerror=()=>{if(!im.dataset.fb&&!r.demon){im.dataset.fb=1;im.src=defBody(p.species)}};
     el.onclick=e=>{e.stopPropagation();petMenu(r,p)};r.el=el;f.appendChild(el);
     const sp=tentSpot(p,i),tw=230*petScale(sp.y),te=document.createElement('div');te.className='tent';
@@ -1367,9 +1560,10 @@ function petMenu(r,p){
   const m=document.createElement('div');m.className='petmenu';Object.assign(m.style,hp(clamp(r.x,150,700),r.y-215*(r.ar||1)*petScale(r.y)-10));
   m.innerHTML=`<div class="pm-h"><b>${r.demon?'餓魔':''}${esc(p.name)}</b>${p.trait?`<span class="tr">${esc(p.trait)}</span>`:''}</div>
     <div class="pm-s">🍖 ${bar(f,'#ff9a6b')}</div><div class="pm-s">💛 ${bar(md,'#f4c542')}</div>
-    <div class="pm-b"><button data-a="pat">🤚 摸頭</button>${r.guest?'':'<button data-a="feed">🍚 餵牠</button>'}<button data-a="treat">🍤 零食</button><button data-a="id">🪪</button></div>`;
+    <div class="pm-b"><button data-a="pat">🤚 摸頭</button>${r.guest?'':'<button data-a="feed">🍚 餵牠</button>'}<button data-a="treat">🍤 零食</button>${!r.guest&&!r.demon&&isFamily(p.houseId)?'<button data-a="closet">👗</button>':''}<button data-a="id">🪪</button></div>`;
   m.onclick=e=>{const b=e.target.closest('button');if(!b)return;m.remove();
     if(b.dataset.a==='id')return idCard(p.id);
+    if(b.dataset.a==='closet')return closetSheet(p.id);
     if(b.dataset.a==='treat')return treatPicker(r,p);
     if(b.dataset.a==='feed')return feedNow(r);
     if(!needMe())return;
@@ -1737,14 +1931,15 @@ $('#me').onclick=()=>{
       ${h?`<button id="mhome"><span class="e">🏠</span><span>回我家<small>${esc(h.name)}</small></span></button>`:`<button id="mbuild"><span class="e">🏠</span><span>蓋我的家<small>選一塊空地</small></span></button><button id="mjoin"><span class="e">🔑</span><span>加入家人的家<small>需要家人密碼</small></span></button>`}
     </div>
     <div class="row2" style="margin-top:10px"><button id="mguide">📲 加到主畫面</button><button id="minv">🔗 複製邀請連結</button></div>
-    <div class="row2" style="margin-top:8px"><button id="msnd">${sndOn?'🔊 音效：開':'🔇 音效：關'}</button></div>
+    <div class="row2" style="margin-top:8px"><button id="msnd">${sndOn?'🔊 音效：開':'🔇 音效：關'}</button>${ONLINE?`<button id="mpush">🔔 通知${OS_ON&&'Notification' in window&&Notification.permission==='granted'?'：開':''}</button>`:''}</div>
     <p class="lead" style="font-size:11px;opacity:.6;margin:8px 0 0">App 版本 ${typeof APP_VER!=='undefined'?APP_VER:''}</p>
     <div class="row2" style="margin-top:8px"><button id="mci">📅 每日簽到${((DB.game.ci||{}).last)===todayTW()?'（已簽）':''}</button><button id="mdm">📋 今日任務</button></div>
-    ${ONLINE?`<div class="codebox"><div><small>我的轉移碼（換手機時用，截圖存起來）</small><b>${esc(DB.me.code||'同步後就會出現')}</b></div><button id="mcode">複製</button></div>`:''}
+    ${ONLINE?`<div class="codebox"><div><small>我的轉移碼（換手機時用，截圖存起來）</small><b>${esc(DB.me.code||'同步後就會出現')}</b></div><span class="cbtns"><button id="mcode">複製</button> <button id="mcodee">✏️ 改</button></span></div>`:''}
     ${ONLINE?'<div class="row2" style="margin-top:8px"><button id="mrec">🔑 用轉移碼登入其他帳號</button></div>':''}
     ${adminPw()?'<div class="row2" style="margin-top:10px"><button id="madmin">👑 島主後台</button></div>':''}
     <div class="row2" style="margin-top:10px"><button data-close>關閉</button></div>`);
   $('#mguide').onclick=()=>homeGuide(false);$('#msnd').onclick=()=>{sndOn=!sndOn;try{localStorage.setItem('mhd_snd',sndOn?'1':'0')}catch(e){}$('#msnd').textContent=sndOn?'🔊 音效：開':'🔇 音效：關';updSndBtns();if(sndOn)sfx('tap')};if($('#madmin'))$('#madmin').onclick=adminSheet;$('#mci').onclick=checkinSheet;$('#mdm').onclick=missionsSheet;if($('#mrec'))$('#mrec').onclick=recoverSheet;
+  if($('#mcodee'))$('#mcodee').onclick=()=>{if(!DB.me.code)return toast('同步後再改');codeSheet()};if($('#mpush'))$('#mpush').onclick=pushSheet;
   if($('#mcode'))$('#mcode').onclick=async()=>{const c=DB.me.code;if(!c)return;try{await navigator.clipboard.writeText(c);toast('轉移碼已複製 🔑')}catch(e){toast(c)}};
   $('#minv').onclick=async()=>{const u=inviteUrl();try{await navigator.clipboard.writeText(u);toast('邀請連結已複製，貼到 LINE 給朋友吧 🔗')}catch(e){toast(u)}};
   $('#msave').onclick=async()=>{const n=$('#mn').value.trim();if(!n)return toast('暱稱不能空白');
@@ -2296,10 +2491,11 @@ function rollPack(h){
   const g=DB.game,own=owned(h.id),left=CARDS.filter(c=>!own.has(c.id));g.pity=(g.pity||0)+1;
   let type;
   if(g.pity>=10)type=left.length?'room':'limited';
-  else{const w={treat:50,toy:30,room:left.length?15:0,limited:5};let x=Math.random()*Object.values(w).reduce((a,b)=>a+b,0);for(const k in w){if((x-=w[k])<0){type=k;break}}}
+  else{const w={treat:50,toy:30,room:left.length?15:0,limited:5,acc:accLeft(h.id).length?12:0};let x=Math.random()*Object.values(w).reduce((a,b)=>a+b,0);for(const k in w){if((x-=w[k])<0){type=k;break}}}
   if(type==='room'){g.pity=0;const avail=Object.keys(RAR).filter(r=>left.some(c=>c.r===r));let x=Math.random()*avail.reduce((a,r)=>a+RAR[r].w,0),r=avail[0];for(const k of avail){if((x-=RAR[k].w)<0){r=k;break}}
     const pool=left.filter(c=>c.r===r);return {type,card:pool[Math.floor(Math.random()*pool.length)]}}
   const pick=f=>{const ids=Object.keys(ITEMS).filter(id=>f(ITEMS[id]));return ids[Math.floor(Math.random()*ids.length)]};
+  if(type==='acc'){const L=accLeft(h.id);return {type,acc:L[Math.floor(Math.random()*L.length)]}}
   if(type==='treat')return {type,items:[0,1,2].map(()=>pick(i=>i.kind==='treat'&&!i.bday))};
   if(type==='toy')return {type,items:[pick(i=>i.kind==='toy'&&!i.limited)]};
   if(left.length===0&&g.pity>=10)g.pity=0;
@@ -2308,7 +2504,7 @@ function rollPack(h){
 const PACK_IMGS=['assets/pack.webp','assets/card_back.webp','assets/logo.webp'];let packReady=null;
 function preloadPack(){if(!packReady)packReady=Promise.all(PACK_IMGS.map(src=>new Promise(res=>{const i=new Image();i.onload=()=>{(i.decode?i.decode().catch(()=>{}):Promise.resolve()).then(res)};i.onerror=res;i.src=src})));return packReady}
 setTimeout(preloadPack,2500);
-function packNotice(go){openModal(`<div style="text-align:center"><div style="font-size:44px">🎉</div><h3>房間都收集完了！</h3><p class="lead">這次卡包會抽到零食或玩具喔</p></div><div class="row2"><button data-close>先不要</button><button class="primary" id="pkgo">好，開卡包</button></div>`);$('#pkgo').onclick=()=>{closeModal();go()}}
+function packNotice(go){openModal(`<div style="text-align:center"><div style="font-size:44px">🎉</div><h3>房間都收集完了！</h3><p class="lead">這次卡包會抽到零食、玩具或配件喔</p></div><div class="row2"><button data-close>先不要</button><button class="primary" id="pkgo">好，開卡包</button></div>`);$('#pkgo').onclick=()=>{closeModal();go()}}
 function openPack(o){o=o||{};
   const h=myHouse();if(!h||(!o.free&&DB.game.tickets<1))return;
   if(!o.ok&&CARDS.every(c=>owned(h.id).has(c.id)))return packNotice(()=>openPack(Object.assign({},o,{ok:1})));
@@ -2318,6 +2514,7 @@ function openPack(o){o=o||{};
     face=cardArt(c);cap=`<b>${'★'.repeat(c.r==='SSR'?3:c.r==='R'?2:1)} ${RAR[c.r].name}房間</b><span>${c.name}</span>`;
     ftxt=`${DB.me.nick} 為 ${h.name} 抽到了 ${c.r==='SSR'?'✨超稀有・':c.r==='R'?'稀有・':''}${c.name}${c.r==='SSR'?'✨':''}`;
     call('drawCard',Object.assign(cred(),{cardId:c.id,feedText:ftxt}),true).catch(e=>toast('收藏沒存到：'+e.message))}
+  else if(R.type==='acc'){const id=R.acc;addAccLocal(h.id,[id]);rar='R';rc='#d98cb3';glow='rgba(255,180,210,.85)';face=`<div class="itemface"><span class="ii huge"><img src="${accImg(id)}" alt=""></span></div>`;cap=`<b>👗 配件</b><span>${ACC[id].n}</span>`}
   else{R.items.forEach(id=>bagAdd(id,1));const lim=R.type==='limited';rar=lim?'SSR':R.type==='toy'?'R':'N';
     rc=lim?'linear-gradient(#ff8fab,#ffd36e,#7fd1b9,#9b8cff)':R.type==='toy'?'#7fb069':'#e9a15c';glow=lim?'rgba(255,215,90,1)':'rgba(255,230,190,.6)';
     face=`<div class="itemface">${R.items.map(id=>itemIcon(id,R.items.length>1?'big':'huge')).join('')}</div>`;
@@ -2329,19 +2526,19 @@ function openPack(o){o=o||{};
     <div class="stage-area"><div class="pack" id="pk" role="button" aria-label="撕開卡包"><div class="pbody"><img class="plogo" src="assets/logo.webp" alt=""></div><div class="ptop"></div></div>
       <div class="card${R.type==='limited'?' gold':''}" id="cd" style="--rc:${rc.startsWith('linear')?'#e8a400':rc};--glow:${glow}"><div class="in"><div class="face back"></div>
         <div class="face front ${rc.startsWith('linear')?'rainbow':''}"><div class="art">${face}</div><div class="cap">${cap}</div></div></div></div></div>
-    <div class="gbtns" id="gb">${R.type==='room'?'<button id="guse" class="primary">換上這間</button>':''}<button id="gok" class="${R.type==='room'?'':'primary'}">${R.type==='room'?'收進收藏':'收進背包'}</button><button id="gmore">再抽一次</button></div>`;
+    <div class="gbtns" id="gb">${R.type==='room'?'<button id="guse" class="primary">換上這間</button>':''}<button id="gok" class="${R.type==='room'?'':'primary'}">${R.type==='room'?'收進收藏':R.type==='acc'?'收進衣櫃':'收進背包'}</button><button id="gmore">再抽一次</button></div>`;
   ov.classList.add('wait');document.body.appendChild(ov);const pk=ov.querySelector('#pk'),cd=ov.querySelector('#cd'),gh=ov.querySelector('#gh');let st=0;
   if(R.type==='room'){const ci=new Image();ci.src=R.card.img}
   Promise.race([preloadPack(),new Promise(r=>setTimeout(r,2500))]).then(()=>requestAnimationFrame(()=>ov.classList.remove('wait')));
   pk.onclick=()=>{if(st||ov.classList.contains('wait'))return;st=1;gh.textContent='';pk.classList.add('shake');setTimeout(()=>{pk.classList.remove('shake');pk.classList.add('torn')},900);setTimeout(()=>{pk.classList.add('gone');cd.classList.add('up');gh.textContent='點卡片翻開';st=2},1500)};
   cd.onclick=()=>{if(st!==2)return;st=3;gh.textContent='';cd.classList.add('flip');sfx('flip');if(typeof rar!=='undefined'&&rar==='SSR')setTimeout(()=>sfx('ssr'),650);
     setTimeout(()=>{if(rar!=='N'){ov.querySelector('#rays').classList.add('on');burst(ov,rar==='SSR'?28:14)}
-      gh.textContent=R.type==='limited'?'✨ 限定玩具！ ✨':R.type==='room'?(rar==='SSR'?'✨ 超稀有房間！ ✨':'抽到新房間！'):R.type==='toy'?'抽到玩具':'抽到零食包';
+      gh.textContent=R.type==='limited'?'✨ 限定玩具！ ✨':R.type==='room'?(rar==='SSR'?'✨ 超稀有房間！ ✨':'抽到新房間！'):R.type==='toy'?'抽到玩具':R.type==='acc'?'抽到配件 👗':'抽到零食包';
       ov.querySelector('#gb').classList.add('on');ov.querySelector('#gmore').style.display=DB.game.tickets?'':'none';if(ONLINE&&ftxt)feedPush(ftxt)},700)};
   if(ov.querySelector('#guse'))ov.querySelector('#guse').onclick=async()=>{const b=ov.querySelector('#guse');b.disabled=true;b.textContent='換房間中…';
     const old=h.room;h.room=R.card.id;ov.remove();toast(`已經換成「${R.card.name}」🏠`);openHome(h.id);
     call('updateHouse',Object.assign(cred(),{patch:{room:R.card.id}}),true).catch(e=>{h.room=old;if(home&&home.id===h.id)openHome(h.id);toast('房間沒換成功：'+e.message)})};
-  ov.querySelector('#gok').onclick=()=>{ov.remove();toast(R.type==='room'?`已收進「${h.name}」的房間收藏`:'放進背包了 🎒')};
+  ov.querySelector('#gok').onclick=()=>{ov.remove();toast(R.type==='room'?`已收進「${h.name}」的房間收藏`:R.type==='acc'?'放進衣櫃了 👗 點自己家的毛孩就能穿':'放進背包了 🎒')};
   ov.querySelector('#gmore').onclick=()=>{ov.remove();openPack()};
 }
 // ================= 睡覺選單・頭像列 =================
@@ -2458,7 +2655,7 @@ if(ONLINE){
 else setTimeout(dailyLogin,800);
 
 // ================= 圖示：自動把 emoji 換成素材 =================
-const ICMAP={'📣':'megaphone','🔒':'lock','🌐':'globe','♂':'male','♀':'female','🎒':'bag','✅':'check','⚠':'warn','🏷':'tag','🎴':'pack','⏳':'hourglass','🛏':'bed','🌙':'moon','☀':'sun','🏥':'clinic','⏰':'alarm','☁':'cloud','🧧':'redpacket','📌':'pin','💧':'drop','🌡':'thermo','💉':'syringe','💊':'pill','🪥':'toothbrush','👁':'eye','🪮':'comb','🚶':'walk','💦':'pee','🤢':'vomit','🛁':'bath','✂':'scissors','🏃':'shoes','😴':'sleep','🔢':'number','🔁':'repeat','🐕':'dog','🐈':'cat','🐇':'rabbit','🐹':'hamster','🐦':'bird',
+const ICMAP={'🏆':'assets/icon_rank.webp','👗':'assets/icon_closet.webp','📣':'megaphone','🔒':'lock','🌐':'globe','♂':'male','♀':'female','🎒':'bag','✅':'check','⚠':'warn','🏷':'tag','🎴':'pack','⏳':'hourglass','🛏':'bed','🌙':'moon','☀':'sun','🏥':'clinic','⏰':'alarm','☁':'cloud','🧧':'redpacket','📌':'pin','💧':'drop','🌡':'thermo','💉':'syringe','💊':'pill','🪥':'toothbrush','👁':'eye','🪮':'comb','🚶':'walk','💦':'pee','🤢':'vomit','🛁':'bath','✂':'scissors','🏃':'shoes','😴':'sleep','🔢':'number','🔁':'repeat','🐕':'dog','🐈':'cat','🐇':'rabbit','🐹':'hamster','🐦':'bird',
   '✨':'assets/fx_star.webp','⭐':'assets/fx_star.webp','★':'assets/fx_star.webp','🎉':'assets/fx_firework.webp','💕':'assets/fx_heart.webp','💖':'assets/fx_heart.webp','❤':'assets/fx_heart.webp','💤':'assets/fx_z.webp','🎵':'assets/fx_notes.webp','💰':'assets/money_bag.webp','💩':'assets/poop.webp','🍤':'assets/item_cookie.webp','🍚':'bowl','🦴':'assets/item_bone.webp','🏡':'home','🙋':'family','👥':'family','🐾':'paws','🏠':'home','←':'back','＋':'add','🙂':'me','📲':'install','🔗':'link','🔊':'sound','🔇':'mute','📅':'calendar','📋':'tasks','🔑':'key','👑':'crown','💬':'chat','💛':'mood','✏':'pencil','⚖':'scale','🩺':'medical','🧾':'wallet','🎂':'cake','🍖':'bowl','📝':'note','🎁':'gift','🦮':'leash','🧹':'broom','📒':'book','🧸':'toy','📷':'camera','🔔':'bell','🎟':'ticket','🪙':'coin','💗':'heart','🏪':'shop','⚙':'gear','🤚':'hand','🪪':'id'};
 const ICRE=new RegExp('('+Object.keys(ICMAP).sort((a,b)=>b.length-a.length).join('|')+')️?','gu');
 function iconizeNode(t){const v=t.nodeValue;if(!v||!ICRE.test(v))return;ICRE.lastIndex=0;const pa=t.parentNode;if(!pa||pa.closest('.ii,textarea,script,style,.noic,option,title'))return;
@@ -2557,7 +2754,7 @@ async function adminSheet(){
   <div class="sec adm"><h4>🔑 邀請碼<span>${(d.invites||[]).filter(x=>!x.usedBy&&!x.void).length} 組可用</span></h4><p class="lead">每組只能用一次，給要蓋房子的朋友</p>
     <div class="row2"><input id="ainn" maxlength="20" placeholder="備註（例如：給小明）"><button id="ainb">產生 1 組</button></div>
     <div class="invl">${(d.invites||[]).slice(0,30).map(x=>`<div class="frow"><span><b class="code">${esc(x.code)}</b><small>${x.usedBy?`已被 ${esc(x.usedNick||'')} 使用`:x.void?'已作廢':'未使用'}${x.note?'・'+esc(x.note):''}</small></span>${!x.usedBy&&!x.void?`<span><button class="mini" data-icp="${esc(x.code)}">複製</button> <button class="mini" data-ivd="${esc(x.code)}">作廢</button></span>`:''}</div>`).join('')||'<div class="locked">還沒有邀請碼</div>'}</div></div>
-  <div class="sec adm"><h4>📣 公告（跑馬燈置頂）</h4><input id="an" maxlength="60" placeholder="留空＝取消公告" value="${esc(d.notice&&d.notice.t||'')}"><div class="row2"><button id="anb">更新公告</button></div></div>
+  <div class="sec adm"><h4>📣 公告（跑馬燈置頂）</h4><input id="an" maxlength="60" placeholder="留空＝取消公告" value="${esc(d.notice&&d.notice.t||'')}"><label class="chk"><input type="checkbox" id="anp"> 📲 同時推播給大家</label><div class="row2"><button id="anb">更新公告</button></div></div>
   <div class="sec adm"><h4>✨ 雙倍日</h4><p class="lead">今天${d.dbl===todayTW()?'<b>是</b>':'不是'}雙倍日（金幣、愛心值、撿到的錢都 ×2，到半夜 12 點結束）</p><div class="row2"><button id="adb">${d.dbl===todayTW()?'關掉雙倍日':'今天開雙倍日'}</button></div></div>
   <div class="sec adm"><h4>💰 撒錢</h4><p class="lead">島上現在有 ${d.drops} 個錢袋還沒被撿</p>
     <div class="row2"><select id="arh"><option value="">隨機幾家</option>${hs}</select><input id="arn" type="number" min="1" max="10" value="3" style="max-width:80px" aria-label="幾袋"></div>
@@ -2573,17 +2770,18 @@ async function adminSheet(){
     <div class="row2"><input id="alc" type="number" min="0" placeholder="金幣"><input id="alk" type="number" min="0" placeholder="抽卡券"></div>
     <div class="row2"><select id="ali"><option value="">（不附道具）</option>${its}</select><input id="aln" type="number" min="0" placeholder="數量" style="max-width:80px"></div>
     <div class="row2"><button id="alsend">寄出</button></div></div>
-  <div class="sec adm"><h4>🙋 玩家列表・轉移碼</h4><div class="plist">${d.players.map(p=>`<div class="frow"><span>${esc(p.nick)}<small>${p.house?esc(p.house):'沒有家'}・Lv.${p.lv}・🪙${p.coins}${p.createdAt?'・'+new Date(p.createdAt).toLocaleDateString('zh-TW',{month:'numeric',day:'numeric'})+' 加入':''}</small></span><span>${p.house?'':`<button class="mini danger" data-dpl="${p.id}">刪除</button> `}<button class="mini" data-code="${esc(p.code)}">${esc(p.code)||'—'}</button></span></div>`).join('')}</div><p class="lead">點轉移碼可以複製，傳給換手機的朋友</p></div>
+  <div class="sec adm"><h4>🙋 玩家列表<span>${d.players.length} 人・全島 🪙${d.players.reduce((a,p)=>a+(+p.coins||0),0).toLocaleString()}</span></h4><p class="lead">照金幣多到少排，點 ⚙️ 可以改金幣、轉移碼</p><div class="plist">${d.players.slice().sort((a,b)=>(+b.coins||0)-(+a.coins||0)).map(p=>`<div class="frow"><span>${esc(p.nick)}<small>${p.house?esc(p.house):'沒有家'}・Lv.${p.lv}・🪙${p.coins}${p.createdAt?'・'+new Date(p.createdAt).toLocaleDateString('zh-TW',{month:'numeric',day:'numeric'})+' 加入':''}</small></span><span>${p.house?'':`<button class="mini danger" data-dpl="${p.id}">刪除</button> `}<button class="mini" data-code="${esc(p.code)}">${esc(p.code)||'—'}</button> <button class="mini" data-apl="${p.id}" aria-label="管理">⚙️</button></span></div>`).join('')}</div><p class="lead">點轉移碼可以複製，傳給換手機的朋友</p></div>
   <div class="sec adm"><h4>🏠 家的管理</h4><div class="row2"><select id="ahh">${hs}</select></div>
     <div class="row2"><input id="ahp" type="password" placeholder="新的家人密碼（4 字以上）"><button id="ahpb">重設密碼</button></div>
     <div class="row2"><button id="ahrb" class="danger">收回成空地</button></div><p class="lead">收回會刪掉這個家的毛孩和紀錄，不能復原</p></div>
   <div class="row2"><button id="aout">登出島主</button><button data-close class="primary">關閉</button></div>`);
   const S=$('#sheet'),ok=m=>{toast(m);sync(true)};
-  $('#anb').onclick=async()=>{const t=$('#an').value.trim();try{await adminCall('adminNotice',{text:t});DB.notice=t?{t}:null;fi=0;tickerShow();ok(t?'公告更新了 📣':'公告取消了')}catch(e){toast(e.message)}};
+  $('#anb').onclick=async()=>{const t=$('#an').value.trim();try{await adminCall('adminNotice',{text:t,push:!!($('#anp')&&$('#anp').checked)});DB.notice=t?{t}:null;fi=0;tickerShow();ok(t?'公告更新了 📣':'公告取消了')}catch(e){toast(e.message)}};
   $('#adb').onclick=async()=>{const on=d.dbl!==todayTW();try{await adminCall('adminDouble',{on});DB.dbl=on?todayTW():'';updHud();ok(on?'今天是雙倍日了 ✨':'雙倍日關掉了');adminSheet()}catch(e){toast(e.message)}};
   $('#arb').onclick=async()=>{try{await adminCall('adminRain',{houseId:$('#arh').value,n:+$('#arn').value||1,amt:+$('#ara').value||0});ok('撒好了，等大家去撿 💰');adminSheet()}catch(e){toast(e.message)}};
   $('#agb').onclick=async()=>{const o={houseId:$('#agp').value,coins:+$('#agc').value||0,tickets:+$('#agt').value||0,item:$('#agi').value,n:+$('#agn').value||0,msg:$('#agm').value.trim()};
     if(!o.coins&&!o.tickets&&!(o.item&&o.n))return toast('要送點什麼喔');try{await adminCall('adminGiftHouse',o);toast('送出了，禮物盒已經放在他們家 👑');['agc','agt','agn','agm'].forEach(k=>$('#'+k).value='');$('#agi').value='';sync(true)}catch(e){toast(e.message)}};
+  S.querySelectorAll('[data-apl]').forEach(b=>b.onclick=()=>{const p=d.players.find(x=>x.id===b.dataset.apl);if(p)adminPlayerSheet(p)});
   S.querySelectorAll('[data-code]').forEach(b=>b.onclick=async()=>{const c=b.dataset.code;if(!c)return;try{await navigator.clipboard.writeText(c);toast('轉移碼已複製：'+c)}catch(e){toast(c)}});
   $('#ahpb').onclick=async()=>{const v=$('#ahp').value;if(v.length<4)return toast('密碼至少 4 個字');try{await adminCall('adminResetPw',{houseId:$('#ahh').value,pw:await hashPw(v)});toast('密碼重設好了，記得告訴他們家 🔑')}catch(e){toast(e.message)}};
   $('#ahrb').onclick=async()=>{const h=house($('#ahh').value);if(!h||!window.confirm(`確定要把「${h.name}」收回成空地嗎？毛孩和紀錄都會刪掉，不能復原。`))return;try{await adminCall('adminRemoveHouse',{houseId:h.id});closeModal();ok('收回了')}catch(e){toast(e.message)}};
@@ -2781,13 +2979,13 @@ $('#gohome').onclick=()=>{const mh=myHouse();if(!mh||!home)return;const h=house(
 
 // ================= 👥 家人與訪客（等級） =================
 function lvOf(id){const p=(DB.players||[]).find(x=>x.id===id);return p&&+p.lv?+p.lv:0}
-function lvTag(id){const n=lvOf(id);return n?`<b class="lvtag">Lv${n}</b>`:''}
+function lvTag(id){const n=lvOf(id);return (n?`<b class="lvtag">Lv${n}</b>`:'')+titleTag(id)}
 function coinOf(id){if(DB.me&&id===DB.me.id)return +(DB.game.coins||0);const p=(DB.players||[]).find(x=>x.id===id);return p&&p.coins!=null?+p.coins:null}
 function coinTag(id){const n=coinOf(id);return n==null?'':`<span class="cointag"><img src="assets/icon_coin.webp" alt="金幣">${n.toLocaleString()}</span>`}
 function peopleSheet(hid){const h=house(hid),M=membersOf(hid),L=h.visits&&h.visits.day===todayTW()?(h.visits.list||[]).slice().reverse():[];
   openModal(`<h3>🏠 ${esc(h.name)}</h3>
-    <div class="sec"><h4>👥 家人<span>${M.length} / ${MAX_MEMBERS}</span></h4>${M.length?M.map(m=>`<div class="frow"><span>${esc(m.nick)} ${lvTag(m.id)||''}</span><span>${isFamily(hid)?coinTag(m.id):''}</span></div>`).join(''):'<div class="locked">還沒有家人</div>'}</div>
-    <div class="sec"><h4>🐾 今天來過<span>${L.length} 人</span></h4>${L.length?L.map(v=>`<div class="frow"><span>${esc(v.nick)} ${lvTag(v.id)}</span><span class="ago">${v.at?ago(+v.at):''}</span></div>`).join(''):'<div class="locked">今天還沒有人來</div>'}</div>
+    <div class="sec"><h4>👥 家人<span>${M.length} / ${MAX_MEMBERS}</span></h4>${M.length?M.map(m=>`<div class="frow"><span>${onDot(m.id)} ${esc(m.nick)} ${lvTag(m.id)||''}${ONLINE&&!isOn(m.id)&&lastOn(m.id)?`<small class="ago">（${lastOn(m.id)}）</small>`:''}</span><span>${isFamily(hid)?coinTag(m.id):''}</span></div>`).join(''):'<div class="locked">還沒有家人</div>'}</div>
+    <div class="sec"><h4>🐾 今天來過<span>${L.length} 人</span></h4>${L.length?L.map(v=>`<div class="frow"><span>${onDot(v.id)} ${esc(v.nick)} ${lvTag(v.id)}</span><span class="ago">${v.at?ago(+v.at):''}</span></div>`).join(''):'<div class="locked">今天還沒有人來</div>'}</div>
     <div class="row2"><button data-close>關閉</button></div>`)}
 
 // ================= 🔊 音效開關（首頁、房間） =================
@@ -2846,7 +3044,7 @@ function announceLetters(){if(!DB.me)return;let seen=[];try{seen=JSON.parse(loca
     sfx('gift');$('#lgopen').onclick=()=>openLetter(nw[0].id,()=>$('#bell').click())};
   setTimeout(go,1800)}
 // ================= 自動更新：發現新版本就重新載入 =================
-const APP_VER='v1.42';
+const APP_VER='v1.43';
 function checkUpdate(){
   if(!/^https?:/.test(location.protocol)||!API_URL)return;
   if(!$('#modal').classList.contains('hidden'))return; // 正在填表單時不打斷
