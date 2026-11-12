@@ -628,6 +628,10 @@ html,body,button,.island,.imap,.logo{touch-action:manipulation}
 .gacha .stage-area,.gacha .hint2{transition:opacity .35s}
 .toy.an-wob .ii img{transform-origin:50% 100%;animation:sway 2.2s ease-in-out infinite}
 .toy.an-float .ii img{animation:tfloat 3.4s ease-in-out infinite}
+/* v1.37 相機移到右上、跑馬燈拉長 */
+.irows .trow{width:calc(100% - 62px)!important}
+#island .camtop{position:absolute;right:12px;top:122px;width:50px;height:50px;font-size:24px;z-index:3000}
+#island .camtop .ii.ic{width:30px!important;height:30px!important}
 @keyframes tfloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
 </style>
 </head>
@@ -645,7 +649,8 @@ html,body,button,.island,.imap,.logo{touch-action:manipulation}
   <div id="things"></div>
   </div>
   <button class="izreset" id="izreset" aria-label="還原大小">⤢ 還原</button>
-  <div class="irows"><div class="trow"><div class="ticker" id="ticker" role="button" aria-label="島上動態"></div><button class="circle camb" id="cami" aria-label="拍照">📷</button></div><div class="bar" id="bar"><button data-p="auto">自動</button><button data-p="dawn">清晨</button><button data-p="day">白天</button><button data-p="sunset">日落</button><button data-p="night">夜晚</button></div></div>
+  <button class="circle camb camtop" id="cami" aria-label="拍照">📷</button>
+  <div class="irows"><div class="trow"><div class="ticker" id="ticker" role="button" aria-label="島上動態"></div></div><div class="bar" id="bar"><button data-p="auto">自動</button><button data-p="dawn">清晨</button><button data-p="day">白天</button><button data-p="sunset">日落</button><button data-p="night">夜晚</button></div></div>
   </div>
   <div class="icol" id="icol">
   <div class="top" style="align-items:flex-start"><img class="logo" src="assets/logo.webp" alt="毛很多"><div class="topright">
@@ -934,6 +939,8 @@ function renderMe(){
 }
 $('#bar').onclick=e=>{const b=e.target.closest('button');if(!b||!b.dataset.p)return;mode=b.dataset.p;renderIsland()};
 $('#cami').onclick=e=>{e.stopPropagation();takePhoto()};
+function placeCam(){const h=$('#hudI'),c=$('#cami');if(!h||!c||!h.offsetHeight||!c.offsetParent)return;const hr=h.getBoundingClientRect(),pr=c.offsetParent.getBoundingClientRect();c.style.top=Math.round(hr.bottom-pr.top+12)+'px';c.style.right=Math.max(6,Math.round(pr.right-hr.right))+'px'}
+window.addEventListener('resize',placeCam);setTimeout(placeCam,300);setTimeout(placeCam,1500);
 $('#pickcancel').onclick=()=>{picking=false;renderIsland()};
 function lotClick(slot){
   if(!DB.me)return onboarding();
@@ -1830,6 +1837,7 @@ $('#bell').onclick=()=>{
   const st=notices(),it=bellItems();
   try{localStorage.setItem('mhd_bellseen',Date.now());localStorage.setItem('mhd_bellsig',noticeSig())}catch(e){}setTimeout(updBell,0);
   openModal(`<h3>🔔 通知</h3>
+    ${DB.notice&&DB.notice.t?`<div class="ncard" style="margin:0 0 12px;padding:10px 12px"><b>👑 島主公告</b><p style="font-size:15px;margin:6px 0 2px">${esc(DB.notice.t)}</p>${DB.notice.at?`<small>${ago(+DB.notice.at)}</small>`:''}</div>`:''}
     ${myHouse()?'':'<p class="lead">有家之後，這裡會通知你家的大小事</p>'}
     ${st.length?`<div class="sec" style="margin-top:0"><h4>📌 現在</h4>${st.map(x=>`<div class="frow"><span>${x.ic} ${esc(x.t)}</span></div>`).join('')}</div>`:''}
     ${lettersSec()}
@@ -2499,20 +2507,20 @@ drawWx();loadWx();setInterval(loadWx,30*60e3);
   window.islandZoomReset=a=>{s=1;tx=0;ty=0;apply(a)};
   btn.onclick=e=>{e.stopPropagation();islandZoomReset(true)};
   let p0=null,pan=null,lastTap=0,lastTapXY=null;
-  map.addEventListener('touchstart',e=>{moved=false;if(e.target.closest('.irows,.izreset'))return;
+  map.addEventListener('touchstart',e=>{moved=false;if(e.target.closest('.irows,.izreset,.camtop'))return;
     if(e.touches.length===2){const[a,b]=e.touches,[mx,my]=loc((a.clientX+b.clientX)/2,(a.clientY+b.clientY)/2);p0={d:Math.hypot(a.clientX-b.clientX,a.clientY-b.clientY),s,px:(mx-tx)/s,py:(my-ty)/s};pan=null}
     else if(e.touches.length===1){const t=e.touches[0];pan={x:t.clientX,y:t.clientY,tx,ty}}},{passive:true});
-  map.addEventListener('touchmove',e=>{if(e.target.closest('.irows,.izreset'))return;
+  map.addEventListener('touchmove',e=>{if(e.target.closest('.irows,.izreset,.camtop'))return;
     if(p0&&e.touches.length===2){e.preventDefault();const[a,b]=e.touches,[mx,my]=loc((a.clientX+b.clientX)/2,(a.clientY+b.clientY)/2);s=Math.max(1,Math.min(MAX,p0.s*Math.hypot(a.clientX-b.clientX,a.clientY-b.clientY)/p0.d));tx=mx-p0.px*s;ty=my-p0.py*s;moved=true;apply()}
     else if(pan&&e.touches.length===1&&s>1.02){const t=e.touches[0],dx=t.clientX-pan.x,dy=t.clientY-pan.y;if(Math.abs(dx)+Math.abs(dy)>6)moved=true;if(moved){e.preventDefault();tx=pan.tx+dx;ty=pan.ty+dy;apply()}}},{passive:false});
   map.addEventListener('touchend',e=>{if(e.touches.length<2)p0=null;if(!e.touches.length)pan=null;
-    if(moved||e.changedTouches.length!==1||e.target.closest('.irows,.izreset'))return;
+    if(moved||e.changedTouches.length!==1||e.target.closest('.irows,.izreset,.camtop'))return;
     const t=e.changedTouches[0],n=Date.now();
     if(n-lastTap<320&&lastTapXY&&Math.hypot(t.clientX-lastTapXY[0],t.clientY-lastTapXY[1])<40){e.preventDefault();lastTap=0;const[cx,cy]=loc(t.clientX,t.clientY);if(s>1.02)islandZoomReset(true);else zoomAt(2,cx,cy,true)}
     else{lastTap=n;lastTapXY=[t.clientX,t.clientY]}},{passive:false});
   map.addEventListener('click',e=>{if(moved){e.stopPropagation();e.preventDefault();moved=false}},true);
-  map.addEventListener('wheel',e=>{if(e.target.closest('.irows'))return;e.preventDefault();const[cx,cy]=loc(e.clientX,e.clientY);zoomAt(s*(e.deltaY<0?1.15:1/1.15),cx,cy)},{passive:false});
-  map.addEventListener('dblclick',e=>{if(e.target.closest('.irows,.izreset'))return;const[cx,cy]=loc(e.clientX,e.clientY);if(s>1.02)islandZoomReset(true);else zoomAt(2,cx,cy,true)});
+  map.addEventListener('wheel',e=>{if(e.target.closest('.irows,.camtop'))return;e.preventDefault();const[cx,cy]=loc(e.clientX,e.clientY);zoomAt(s*(e.deltaY<0?1.15:1/1.15),cx,cy)},{passive:false});
+  map.addEventListener('dblclick',e=>{if(e.target.closest('.irows,.izreset,.camtop'))return;const[cx,cy]=loc(e.clientX,e.clientY);if(s>1.02)islandZoomReset(true);else zoomAt(2,cx,cy,true)});
   // 超過 5 分鐘沒碰，回到小島時還原
   const chk=()=>{if(s>1.02&&Date.now()-last>5*60e3)islandZoomReset(false)};
   document.addEventListener('visibilitychange',()=>{if(!document.hidden)chk()});
@@ -2663,7 +2671,7 @@ function announceLetters(){if(!DB.me)return;let seen=[];try{seen=JSON.parse(loca
     sfx('gift');$('#lgopen').onclick=()=>openLetter(nw[0].id,()=>$('#bell').click())};
   setTimeout(go,1800)}
 // ================= 自動更新：發現新版本就重新載入 =================
-const APP_VER='v1.36';
+const APP_VER='v1.37';
 function checkUpdate(){
   if(!/^https?:/.test(location.protocol)||!API_URL)return;
   if(!$('#modal').classList.contains('hidden'))return; // 正在填表單時不打斷
