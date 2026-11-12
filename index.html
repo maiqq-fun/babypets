@@ -640,6 +640,7 @@ html,body,button,.island,.imap,.logo{touch-action:manipulation}
 .ggrid{position:absolute;inset:0;pointer-events:none;z-index:3}
 .ggrid svg{width:100%;height:100%;display:block}
 .ggrid polygon{fill:rgba(255,255,255,.14);stroke:rgba(255,255,255,.85);stroke-width:2.5;stroke-dasharray:10 7}
+.ggrid polygon.blk{fill:rgba(90,80,80,.38);stroke:rgba(255,255,255,.35)}
 .ggrid polygon.occ{fill:rgba(226,75,74,.32);stroke:rgba(255,190,190,.95)}
 .ggrid polygon.bad{fill:rgba(226,75,74,0);stroke:none}
 .ggrid polygon.bad.on{animation:gbad .6s}
@@ -1160,7 +1161,7 @@ function giftVisible(g,h){if(!g.admin)return true;const op=Array.isArray(g.opene
 function openHome(hid,keep){
   const h=house(hid);if(!h)return;
   $('#island').classList.add('hidden');$('#home').classList.remove('hidden');
-  setHname(h);$('#roombg').src=roomImg(h.room);$('#hback').style.backgroundImage=`url(${roomImg(h.room)})`;if(!ONLINE)spawnPoops(h);
+  setHname(h);useRoom(h);$('#roombg').src=roomImg(h.room);$('#hback').style.backgroundImage=`url(${roomImg(h.room)})`;if(!ONLINE)spawnPoops(h);
   const prev=home&&home.id===hid?home.pets:[];
   const plist=petsOf(hid).filter(p=>!outAt(p.id)||outAt(p.id).id===hid).concat(guestsOf(hid).map(g=>pet(g.petId)).filter(p=>p.houseId!==hid));
   home={id:hid,pets:plist.map((p,i)=>{const o=prev.find(q=>q.id===p.id);
@@ -1254,10 +1255,10 @@ function noteForm(){
 $('#addnote').onclick=noteForm;
 $('#notebook').onclick=noteBook;
 // ---------- 地板 ----------
-const petScale=y=>0.78+0.32*(y-FLOOR.y0)/(FLOOR.y1-FLOOR.y0);
+const petScale=y=>0.78+0.32*(y-840)/(1170-840);
 function tentSpot(p,i){const k=hash01(p.id+'tent');return {x:FLOOR.x0+70+k*(FLOOR.x1-FLOOR.x0-140),y:FLOOR.y0+40+hash01(p.id+'ty')*120}}
 function renderFloor(){
-  const f=$('#floor');f.innerHTML='';const h=house(home.id);
+  const f=$('#floor');f.innerHTML='';const h=house(home.id);useRoom(h);
   (h.toys||[]).forEach(t=>{const it=ITEMS[t.item]||{},el=document.createElement('button');el.className='toy'+(t.flip?' flip':'')+(it.an?' an-'+it.an:'')+(it.flat?' flat':'');el.innerHTML=itemIcon(t.item,'toyi');el.setAttribute('aria-label',it.name||'玩具');
     if(it.sz)el.style.setProperty('--sz',it.sz);el.dataset.tid=t.id;
     Object.assign(el.style,hp(t.x,t.y),{zIndex:it.flat?1:Math.round(t.y)-300});el.onclick=e=>{e.stopPropagation();if(placing){if(placing.toy===t){placing=null;if($('#gcancel'))$('#gcancel').remove();renderFloor();return toast('沒有移動')}toast('這格已經有家具了，換一格放吧');return}toyMenu(t)};f.appendChild(el)});
@@ -2093,23 +2094,46 @@ async function openGift(gid){
 }
 // ---------- 地上的玩具 ----------
 let placing=null;
-// ---------- 家具網格：橫 6 × 深 4，配合透視；大家具占 2 格 ----------
-const GC=6,GR=4,WIDE={sofa:1,piano:1,slide:1,teepee:1,swing:1,blanket:1};
-const gRowY=r=>FLOOR.y0+(FLOOR.y1-FLOOR.y0)*r/GR;
-const gInset=y=>70*(1-(y-FLOOR.y0)/(FLOOR.y1-FLOOR.y0));
-const gX=(y,t)=>{const i=gInset(y);return FLOOR.x0+i+(FLOOR.x1-FLOOR.x0-2*i)*t};
-function gCell(x,y){const r=clamp(Math.floor((y-FLOOR.y0)/(FLOOR.y1-FLOOR.y0)*GR),0,GR-1),yc=gRowY(r+.5),L=gX(yc,0),Rr=gX(yc,1);return {r,c:clamp(Math.floor((x-L)/(Rr-L)*GC),0,GC-1)}}
+// ---------- 每間房間的地板範圍（v1.40）----------
+const RF_Y1=1240,RF_DEF={y0:770,t:[105,745],b:[20,828],x:[]};
+const RFLOOR={
+  basic1:{},basic2:{},basic3:{},
+  study:{y0:780,t:[110,720]},
+  garden:{y0:760,t:[70,745],b:[0,848]},
+  cafe:{y0:790,t:[150,705],b:[0,848],x:[[615,700,848,838]]},
+  beach:{y0:770,t:[95,705],b:[0,848],x:[[665,700,848,872]]},
+  sakura:{y0:780,t:[85,745],b:[0,848]},
+  forest:{y0:770,t:[80,710],b:[0,848],x:[[640,700,848,812]]},
+  cloud:{y0:770,t:[85,765],b:[0,848],x:[[640,740,848,875]]},
+  xmas:{y0:800,t:[120,765],b:[0,848],x:[[0,700,265,858],[620,700,848,806]]},
+  ocean:{y0:770,t:[80,780],b:[0,848],x:[[0,950,130,1240],[0,1140,190,1240],[690,890,848,1240],[610,1080,848,1240]]},
+  star:{y0:770,t:[90,765],b:[0,848],x:[[0,700,130,812]]},
+  space:{y0:728,t:[150,712],b:[0,848]},
+  dessert:{y0:800,t:[60,790]},library:{y0:800,t:[60,790]},cabin:{y0:800,t:[80,800]},
+  arcade:{y0:810,t:[60,790]},washitsu:{y0:790,t:[60,790]},circus:{y0:800,t:[60,790]},party:{y0:820,t:[60,760]}
+};
+let GRID=null;
+function roomGrid(room){const d=Object.assign({},RF_DEF,RFLOOR[room]||{});return {y0:d.y0,y1:RF_Y1,t:d.t,b:d.b,x:d.x||[],room}}
+function useRoom(h){GRID=roomGrid(h&&h.room);const G=GRID;
+  Object.assign(FLOOR,{x0:Math.max(G.t[0],G.b[0])+45,x1:Math.min(G.t[1],G.b[1])-45,y0:G.y0+35,y1:1200});return G}
+// ---------- 家具網格：橫 7 × 深 5，跟著每間房間的地板伸縮；大家具占 2 格；被擋住的格子不能放 ----------
+const GC=7,GR=5,WIDE={sofa:1,piano:1,slide:1,teepee:1,swing:1,blanket:1};
+const gG=()=>GRID||roomGrid(home&&house(home.id)&&house(home.id).room);
+const gRowY=r=>{const G=gG();return G.y0+(G.y1-G.y0)*r/GR};
+const gX=(y,t)=>{const G=gG(),k=clamp((y-G.y0)/(G.y1-G.y0),0,1),L=G.t[0]+(G.b[0]-G.t[0])*k,Rr=G.t[1]+(G.b[1]-G.t[1])*k;return L+(Rr-L)*t};
+function gBlocked(){const G=gG(),o=new Set();for(let r=0;r<GR;r++)for(let c=0;c<GC;c++){const y=gRowY(r+.5),x=gX(y,(c+.5)/GC);if(G.x.some(q=>x>=q[0]&&x<=q[2]&&y>=q[1]&&y<=q[3]))o.add(r+','+c)}return o}
+function gCell(x,y){const G=gG(),r=clamp(Math.floor((y-G.y0)/(G.y1-G.y0)*GR),0,GR-1),yc=gRowY(r+.5),L=gX(yc,0),Rr=gX(yc,1);return {r,c:clamp(Math.floor((x-L)/(Rr-L)*GC),0,GC-1)}}
 const gSpan=item=>WIDE[item]?2:1;
 function gCells(t){const n=gSpan(t.item);if(n===1){const a=gCell(t.x,t.y-8);return [[a.r,a.c]]}const yc=gRowY(gCell(t.x,t.y-8).r+.5),w=(gX(yc,1)-gX(yc,0))/GC,a=gCell(t.x-w/2,t.y-8);return [[a.r,a.c],[a.r,Math.min(GC-1,a.c+1)]]}
 function gOcc(h,except){const o=new Set();(h.toys||[]).forEach(t=>{if(t===except)return;gCells(t).forEach(([r,c])=>o.add(r+','+c))});return o}
 function gSpot(r,c,n){const y=gRowY(r+0.85),L=gX(y,0),w=(gX(y,1)-L)/GC;return {x:Math.round(L+w*(c+n/2)),y:Math.round(y)}}
 const gPoly=(r,c,n)=>{const y0=gRowY(r),y1=gRowY(r+1);return [[gX(y0,c/GC),y0],[gX(y0,(c+n)/GC),y0],[gX(y1,(c+n)/GC),y1],[gX(y1,c/GC),y1]].map(q=>q.map(Math.round).join(',')).join(' ')};
 function drawGrid(){const f=$('#floor');if(!f||!placing||!home)return;const h=house(home.id),occ=gOcc(h,placing.toy);let p='';
-  for(let r=0;r<GR;r++)for(let c=0;c<GC;c++)p+=`<polygon points="${gPoly(r,c,1)}" class="${occ.has(r+','+c)?'occ':''}"/>`;
+  const blk=gBlocked();for(let r=0;r<GR;r++)for(let c=0;c<GC;c++)p+=`<polygon points="${gPoly(r,c,1)}" class="${blk.has(r+','+c)?'blk':occ.has(r+','+c)?'occ':''}"/>`;
   const g=document.createElement('div');g.className='ggrid';g.innerHTML=`<svg viewBox="0 0 ${RW} ${RH}" preserveAspectRatio="none">${p}<polygon id="gfl" points="" class="bad"/></svg>`;f.appendChild(g);
   if(!$('#gcancel')){const b=document.createElement('button');b.id='gcancel';b.className='gcancel';b.textContent='✕ 取消擺放';b.onclick=e=>{e.stopPropagation();placing=null;b.remove();renderFloor()};$('#home').appendChild(b)}}
 function gFlash(r,c,n){const p=$('#gfl');if(!p)return;p.setAttribute('points',gPoly(r,c,n));p.classList.remove('on');void p.getBoundingClientRect();p.classList.add('on')}
-function startPlacing(P){placing=P;renderFloor();toast(gSpan(P.toy?P.toy.item:P.item)===2?'點格子放下（這個比較大，會占 2 格）':'點格子放下（紅色格子已經有東西了）')}
+function startPlacing(P){placing=P;renderFloor();toast(gSpan(P.toy?P.toy.item:P.item)===2?'點格子放下（這個比較大，會占 2 格）':'點格子放下（紅色有東西、灰色不能放）')}
 function toyMenu(t){
   const h=house(home.id);if(!isFamily(h.id)){const r=home.pets.filter(x=>!x.sleep)[0]&&home.pets.filter(x=>!x.sleep)[Math.floor(Math.random()*home.pets.filter(x=>!x.sleep).length)];if(r){r.tx=t.x+40;r.ty=t.y;r.state='walk';r.goal='toy';if(DB.me&&demonOf(h)){toast(`陪 ${pet(r.id).name} 玩 ${(ITEMS[t.item]||{}).name||'玩具'}`);demonHelp('toy')}}return}
   openModal(`<h3>${itemIcon(t.item)} ${esc((ITEMS[t.item]||{}).name||'玩具')}</h3>
@@ -2130,8 +2154,9 @@ function toyPlacer(){
 }
 $('#home').addEventListener('click',async e=>{
   if(!placing||!home)return;if(e.target.closest('.pet,.poop,.toy,.gift,.tent,.petmenu,.famtools,.petheads,.visits,.board,button'))return;
-  const rect=$('#home').getBoundingClientRect();let x=clamp((e.clientX-rect.left)/rect.width*RW,FLOOR.x0,FLOOR.x1),y=clamp((e.clientY-rect.top)/rect.height*RH,FLOOR.y0+2,FLOOR.y1-2);
+  const rect=$('#home').getBoundingClientRect(),G=gG();let x=clamp((e.clientX-rect.left)/rect.width*RW,0,RW),y=clamp((e.clientY-rect.top)/rect.height*RH,G.y0+2,G.y1-2);
   const h=house(home.id),P=placing,n=gSpan(P.toy?P.toy.item:P.item);let {r,c}=gCell(x,y);if(n===2&&c>GC-2)c=GC-2;
+  const blk=gBlocked();if([0,1].slice(0,n).some(i=>blk.has(r+','+(c+i)))){toast('這裡被房間的家具擋住了，換一格吧');gFlash(r,c,n);return}
   const occ=gOcc(h,P.toy);if([0,1].slice(0,n).some(i=>occ.has(r+','+(c+i)))){toast('這格已經有家具了，換一格放吧');gFlash(r,c,n);return}
   ({x,y}=gSpot(r,c,n));placing=null;$('#home').classList.remove('placing');if($('#gcancel'))$('#gcancel').remove();
   if(P.toy){P.toy.x=Math.round(x);P.toy.y=Math.round(y);renderFloor();toyPend(h.id).mv[P.toy.id]={x:P.toy.x,y:P.toy.y,flip:!!P.toy.flip};if(String(P.toy.id).startsWith('tmp'))return;call('moveToy',Object.assign(cred(),{toyId:P.toy.id,x:P.toy.x,y:P.toy.y,flip:!!P.toy.flip}),true).catch(err=>toast(err.message));return}
@@ -2811,7 +2836,7 @@ function announceLetters(){if(!DB.me)return;let seen=[];try{seen=JSON.parse(loca
     sfx('gift');$('#lgopen').onclick=()=>openLetter(nw[0].id,()=>$('#bell').click())};
   setTimeout(go,1800)}
 // ================= 自動更新：發現新版本就重新載入 =================
-const APP_VER='v1.39';
+const APP_VER='v1.40';
 function checkUpdate(){
   if(!/^https?:/.test(location.protocol)||!API_URL)return;
   if(!$('#modal').classList.contains('hidden'))return; // 正在填表單時不打斷
