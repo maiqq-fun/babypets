@@ -1271,18 +1271,23 @@ function codeSheet(){const cur=String(DB.me.code||'').replace(/^MH-/,'');
 const OS_APP='d95f593b-a072-4dd2-a00c-a057b8467137',OS_ON=ONLINE&&/github\.io$/.test(location.hostname);let osLogged='';
 if(OS_ON){window.OneSignalDeferred=window.OneSignalDeferred||[];const sc=document.createElement('script');sc.src='https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js';sc.defer=true;document.head.appendChild(sc);
   OneSignalDeferred.push(async OS=>{try{await OS.init({appId:OS_APP,notifyButton:{enable:false},autoResubscribe:true});osLogin()}catch(e){}})}
-function osLogin(){if(!OS_ON||!DB.me||osLogged===DB.me.id)return;osLogged=DB.me.id;OneSignalDeferred.push(async OS=>{try{await OS.login(DB.me.id)}catch(e){osLogged=''}})}
+function pushOff(){try{return localStorage.getItem('mhd_pushoff')==='1'}catch(e){return false}}
+function osLogin(){if(!OS_ON||!DB.me||osLogged===DB.me.id)return;osLogged=DB.me.id;const me=DB.me.id;OneSignalDeferred.push(async OS=>{try{
+  if(OS.User.externalId!==me)await OS.login(me);
+  if(Notification.permission==='granted'&&!pushOff()&&OS.User.PushSubscription.optedIn===false)await OS.User.PushSubscription.optIn()}catch(e){osLogged=''}})}
+function osState(){return new Promise(ok=>{if(!OS_ON||!window.OneSignalDeferred)return ok(null);const t=setTimeout(()=>ok(null),4000);
+  OneSignalDeferred.push(async OS=>{clearTimeout(t);try{const ps=OS.User.PushSubscription;ok({ext:OS.User.externalId||'',opted:ps.optedIn,sub:ps.id||''})}catch(e){ok(null)}})})}
 const PUSH_KINDS=['🍚 毛孩肚子餓了','😈 毛孩變成餓魔','🎁 有人送你們家禮物','💩 家裡好臭該打掃了','💰 島上掉了好多錢','✨ 出現金色福袋','🏆 每週排行榜出爐','📢 島主公告'];
-function pushSheet(){const kinds=`<div class="sec"><h4>會通知你的事</h4>${PUSH_KINDS.map(k=>`<div class="frow"><span>${k}</span></div>`).join('')}<p class="lead" style="margin-top:6px">晚上 11 點到早上 8 點不吵你；正在玩的時候不推；每天最多 10 則</p></div>`;
+async function pushSheet(){const kinds=`<div class="sec"><h4>會通知你的事</h4>${PUSH_KINDS.map(k=>`<div class="frow"><span>${k}</span></div>`).join('')}<p class="lead" style="margin-top:6px">晚上 11 點到早上 8 點不吵你；正在玩的時候不推；每天最多 10 則</p></div>`;
   if(!ONLINE)return toast('試做版沒有推播');
   if(isIOS&&!isStandalone()){openModal(`<div style="text-align:center"><div class="giftopen">🔔</div><h3>iPhone 要先加到主畫面</h3><p class="lead">把毛很多加到主畫面，再從主畫面的圖示打開，才能開啟通知（需要 iOS 16.4 以上）</p></div>${kinds}<div class="row2"><button data-close>關閉</button><button class="primary" id="pgd">📲 教我加到主畫面</button></div>`);$('#pgd').onclick=()=>homeGuide(false);return}
   if(!('Notification' in window)||!OS_ON){openModal(`<h3>🔔 通知</h3><p class="lead">這個瀏覽器不支援通知，換成手機的 Safari（加到主畫面）或 Chrome 試試看</p><div class="row2"><button data-close>關閉</button></div>`);return}
-  const on=Notification.permission==='granted';
-  openModal(`<div style="text-align:center"><div class="giftopen">🔔</div><h3>${on?'通知已開啟 ✅':'開啟通知'}</h3><p class="lead">${on?'毛孩有事會第一時間告訴你':Notification.permission==='denied'?'通知被關掉了，要到手機的「設定 → 通知 → 毛很多」打開':'毛孩肚子餓、有人送禮的時候，會傳通知給你'}</p></div>${kinds}
-    <div class="row2"><button data-close>關閉</button>${on?'<button id="poff">關閉通知</button>':Notification.permission==='denied'?'':'<button class="primary" id="pon">開啟通知</button>'}</div>`);
-  if($('#pon'))$('#pon').onclick=()=>{osLogged='';OneSignalDeferred.push(async OS=>{try{await OS.Notifications.requestPermission();await OS.login(DB.me.id);osLogged=DB.me.id;if(OS.User.PushSubscription.optedIn===false)await OS.User.PushSubscription.optIn()}catch(e){}
-    setTimeout(()=>{toast(Notification.permission==='granted'?'通知開好了 🔔':'沒有開成功，再試一次');pushSheet()},400)})};
-  if($('#poff'))$('#poff').onclick=()=>OneSignalDeferred.push(async OS=>{try{await OS.User.PushSubscription.optOut()}catch(e){}toast('通知關掉了');closeModal()});
+  const st=await osState(),perm=Notification.permission,linked=!!(st&&st.ext===DB.me.id&&st.opted!==false&&st.sub),on=perm==='granted'&&linked;
+  openModal(`<div style="text-align:center"><div class="giftopen">🔔</div><h3>${on?'通知已開啟 ✅':'開啟通知'}</h3><p class="lead">${on?'毛孩有事會第一時間告訴你':perm==='denied'?'通知被關掉了，要到手機的「設定 → 通知 → 毛很多」打開':perm==='granted'?'手機允許了，但還沒跟你的帳號連上，按「開啟通知」重新連結':'毛孩肚子餓、有人送禮的時候，會傳通知給你'}</p><p class="lead" style="font-size:11px;opacity:.7">${st?`連線狀態：${st.sub?'手機已登記':'手機未登記'}・${st.ext===DB.me.id?'帳號已綁定':'帳號未綁定'}${st.opted===false?'・已關閉':''}`:'連線狀態：讀不到'}</p></div>${kinds}
+    <div class="row2"><button data-close>關閉</button>${on?'<button id="poff">關閉通知</button>':perm==='denied'?'':'<button class="primary" id="pon">開啟通知</button>'}</div>`);
+  if($('#pon'))$('#pon').onclick=()=>{osLogged='';try{localStorage.removeItem('mhd_pushoff')}catch(e){}const b=$('#pon');b.disabled=true;b.textContent='連線中…';OneSignalDeferred.push(async OS=>{try{if(OS.User.externalId&&OS.User.externalId!==DB.me.id)await OS.logout();await OS.Notifications.requestPermission();await OS.login(DB.me.id);osLogged=DB.me.id;if(OS.User.PushSubscription.optedIn===false)await OS.User.PushSubscription.optIn()}catch(e){}
+    setTimeout(async()=>{const s2=await osState();toast(Notification.permission==='granted'&&s2&&s2.ext===DB.me.id&&s2.sub?'通知開好了 🔔':'還沒連上，再按一次試試');pushSheet()},1200)})};
+  if($('#poff'))$('#poff').onclick=()=>OneSignalDeferred.push(async OS=>{try{localStorage.setItem('mhd_pushoff','1');await OS.User.PushSubscription.optOut()}catch(e){}toast('通知關掉了');closeModal()});
 }
 // ---------- 👑 島主：玩家金幣、轉移碼 ----------
 function adminPlayerSheet(p){
@@ -3302,7 +3307,7 @@ function announceLetters(){if(!DB.me)return;let seen=[];try{seen=JSON.parse(loca
     sfx('gift');$('#lgopen').onclick=()=>openLetter(nw[0].id,()=>$('#bell').click())};
   setTimeout(go,1800)}
 // ================= 自動更新：發現新版本就重新載入 =================
-const APP_VER='v1.53';
+const APP_VER='v1.54';
 function checkUpdate(){
   if(!/^https?:/.test(location.protocol)||!API_URL)return;
   if(!$('#modal').classList.contains('hidden'))return; // 正在填表單時不打斷
