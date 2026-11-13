@@ -753,6 +753,18 @@ html,body,button,.island,.imap,.logo{touch-action:manipulation}
 .edh.sd.l{left:-10px;top:50%;transform:translateY(-50%);cursor:ew-resize}.edh.sd.r{right:-10px;top:50%;transform:translateY(-50%);cursor:ew-resize}
 .edh.sd.t{top:-10px;left:28%;cursor:ns-resize}.edh.sd.b{bottom:-10px;left:50%;transform:translateX(-50%);cursor:ns-resize}
 .edrow button.on{background:#4a90e2;color:#fff;border-color:#4a90e2}
+.clstick .clprev{overflow:hidden;padding-top:30px}
+.clfoot{position:sticky;bottom:-18px;background:var(--sheetbg,var(--cream));margin:8px -16px -18px;padding:8px 16px 14px;box-shadow:0 -6px 8px -6px rgba(90,60,30,.25);z-index:6}
+.clfoot .row2{margin-top:6px}
+.cfm{position:fixed;inset:0;background:rgba(40,25,10,.45);display:flex;align-items:center;justify-content:center;z-index:9000}
+.cfmbox{background:#fffaf0;border-radius:18px;padding:18px 18px 12px;width:min(86vw,330px);text-align:center;box-shadow:0 8px 24px rgba(0,0,0,.3)}
+.cfmbox p{color:var(--soft);margin:6px 0 10px;font-size:14px}
+/* v1.50 長按不反白 */
+html,body{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
+input,textarea,select,[contenteditable]{-webkit-user-select:text;user-select:text;-webkit-touch-callout:default}
+img{-webkit-user-drag:none}
+.xclose{z-index:12}
+.clfoot .r3 button{flex:1;padding-left:4px;padding-right:4px}.clfoot .r3 #clok{flex:1.4}
 .chk{display:flex;align-items:center;gap:6px;font-size:13px;color:var(--soft);margin:6px 0}.chk input{width:18px;height:18px}
 .codebox .cbtns{display:flex;gap:4px;flex:none}
 </style>
@@ -1014,9 +1026,9 @@ const $=s=>document.querySelector(s);
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 let tt;function toast(m){const t=$('#toast');t.textContent=m;t.classList.add('show');clearTimeout(tt);tt=setTimeout(()=>t.classList.remove('show'),2000)}
 let modalLocked=false;
-function openModal(html,locked,theme){const sh=$('#sheet');sh.classList.toggle('themed',!!theme);if(theme)sh.style.setProperty('--cc',theme);else sh.style.removeProperty('--cc');sh.innerHTML=(locked?'':'<button class="xclose noic" data-close aria-label="關閉">✕</button>')+html;$('#modal').classList.remove('hidden');modalLocked=!!locked;$('#sheet').scrollTop=0}
-function closeModal(){$('#modal').classList.add('hidden');$('#sheet').innerHTML='';$('#sheet').classList.remove('themed');modalLocked=false}
-$('#modal').addEventListener('click',e=>{if((e.target.id==='modal'&&!modalLocked)||e.target.closest('[data-close]'))closeModal()});
+function openModal(html,locked,theme){if(typeof CDRAFT!=='undefined'&&CDRAFT&&!closetOpening)draftCancel();const sh=$('#sheet');sh.classList.toggle('themed',!!theme);if(theme)sh.style.setProperty('--cc',theme);else sh.style.removeProperty('--cc');sh.innerHTML=(locked?'':'<button class="xclose noic" data-close aria-label="關閉">✕</button>')+html;$('#modal').classList.remove('hidden');modalLocked=!!locked;$('#sheet').scrollTop=0}
+function closeModal(){if(typeof CDRAFT!=='undefined'&&CDRAFT)draftCancel();$('#modal').classList.add('hidden');$('#sheet').innerHTML='';$('#sheet').classList.remove('themed');modalLocked=false}
+$('#modal').addEventListener('click',e=>{if((e.target.id==='modal'&&!modalLocked)||e.target.closest('[data-close]')){if(typeof draftDirty==='function'&&draftDirty())return draftAsk();closeModal()}});
 const house=id=>DB.houses.find(h=>h.id===id);
 const pet=id=>DB.pets.find(p=>p.id===id);
 const petsOf=hid=>DB.pets.filter(p=>p.houseId===hid).sort((a,b)=>a.no-b.no);
@@ -1039,12 +1051,14 @@ const choiceVal=id=>{const b=$('#'+id+' button.on');return b?b.dataset.v:''};
 // ---------- 👗 配件 ----------
 const ACC={
   cap:{n:'貓耳棒球帽',s:'head',p:180,oy:3,ow:1.1},crown:{n:'寶石皇冠',s:'head',p:300,oy:-2,ow:.85},wizard:{n:'月亮巫師帽',s:'head',p:250,oy:-4,ow:1.15},bearpilot:{n:'小熊飛行帽',s:'head',p:220,oy:7,ow:1.15},
-  bunny:{n:'兔耳蝴蝶結髮箍',s:'head',p:180,oy:-6},pirhat:{n:'海盜船長帽',s:'head',p:250,oy:0,ow:1.15},berry:{n:'草莓小花帽',s:'head',p:200,oy:3,ow:1.05},astro:{n:'太空貓頭盔',s:'head',p:350,oy:30,ow:1.45},
-  devil:{n:'小惡魔髮箍',s:'head',p:180,oy:-3,ow:1.05},halo:{n:'天使光環',s:'head',p:280,oy:-8,ow:1.05},samurai:{n:'武士頭盔',s:'head',p:350,oy:2,ow:1.15},flower:{n:'紫色花圈',s:'head',p:200,oy:-1},
+  bunny:{n:'兔耳蝴蝶結髮箍',s:'head',p:180,oy:-8},pirhat:{n:'海盜船長帽',s:'head',p:250,oy:0,ow:1.15},berry:{n:'草莓小花帽',s:'head',p:200,oy:3,ow:1.05},astro:{n:'太空貓頭盔',s:'head',p:350,oy:30,ow:1.45},
+  devil:{n:'小惡魔髮箍',s:'head',p:180,oy:-3,ow:1.05},halo:{n:'天使翅膀髮箍',s:'head',p:280,oy:-6,ow:1.1},samurai:{n:'武士頭盔',s:'head',p:350,oy:2,ow:1.15},flower:{n:'紫色花圈',s:'head',p:200,oy:-1},
   minehat:{n:'礦工安全帽',s:'head',p:200,oy:3,ow:1.05},snorkel:{n:'貓耳潛水鏡',s:'head',p:220,oy:10,ow:1.05},unicorn:{n:'獨角獸髮箍',s:'head',p:300,oy:-4,ow:1.05},chef:{n:'廚師帽',s:'head',p:180,oy:-4,ow:.9},
-  grad:{n:'學士帽',s:'head',p:220,oy:0,ow:1.05},steam:{n:'蒸汽龐克禮帽',s:'head',p:280,oy:-3},beanie:{n:'貓耳毛線帽',s:'head',p:200,oy:3,ow:1},pilot:{n:'飛行員毛帽',s:'head',p:220,oy:7,ow:1.1},
-  beret:{n:'紅色貝雷帽',s:'head',p:180,oy:0,ow:1},cowhat:{n:'乳牛漁夫帽',s:'head',p:200,oy:3,ow:1.1},shark:{n:'鯊魚帽',s:'head',p:250,oy:6,ow:1.15},dino:{n:'小恐龍帽',s:'head',p:250,oy:6,ow:1.15},
-  kitsune:{n:'狐狸面具髮箍',s:'head',p:260,oy:2,ow:1.05},reindeer:{n:'聖誕麋鹿髮箍',s:'head',p:220,oy:-3,ow:1.1},headset:{n:'貓耳耳機',s:'head',p:240,oy:20,ow:1.35},
+  grad:{n:'學士帽',s:'head',p:220,oy:0,ow:1.05},steam:{n:'蒸汽龐克禮帽',s:'head',p:280,oy:-3},beanie:{n:'貓耳毛線帽',s:'head',p:200,oy:3,ow:1},pilot:{n:'飛行員毛帽',s:'head',p:220,oy:14,ow:1.2},
+  beret:{n:'紅色貝雷帽',s:'head',p:180,oy:0,ow:1},cowhat:{n:'乳牛漁夫帽',s:'head',p:200,oy:4,ow:1.15},shark:{n:'鯊魚帽',s:'head',p:250,oy:6,ow:1.15},dino:{n:'小恐龍帽',s:'head',p:250,oy:6,ow:1.15},
+  kitsune:{n:'狐狸面具髮箍',s:'head',p:260,oy:-2,ow:1.05},reindeer:{n:'聖誕麋鹿髮箍',s:'head',p:220,oy:-4,ow:1.1},
+  orange:{n:'橘子貝雷帽',s:'head',p:200,oy:0},catpilot:{n:'貓耳飛行帽',s:'head',p:220,oy:2},batband:{n:'蝙蝠骷髏髮箍',s:'head',p:220,oy:-4,ow:1.1},daisy:{n:'雛菊花環',s:'head',p:200,oy:-2,ow:1.05},
+  shell:{n:'貝殼珊瑚髮箍',s:'head',p:260,oy:-4,ow:1.05},crowncat:{n:'皇冠貓耳髮箍',s:'head',p:280,oy:-4,ow:1.05},bun:{n:'包子髮箍',s:'head',p:200,oy:-2,ow:1.05},
   stargl:{n:'星星眼鏡',s:'face',p:180},glasses:{n:'金框圓眼鏡',s:'face',p:150},sun:{n:'黑框墨鏡',s:'face',p:180},heartgl:{n:'蝴蝶結愛心眼鏡',s:'face',p:200},
   monocle:{n:'紳士鬍單片眼鏡',s:'face',p:250,oy:8,ow:.95},stache:{n:'翹鬍子',s:'face',p:150,oy:14,ow:.65},mask:{n:'貓掌口罩',s:'face',p:120,oy:14,ow:.8},pirate:{n:'海盜眼罩',s:'face',p:200,ox:12,ow:.42},
   goggle:{n:'潛水面鏡',s:'face',p:220,oy:4,ow:1.1},sprout:{n:'綠芽圓眼鏡',s:'face',p:180,oy:-2},pixel:{n:'像素墨鏡',s:'face',p:220},pilotgl:{n:'飛行護目鏡',s:'face',p:200,ow:1.05},
@@ -1052,16 +1066,19 @@ const ACC={
   sleepmask:{n:'月亮眼罩',s:'face',p:160},masque:{n:'華麗面具',s:'face',p:300,ow:1.05},devilgl:{n:'小惡魔墨鏡',s:'face',p:200,oy:-2},shutter:{n:'百葉窗眼鏡',s:'face',p:160},
   aviator:{n:'飛行員墨鏡',s:'face',p:200},steamgl:{n:'蒸汽龐克護目鏡',s:'face',p:260,ow:1.05},galaxygl:{n:'星空眼鏡',s:'face',p:280},retrogl:{n:'復古吊墜墨鏡',s:'face',p:240,oy:3},
   sportgl:{n:'彩虹運動墨鏡',s:'face',p:240},cyber:{n:'科技護目鏡',s:'face',p:260,ow:1.05},
-  tie:{n:'貓掌領帶',s:'neck',p:150,oy:8,ow:.75},lei:{n:'粉嫩花環',s:'neck',p:200},pearl:{n:'寶石珍珠項鍊',s:'neck',p:280,oy:4,ow:.85},sailor:{n:'水手領',s:'neck',p:220,oy:4,ow:1.05},
-  catchain:{n:'金鍊貓牌',s:'neck',p:300,oy:6,ow:.8},snowbow:{n:'雪花蝴蝶結',s:'neck',p:240,ow:.85},bowtie:{n:'紅色星星領結',s:'neck',p:180,ow:.7},scarf:{n:'條紋圍巾',s:'neck',p:200,oy:6},
-  spike:{n:'龐克項圈',s:'neck',p:220,oy:3},bandana:{n:'貓掌小領巾',s:'neck',p:160,oy:4,ow:.85},lacebow:{n:'蕾絲蝴蝶結領',s:'neck',p:240},tassel:{n:'紅繩中國結',s:'neck',p:200,oy:4,ow:.8}};
+  tie:{n:'貓掌領帶',s:'neck',p:150,oy:6,ow:.5},lei:{n:'粉嫩花環',s:'neck',p:200},pearl:{n:'寶石珍珠項鍊',s:'neck',p:280,oy:4,ow:.85},sailor:{n:'船錨水手領',s:'neck',p:220,oy:3,ow:1},
+  catchain:{n:'金鍊貓牌',s:'neck',p:300,oy:6,ow:.75},snowbow:{n:'雪花蝴蝶結',s:'neck',p:240,ow:.85},bowtie:{n:'紅色星星領結',s:'neck',p:180,ow:.7},scarf:{n:'星月圍巾',s:'neck',p:200,oy:8,ow:.85},
+  spike:{n:'龐克項圈',s:'neck',p:220,oy:3},bandana:{n:'貓掌小領巾',s:'neck',p:160,oy:4,ow:.85},lacebow:{n:'蕾絲蝴蝶結領',s:'neck',p:240},tassel:{n:'紅繩中國結',s:'neck',p:200,oy:4,ow:.75},
+  moonsailor:{n:'月亮水手領',s:'neck',p:220,oy:2,ow:1},batcollar:{n:'蝙蝠骷髏領',s:'neck',p:220,oy:0,ow:1.05},laurel:{n:'金葉寶石領',s:'neck',p:260,oy:2,ow:1},
+  pinkbow:{n:'貓掌蝴蝶結',s:'neck',p:180,oy:2,ow:.75},starbow:{n:'星星蝴蝶結',s:'neck',p:200,oy:3,ow:.75},jabot:{n:'荷葉寶石領',s:'neck',p:260,oy:5,ow:.8},
+  bellbow:{n:'鈴鐺蝴蝶結',s:'neck',p:200,oy:3,ow:.75},heartpearl:{n:'愛心珍珠項鍊',s:'neck',p:280,oy:3,ow:.85}};
 const SLOT_N={head:'頭',face:'臉',neck:'脖子'},SLOTS3=['neck','face','head'];
-const DEF_ADJ={貓:{head:{x:30,y:6,w:46},face:{x:30,y:31,w:40},neck:{x:31,y:53,w:40}},狗:{head:{x:47,y:4,w:48},face:{x:47,y:27,w:42},neck:{x:47,y:50,w:44}},
-  兔:{head:{x:44,y:24,w:38},face:{x:44,y:43,w:32},neck:{x:45,y:60,w:34}},倉鼠:{head:{x:55,y:6,w:50},face:{x:57,y:32,w:42},neck:{x:55,y:51,w:42}},
-  鳥:{head:{x:48,y:11,w:40},face:{x:48,y:36,w:38},neck:{x:47,y:55,w:38}},其他:{head:{x:50,y:12,w:46},face:{x:50,y:36,w:40},neck:{x:50,y:58,w:40}}};
+const DEF_ADJ={貓:{head:{x:30,y:6,w:46},face:{x:30,y:31,w:40},neck:{x:31,y:61,w:40}},狗:{head:{x:47,y:4,w:48},face:{x:47,y:27,w:42},neck:{x:47,y:57,w:44}},
+  兔:{head:{x:44,y:24,w:38},face:{x:44,y:43,w:32},neck:{x:45,y:65,w:34}},倉鼠:{head:{x:55,y:6,w:50},face:{x:57,y:32,w:42},neck:{x:55,y:57,w:42}},
+  鳥:{head:{x:48,y:11,w:40},face:{x:48,y:36,w:38},neck:{x:47,y:60,w:38}},其他:{head:{x:50,y:12,w:46},face:{x:50,y:36,w:40},neck:{x:50,y:63,w:40}}};
 const accImg=id=>`assets/acc_${id}.webp`;
-function petAdj(p,s){const a=p.wadj&&p.wadj[s];if(a&&a.w)return a;const d=p.body?{head:{x:50,y:10,w:46},face:{x:50,y:32,w:40},neck:{x:50,y:55,w:40}}:(DEF_ADJ[p.species]||DEF_ADJ.其他);return d[s]}
-function slotBox(p,s,id){const a=petAdj(p,s),it=ACC[id]||{},f=!!a.f;return {x:a.x+(f?-1:1)*(it.ox||0)*a.w/100,y:a.y+(it.oy||0)*a.w/100*.9,w:a.w*(it.ow||1),f,r:0,tx:0,ty:0}}
+function petAdj(p,s){const a=p.wadj&&p.wadj[s];if(a&&a.w)return a;const d=p.body?{head:{x:50,y:10,w:46},face:{x:50,y:32,w:40},neck:{x:50,y:60,w:40}}:(DEF_ADJ[p.species]||DEF_ADJ.其他);return d[s]}
+function slotBox(p,s,id){const a=petAdj(p,s),it=ACC[id]||{},f=!!a.f;return {x:a.x+(f?-1:1)*(it.ox||0)*a.w/100,y:a.y+(it.oy||0)*a.w/100*.9,w:a.w*(it.ow||1),f,r:0,tx:0,ty:0,sy:it.sy||1}}
 function accBox(p,s,id){const o=p.wadj&&p.wadj[id];return o&&o.w?Object.assign({f:false,r:0,tx:0,ty:0},o):slotBox(p,s,id)}
 const accT=b=>`translate(-50%,-50%) perspective(260px) rotate(${b.r||0}deg) rotateY(${b.ty||0}deg) rotateX(${b.tx||0}deg) scale(${b.f?-1:1},${b.sy||1})`;
 function wearHTML(p,only){const w=p.wear||{};let o='';SLOTS3.forEach(s=>{const id=w[s];if(!id||!ACC[id]||(only&&only!==s&&only!=='all'))return;const b=accBox(p,s,id);
@@ -1069,27 +1086,37 @@ function wearHTML(p,only){const w=p.wear||{};let o='';SLOTS3.forEach(s=>{const i
 const accOwn=hid=>new Set((house(hid)||{}).acc||[]);
 const accLeft=hid=>Object.keys(ACC).filter(id=>!accOwn(hid).has(id));
 const WPEND={},APEND={};let wq=Promise.resolve();
-function keepWear(){const now=Date.now();for(const id in WPEND){const w=WPEND[id],p=pet(id);if(now-w.t>120000){delete WPEND[id];continue}if(p){p.wear=w.wear;p.wadj=w.wadj}}
+function keepWear(){if(CDRAFT)for(const id in CDRAFT.cur){const p=pet(id);if(p){p.wear=CDRAFT.cur[id].wear;p.wadj=CDRAFT.cur[id].wadj}}const now=Date.now();for(const id in WPEND){const w=WPEND[id],p=pet(id);if(now-w.t>120000){delete WPEND[id];continue}if(p){p.wear=w.wear;p.wadj=w.wadj}}
   for(const hid in APEND){const a=APEND[hid],h=house(hid);if(now-a.t>120000){delete APEND[hid];continue}if(h)h.acc=[...new Set([...(h.acc||[]),...a.ids])]}}
 function addAccLocal(hid,ids){const h=house(hid);if(!h)return;h.acc=[...new Set([...(h.acc||[]),...ids])];const a=APEND[hid]||(APEND[hid]={ids:[],t:0});a.ids=[...new Set(a.ids.concat(ids))];a.t=Date.now();
   wq=wq.then(()=>call('addAcc',Object.assign(cred(),{acc:ids}),true)).catch(e=>toast('衣櫃沒存到：'+e.message))}
 let wearT={};
 function saveWearSoon(p){WPEND[p.id]={wear:Object.assign({},p.wear||{}),wadj:JSON.parse(JSON.stringify(p.wadj||{})),t:Date.now()};clearTimeout(wearT[p.id]);
   wearT[p.id]=setTimeout(()=>{wq=wq.then(()=>call('saveWear',Object.assign(cred(),{petId:p.id,wear:p.wear||{},wadj:p.wadj||{}}),true)).catch(e=>toast('打扮沒存到：'+e.message))},600)}
-let closetTab='head',closetShop=false,closetSel=null,closetGrp=false;const TRY={},TRYADJ={};
+let closetTab='head',closetShop=false,closetSel=null,closetGrp=false,CDRAFT=null,closetOpening=false;
+// 衣櫃草稿：按「完成」才存，取消就還原
+const wclone=p=>({wear:JSON.parse(JSON.stringify(p.wear||{})),wadj:JSON.parse(JSON.stringify(p.wadj||{}))});
+function cdirty(p){if(!CDRAFT){saveWearSoon(p);rewearHome(p.id);return}CDRAFT.dirty.add(p.id);CDRAFT.cur[p.id]=wclone(p)}
+function draftStart(hid){if(CDRAFT&&CDRAFT.hid===hid)return;CDRAFT={hid,orig:{},cur:{},dirty:new Set()};petsOf(hid).forEach(q=>CDRAFT.orig[q.id]=wclone(q))}
+function draftDone(){if(!CDRAFT)return;const D=CDRAFT;CDRAFT=null;D.dirty.forEach(id=>{const q=pet(id);if(q){saveWearSoon(q);rewearHome(id)}});for(const k in TRY)delete TRY[k];for(const k in TRYADJ)delete TRYADJ[k];return D.dirty.size}
+function draftCancel(){if(!CDRAFT)return;const D=CDRAFT;CDRAFT=null;for(const id in D.orig){const q=pet(id);if(q){q.wear=D.orig[id].wear;q.wadj=D.orig[id].wadj;rewearHome(id)}}for(const k in TRY)delete TRY[k];for(const k in TRYADJ)delete TRYADJ[k]}
+const draftDirty=()=>!!(CDRAFT&&(CDRAFT.dirty.size||Object.keys(TRY).some(k=>Object.keys(TRY[k]).length)));
+function draftAsk(then){const S=$('#sheet');if(S.querySelector('.cfm'))return;const d=document.createElement('div');d.className='cfm';
+  d.innerHTML=`<div class="cfmbox"><b>還沒按「完成」</b><p>要放棄這次的換裝嗎？</p><div class="row2"><button id="cfk">繼續換裝</button><button class="primary" id="cfx">放棄變更</button></div></div>`;S.appendChild(d);
+  d.querySelector('#cfk').onclick=()=>d.remove();d.querySelector('#cfx').onclick=()=>{d.remove();draftCancel();then?then():closeModal()}}const TRY={},TRYADJ={};
 function tryOf(pid){return TRY[pid]||(TRY[pid]={})}
 function baseFrom(b,id){const it=ACC[id]||{},w=b.w/(it.ow||1);return {x:Math.round((b.x-(b.f?-1:1)*(it.ox||0)*w/100)*10)/10,y:Math.round((b.y-(it.oy||0)*w/100*.9)*10)/10,w:Math.round(w*10)/10,f:b.f?1:0}}
 function viewPet(p){const T=tryOf(p.id);return Object.assign({},p,{wear:Object.assign({},p.wear||{},T),wadj:Object.assign({},p.wadj||{},TRYADJ[p.id]||{})})}
 function commitAdj(p,s,id,b){const box={x:Math.round(b.x*10)/10,y:Math.round(b.y*10)/10,w:Math.round(b.w*10)/10};if(b.f)box.f=1;['r','tx','ty'].forEach(k=>{const v=Math.round(b[k]||0);if(v)box[k]=v});if(b.sy&&Math.abs(b.sy-1)>.01)box.sy=Math.round(b.sy*100)/100;
   if(tryOf(p.id)[s]===id){(TRYADJ[p.id]=TRYADJ[p.id]||{})[id]=box;return}
-  p.wadj=Object.assign({},p.wadj||{},{[id]:box,[s]:baseFrom(box,id)});saveWearSoon(p);rewearHome(p.id)}
+  p.wadj=Object.assign({},p.wadj||{},{[id]:box,[s]:baseFrom(box,id)});cdirty(p)}
 function closetSheet(pid,tab,o){o=o||{};const p=pet(pid);if(!p)return;if(!isFamily(p.houseId))return toast(ONLINE&&DB.me&&DB.me.houseId===p.houseId?'正在跟小島同步，等一下再試':'只能幫自己家的毛孩換裝喔');
-  if(tab)closetTab=tab;if(!o.keep){for(const k in TRY)delete TRY[k];for(const k in TRYADJ)delete TRYADJ[k];closetShop=!!o.shop;closetSel=null}
+  if(tab)closetTab=tab;if(!o.keep){for(const k in TRY)delete TRY[k];for(const k in TRYADJ)delete TRYADJ[k];closetShop=!!o.shop;closetSel=null;CDRAFT=null}draftStart(p.houseId);
   const hid=p.houseId,own=accOwn(hid),g=DB.game,w=p.wear||{},T=tryOf(pid),VP=viewPet(p),view=VP.wear,sibs=petsOf(hid);
   if(o.sel!==undefined)closetSel=o.sel;if(closetSel&&!view[closetSel])closetSel=null;if(closetSel==null&&view[closetTab])closetSel=closetTab;
   const ids=Object.keys(ACC).filter(id=>ACC[id].s===closetTab).sort((a,b)=>closetShop?ACC[a].p-ACC[b].p:((own.has(b)-own.has(a))||ACC[a].p-ACC[b].p));
   const tried=SLOTS3.slice().reverse().filter(s=>T[s]),sid=closetSel&&view[closetSel],sb=sid?accBox(VP,closetSel,sid):null;
-  openModal(`<div class="clstick"><h3>${closetShop?'👗 毛毛服飾店':`👗 ${esc(p.name)} 的衣櫃`}<small class="coinv">🪙 ${g.coins||0}</small></h3>
+  closetOpening=true;openModal(`<div class="clstick"><h3>${closetShop?'👗 毛毛服飾店':`👗 ${esc(p.name)} 的衣櫃`}<small class="coinv">🪙 ${g.coins||0}</small></h3>
     ${sibs.length>1?`<div class="sibs">${sibs.map(s=>`<button data-sib="${s.id}" class="${s.id===pid?'on':''}"><img src="${petHead(s)}" alt=""><span>${esc(s.name)}</span></button>`).join('')}</div>`:''}
     <div class="clprev"><div class="clbody" id="clb"><img src="${petBody(p)}" alt="" onerror="this.src='${defBody(p.species)}'">${wearHTML(VP)}${sb?`<div class="edbox" id="edb"><i class="edh rt" data-h="rt"></i><i class="edh sz" data-h="sz"></i><i class="edh sd l" data-h="l"></i><i class="edh sd r" data-h="r"></i><i class="edh sd t" data-h="t"></i><i class="edh sd b" data-h="b"></i></div>`:''}</div></div>
     ${sb?`<div class="edbar"><div class="edrow"><b>${ACC[sid].n}</b><button id="edg" class="${closetGrp?'on':''}">🔗 全部一起</button><button id="edf">↔️ 翻轉</button><button id="edr">↺ 還原</button></div>
@@ -1099,21 +1126,23 @@ function closetSheet(pid,tab,o){o=o||{};const p=pet(pid);if(!p)return;if(!isFami
     <div class="tabs3">${['head','face','neck'].map(s=>`<button data-ct="${s}" class="${s===closetTab?'on':''}">${SLOT_N[s]}${view[s]?' ✓':''}</button>`).join('')}</div></div>
     <div class="accgrid">${ids.map(id=>{const on=w[closetTab]===id,tr=T[closetTab]===id,has=own.has(id);return `<button class="acci${on?' on':''}${tr?' try':''}${has?'':' buy'}" data-acc="${id}"><img src="${accImg(id)}" alt=""><span>${ACC[id].n}</span><em>${on?'戴著':tr?'試穿中':has?'已擁有':'🪙 '+ACC[id].p}</em></button>`}).join('')}</div>
     <div class="hint">拖曳配件移動、拉右下角縮放、拉上方圓點旋轉，也可以用兩根手指同時縮放和旋轉。沒有的配件可以先試穿，喜歡再按「買下」</div>
-    <div class="row2"><button id="cloff">全部脫掉</button>${closetShop?'<button id="clshop">← 商店</button>':''}<button data-close>關閉</button></div>`);
-  const S=$('#sheet'),again=(t,ex)=>{const st=S.scrollTop;closetSheet(pid,t||closetTab,Object.assign({keep:1},ex||{}));$('#sheet').scrollTop=st};
+    <div class="clfoot">${closetShop?'<div class="row2"><button id="clshop">← 回商店</button></div>':''}<div class="row2 r3"><button id="cloff">全部脫掉</button><button id="clcancel">取消</button><button class="primary" id="clok">✅ 完成</button></div></div>`);
+  closetOpening=false;const S=$('#sheet'),again=(t,ex)=>{const st=S.scrollTop;closetSheet(pid,t||closetTab,Object.assign({keep:1},ex||{}));$('#sheet').scrollTop=st};
   S.querySelectorAll('[data-sib]').forEach(b=>b.onclick=()=>{for(const k in TRY)delete TRY[k];for(const k in TRYADJ)delete TRYADJ[k];closetSel=null;closetSheet(b.dataset.sib,closetTab,{keep:1})});
   S.querySelectorAll('[data-ct]').forEach(b=>b.onclick=()=>again(b.dataset.ct,{sel:view[b.dataset.ct]?b.dataset.ct:null}));
   S.querySelectorAll('[data-acc]').forEach(b=>b.onclick=()=>{const id=b.dataset.acc,it=ACC[id];sfx&&sfx('tap');
     if(!accOwn(hid).has(id)){if(T[it.s]===id){delete T[it.s];return again(null,{sel:null})}T[it.s]=id;return again(null,{sel:it.s})}
-    delete T[it.s];p.wear=Object.assign({},p.wear||{});if(p.wear[it.s]===id){delete p.wear[it.s];saveWearSoon(p);rewearHome(p.id);return again(null,{sel:null})}
-    p.wear[it.s]=id;saveWearSoon(p);rewearHome(p.id);again(null,{sel:it.s})});
+    delete T[it.s];p.wear=Object.assign({},p.wear||{});if(p.wear[it.s]===id){delete p.wear[it.s];cdirty(p);return again(null,{sel:null})}
+    p.wear[it.s]=id;cdirty(p);again(null,{sel:it.s})});
   S.querySelectorAll('[data-untry]').forEach(b=>b.onclick=()=>{delete T[b.dataset.untry];again(null,{sel:null})});
   S.querySelectorAll('[data-buy]').forEach(b=>b.onclick=()=>{const s=b.dataset.buy,id=T[s],it=ACC[id];if(!it)return;
     if((g.coins||0)<it.p)return toast(`金幣不夠，還差 ${it.p-(g.coins||0)} 🪙`);
     g.coins-=it.p;sfx&&sfx('coin');save();updHud&&updHud();addAccLocal(hid,[id]);delete T[s];p.wear=Object.assign({},p.wear||{},{[s]:id});
-    const ta=TRYADJ[pid]&&TRYADJ[pid][id];if(ta){delete TRYADJ[pid][id];commitAdj(p,s,id,ta)}saveWearSoon(p);rewearHome(p.id);toast(`買了${it.n}，幫 ${p.name} 戴上了 👗`);again(s,{sel:s})});
-  $('#cloff').onclick=()=>{if(!Object.keys(view).length)return toast(`${p.name} 身上沒有戴東西`);for(const k in T)delete T[k];p.wear={};saveWearSoon(p);rewearHome(p.id);again(null,{sel:null});toast('都脫掉了')};
-  if($('#clshop'))$('#clshop').onclick=()=>shopSheet('treat');
+    const ta=TRYADJ[pid]&&TRYADJ[pid][id];if(ta){delete TRYADJ[pid][id];commitAdj(p,s,id,ta)}cdirty(p);toast(`買了${it.n}，幫 ${p.name} 戴上了 👗`);again(s,{sel:s})});
+  $('#cloff').onclick=()=>{if(!Object.keys(view).length)return toast(`${p.name} 身上沒有戴東西`);for(const k in T)delete T[k];p.wear={};cdirty(p);again(null,{sel:null});toast('都脫掉了')};
+  if($('#clshop'))$('#clshop').onclick=()=>{const go=()=>shopSheet('treat');if(draftDirty())return draftAsk(go);draftCancel();go()};
+  $('#clcancel').onclick=()=>{draftCancel();closeModal()};
+  $('#clok').onclick=()=>{const tr=Object.keys(TRY[pid]||{}).length;const n=draftDone();closeModal();toast(n?`換好了 ✨${tr?'（試穿中、還沒買的已經拿掉）':''}`:(tr?'試穿中的配件沒有買，已經拿掉了':'沒有變更'))};
   // ---- 直接在預覽上調整 ----
   const cb=$('#clb');
   const pv=S.querySelector('.clprev');
@@ -1160,7 +1189,7 @@ function closetSheet(pid,tab,o){o=o||{};const p=pet(pid);if(!p)return;if(!isFami
   if($('#edg'))$('#edg').onclick=()=>{closetGrp=!closetGrp;$('#edg').classList.toggle('on',closetGrp);toast(closetGrp?'🔗 拖曳、縮放會讓身上所有配件一起動':'只調整選中的這件')};
   if($('#edf'))$('#edf').onclick=()=>{cur.f=!cur.f;live();commit()};
   if($('#edr'))$('#edr').onclick=()=>{const d=Object.assign({sy:1},slotBox(Object.assign({},p,{wadj:{}}),closetSel,sid));cur=d;$('#edty').value=0;$('#edtx').value=0;live();
-    if(T[closetSel]===sid){if(TRYADJ[pid])delete TRYADJ[pid][sid]}else{const wa=Object.assign({},p.wadj||{});delete wa[sid];delete wa[closetSel];p.wadj=wa;saveWearSoon(p);rewearHome(pid)}toast('還原了')};
+    if(T[closetSel]===sid){if(TRYADJ[pid])delete TRYADJ[pid][sid]}else{const wa=Object.assign({},p.wadj||{});delete wa[sid];delete wa[closetSel];p.wadj=wa;cdirty(p)}toast('還原了')};
   ['edty','edtx'].forEach(k=>{const el=$('#'+k);if(!el)return;el.oninput=()=>{cur[k.slice(2)]=+el.value;live()};el.onchange=()=>commit()});
 }
 function rewearHome(pid){if(!home)return;const r=home.pets.find(x=>x.id===pid),p=pet(pid);if(!r||!r.el||!p)return;const bd=r.el.querySelector('.body');if(!bd)return;const old=bd.querySelector('.wear');if(old)old.remove();if(!r.demon)bd.insertAdjacentHTML('beforeend',wearHTML(p))}
@@ -2255,7 +2284,7 @@ const ITEMS={
   box:{name:'紙箱',emo:'📦',kind:'toy',price:50},
   cushion:{name:'軟墊',emo:'🟣',kind:'toy',price:80},
 };
-const TREAT_MAX=3,TOY_MAX=12;
+const TREAT_MAX=3,TOY_MAX=20;
 
 // ---------- v1.48 新玩具 ----------
 Object.assign(ITEMS,{
@@ -3185,7 +3214,7 @@ function announceLetters(){if(!DB.me)return;let seen=[];try{seen=JSON.parse(loca
     sfx('gift');$('#lgopen').onclick=()=>openLetter(nw[0].id,()=>$('#bell').click())};
   setTimeout(go,1800)}
 // ================= 自動更新：發現新版本就重新載入 =================
-const APP_VER='v1.49';
+const APP_VER='v1.50';
 function checkUpdate(){
   if(!/^https?:/.test(location.protocol)||!API_URL)return;
   if(!$('#modal').classList.contains('hidden'))return; // 正在填表單時不打斷
