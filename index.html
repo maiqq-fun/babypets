@@ -802,6 +802,13 @@ img{-webkit-user-drag:none}
 .invl .mini{aspect-ratio:auto;height:auto;white-space:nowrap;writing-mode:horizontal-tb;padding:6px 10px}
 .adm label.chk{display:flex;grid-template-columns:none;align-items:center;gap:8px;margin-top:10px;font-size:14px;line-height:1.3}
 .adm label.chk input[type=checkbox]{width:20px!important;height:20px;margin:0!important;padding:0!important;flex:none}
+
+/* 衣櫃／服飾店：試穿預覽固定高度，不管毛孩照片多高，下面的配件清單都有空間 */
+.clstick .clbody{width:auto;max-width:none}
+.clstick .clbody>img{width:auto;height:auto;min-height:min(24vh,185px);max-height:min(24vh,185px);max-width:none}
+
+/* 島主後台：島民來信未讀徽章 */
+.mbtn .ubadge{background:#e0453a;color:#fff;border-radius:999px;padding:1px 8px;font-size:12px;line-height:1.5;margin-left:6px}
 </style>
 </head>
 <body>
@@ -3039,7 +3046,7 @@ async function adminSheet(){
   DB.adminId=DB.me.id;
   const hs=d.houses.map(h=>`<option value="${h.id}">${esc(h.name)}</option>`).join(''),its=Object.entries(ITEMS).map(([id,i])=>`<option value="${id}">${i.emo} ${esc(i.name)}</option>`).join('');
   openModal(`<h3>👑 島主後台</h3>
-  <div class="row2" style="margin-bottom:8px"><button class="primary mbtn" id="amail"><img class="mic" src="assets/icon_mail.webp" alt="">島民來信</button></div>
+  <div class="row2" style="margin-bottom:8px"><button class="primary mbtn" id="amail"><img class="mic" src="assets/icon_mail.webp" alt="">島民來信</button></div><div class="mlist" id="amprev"></div>
   <div class="sec adm"><h4>🔑 邀請碼<span>${(d.invites||[]).filter(x=>!x.usedBy&&!x.void).length} 組可用</span></h4><p class="lead">每組只能用一次，給要蓋房子的朋友</p>
     <div class="row2"><input id="ainn" maxlength="20" placeholder="備註（例如：給小明）"><button id="ainb">產生 1 組</button></div>
     <div class="invl">${(d.invites||[]).slice(0,30).map(x=>`<div class="frow"><span><b class="code">${esc(x.code)}</b><small>${x.usedBy?`已被 ${esc(x.usedNick||'')} 使用`:x.void?'已作廢':'未使用'}${x.note?'・'+esc(x.note):''}</small></span>${!x.usedBy&&!x.void?`<span><button class="mini" data-icp="${esc(x.code)}">複製</button> <button class="mini" data-ivd="${esc(x.code)}">作廢</button></span>`:''}</div>`).join('')||'<div class="locked">還沒有邀請碼</div>'}</div></div>
@@ -3048,7 +3055,7 @@ async function adminSheet(){
   <div class="sec adm"><h4>💰 撒錢</h4><p class="lead">島上現在有 ${d.drops} 個錢袋還沒被撿</p>
     <div class="row2"><select id="arh"><option value="">隨機幾家</option>${hs}</select><input id="arn" type="number" min="1" max="10" value="3" style="max-width:80px" aria-label="幾袋"></div>
     <div class="row2"><input id="ara" type="number" min="0" max="999" placeholder="每袋金額（空白＝隨機）"><button id="arb">撒下去</button></div></div>
-  <div class="sec adm"><h4>🎁 送禮到家</h4><p class="lead">禮物盒會出現在那個家的地上，一個家一份，第一個拆的家人拿走</p><div class="row2"><select id="agp">${hs}</select></div>
+  <div class="sec adm"><h4>🎁 送禮到家</h4><p class="lead">禮物盒會出現在那個家的地上，一個家一份，第一個拆的家人拿走</p><div class="row2"><select id="agp">${hs}<option value="__all__">🌏 全島（每個家都送一份）</option></select></div>
     <div class="row2"><input id="agc" type="number" min="0" placeholder="金幣"><input id="agt" type="number" min="0" placeholder="抽卡券"></div>
     <div class="row2"><select id="agi"><option value="">（不送道具）</option>${its}</select><input id="agn" type="number" min="0" placeholder="數量" style="max-width:80px"></div>
     <div class="row2"><select id="agr"></select></div><p class="lead" id="agrh" style="margin:0"></p>
@@ -3068,13 +3075,25 @@ async function adminSheet(){
   <div class="row2"><button id="aout">登出島主</button><button data-close class="primary">關閉</button></div>`);
   const S=$('#sheet'),ok=m=>{toast(m);sync(true)};
   $('#amail').onclick=adminMailSheet;
+  call('adminMailList',{adminPw:adminPw(),playerId:DB.me&&DB.me.id},true).then(L=>{if(!Array.isArray(L)||!$('#amail'))return;const un=L.filter(m=>!m.read);if(!un.length)return;
+    const bd=document.createElement('span');bd.className='ubadge';bd.textContent=un.length>99?'99+':un.length;$('#amail').appendChild(bd);
+    const box=$('#amprev');if(!box)return;
+    box.innerHTML=un.slice(0,3).map(m=>`<button class="mrow unread" data-pmid="${m.id}"><span class="mt">${mic(m.type in MAILN?m.type:'talk',30)}</span><span class="mn">${m.anon?'🙈 匿名':esc(m.nick)}<small>${esc(m.text.slice(0,24))}${m.text.length>24?'…':''}${m.img?' 📷':''}</small></span><span class="ago">${ago(m.at)}</span></button>`).join('')+(un.length>3?`<div class="lead" style="text-align:center;margin:0">還有 ${un.length-3} 封未讀，點上面「島民來信」看全部</div>`:'');
+    box.querySelectorAll('[data-pmid]').forEach(b=>b.onclick=()=>adminMailOne(L.find(m=>m.id===b.dataset.pmid)))}).catch(()=>{});
   $('#anb').onclick=async()=>{const t=$('#an').value.trim();try{await adminCall('adminNotice',{text:t,push:!!($('#anp')&&$('#anp').checked)});DB.notice=t?{t}:null;fi=0;tickerShow();ok(t?'公告更新了 📣':'公告取消了')}catch(e){toast(e.message)}};
   $('#adb').onclick=async()=>{const on=d.dbl!==todayTW();try{await adminCall('adminDouble',{on});DB.dbl=on?todayTW():'';updHud();ok(on?'今天是雙倍日了 ✨':'雙倍日關掉了');adminSheet()}catch(e){toast(e.message)}};
   $('#arb').onclick=async()=>{try{await adminCall('adminRain',{houseId:$('#arh').value,n:+$('#arn').value||1,amt:+$('#ara').value||0});ok('撒好了，等大家去撿 💰');adminSheet()}catch(e){toast(e.message)}};
   const OWN=d.owned||DB.owned||{},roomOpts=()=>{const own=new Set(OWN[$('#agp').value]||[]),L=CARDS.filter(c=>!c.limitedOnly),A=L.filter(c=>!own.has(c.id));$('#agr').innerHTML=`<option value="">🏠（不送房間）</option>`+A.map(c=>`<option value="${c.id}">${esc(c.name)}</option>`).join('');$('#agrh').textContent=A.length?`這個家已經有 ${L.length-A.length} / ${L.length} 間，清單只列還沒有的`:'這個家所有房間都有了'};
-  roomOpts();$('#agp').onchange=roomOpts;
-  $('#agb').onclick=async()=>{const o={houseId:$('#agp').value,coins:+$('#agc').value||0,tickets:+$('#agt').value||0,item:$('#agi').value,n:+$('#agn').value||0,msg:$('#agm').value.trim(),room:$('#agr').value};if(o.room)o.roomName=cardById(o.room).name;
-    if(!o.coins&&!o.tickets&&!(o.item&&o.n)&&!o.room)return toast('要送點什麼喔');try{await adminCall('adminGiftHouse',o);toast('送出了，禮物盒已經放在他們家 👑');['agc','agt','agn','agm'].forEach(k=>$('#'+k).value='');$('#agi').value='';$('#agr').value='';sync(true)}catch(e){toast(e.message)}};
+  const roomOpts0=roomOpts,roomOptsX=()=>{roomOpts0();if($('#agp').value==='__all__')$('#agrh').textContent='全島模式：已經有這間房間的家會自動跳過'};roomOptsX();$('#agp').onchange=roomOptsX;
+  $('#agb').onclick=async e=>{const o={houseId:$('#agp').value,coins:+$('#agc').value||0,tickets:+$('#agt').value||0,item:$('#agi').value,n:+$('#agn').value||0,msg:$('#agm').value.trim(),room:$('#agr').value};if(o.room)o.roomName=cardById(o.room).name;
+    if(!o.coins&&!o.tickets&&!(o.item&&o.n)&&!o.room)return toast('要送點什麼喔');
+    if(o.houseId==='__all__'){const H=d.houses||[];if(!H.length)return toast('島上還沒有家');const btn=e.target;if(!armBtn(btn,`確定送給全島 ${H.length} 個家？`))return;
+      btn.disabled=true;let okN=0,skip=0,fail='';
+      for(let i=0;i<H.length;i++){btn.textContent=`送出中 ${i+1}/${H.length}…`;try{await adminCall('adminGiftHouse',Object.assign({},o,{houseId:H[i].id}));okN++}catch(x){if(/已經有這間房間/.test(x.message))skip++;else fail=x.message}}
+      btn.disabled=false;btn.classList.remove('armed');btn.textContent='送出';
+      toast(`全島送出了：${okN} 個家收到禮物盒${skip?`，${skip} 個家已有房間而跳過`:''}${fail?`（有失敗：${fail}）`:''} 👑`);
+      ['agc','agt','agn','agm'].forEach(k=>$('#'+k).value='');$('#agi').value='';$('#agr').value='';sync(true);return}
+    try{await adminCall('adminGiftHouse',o);toast('送出了，禮物盒已經放在他們家 👑');['agc','agt','agn','agm'].forEach(k=>$('#'+k).value='');$('#agi').value='';$('#agr').value='';sync(true)}catch(e){toast(e.message)}};
   S.querySelectorAll('[data-apl]').forEach(b=>b.onclick=()=>{const p=d.players.find(x=>x.id===b.dataset.apl);if(p)adminPlayerSheet(p)});
   S.querySelectorAll('[data-code]').forEach(b=>b.onclick=async()=>{const c=b.dataset.code;if(!c)return;try{await navigator.clipboard.writeText(c);toast('轉移碼已複製：'+c)}catch(e){toast(c)}});
   $('#ahpb').onclick=async()=>{const v=$('#ahp').value;if(v.length<4)return toast('密碼至少 4 個字');try{await adminCall('adminResetPw',{houseId:$('#ahh').value,pw:await hashPw(v)});toast('密碼重設好了，記得告訴他們家 🔑')}catch(e){toast(e.message)}};
