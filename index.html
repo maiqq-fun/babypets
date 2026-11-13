@@ -793,6 +793,8 @@ img{-webkit-user-drag:none}
 .codebox .cbtns{display:flex;gap:4px;flex:none}
 .hglead{text-align:center;line-height:1.6}.hglead b{color:#7a4f10;font-size:15px}
 </style>
+<meta name="maomanyou-performance" content="perf-1.1-30fps">
+<meta name="maomanyou-fixpack" content="wardrobe-feed-walk-dialogue-1.1">
 </head>
 <body>
 <!-- ===== 小島 ===== -->
@@ -1008,7 +1010,7 @@ const LOCAL={
   feed({houseId}){feedPush(`${DB.me.nick} 在 ${house(houseId).name} 餵了飯 🍖`);return true},
   drawCard({houseId,cardId,feedText}){const o=new Set(DB.owned[houseId]||[]);o.add(cardId);DB.owned[houseId]=[...o];if(feedText)feedPush(feedText);return {owned:DB.owned[houseId]}},
   upload({dataUrl}){return {url:dataUrl}},
-  feedPets({petIds}){feedPush(`${DB.me.nick} 餵了 ${petIds.map(id=>pet(id).name).join('、')} 🍖`);return true},
+  feedPets({petIds}){feedPush(`${DB.me.nick} 餵了 ${petIds.map(id=>pet(id).name).join('、')} 🍖`);return {fedIds:petIds.slice()}},
   pat(){return true},
   treat({petId,item}){const p=pet(petId),d=todayTW();if(p.treatDay===d&&(+p.treatN||0)>TREAT_MAX)throw new Error('今天吃太多零食了');feedPush(`${DB.me.nick} 請 ${p.name} 吃了 ${ITEMS[item].emo}${ITEMS[item].name}`);return true},
   sendGift({houseId,item,msg}){const g={id:uid(),from:DB.me.nick,fromId:DB.me.id,item,msg,at:Date.now(),x:Math.round(FLOOR.x0+60+Math.random()*(FLOOR.x1-FLOOR.x0-120)),y:Math.round(FLOOR.y0+40+Math.random()*150)};feedPush(`${DB.me.nick} 送了 ${house(houseId).name} 一份禮物 🎁`);return g},
@@ -1107,7 +1109,7 @@ function petAdj(p,s){const a=p.wadj&&p.wadj[s];if(a&&a.w)return a;const d=p.body
 function slotBox(p,s,id){const a=petAdj(p,s),it=ACC[id]||{},f=!!a.f;return {x:a.x+(f?-1:1)*(it.ox||0)*a.w/100,y:a.y+(it.oy||0)*a.w/100*.9,w:a.w*(it.ow||1),f,r:0,tx:0,ty:0,sy:it.sy||1}}
 function accBox(p,s,id){const o=p.wadj&&p.wadj[id];return o&&o.w?Object.assign({f:false,r:0,tx:0,ty:0},o):slotBox(p,s,id)}
 const accT=b=>`translate(-50%,-50%) perspective(260px) rotate(${b.r||0}deg) rotateY(${b.ty||0}deg) rotateX(${b.tx||0}deg) scale(${b.f?-1:1},${b.sy||1})`;
-function wearHTML(p,only){const w=p.wear||{};let o='';SLOTS3.forEach(s=>{const id=w[s];if(!id||!ACC[id]||(only&&only!==s&&only!=='all'))return;const b=accBox(p,s,id);
+function wearHTML(p,only){const w=p.wear||{};let o='';SLOTS3.forEach(s=>{const id=w[s];if(!id||!ACC[id]||ACC[id].s!==s||(only&&only!==s&&only!=='all'))return;const b=accBox(p,s,id);
   o+=`<img class="acc a-${s}" data-s="${s}" src="${accImg(id)}" alt="" style="left:${b.x}%;top:${b.y}%;width:${b.w}%;transform:${accT(b)}">`});return o?`<div class="wear">${o}</div>`:''}
 const accOwn=hid=>new Set((house(hid)||{}).acc||[]);
 const accLeft=hid=>Object.keys(ACC).filter(id=>!accOwn(hid).has(id));
@@ -1139,13 +1141,15 @@ function commitAdj(p,s,id,b){const box={x:Math.round(b.x*10)/10,y:Math.round(b.y
 function closetSheet(pid,tab,o){o=o||{};const p=pet(pid);if(!p)return;if(!isFamily(p.houseId))return toast(ONLINE&&DB.me&&DB.me.houseId===p.houseId?'正在跟小島同步，等一下再試':'只能幫自己家的毛孩換裝喔');
   if(tab)closetTab=tab;if(!o.keep){for(const k in TRY)delete TRY[k];for(const k in TRYADJ)delete TRYADJ[k];closetShop=!!o.shop;closetSel=null;CDRAFT=null}draftStart(p.houseId);
   const hid=p.houseId,own=accOwn(hid),g=DB.game,w=p.wear||{},T=tryOf(pid),VP=viewPet(p),view=VP.wear,sibs=petsOf(hid);
+  // 舊資料若含不存在或放錯部位的配件 ID，不讓它拖垮整個衣櫥。
+  SLOTS3.forEach(slot=>{const id=view[slot];if(id&&(!ACC[id]||ACC[id].s!==slot)){delete view[slot];delete w[slot];delete T[slot];}});
   if(o.sel!==undefined)closetSel=o.sel;if(closetSel&&!view[closetSel])closetSel=null;if(closetSel==null&&view[closetTab])closetSel=closetTab;
   const ids=Object.keys(ACC).filter(id=>ACC[id].s===closetTab).sort((a,b)=>closetShop?ACC[a].p-ACC[b].p:((own.has(b)-own.has(a))||ACC[a].p-ACC[b].p));
-  const tried=SLOTS3.slice().reverse().filter(s=>T[s]),sid=closetSel&&view[closetSel],sb=sid?accBox(VP,closetSel,sid):null;
+  const tried=SLOTS3.slice().reverse().filter(s=>T[s]&&ACC[T[s]]&&ACC[T[s]].s===s),sid=closetSel&&view[closetSel]&&ACC[view[closetSel]]?view[closetSel]:null,sb=sid?accBox(VP,closetSel,sid):null;
   closetOpening=true;openModal(`<div class="clstick"><h3>${closetShop?'👗 毛毛服飾店':`👗 ${esc(p.name)} 的衣櫃`}<small class="coinv">🪙 ${g.coins||0}</small></h3>
     ${sibs.length>1?`<div class="sibs">${sibs.map(s=>`<button data-sib="${s.id}" class="${s.id===pid?'on':''}"><img src="${petHead(s)}" alt=""><span>${esc(s.name)}</span></button>`).join('')}</div>`:''}
     <div class="clprev"><div class="clbody" id="clb"><img src="${petBody(p)}" alt="" onerror="this.src='${defBody(p.species)}'">${wearHTML(VP)}${sb?`<div class="edbox" id="edb"><i class="edh rt" data-h="rt"></i><i class="edh sz" data-h="sz"></i><i class="edh sd l" data-h="l"></i><i class="edh sd r" data-h="r"></i><i class="edh sd t" data-h="t"></i><i class="edh sd b" data-h="b"></i></div>`:''}</div></div>
-    ${sb?`<div class="edbar"><div class="edrow"><b>${ACC[sid].n}</b><button id="edg" class="${closetGrp?'on':''}">🔗 全部一起</button><button id="edf">↔️ 翻轉</button><button id="edr">↺ 還原</button></div>
+    ${sb&&ACC[sid]?`<div class="edbar"><div class="edrow"><b>${ACC[sid].n}</b><button id="edg" class="${closetGrp?'on':''}">🔗 全部一起</button><button id="edf">↔️ 翻轉</button><button id="edr">↺ 還原</button></div>
       <label class="edsl"><span>左右傾斜</span><input type="range" id="edty" min="-50" max="50" step="1" value="${sb.ty||0}"></label>
       <label class="edsl"><span>上下傾斜</span><input type="range" id="edtx" min="-50" max="50" step="1" value="${sb.tx||0}"></label></div>`:`<div class="edhint">點下面的配件戴上去，就能直接在毛孩身上拖曳、縮放、旋轉</div>`}
     ${tried.length?`<div class="trybar">${tried.map(s=>`<div class="tryrow"><span>試穿中：${ACC[T[s]].n}</span><button class="primary" data-buy="${s}">🪙 ${ACC[T[s]].p} 買下</button><button data-untry="${s}" aria-label="不要">✕</button></div>`).join('')}</div>`:''}
@@ -1154,9 +1158,9 @@ function closetSheet(pid,tab,o){o=o||{};const p=pet(pid);if(!p)return;if(!isFami
     <div class="hint">拖曳配件移動、拉右下角縮放、拉上方圓點旋轉，也可以用兩根手指同時縮放和旋轉。沒有的配件可以先試穿，喜歡再按「買下」</div>
     <div class="clfoot">${closetShop?'<div class="row2"><button id="clshop">← 回商店</button></div>':''}<div class="row2 r3"><button id="cloff">全部脫掉</button><button id="clcancel">取消</button><button class="primary" id="clok">✅ 完成</button></div></div>`);
   closetOpening=false;const S=$('#sheet'),again=(t,ex)=>{const st=S.scrollTop;closetSheet(pid,t||closetTab,Object.assign({keep:1},ex||{}));$('#sheet').scrollTop=st};
-  S.querySelectorAll('[data-sib]').forEach(b=>b.onclick=()=>{for(const k in TRY)delete TRY[k];for(const k in TRYADJ)delete TRYADJ[k];closetSel=null;closetSheet(b.dataset.sib,closetTab,{keep:1})});
+  S.querySelectorAll('[data-sib]').forEach(b=>b.onclick=e=>{e.preventDefault();e.stopPropagation();const next=b.dataset.sib;if(!next||next===String(pid))return;for(const k in TRY)delete TRY[k];for(const k in TRYADJ)delete TRYADJ[k];closetSel=null;closetSheet(next,closetTab,{keep:1})});
   S.querySelectorAll('[data-ct]').forEach(b=>b.onclick=()=>again(b.dataset.ct,{sel:view[b.dataset.ct]?b.dataset.ct:null}));
-  S.querySelectorAll('[data-acc]').forEach(b=>b.onclick=()=>{const id=b.dataset.acc,it=ACC[id];sfx&&sfx('tap');
+  S.querySelectorAll('[data-acc]').forEach(b=>b.onclick=e=>{e.preventDefault();e.stopPropagation();const id=b.dataset.acc,it=ACC[id];sfx&&sfx('tap');if(!it||!['head','face','neck'].includes(it.s))return toast('這件配件資料有誤，請重新整理後再試');
     if(!accOwn(hid).has(id)){if(T[it.s]===id){delete T[it.s];return again(null,{sel:null})}T[it.s]=id;return again(null,{sel:it.s})}
     delete T[it.s];p.wear=Object.assign({},p.wear||{});if(p.wear[it.s]===id){delete p.wear[it.s];cdirty(p);return again(null,{sel:null})}
     p.wear[it.s]=id;cdirty(p);again(null,{sel:it.s})});
@@ -1478,7 +1482,8 @@ const RW=848,RH=1264,FLOOR={x0:110,x1:750,y0:840,y1:1170};
 const BOARDS={basic1:[432,352,698,536],basic2:[422,335,710,547],basic3:[433,346,700,534],study:[456,286,689,486],garden:[428,255,680,479],cafe:[444,297,681,499],beach:[417,275,698,492],sakura:[435,270,701,507],forest:[432,266,690,492],cloud:[429,265,686,495],xmas:[433,269,689,505],ocean:[428,275,683,496],star:[425,248,690,507],space:[431,280,693,467],dessert:[432,270,762,456],arcade:[432,277,742,462],library:[440,284,742,452],washitsu:[448,280,735,462],circus:[434,302,733,463],cabin:[432,288,738,462],party:[445,281,738,462],pinkroom:[422,236,737,422],sweetdevil:[430,245,705,476],ufobase:[420,262,738,455],street:[426,261,733,455],pearl:[402,248,733,470],surf:[412,250,708,460],nightmkt:[412,280,720,462],redcheck:[422,240,745,435],princess:[426,263,755,457],hiphop:[412,268,764,479],hawaiicat:[430,265,712,460]};
 const BOWL={x:424,y:1150};
 const hp=(x,y)=>({left:(x/RW*100)+'%',top:(y/RH*100)+'%'});
-let home=null,raf=0,last=0;
+let home=null,raf=0,last=0,lastFrame=0,homeScaleK=1;
+const PET_FPS=30,PET_FRAME_MS=1000/PET_FPS;
 function spawnPoops(h){
   const n=petsOf(h.id).length;if(!n){h.poopAt=Date.now();return}
   const every=4*HOUR,k=Math.floor((Date.now()-(h.poopAt||Date.now()))/every)*n;
@@ -1492,7 +1497,7 @@ function hash01(s){let h=2166136261;for(let i=0;i<s.length;i++){h^=s.charCodeAt(
 const TWO=8*HOUR;const twMin=t=>{const d=new Date(t+TWO);return d.getUTCHours()*60+d.getUTCMinutes()};
 const twDay=t=>new Date(t+TWO).toISOString().slice(0,10);
 function dayStart(t){const d=new Date(t+TWO);return t-(d.getUTCHours()*60+d.getUTCMinutes())*60000-d.getUTCSeconds()*1000-d.getUTCMilliseconds()}
-function fullness(p,now){if(!p.lastFed)return 55;return clamp(Math.round(100-((now||Date.now())-p.lastFed)/HOUR*100/12),0,100)}
+function fullness(p,now){if(!p.lastFed)return 55;return clamp(100-((now||Date.now())-p.lastFed)/HOUR*100/12,0,100)}
 function mealsToday(p){return p.mealDay===todayTW()?(+p.meals||0):0}
 function mood(p,h){const now=Date.now(),pats=(Array.isArray(p.pats)?p.pats:[]).filter(t=>now-t<3*HOUR).length;
   const vis=h.visits&&h.visits.day===todayTW()?(h.visits.list||[]).length:0;
@@ -1533,7 +1538,7 @@ function openHome(hid,keep){
   home={id:hid,pets:plist.map((p,i)=>{const o=prev.find(q=>q.id===p.id);
     return Object.assign(o?Object.assign(o,{el:null,tentEl:null}):{id:p.id,x:220+(i%3)*200,y:900+(i%2)*120,tx:0,ty:0,state:'idle',until:performance.now()+500+i*600,facing:1,hop:0,anim:null,welcome:!keep},{guest:p.houseId!==hid})}),bowl:null};
   if(!keep&&home.pets.length){home.pets.forEach((r,i)=>{r.tx=300+i*120;r.ty=1110;r.state='walk';r.goal='welcome'})}
-  renderHome();cancelAnimationFrame(raf);last=performance.now();raf=requestAnimationFrame(tick);
+  renderHome();cancelAnimationFrame(raf);last=performance.now();lastFrame=0;homeScaleK=$('#home').clientHeight/RH;raf=requestAnimationFrame(tick);
   if(!keep&&DB.me&&!isFamily(hid)){const v={id:DB.me.id,nick:DB.me.nick,at:Date.now()};const day=todayTW();
     if(!h.visits||h.visits.day!==day)h.visits={day,list:[]};const L=h.visits.list;const i=L.findIndex(x=>x.id===v.id);if(i>=0)L[i]=v;else L.push(v);
     call('visit',{playerId:DB.me.id,houseId:hid},true).catch(()=>{});visitReward(hid);renderFoot2()}
@@ -1566,7 +1571,7 @@ function renderHome(){
   if($('#eh'))$('#eh').onclick=()=>petForm(h.id);
   renderBoard();renderFloor();renderFoot2();
 }
-$('#back').onclick=()=>{cancelAnimationFrame(raf);home=null;if(ONLINE){sync(true);pingWhere()}$('#home').classList.add('hidden');$('#island').classList.remove('hidden');renderIsland();renderFoot();window.scrollTo(0,0)};
+$('#back').onclick=()=>{cancelAnimationFrame(raf);raf=0;home=null;if(ONLINE){sync(true);pingWhere()}$('#home').classList.add('hidden');$('#island').classList.remove('hidden');renderIsland();renderFoot();window.scrollTo(0,0)};
 // ---------- 留言板 ----------
 function renderBoard(){
   const h=house(home.id),B=BOARDS[h.room]||BOARDS.basic1,ins=10;
@@ -1644,13 +1649,14 @@ function renderFloor(){
     const dm=!r.guest&&demonShown(h);r.demon=dm;if(dm){r.di=r.di||DEMON_IMG[Math.floor(Math.random()*2)];r.dw=r.dw||DEMON_WALK[Math.floor(Math.random()*2)]}r.dsrc=dm?r.di:null;
     const dd=demonOf(h),bar=dm&&!isFamily(h.id)&&dd?`<span class="dbar"><i style="width:${Math.min(100,(+dd.prog||0)/DEMON_GOAL*100)}%"></i><b>解救 ${+dd.prog||0}/${DEMON_GOAL}</b></span>`:'';
     el.innerHTML=`<div class="body"><img src="${dm?r.di:petBody(p)}" alt=""><div class="shadow"></div>${dm?'':wearHTML(p)}</div><span class="nm">${r.guest?'🐾 ':''}${dm?'餓魔':''}${esc(p.name)}${!dm&&popKing(p.id)?'<span class="crownk">🏅</span>':''}</span>${bar}`;if(dm)el.classList.add('demon');
-    const im=el.querySelector('img');r.ar=r.ar||1;im.onload=()=>{r.ar=im.naturalHeight/im.naturalWidth;placePet(r)};im.onerror=()=>{if(!im.dataset.fb&&!r.demon){im.dataset.fb=1;im.src=defBody(p.species)}};
+    const im=el.querySelector('.body>img');r.bodyImg=im;r.bodyEl=el.querySelector('.body');r.ar=r.ar||1;im.onload=()=>{r.ar=im.naturalHeight/im.naturalWidth;placePet(r)};im.onerror=()=>{if(!im.dataset.fb&&!r.demon){im.dataset.fb=1;im.src=defBody(p.species)}};
     el.onclick=e=>{e.stopPropagation();petMenu(r,p)};r.el=el;f.appendChild(el);
     const sp=tentSpot(p,i),tw=230*petScale(sp.y),te=document.createElement('div');te.className='tent';
     te.innerHTML=`<img src="assets/tent_${(p.card||'#ff9a6b').slice(1)}.webp" alt="" onerror="this.src='assets/tent.webp'"><span class="zz">${[0,1,2].map(()=>`<i><img src="assets/fx_z.webp" alt="" onerror="this.replaceWith('Z')"></i>`).join('')}</span><span class="flag"><img src="${petHead(p)}" alt=""></span><span class="nm" id="tl_${r.id}"></span>`;
     Object.assign(te.style,hp(sp.x-tw/2,sp.y-tw*0.98),{width:(tw/RW*100)+'%',zIndex:Math.round(sp.y)});
     te.onclick=e=>{e.stopPropagation();sleepMenu(r,p)};
-    r.tentEl=te;r.tent=sp;f.appendChild(te);r.sleep=undefined;petLook(r);placePet(r)});
+    r.tentEl=te;r.tentLabelEl=te.querySelector('.nm');r.tent=sp;f.appendChild(te);r.sleep=undefined;petLook(r);placePet(r)});
+  homeScaleK=$('#home').clientHeight/RH;
   $('#home').classList.toggle('placing',!!placing);if(placing)drawGrid();else if($('#gcancel'))$('#gcancel').remove();
 }
 // 外觀：餓到縮小、生氣（每幾秒算一次）
@@ -1678,17 +1684,19 @@ function placePet(r){
   if(r.sleep===undefined||Math.random()<0.01){const s=sleepState(p);const was=r.sleep;r.sleep=s;
     if(was&&!s){r.x=r.tent.x+40;r.y=r.tent.y+20;startAnim(r,'pop');r.state='idle';r.until=performance.now()+1200}}
   const asleep=!!r.sleep;r.el.style.display=asleep?'none':'';r.tentEl.style.display=asleep?'':'none';
-  if(asleep){const lb=$('#tl_'+r.id);if(lb)lb.textContent=`${p.name}・${r.sleep.label} ${r.sleep.icon}`;if(r.tentEl)r.tentEl.style.transform=(r.hs||1)<0.995?`scale(${r.hs})`:'';return}
-  if(r.demon){const want=r.state==='walk'?r.dw:r.di,im=r.el.querySelector('.body img');if(im&&r.dsrc!==want){r.dsrc=want;im.src=want}}
+  if(asleep){const lb=r.tentLabelEl;if(lb){const label=`${p.name}・${r.sleep.label} ${r.sleep.icon}`;if(lb.textContent!==label)lb.textContent=label}if(r.tentEl){const tr=(r.hs||1)<0.995?`scale(${r.hs})`:'';if(r.tentEl.style.transform!==tr)r.tentEl.style.transform=tr}return}
+  if(r.demon){const want=r.state==='walk'?r.dw:r.di,im=r.bodyImg;if(im&&r.dsrc!==want){r.dsrc=want;im.src=want}}
   const hs=r.keepS!=null?r.keepS:(r.hs||1),s=petScale(r.y)*hs,w=215*s;
   Object.assign(r.el.style,{left:((r.x-w/2)/RW*100)+'%',top:((r.y-w*(r.ar||1))/RH*100)+'%',width:(w/RW*100)+'%',zIndex:Math.round(r.y)});
   let dy=r.state==='walk'?-Math.abs(Math.sin(r.hop))*(r.fast?20:14)*s:0,dx=0,sq=r.state==='happy'?1+Math.sin(r.hop*2)*0.06:1,sx=1,rot=r.fast?r.facing*8:0;
   let ctr=0;if(r.anim){const A=ACTS[r.anim.type],t=(performance.now()-r.anim.t0)/A.dur;if(t>=1)r.anim=null;else{const o=A.f(t);dy+=(o.dy||0)*s;dx+=(o.dx||0)*s;rot+=(o.rot||0)*r.facing;if(o.sq)sq=o.sq;if(o.sx)sx=o.sx;if(o.c)ctr=1}}
-  const k=$('#home').clientHeight/RH,bd=r.el.querySelector('.body');bd.style.transformOrigin=ctr?'50% 50%':'';
+  const k=homeScaleK,bd=r.bodyEl;
   bd.style.transform=`translate(${dx*k}px,${dy*k}px) rotate(${rot}deg) scaleX(${r.facing*sq*sx}) scaleY(${2-sq})`;
 }
 function tick(now){
-  const dt=Math.min(0.05,(now-last)/1000);last=now;
+  if(!home||document.hidden||$('#home').classList.contains('hidden')){raf=0;return}
+  if(now-lastFrame<PET_FRAME_MS){raf=requestAnimationFrame(tick);return}
+  const dt=Math.min(0.05,(now-last)/1000);last=now;lastFrame=now;
   home.pets.forEach(r=>{if(!r.el)return;const p=pet(r.id);if(!p)return;
     if(r.sleep){placePet(r);return}
     if(r.state==='idle'&&now>r.until&&!r.anim){
@@ -1719,7 +1727,8 @@ function tick(now){
   raf=requestAnimationFrame(tick);
 }
 const FXIMG={'💕':'heart','❤️':'heart','💖':'heart','✨':'star','🎉':'firework','🍖？':'question','🎵':'notes','💤':'z'};
-function fx(ch,x,y){const el=document.createElement('div');el.className='fx';if(FXIMG[ch])el.innerHTML=`<img src="assets/fx_${FXIMG[ch]}.webp" alt="" onerror="this.replaceWith('${ch}')">`;else el.textContent=ch;Object.assign(el.style,hp(x,y));$('#floor').appendChild(el);setTimeout(()=>el.remove(),1400)}
+const liveFX=new Set(),MAX_LIVE_FX=24;
+function fx(ch,x,y){const el=document.createElement('div');el.className='fx';if(FXIMG[ch])el.innerHTML=`<img src="assets/fx_${FXIMG[ch]}.webp" alt="" onerror="this.replaceWith('${ch}')">`;else el.textContent=ch;Object.assign(el.style,hp(x,y));const floor=$('#floor');if(liveFX.size>=MAX_LIVE_FX){const old=liveFX.values().next().value;if(old){old.remove();liveFX.delete(old)}}liveFX.add(el);floor.appendChild(el);setTimeout(()=>{el.remove();liveFX.delete(el)},1400)}
 function bar(v,c){return `<span class="sbar"><i style="width:${v}%;background:${c}"></i></span>`}
 function petMenu(r,p){
   document.querySelectorAll('.petmenu').forEach(m=>m.remove());
@@ -1752,6 +1761,8 @@ function feedNow(only){
   if(!eat.length&&!nap.length){if(!full.length)return toast(awayMsg||'現在沒有毛孩要吃飯');
     return toast((only?`${full[0]} 還飽飽的，晚點再餵`:full.length===cand.length?'大家都吃飽飽了～':`${full.join('、')} 還飽飽的`)+(awayMsg?'；'+awayMsg:''))}
   const now=Date.now(),day=todayTW(),fed=eat.concat(nap);
+  // 保留餵食前狀態，伺服器拒絕的毛孩稍後可還原，避免樂觀更新造成數值跳動。
+  const feedBefore=new Map(fed.map(r=>{const p=pet(r.id);return [r.id,p?{lastFed:p.lastFed,meals:p.meals,mealDay:p.mealDay}:null]}));
   if(eat.length){home.bowl={empty:false};renderFloor();
     eat.forEach((r,i)=>{const p=pet(r.id);if(r.hs<0.995||isHungry(p)){r.revive=true;r.keepS=r.hs||1}r.tx=BOWL.x+(i%2?75:-75)*(1+Math.floor(i/2));r.ty=BOWL.y-10;r.state='walk';r.goal='eat';r.fast=false;r.anim=null});
     setTimeout(()=>{if(home&&home.bowl){home.bowl.empty=true;renderFloor()}},4200);
@@ -1760,7 +1771,20 @@ function feedNow(only){
   fed.forEach(r=>{const p=pet(r.id);p.lastFed=now;p.meals=(p.mealDay===day?(+p.meals||0):0)+1;p.mealDay=day});
   const names=fed.map(r=>pet(r.id).name).join('、');
   toast(`你餵了 ${names} 🍖${nap.length?'（睡著的幫牠留飯了 💤）':''}${full.length&&!only?'（其他毛孩還飽飽的）':''}${awayMsg?'；'+awayMsg:''}`);
-  call('feedPets',{playerId:DB.me.id,houseId:h.id,petIds:fed.map(r=>r.id)},true).catch(e=>toast(e.message));
+  call('feedPets',{playerId:DB.me.id,houseId:h.id,petIds:fed.map(r=>r.id)},true).then(async result=>{
+    const accepted=Array.isArray(result&&result.fedIds)?new Set(result.fedIds.map(String)):null;
+    if(accepted){
+      const rejected=fed.filter(r=>!accepted.has(String(r.id)));
+      if(rejected.length){
+        rejected.forEach(r=>{const p=pet(r.id),before=feedBefore.get(r.id);if(p&&before)Object.assign(p,before)});
+        await sync(true);if(home&&home.id===h.id)renderHome();
+        toast(`${rejected.map(r=>pet(r.id)?.name||'毛孩').join('、')} 沒有成功吃到飯，已同步最新狀態`);
+      }
+    }
+  }).catch(async e=>{
+    feedBefore.forEach((before,id)=>{const p=pet(id);if(p&&before)Object.assign(p,before)});
+    await sync(true);if(home&&home.id===h.id)renderHome();toast('餵食同步失敗，已重新整理狀態：'+e.message)
+  });
   earn('feed');if(ONLINE)feedPush(`${DB.me.nick} 餵了 ${names} 🍖`);demonHelp('feed');
   const g=DB.game;if(!g.feedAt[h.id]||Date.now()-g.feedAt[h.id]>2*HOUR){g.feedAt[h.id]=Date.now();progress('feed')}
 }
@@ -2851,10 +2875,14 @@ function walkForm(){
     ${here.length?`<div class="row2"><button id="wback">🏠 把 ${here.map(g=>esc(pet(g.petId).name)).join('、')} 帶回家</button></div>`:''}
     <div class="row2" style="margin-top:10px"><button data-close>取消</button></div>`);
   if($('#wback'))$('#wback').onclick=()=>{for(const g of here){PEND.home[g.petId]={t:Date.now()};delete PEND.walk[g.petId];call('walkHome',{playerId:DB.me.id,petId:g.petId},true).catch(()=>{})}h.guests=(h.guests||[]).filter(g=>!here.includes(g));closeModal();openHome(h.id,true);toast('帶回家了 🏠')};
-  $('#sheet').querySelectorAll('[data-w]').forEach(b=>b.onclick=async()=>{const p=pet(b.dataset.w);
-    let g;if(ONLINE){g={petId:p.id,ownerId:DB.me.id,ownerNick:DB.me.nick,until:Date.now()+WALK_MIN*60000};const gg=g;
-      call('walkPet',{playerId:DB.me.id,houseId:h.id,petId:p.id},true).then(r=>{if(r)Object.assign(gg,r)}).catch(e=>{h.guests=(h.guests||[]).filter(x=>x!==gg);delete PEND.walk[p.id];if(home&&home.id===h.id)openHome(h.id,true);toast('遛遛沒成功：'+e.message)})}
-    else{try{g=await call('walkPet',{playerId:DB.me.id,houseId:h.id,petId:p.id})}catch(e){toast(e.message);return}}
+  $('#sheet').querySelectorAll('[data-w]').forEach(b=>b.onclick=async()=>{
+    const p=pet(b.dataset.w);if(!p||b.disabled)return;b.disabled=true;
+    let g;
+    try{
+      // 等後端確認成功才更新本機位置，失敗時不先搬走毛孩。
+      g=await call('walkPet',{playerId:DB.me.id,houseId:h.id,petId:p.id},true);
+      if(!g||!g.petId)throw new Error('沒有收到遛遛成功確認，請重新整理後再試');
+    }catch(e){b.disabled=false;toast('遛遛沒成功：'+e.message);return}
     DB.houses.forEach(x=>x.guests=(x.guests||[]).filter(y=>y.petId!==p.id));(h.guests=h.guests||[]).push(g);p.wakeUntil=g.until;PEND.walk[p.id]={hid:h.id,g,t:Date.now()};delete PEND.home[p.id];PEND.wake[p.id]={v:+g.until,t:Date.now()};
     petsOf(h.id).forEach(q=>{p.friends=[...new Set((p.friends||[]).concat(q.id))];q.friends=[...new Set((q.friends||[]).concat(p.id))]});
     closeModal();openHome(h.id,true);const r=home.pets.find(x=>x.id===p.id);if(r){r.x=430;r.y=1170;startAnim(r,'pop')}
@@ -2929,8 +2957,16 @@ if(ONLINE){
   busy(true);sync().finally(()=>{busy(false);updGuestBar();if(!DB.me&&!isGuest())hgThen(onboarding)});
   setInterval(()=>{if(document.visibilityState==='visible'&&$('#modal').classList.contains('hidden'))sync(true)},45000);
   document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')sync(true)});
+
 }else if(!DB.me)setTimeout(()=>hgThen(onboarding),400);
 else setTimeout(dailyLogin,800);
+
+// 背景分頁停止寵物動畫，回到前景才重新啟動，避免閒置時持續耗電與累積工作
+document.addEventListener('visibilitychange',()=>{
+  if(document.hidden){if(raf)cancelAnimationFrame(raf);raf=0;return}
+  if(home&&!$('#home').classList.contains('hidden')&&!raf){last=performance.now();lastFrame=0;raf=requestAnimationFrame(tick)}
+});
+window.addEventListener('resize',()=>{if(home&&!$('#home').classList.contains('hidden'))homeScaleK=$('#home').clientHeight/RH},{passive:true});
 
 // ================= 圖示：自動把 emoji 換成素材 =================
 const ICMAP={'🏆':'assets/icon_rank.webp','👗':'assets/icon_closet.webp','📣':'megaphone','🔒':'lock','🌐':'globe','♂':'male','♀':'female','🎒':'bag','✅':'check','⚠':'warn','🏷':'tag','🎴':'pack','⏳':'hourglass','🛏':'bed','🌙':'moon','☀':'sun','🏥':'clinic','⏰':'alarm','☁':'cloud','🧧':'redpacket','📌':'pin','💧':'drop','🌡':'thermo','💉':'syringe','💊':'pill','🪥':'toothbrush','👁':'eye','🪮':'comb','🚶':'walk','💦':'pee','🤢':'vomit','🛁':'bath','✂':'scissors','🏃':'shoes','😴':'sleep','🔢':'number','🔁':'repeat','🐕':'dog','🐈':'cat','🐇':'rabbit','🐹':'hamster','🐦':'bird',
@@ -2960,10 +2996,10 @@ function coinFloat(d,txt,miss){const el=document.createElement('div');el.classNa
 function bigCoin(d){fx('🎉',d.x-40,d.y-90);setTimeout(()=>fx('✨',d.x+40,d.y-110),200);setTimeout(()=>fx('🎉',d.x,d.y-130),400);sfx('ssr');toast('✨ 金色福袋！')}
 
 // ================= 會動的玩具：定時特效 =================
-let toyTick=0;
+let toyTick=0;const liveBubbles=new Set(),MAX_LIVE_BUBBLES=16;
 setInterval(()=>{if(!home||$('#home').classList.contains('hidden')||document.hidden)return;toyTick++;const h=house(home.id);if(!h)return;
   (h.toys||[]).forEach((t,i)=>{const it=ITEMS[t.item]||{},k=it.fxk;if(!k)return;const sc=it.sz||1;
-    if(k==='bubble'){if(toyTick%2)return;for(let n=0;n<2;n++){const b=document.createElement('div');b.className='bub';const s=10+Math.random()*14;Object.assign(b.style,hp(t.x+(Math.random()*40-10),t.y-60*sc),{width:s+'px',height:s+'px','--dx':(Math.random()*60-30)+'px'});$('#floor').appendChild(b);setTimeout(()=>b.remove(),3200)}}
+    if(k==='bubble'){if(toyTick%2||liveBubbles.size>=MAX_LIVE_BUBBLES)return;for(let n=0;n<2&&liveBubbles.size<MAX_LIVE_BUBBLES;n++){const b=document.createElement('div');b.className='bub';const s=10+Math.random()*14;Object.assign(b.style,hp(t.x+(Math.random()*40-10),t.y-60*sc),{width:s+'px',height:s+'px','--dx':(Math.random()*60-30)+'px'});liveBubbles.add(b);$('#floor').appendChild(b);setTimeout(()=>{b.remove();liveBubbles.delete(b)},3200)}}
     else if(k==='cloud'&&(toyTick+i)%6===0)fx('☁️',t.x,t.y-90*sc);
     else if(k==='heart'&&(toyTick+i)%8===0)fx('💕',t.x,t.y-80*sc);
     else if(k==='squawk'&&(toyTick+i)%9===0)fx('嘎！',t.x,t.y-70*sc);
@@ -3144,7 +3180,8 @@ let lastSayAt=0,nextSayGap=12000;
 setInterval(()=>{if(!home||$('#home').classList.contains('hidden')||document.hidden||!$('#modal').classList.contains('hidden'))return;
   if(Date.now()-lastSayAt<nextSayGap)return;const L=home.pets.filter(r=>r.el&&!r.sleep&&r.el.style.display!=='none');if(!L.length)return;
   const r=L[Math.floor(Math.random()*L.length)],p=pet(r.id);if(!p)return;const own=greets(p);
-  if(own.length&&Math.random()<0.5)petSay(r,null,own[Math.floor(Math.random()*own.length)]);else petSay(r,situation(r,p));
+  // 身分證的三句自訂招呼是日常主台詞；互動事件（餵食、摸摸等）仍保留專屬情境台詞。
+  if(own.length)petSay(r,null,own[Math.floor(Math.random()*own.length)]);else petSay(r,situation(r,p));
   nextSayGap=(25+Math.random()*30)*1000},2000);
 
 // ================= 🌧️❄️ 小島天氣 =================
@@ -3152,7 +3189,7 @@ let wxNow=null;
 function wxKind(){const d=new Date(Date.now()+8*3600e3),m=d.getUTCMonth()+1,day=d.getUTCDate();
   if(wxNow==='snow')return 'snow';if(m===12&&day>=15||m===1&&day<=1)return 'snow';return wxNow==='rain'?'rain':''}
 function drawWx(){const el=$('#wx');if(!el)return;const k=wxKind();if(el.dataset.k===k)return;el.dataset.k=k;el.innerHTML='';el.className='wx '+k;if(!k)return;
-  const n=k==='rain'?70:70;let h='';for(let i=0;i<n;i++){const x=Math.random()*100,dl=-Math.random()*(k==='rain'?1:12),du=k==='rain'?0.5+Math.random()*0.4:6+Math.random()*6,sz=k==='rain'?'':(()=>{const z=4+Math.random()*6;return `width:${z}px;height:${z}px;`})();
+  const n=k==='rain'?38:32;let h='';for(let i=0;i<n;i++){const x=Math.random()*100,dl=-Math.random()*(k==='rain'?1:12),du=k==='rain'?0.5+Math.random()*0.4:6+Math.random()*6,sz=k==='rain'?'':(()=>{const z=4+Math.random()*6;return `width:${z}px;height:${z}px;`})();
     h+=`<i style="left:${x}%;animation-delay:${dl}s;animation-duration:${du}s;${sz}--dx:${(Math.random()*40-20)}px"></i>`}el.innerHTML=h}
 async function loadWx(){try{const c=JSON.parse(localStorage.getItem('mhd_wx')||'null');if(c&&Date.now()-c.t<30*60e3){wxNow=c.k;drawWx();return}}catch(e){}
   try{const r=await fetch('https://api.open-meteo.com/v1/forecast?latitude=25.04&longitude=121.56&current=precipitation,weather_code&timezone=Asia%2FTaipei');const j=await r.json();const wc=+(j.current&&j.current.weather_code),pr=+(j.current&&j.current.precipitation);
