@@ -767,6 +767,7 @@ img{-webkit-user-drag:none}
 .clfoot .r3 button{flex:1;padding-left:4px;padding-right:4px}.clfoot .r3 #clok{flex:1.4}
 .chk{display:flex;align-items:center;gap:6px;font-size:13px;color:var(--soft);margin:6px 0}.chk input{width:18px;height:18px}
 .codebox .cbtns{display:flex;gap:4px;flex:none}
+.hglead{text-align:center;line-height:1.6}.hglead b{color:#7a4f10;font-size:15px}
 </style>
 </head>
 <body>
@@ -936,7 +937,7 @@ async function sync(quiet){
   try{const d=await api('getState',Object.assign(cred(),{where:curWhere()}));
     Object.assign(DB,{houses:d.houses,pets:d.pets,weights:d.weights,medical:d.medical,expenses:d.expenses,notes:d.notes,feed:d.feed,famOk:d.famOk,players:d.players||[],tlogs:d.tlogs||[]});
     DB.houses.forEach(h=>{if(!Array.isArray(h.poops))h.poops=[]});
-    keepPending();DB.letters=(d.letters||[]).filter(l=>!LGONE[l.id]).map(l=>Object.assign(l,LSTATE[l.id]||{},CLAIMED['l:'+l.id]?{claimed:true}:{}));DB.drops=(d.drops||[]).filter(x=>!PICKED.has(x.id));DB.notice=d.notice||null;DB.kuji=d.kuji||DB.kuji||null;DB.online=d.online||[];DB.rank=d.rank||DB.rank||null;osLogin();setTimeout(noticePop,1200);DB.dbl=d.dbl||'';DB.adminId=d.adminId||'';
+    keepPending();DB.letters=(d.letters||[]).filter(l=>!LGONE[l.id]).map(l=>Object.assign(l,LSTATE[l.id]||{},CLAIMED['l:'+l.id]?{claimed:true}:{}));DB.drops=(d.drops||[]).filter(x=>!PICKED.has(x.id));DB.notice=d.notice||null;DB.kuji=d.kuji||DB.kuji||null;DB.online=d.online||[];setTimeout(checkAdminGifts,600);DB.rank=d.rank||DB.rank||null;osLogin();setTimeout(noticePop,1200);DB.dbl=d.dbl||'';DB.adminId=d.adminId||'';
     setTimeout(announceLetters,0);setTimeout(updGuestBar,0);
     if(d.player&&DB.me){DB.me.code=d.player.code||DB.me.code;const ml=Array.isArray(d.player.mail)?d.player.mail:[];if(ml.length)claimMail(ml)}
     DB.owned={};d.houses.forEach(h=>DB.owned[h.id]=Array.isArray(h.owned)?h.owned:[]);
@@ -1050,15 +1051,16 @@ const choiceVal=id=>{const b=$('#'+id+' button.on');return b?b.dataset.v:''};
 // ================= v1.43：衣櫃打扮・排行榜・上線名單・推播・轉移碼 =================
 // ---------- 👗 配件 ----------
 const ACC={
-  cap:{n:'貓耳棒球帽',s:'head',p:180,oy:3,ow:1.1},crown:{n:'寶石皇冠',s:'head',p:300,oy:-2,ow:.85},wizard:{n:'月亮巫師帽',s:'head',p:250,oy:-4,ow:1.15},bearpilot:{n:'小熊飛行帽',s:'head',p:220,oy:7,ow:1.15},
+  cap:{n:'貓耳棒球帽',s:'head',p:180,oy:3,ow:1.1},crown:{n:'寶石皇冠',s:'head',p:300,oy:-2,ow:.85},wizard:{n:'星星巫師帽',s:'head',p:250,oy:-4,ow:1.1},bearpilot:{n:'小熊飛行帽',s:'head',p:220,oy:7,ow:1.15},
   bunny:{n:'兔耳蝴蝶結髮箍',s:'head',p:180,oy:-8},pirhat:{n:'海盜船長帽',s:'head',p:250,oy:0,ow:1.15},berry:{n:'草莓小花帽',s:'head',p:200,oy:3,ow:1.05},astro:{n:'太空貓頭盔',s:'head',p:350,oy:30,ow:1.45},
   devil:{n:'小惡魔髮箍',s:'head',p:180,oy:-3,ow:1.05},halo:{n:'天使翅膀髮箍',s:'head',p:280,oy:-6,ow:1.1},samurai:{n:'武士頭盔',s:'head',p:350,oy:2,ow:1.15},flower:{n:'紫色花圈',s:'head',p:200,oy:-1},
-  minehat:{n:'礦工安全帽',s:'head',p:200,oy:3,ow:1.05},snorkel:{n:'貓耳潛水鏡',s:'head',p:220,oy:10,ow:1.05},unicorn:{n:'獨角獸髮箍',s:'head',p:300,oy:-4,ow:1.05},chef:{n:'廚師帽',s:'head',p:180,oy:-4,ow:.9},
+  minehat:{n:'礦工安全帽',s:'head',p:200,oy:3,ow:1.05},snorkel:{n:'貓耳潛水鏡',s:'head',p:220,oy:10,ow:1.05},unicorn:{n:'獨角獸髮箍',s:'head',p:300,oy:-4,ow:1.05},chef:{n:'廚師帽',s:'head',p:180,oy:-4,ow:1.05},
   grad:{n:'學士帽',s:'head',p:220,oy:0,ow:1.05},steam:{n:'蒸汽龐克禮帽',s:'head',p:280,oy:-3},beanie:{n:'貓耳毛線帽',s:'head',p:200,oy:3,ow:1},pilot:{n:'飛行員毛帽',s:'head',p:220,oy:14,ow:1.2},
   beret:{n:'紅色貝雷帽',s:'head',p:180,oy:0,ow:1},cowhat:{n:'乳牛漁夫帽',s:'head',p:200,oy:4,ow:1.15},shark:{n:'鯊魚帽',s:'head',p:250,oy:6,ow:1.15},dino:{n:'小恐龍帽',s:'head',p:250,oy:6,ow:1.15},
   kitsune:{n:'狐狸面具髮箍',s:'head',p:260,oy:-2,ow:1.05},reindeer:{n:'聖誕麋鹿髮箍',s:'head',p:220,oy:-4,ow:1.1},
   orange:{n:'橘子貝雷帽',s:'head',p:200,oy:0},catpilot:{n:'貓耳飛行帽',s:'head',p:220,oy:2},batband:{n:'蝙蝠骷髏髮箍',s:'head',p:220,oy:-4,ow:1.1},daisy:{n:'雛菊花環',s:'head',p:200,oy:-2,ow:1.05},
   shell:{n:'貝殼珊瑚髮箍',s:'head',p:260,oy:-4,ow:1.05},crowncat:{n:'皇冠貓耳髮箍',s:'head',p:280,oy:-4,ow:1.05},bun:{n:'包子髮箍',s:'head',p:200,oy:-2,ow:1.05},
+  magichat:{n:'撲克魔術帽',s:'head',p:260,oy:-4,ow:1.1},explorer:{n:'探險家帽',s:'head',p:220,oy:0,ow:1.1},strawhat:{n:'小花草帽',s:'head',p:220,oy:0,ow:1.15},partyhat:{n:'派對尖帽',s:'head',p:180,oy:-6,ow:.8},
   stargl:{n:'星星眼鏡',s:'face',p:180},glasses:{n:'金框圓眼鏡',s:'face',p:150},sun:{n:'黑框墨鏡',s:'face',p:180},heartgl:{n:'蝴蝶結愛心眼鏡',s:'face',p:200},
   monocle:{n:'紳士鬍單片眼鏡',s:'face',p:250,oy:8,ow:.95},stache:{n:'翹鬍子',s:'face',p:150,oy:14,ow:.65},mask:{n:'貓掌口罩',s:'face',p:120,oy:14,ow:.8},pirate:{n:'海盜眼罩',s:'face',p:200,ox:12,ow:.42},
   goggle:{n:'潛水面鏡',s:'face',p:220,oy:4,ow:1.1},sprout:{n:'綠芽圓眼鏡',s:'face',p:180,oy:-2},pixel:{n:'像素墨鏡',s:'face',p:220},pilotgl:{n:'飛行護目鏡',s:'face',p:200,ow:1.05},
@@ -1274,6 +1276,16 @@ function adminPlayerSheet(p){
   $('#apkb').onclick=()=>{const v=$('#apk').value.trim().toUpperCase().replace(/^MH-?/,'');if(!v)return toast('先輸入新的轉移碼');setc(v)};
   $('#apkr').onclick=e=>{if(!armBtn(e.target,'確定重新產生？'))return;setc('')};
 }
+// ---------- 👑 島主禮物：🔔 通知＋跳出提醒（v1.52） ----------
+function myGiftsUnopened(){const h=myHouse();if(!h||!DB.me)return [];return (h.gifts||[]).filter(g=>!GONEGIFT[g.id]&&(g.admin?!(g.opened||[]).includes(DB.me.id)&&!CLAIMED['g:'+g.id+':'+DB.me.id]:true))}
+let agPoll=null;
+function checkAdminGifts(){const L=myGiftsUnopened().filter(g=>g.admin);if(!L.length)return;let seen=[];try{seen=JSON.parse(localStorage.getItem('mhd_agseen')||'[]')}catch(e){}
+  const nw=L.filter(g=>!seen.includes(g.id));if(!nw.length||agPoll)return;let tries=0;
+  agPoll=setInterval(()=>{if(++tries>50){clearInterval(agPoll);agPoll=null;return}if(!$('#modal').classList.contains('hidden')||picking||document.querySelector('.gacha')||(home&&home.id===myHouse().id&&!$('#home').classList.contains('hidden')))return;
+    clearInterval(agPoll);agPoll=null;try{localStorage.setItem('mhd_agseen',JSON.stringify(seen.concat(nw.map(g=>g.id)).slice(-50)))}catch(e){}
+    const g=nw[nw.length-1];sfx&&sfx('gift');
+    openModal(`<div style="text-align:center"><div class="giftopen"><span class="ii huge"><img src="assets/gift_admin.webp" alt="" onerror="this.remove()"><b>🎁</b></span></div><h3>👑 島主送禮物來了！</h3>${g.msg?`<p class="lead">「${esc(g.msg)}」</p>`:''}<p class="lead">${nw.length>1?`你家收到 ${nw.length} 份島主禮物，`:''}禮物盒放在你家地上，回家點一下就能拆</p></div><div class="row2"><button data-close>等一下</button><button class="primary" id="aggo">🏠 回家拆禮物</button></div>`);
+    $('#aggo').onclick=()=>{closeModal();openHome(myHouse().id)}},1000)}
 
 // ================= 小島 =================
 const HOUSE_W=150,LOT_W=110,SHOP_IMG=true;let mode='auto',picking=false;
@@ -2222,6 +2234,7 @@ function notices(){
   if(demonOf(h))out.push({ic:'😱',t:`你不在的時候，${petsOf(h.id).map(p=>p.name).join('、')} 變成餓魔了！快回家摸摸牠`,go:'home'});
   petsOf(h.id).forEach(p=>{if(!demonOf(h)&&isHungry(p)){const o=outAt(p.id);out.push({ic:'🍖',t:o&&o.id!==h.id?`${p.name} 在「${o.name}」玩到肚子餓了，叫牠回家吃飯`:`${p.name} 肚子餓了，快去餵牠`,go:'home'})}
     if(p.birthday){const b=p.birthday.slice(5),days=[0,1,2,3,4,5,6,7].find(k=>twDay(now+k*86400e3).slice(5)===b);if(days!==undefined)out.push({ic:'🎂',t:days?`${p.name} 再 ${days} 天生日`:`今天是 ${p.name} 的生日！`,go:'home'})}});
+  const UG=myGiftsUnopened(),ua=UG.filter(g=>g.admin).length,ub=UG.length-ua;if(ua)out.push({ic:'👑',t:`島主送了 ${ua} 份禮物到你家，快回家拆！`,go:'home'});if(ub)out.push({ic:'🎁',t:`家裡有 ${ub} 份禮物還沒拆`,go:'home'});
   const pp=(h.poops||[]).length;if(pp)out.push({ic:'💩',t:`家裡有 ${pp} 坨便便等人清`,go:'home'});
   (DB.medical||[]).forEach(m=>{if(m.next){const d=(new Date(m.next)-new Date(todayTW()))/86400e3;const p=pet(m.petId);if(p&&d>=0&&d<=7)out.push({ic:'🩺',t:`${p.name} ${d?d+' 天後':'今天'}要回診（${m.type}${m.title?'・'+m.title:''}）`,go:'home'})}});
   return out;
@@ -2251,18 +2264,25 @@ let installEvt=null;window.addEventListener('beforeinstallprompt',e=>{e.preventD
 if(ONLINE&&inLine&&!/openExternalBrowser=1/.test(location.search)){try{const u=new URL(location.href);u.searchParams.set('openExternalBrowser','1');location.replace(u.toString())}catch(e){}}
 const inviteUrl=()=>{try{const u=new URL(location.href);u.search='';u.hash='';u.searchParams.set('openExternalBrowser','1');return u.toString()}catch(e){return location.href}};
 const SHARE_SVG='<svg width="18" height="20" viewBox="0 0 18 20" style="vertical-align:-3px"><path d="M9 1v12M5 5l4-4 4 4" fill="none" stroke="#2d7ff9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M5 8H3v11h12V8h-2" fill="none" stroke="#2d7ff9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
-function homeGuide(auto){
-  if(auto&&(isStandalone()||!ONLINE))return;
-  let body;
-  if(inApp)body=`<p class="lead">你現在是在 LINE／IG 裡面開啟，這裡沒辦法加到主畫面</p><ol class="steps2"><li>點右上或右下角的「⋯」</li><li>選「用預設瀏覽器開啟」或「在 Safari 中開啟」</li><li>打開後再照提示加到主畫面</li></ol>`;
-  else if(isIOS)body=`<p class="lead">加到主畫面後，就能像 App 一樣一鍵打開 🐾</p><ol class="steps2"><li>點 Safari 下方（或右上）的分享按鈕 ${SHARE_SVG}</li><li>往下滑，點「<b>加入主畫面</b>」</li><li>右上角按「<b>加入</b>」，主畫面就會出現毛球圖示</li></ol>`;
-  else if(installEvt)body=`<p class="lead">加到主畫面後，就能像 App 一樣一鍵打開 🐾</p><div class="row2"><button class="primary" id="doinstall">📲 安裝到手機</button></div>`;
-  else body=`<p class="lead">加到主畫面後，就能像 App 一樣一鍵打開 🐾</p><ol class="steps2"><li>點瀏覽器右上角的「⋮」</li><li>選「<b>加到主畫面</b>」或「安裝應用程式」</li></ol>`;
-  openModal(`<h3>📲 把毛很多加到主畫面</h3>${isStandalone()?'<p class="lead">你已經是從主畫面打開的了 ✅</p>':body}
-    <div class="row2" style="margin-top:12px"><button data-close>${auto?'等一下再說':'關閉'}</button></div>`);
+function hgDue(){if(isStandalone())return false;let s={};try{s=JSON.parse(localStorage.getItem('mhd_hg')||'{}')}catch(e){}return !((+s.n||0)>=3||(s.n&&Date.now()-(+s.at||0)<3*864e5))}
+function hgThen(then){if(hgDue())homeGuide(true,then);else then()}
+function homeGuide(auto,then){
+  if(auto&&isStandalone())return then&&then();
+  const lead=`<p class="lead hglead"><b>把毛很多加入主畫面，遊戲版面更完整</b><br>像 App 一樣一鍵打開，還能收到毛孩的通知 🐾</p>`;
+  let ic='📲',ttl='加到主畫面',body;
+  if(inApp){ic='🧭';ttl='先換到瀏覽器打開';body=`<p class="lead hglead"><b>在 LINE／IG 裡沒辦法加到主畫面</b><br>換到瀏覽器打開，遊戲版面更完整，資料也比較不會不見</p><ol class="steps2"><li>點右上或右下角的「⋯」</li><li>選「用預設瀏覽器開啟」或「在 Safari 中開啟」</li><li>打開後會再教你加到主畫面</li></ol><div class="row2"><button id="hgcopy">🔗 複製網址，自己貼到 Safari</button></div>`}
+  else if(isIOS)body=lead+`<ol class="steps2"><li>點 Safari 下方（或右上）的分享按鈕 ${SHARE_SVG}</li><li>往下滑，點「<b>加入主畫面</b>」</li><li>右上角按「<b>加入</b>」，主畫面就會出現毛很多 🐾</li></ol>`;
+  else if(installEvt){ttl='把毛很多裝到手機';body=lead+`<p class="lead" style="font-size:12px">按一下就好，不用去商店下載</p><div class="row2"><button class="primary" id="doinstall">📲 安裝到手機</button></div>`}
+  else body=lead+`<ol class="steps2"><li>點瀏覽器右上角的「⋮」</li><li>選「<b>加到主畫面</b>」或「安裝應用程式」</li></ol>`;
+  openModal(`<div style="text-align:center"><div class="giftopen">${ic}</div><h3>${ttl}</h3></div>${isStandalone()?'<p class="lead">你已經是從主畫面打開的了 ✅</p>':body}
+    <div class="row2" style="margin-top:12px">${auto?'<button id="hglater">之後再說</button><button class="primary" id="hgok">知道了</button>':'<button data-close>關閉</button>'}</div>`,!!auto);
+  ['hglater','hgok'].forEach(k=>{if($('#'+k))$('#'+k).onclick=()=>{closeModal();if(then)then()}});
   if($('#doinstall'))$('#doinstall').onclick=async()=>{try{installEvt.prompt();await installEvt.userChoice}catch(e){}installEvt=null;closeModal()};
-  try{localStorage.setItem('mhd_homeguide','1')}catch(e){}
+  if($('#hgcopy'))$('#hgcopy').onclick=async()=>{try{await navigator.clipboard.writeText(inviteUrl());toast('網址複製好了，打開 Safari 貼上就好')}catch(e){toast(inviteUrl())}};
+  if(auto){try{const s=JSON.parse(localStorage.getItem('mhd_hg')||'{}');s.n=(+s.n||0)+1;s.at=Date.now();localStorage.setItem('mhd_hg',JSON.stringify(s))}catch(e){}}
 }
+// 第一次打開就跳（參觀的人也會跳）；之後再說 → 3 天後再跳，最多 3 次；從主畫面打開的不跳
+(function(){if(!hgDue())return;let tries=0;const t=setInterval(()=>{if(++tries>60||!hgDue())return clearInterval(t);if(!$('#modal').classList.contains('hidden')||document.querySelector('.gacha'))return;clearInterval(t);homeGuide(true)},1200)})();
 
 // ================= 毛毛商店・背包・零食・禮物 =================
 const SHOP_POS={x:520,y:1220,style:6};
@@ -2811,10 +2831,10 @@ function renderFoot(){
 }
 renderIsland();renderFoot();tickerShow();setInterval(()=>{if(mode==='auto'&&!$('#island').classList.contains('hidden'))renderIsland()},60000);
 if(ONLINE){
-  busy(true);sync().finally(()=>{busy(false);updGuestBar();if(!DB.me&&!isGuest())onboarding()});
+  busy(true);sync().finally(()=>{busy(false);updGuestBar();if(!DB.me&&!isGuest())hgThen(onboarding)});
   setInterval(()=>{if(document.visibilityState==='visible'&&$('#modal').classList.contains('hidden'))sync(true)},45000);
   document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')sync(true)});
-}else if(!DB.me)setTimeout(onboarding,400);
+}else if(!DB.me)setTimeout(()=>hgThen(onboarding),400);
 else setTimeout(dailyLogin,800);
 
 // ================= 圖示：自動把 emoji 換成素材 =================
@@ -3214,7 +3234,7 @@ function announceLetters(){if(!DB.me)return;let seen=[];try{seen=JSON.parse(loca
     sfx('gift');$('#lgopen').onclick=()=>openLetter(nw[0].id,()=>$('#bell').click())};
   setTimeout(go,1800)}
 // ================= 自動更新：發現新版本就重新載入 =================
-const APP_VER='v1.50';
+const APP_VER='v1.52';
 function checkUpdate(){
   if(!/^https?:/.test(location.protocol)||!API_URL)return;
   if(!$('#modal').classList.contains('hidden'))return; // 正在填表單時不打斷
