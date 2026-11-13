@@ -787,6 +787,8 @@ img{-webkit-user-drag:none}
 .giftopen .mic{width:84px;height:84px;margin:0}
 #mpush.pushoff{border-color:#f0a33a;background:#fff4d6;color:#7a4f10}
 .pic{display:inline-block;width:20px;font-size:13px}
+#floor .gift::before{content:'';position:absolute;inset:-16px -12px -10px}
+#mci,#mdm,#msnd,#mpush{white-space:nowrap}
 .chk{display:flex;align-items:center;gap:6px;font-size:13px;color:var(--soft);margin:6px 0}.chk input{width:18px;height:18px}
 .codebox .cbtns{display:flex;gap:4px;flex:none}
 .hglead{text-align:center;line-height:1.6}.hglead b{color:#7a4f10;font-size:15px}
@@ -1030,7 +1032,7 @@ const LOCAL={
   setCode({code}){DB.me.code='MH-'+code;return {code:'MH-'+code}},adminSetCode({code}){return {code:'MH-'+(code||'NEW123')}},adminSetCoins({coins}){return {coins}},
   addAcc({houseId,acc}){const h=house(houseId);h.acc=[...new Set([...(h.acc||[]),...acc])];return {acc:h.acc}},
   saveWear({petId,wear,wadj}){const p=pet(petId);p.wear=wear;p.wadj=wadj;return {wear,wadj}},
-  kujiDraw({houseId}){const RM={A:['party','princess'],B:['ocean','star','space','sweetdevil','ufobase','pearl'],C:['sakura','forest','cloud','xmas','arcade','washitsu','circus','pinkroom','street','nightmkt','hiphop','hawaiicat'],D:['study','garden','cafe','beach','dessert','library','cabin','surf','redcheck']},PL={A:1,B:2,C:3,D:4};
+  kujiDraw({houseId}){const RM=KUJI_POOL,PL={A:1,B:2,C:3,D:4};
     const nb=no=>{const it=[];for(const g in PL)RM[g].slice().sort(()=>Math.random()-.5).slice(0,PL[g]).forEach(room=>it.push({g,room,t:false}));return {no,items:it,log:[]}};
     let k=DB.kuji&&DB.kuji.items?DB.kuji:nb(1);const pool=k.items.filter(x=>!x.t),t=pool[Math.floor(Math.random()*pool.length)];t.t=true;
     const last=k.items.every(x=>x.t),o=new Set(DB.owned[houseId]||[]),dup=o.has(t.room);if(!dup){o.add(t.room);DB.owned[houseId]=[...o]}
@@ -1304,7 +1306,7 @@ function adminPlayerSheet(p){
   $('#apkr').onclick=e=>{if(!armBtn(e.target,'確定重新產生？'))return;setc('')};
 }
 // ---------- 👑 島主禮物：🔔 通知＋跳出提醒（v1.52） ----------
-function myGiftsUnopened(){const h=myHouse();if(!h||!DB.me)return [];return (h.gifts||[]).filter(g=>!GONEGIFT[g.id]&&(g.admin?!(g.opened||[]).includes(DB.me.id)&&!CLAIMED['g:'+g.id+':'+DB.me.id]:true))}
+function myGiftsUnopened(){const h=myHouse();if(!h||!DB.me)return [];return (h.gifts||[]).filter(g=>!GONEGIFT[g.id]&&(g.admin?!(g.opened||[]).length&&!CLAIMED['g:'+g.id+':'+DB.me.id]:true))}
 let agPoll=null;
 function checkAdminGifts(){const L=myGiftsUnopened().filter(g=>g.admin);if(!L.length)return;let seen=[];try{seen=JSON.parse(localStorage.getItem('mhd_agseen')||'[]')}catch(e){}
   const nw=L.filter(g=>!seen.includes(g.id));if(!nw.length||agPoll)return;let tries=0;
@@ -1520,7 +1522,7 @@ function petDemon(p){const h=p&&house(p.houseId);return !!(h&&demonShown(h))}
 const DEMON_IMG=['assets/demon1.webp','assets/demon2.webp'],DEMON_WALK=['assets/demon3.webp','assets/demon4.webp'];
 const CLAIMED=(()=>{let o={};try{o=JSON.parse(localStorage.getItem('mhd_claimed')||'{}')}catch(e){}return o})();
 function markClaimed(k){CLAIMED[k]=Date.now();try{const ks=Object.keys(CLAIMED);if(ks.length>300)ks.sort((a,b)=>CLAIMED[a]-CLAIMED[b]).slice(0,ks.length-300).forEach(x=>delete CLAIMED[x]);localStorage.setItem('mhd_claimed',JSON.stringify(CLAIMED))}catch(e){}}
-function giftVisible(g,h){if(g.admin&&CLAIMED['g:'+g.id+':'+(DB.me&&DB.me.id)])return false;if(!g.admin)return true;const op=Array.isArray(g.opened)?g.opened:[];if(DB.me&&op.includes(DB.me.id))return false;if(h&&!isFamily(h.id)&&op.length)return false;return true}
+function giftVisible(g,h){if(g.admin&&CLAIMED['g:'+g.id+':'+(DB.me&&DB.me.id)])return false;if(!g.admin)return true;const op=Array.isArray(g.opened)?g.opened:[];if(op.length)return false;return true}
 // ---------- 開門 ----------
 function openHome(hid,keep){
   const h=house(hid);if(!h)return;
@@ -1628,9 +1630,9 @@ function renderFloor(){
     Object.assign(el.style,hp(t.x,t.y),{zIndex:it.flat?1:Math.round(t.y)-300});el.onclick=e=>{e.stopPropagation();if(placing){if(placing.toy===t){placing=null;if($('#gcancel'))$('#gcancel').remove();renderFloor();return toast('沒有移動')}toast('這格已經有家具了，換一格放吧');return}toyMenu(t)};f.appendChild(el)});
   const GV=(h.gifts||[]).filter(g=>giftVisible(g,h));
   (DB.drops||[]).filter(d=>d.houseId===h.id&&!PICKED.has(d.id)).forEach(d=>{const el=document.createElement('button');let dx=d.x,dz=Math.round(d.y)+4;GV.forEach(g=>{if(Math.abs(g.x-dx)<80&&Math.abs(g.y-d.y)<70){dx=g.x+(d.x>=g.x?90:-90);if(dx<FLOOR.x0+30||dx>FLOOR.x1-30)dx=g.x+(d.x>=g.x?-90:90);dz=Math.max(dz,Math.round(g.y)+4)}});el.className='gift coin'+(d.gold?' gold':'');el.innerHTML=`<span class="ii toyi"><img src="assets/money_bag.webp" alt="" onerror="this.remove()"><b>💰</b></span>`;el.setAttribute('aria-label',d.gold?'金色福袋':'錢袋');
-    Object.assign(el.style,hp(dx,d.y),{zIndex:dz});el.onclick=e=>{e.stopPropagation();pickCoin(d,el)};f.appendChild(el)});
+    Object.assign(el.style,hp(dx,d.y),{zIndex:2560+Math.round(dz/10)});el.onclick=e=>{e.stopPropagation();pickCoin(d,el)};f.appendChild(el)});
   (h.gifts||[]).filter(g=>giftVisible(g,h)).forEach(g=>{const el=document.createElement('button');el.className='gift'+(g.admin?' gadmin':'');el.innerHTML=`<span class="ii toyi"><img src="assets/${g.admin?'gift_admin':'gift_box'}.webp" alt="" onerror="this.remove()"><b>🎁</b></span>`;el.setAttribute('aria-label',g.admin?'島主的禮物':'禮物');
-    Object.assign(el.style,hp(g.x,g.y),{zIndex:Math.round(g.y)-4});el.onclick=e=>{e.stopPropagation();openGift(g.id)};f.appendChild(el)});
+    Object.assign(el.style,hp(g.x,g.y),{zIndex:2440+Math.round(g.y/10)});el.onclick=e=>{e.stopPropagation();openGift(g.id)};f.appendChild(el)});
   (h.poops||[]).forEach(p=>{const el=document.createElement('button');el.className='poop';el.innerHTML='<img src="assets/poop.webp" alt="">';el.setAttribute('aria-label','清便便');
     Object.assign(el.style,hp(p.x,p.y),{zIndex:2600});
     el.onclick=e=>{e.stopPropagation();if(!needMe())return;sfx('sweep');fx('✨',p.x,p.y-40);GONEPOOP[p.id]=Date.now();h.poops=h.poops.filter(x=>x.id!==p.id);renderFloor();const nm=(petsOf(h.id)[0]||{}).name||h.name;
@@ -2098,7 +2100,7 @@ $('#me').onclick=()=>{
     <div class="row2" style="margin-top:10px"><button id="mguide">📲 加到主畫面</button><button id="minv">🔗 複製邀請連結</button></div>${ONLINE&&myHouse()?'<div class="row2"><button id="mmail" class="mbtn"><img class="mic" src="assets/icon_mail.webp" alt="">島主信箱</button></div>':''}
     <div class="row2" style="margin-top:8px"><button id="msnd">${sndOn?'🔊 音效：開':'🔇 音效：關'}</button>${ONLINE?`<button id="mpush">🔔 通知…</button>`:''}</div>
     <p class="lead" style="font-size:11px;opacity:.6;margin:8px 0 0">App 版本 ${typeof APP_VER!=='undefined'?APP_VER:''}</p>
-    <div class="row2" style="margin-top:8px"><button id="mci">📅 每日簽到${((DB.game.ci||{}).last)===todayTW()?'（已簽）':''}</button><button id="mdm">📋 今日任務</button></div>
+    <div class="row2" style="margin-top:8px"><button id="mci">${((DB.game.ci||{}).last)===todayTW()?'📅 簽到 ✅':'📅 每日簽到'}</button><button id="mdm">📋 今日任務</button></div>
     ${ONLINE?`<div class="codebox"><div><small>我的轉移碼（換手機時用，截圖存起來）</small><b>${esc(DB.me.code||'同步後就會出現')}</b></div><span class="cbtns"><button id="mcode">複製</button> <button id="mcodee">✏️ 改</button></span></div>`:''}
     ${ONLINE?'<div class="row2" style="margin-top:8px"><button id="mrec">🔑 用轉移碼登入其他帳號</button></div>':''}
     ${adminPw()?'<div class="row2" style="margin-top:10px"><button id="madmin">👑 島主後台</button></div>':''}
@@ -2331,7 +2333,7 @@ function adminMailOne(m){if(!m.read){m.read=true;adminCall('adminMailMark',{id:m
     try{await adminCall('adminLetter',{to:m.fromId,title:title.slice(0,30),body,coins:+$('#arc').value||0,tickets:+$('#art').value||0});await adminCall('adminMailMark',{id:m.id,replied:1});m.replied=true;toast('回信寄出了');adminMailSheet()}catch(e){toast(e.message)}}}
 
 // ---------- 🔔 通知真實狀態＋回報給島主（v1.54） ----------
-const PUSHLBL={on:'🔔 通知：已開啟',off:'🔕 通知：未開啟',denied:'🔕 通知：被關掉',home:'📲 通知：要先加主畫面',na:'🔕 通知：不支援'};
+const PUSHLBL={on:'🔔 通知：已開啟',off:'🔕 通知：未開啟',denied:'🔕 通知：被關掉',home:'📲 通知：先加主畫面',na:'🔕 通知：不支援'};
 async function pushStatus(){if(!ONLINE||!DB.me)return '';if(isIOS&&!isStandalone())return 'home';if(!('Notification' in window)||!OS_ON)return 'na';
   const perm=Notification.permission;if(perm==='denied')return 'denied';if(perm!=='granted')return 'off';
   const st=await osState();return st&&st.ext===DB.me.id&&st.opted!==false&&st.sub?'on':'off'}
@@ -2437,6 +2439,12 @@ function shopSheet(tab){
   const t=S.querySelector('[data-ticket]');if(t)t.onclick=()=>{if((g.coins||0)<PACK_PRICE)return;g.coins-=PACK_PRICE;g.tickets++;sfx('coin');save();updTix();toast('換到 1 張抽卡券 🎟️');shopSheet()};
 }
 // ================= 🎪 毛很多一番賞 =================
+// 🎰 一番賞獎品清單（新增背景時改這裡就好，後端會跟著用）：A 賞至少 1 間、B 至少 2、C 至少 3、D 至少 4
+const KUJI_POOL={
+  A:['party','princess'],
+  B:['ocean','star','space','sweetdevil','ufobase','pearl'],
+  C:['sakura','forest','cloud','xmas','arcade','washitsu','circus','pinkroom','street','nightmkt','hiphop','hawaiicat'],
+  D:['study','garden','cafe','beach','dessert','library','cabin','surf','redcheck']};
 const KUJI_PRICE=200,KUJI_SELL=100,CARD_PRICE=100;
 const KG={A:{n:'A 賞',img:'assets/badge_a.webp'},B:{n:'B 賞',img:'assets/badge_b.webp'},C:{n:'C 賞',img:'assets/badge_c.webp'},D:{n:'D 賞',img:'assets/badge_d.webp'},L:{n:'最後賞',img:'assets/badge_last.webp'}};
 const KUJI_IMGS=['assets/kuji_booth.webp','assets/kuji_closed.webp','assets/kuji_open.webp'].concat(Object.values(KG).map(x=>x.img));
@@ -2467,7 +2475,7 @@ function kujiDraw(ok){
   ov.innerHTML=`<div class="rays" id="rays"></div><div class="hint2" id="kh">點籤紙撕開</div><div class="kstage" id="kst"><img class="ktc" id="ktc" src="assets/kuji_closed.webp" alt="籤紙"></div><div class="gbtns" id="kb"></div>`;
   document.body.appendChild(ov);
   let res=null,err=null,anim=false,shown=false;
-  call('kujiDraw',cred(),true).then(r=>{res=r;if(r&&r.kuji)DB.kuji=r.kuji;show()}).catch(e=>{err=e;show()});
+  call('kujiDraw',Object.assign(cred(),{kpool:KUJI_POOL}),true).then(r=>{res=r;if(r&&r.kuji)DB.kuji=r.kuji;show()}).catch(e=>{err=e;show()});
   ov.querySelector('#ktc').onclick=()=>{if(anim)return;anim=true;sfx('flip');ov.querySelector('#ktc').classList.add('tear');ov.querySelector('#kh').textContent='';
     setTimeout(()=>{anim=2;if(!res&&!err)ov.querySelector('#kh').textContent='籤紙打開中…';show()},700)};
   function show(){if(shown||anim!==2||(!res&&!err))return;shown=true;
@@ -2494,7 +2502,7 @@ function kujiDraw(ok){
       kb.querySelector('#kback').onclick=buttons;
       kb.querySelectorAll('[data-to]').forEach(b=>b.onclick=()=>{const to=house(b.dataset.to);const o=owned(to.id);o.add(res.room);DB.owned[to.id]=[...o];
         toast(`送給「${to.name}」了 🎁 他們會收到通知`);if(ONLINE)feedPush(`🎁 ${DB.me.nick} 送給 ${to.name} 一間「${rName(res.room)}」`);
-        call('kujiGiftRoom',{playerId:DB.me.id,toHouseId:to.id,room:res.room,name:rName(res.room)},true).catch(e=>toast('沒送成功：'+e.message));finish()})};
+        call('kujiGiftRoom',{playerId:DB.me.id,toHouseId:to.id,room:res.room,name:rName(res.room),kpool:KUJI_POOL},true).catch(e=>toast('沒送成功：'+e.message));finish()})};
   }
 }
 // ---------- 餵零食 ----------
@@ -2537,15 +2545,16 @@ const GONEGIFT={};
 async function openGift(gid){
   const h=house(home.id),g=(h.gifts||[]).find(x=>x.id===gid);if(!g||GONEGIFT[gid])return;
   if(!isFamily(h.id))return toast(g.admin?'這是島主送給這個家的禮物，等家人來拆 👑':`這是 ${g.from} 送給這個家的禮物，等家人來拆 🎁`);
-  if(g.admin&&(CLAIMED['g:'+gid+':'+DB.me.id]||(g.opened||[]).includes(DB.me.id))){renderFloor();return toast('這份島主禮物你已經拆過了')}
-  GONEGIFT[gid]=Date.now();
-  if(g.admin){const G=DB.game,got=[];g.opened=(g.opened||[]).concat(DB.me.id);markClaimed('g:'+gid+':'+DB.me.id);
+  if(g.admin&&(CLAIMED['g:'+gid+':'+DB.me.id]||(g.opened||[]).length)){renderFloor();return toast('這份島主禮物已經被拆走了')}
+  if(g.admin){if(g.busy)return;g.busy=1;toast('拆禮物中…');let r;
+    try{r=await call('openGift',Object.assign(cred(),{giftId:gid}))}catch(e){g.busy=0;const m=String(e.message||'');
+      if(/拆走|拆過/.test(m)){g.opened=['x'];GONEGIFT[gid]=Date.now();renderFloor();sync(true);return toast(m)}return toast('拆禮物沒成功：'+m)}
+    GONEGIFT[gid]=Date.now();const G=DB.game,got=[];g.opened=[DB.me.id];markClaimed('g:'+gid+':'+DB.me.id);
     if(+g.coins){G.coins=(G.coins||0)+ +g.coins;got.push(`${g.coins} 金幣`)}if(+g.tickets){G.tickets=(G.tickets||0)+ +g.tickets;got.push(`${g.tickets} 張抽卡券`)}
     if(g.item&&ITEMS[g.item]&&+g.n){bagAdd(g.item,+g.n);got.push(`${ITEMS[g.item].name} ×${g.n}`)}
     if(g.room){const own=new Set(DB.owned[h.id]||[]);if(!own.has(g.room)){own.add(g.room);DB.owned[h.id]=[...own];got.push(`🏠 新房間「${rName(g.room)}」`)}else got.push(`🏠 房間「${rName(g.room)}」已經收進家裡了`)}save();updTix();
-    fx('🎉',g.x,g.y-60);renderFloor();sfx('gift');sayAny('gift');
-    openModal(`<div style="text-align:center"><div class="giftopen"><span class="ii huge"><img src="assets/gift_admin.webp" alt="" onerror="this.remove()"><b>🎁</b></span></div><h3>👑 島主送的禮物！</h3>${g.msg?`<p class="lead">「${esc(g.msg)}」</p>`:''}<p class="lead">${got.join('、')||'一份心意'}</p><p class="lead" style="font-size:12px">${g.room?'房間可以到「⚙️ 家」裡換上。':''}道具已經放進你的背包。每位家人都能各拆一份喔</p></div><div class="row2"><button data-close>謝謝島主 🎉</button></div>`);
-    call('openGift',Object.assign(cred(),{giftId:gid}),true).catch(e=>{const dup=/拆過/.test(e.message);if(+g.coins)G.coins-= +g.coins;if(+g.tickets)G.tickets-= +g.tickets;if(g.item&&+g.n)bagAdd(g.item,-g.n);if(!dup){g.opened=(g.opened||[]).filter(x=>x!==DB.me.id);delete GONEGIFT[gid];delete CLAIMED['g:'+gid+':'+DB.me.id]}save();updTix();renderFloor();toast(dup?'這份島主禮物之前已經拆過了，剛剛的先收回喔':'拆禮物沒成功：'+e.message)});return}
+    fx('🎉',g.x,g.y-60);renderFloor();sfx('gift');sayAny('gift');if(ONLINE)feedPush(`🎁 ${DB.me.nick} 幫 ${h.name} 拆開了島主的禮物！`);
+    openModal(`<div style="text-align:center"><div class="giftopen"><span class="ii huge"><img src="assets/gift_admin.webp" alt="" onerror="this.remove()"><b>🎁</b></span></div><h3>👑 島主送的禮物！</h3>${g.msg?`<p class="lead">「${esc(g.msg)}」</p>`:''}<p class="lead">${got.join('、')||'一份心意'}</p><p class="lead" style="font-size:12px">${g.room?'房間可以到「⚙️ 家」裡換上。':''}道具已經放進你的背包。這份禮物一個家只有一份，被你搶先拆到了！</p></div><div class="row2"><button data-close>謝謝島主 🎉</button></div>`);return}
   // 一般禮物：先在畫面上拆開，雲端在背景處理
   const it=ITEMS[g.item]||{name:'神秘禮物',emo:'🎁',kind:'treat'},asToy=it.kind==='toy'&&(h.toys||[]).length<TOY_MAX;
   h.gifts=h.gifts.filter(x=>x.id!==gid);let tmp=null;
@@ -3029,7 +3038,7 @@ async function adminSheet(){
   <div class="sec adm"><h4>💰 撒錢</h4><p class="lead">島上現在有 ${d.drops} 個錢袋還沒被撿</p>
     <div class="row2"><select id="arh"><option value="">隨機幾家</option>${hs}</select><input id="arn" type="number" min="1" max="10" value="3" style="max-width:80px" aria-label="幾袋"></div>
     <div class="row2"><input id="ara" type="number" min="0" max="999" placeholder="每袋金額（空白＝隨機）"><button id="arb">撒下去</button></div></div>
-  <div class="sec adm"><h4>🎁 送禮到家</h4><p class="lead">禮物盒會出現在那個家的地上，每位家人都能各拆一份</p><div class="row2"><select id="agp">${hs}</select></div>
+  <div class="sec adm"><h4>🎁 送禮到家</h4><p class="lead">禮物盒會出現在那個家的地上，一個家一份，第一個拆的家人拿走</p><div class="row2"><select id="agp">${hs}</select></div>
     <div class="row2"><input id="agc" type="number" min="0" placeholder="金幣"><input id="agt" type="number" min="0" placeholder="抽卡券"></div>
     <div class="row2"><select id="agi"><option value="">（不送道具）</option>${its}</select><input id="agn" type="number" min="0" placeholder="數量" style="max-width:80px"></div>
     <div class="row2"><select id="agr"></select></div><p class="lead" id="agrh" style="margin:0"></p>
@@ -3040,6 +3049,7 @@ async function adminSheet(){
     <p class="lead" style="margin:6px 0 0">附上禮物（可以不填，收件人要按「領取」）</p>
     <div class="row2"><input id="alc" type="number" min="0" placeholder="金幣"><input id="alk" type="number" min="0" placeholder="抽卡券"></div>
     <div class="row2"><select id="ali"><option value="">（不附道具）</option>${its}</select><input id="aln" type="number" min="0" placeholder="數量" style="max-width:80px"></div>
+    <div class="row2"><select id="alr"></select></div><p class="lead" id="alrh" style="margin:0"></p>
     <div class="row2"><button id="alsend">寄出</button></div></div>
   <div class="sec adm"><h4>🙋 玩家列表<span>${d.players.length} 人・🔔 ${d.players.filter(p=>p.pushSt==='on').length} 人有開通知・全島 🪙${d.players.reduce((a,p)=>a+(+p.coins||0),0).toLocaleString()}</span></h4><p class="lead">照金幣多到少排，點 ⚙️ 可以改金幣、轉移碼<br>🔔 收得到通知・🔕 沒開・📲 還沒加主畫面・❔ 還沒更新到新版</p><div class="plist">${d.players.slice().sort((a,b)=>(+b.coins||0)-(+a.coins||0)).map(p=>`<div class="frow"><span>${pushIc(p)}${esc(p.nick)}<small>${p.house?esc(p.house):'沒有家'}・Lv.${p.lv}・🪙${p.coins}${p.createdAt?'・'+new Date(p.createdAt).toLocaleDateString('zh-TW',{month:'numeric',day:'numeric'})+' 加入':''}</small></span><span>${p.house?'':`<button class="mini danger" data-dpl="${p.id}">刪除</button> `}<button class="mini" data-code="${esc(p.code)}">${esc(p.code)||'—'}</button> <button class="mini" data-apl="${p.id}" aria-label="管理">⚙️</button></span></div>`).join('')}</div><p class="lead">點轉移碼可以複製，傳給換手機的朋友</p></div>
   <div class="sec adm"><h4>🏠 家的管理</h4><div class="row2"><select id="ahh">${hs}</select></div>
@@ -3051,7 +3061,7 @@ async function adminSheet(){
   $('#anb').onclick=async()=>{const t=$('#an').value.trim();try{await adminCall('adminNotice',{text:t,push:!!($('#anp')&&$('#anp').checked)});DB.notice=t?{t}:null;fi=0;tickerShow();ok(t?'公告更新了 📣':'公告取消了')}catch(e){toast(e.message)}};
   $('#adb').onclick=async()=>{const on=d.dbl!==todayTW();try{await adminCall('adminDouble',{on});DB.dbl=on?todayTW():'';updHud();ok(on?'今天是雙倍日了 ✨':'雙倍日關掉了');adminSheet()}catch(e){toast(e.message)}};
   $('#arb').onclick=async()=>{try{await adminCall('adminRain',{houseId:$('#arh').value,n:+$('#arn').value||1,amt:+$('#ara').value||0});ok('撒好了，等大家去撿 💰');adminSheet()}catch(e){toast(e.message)}};
-  const roomOpts=()=>{const own=new Set(DB.owned[$('#agp').value]||[]),L=CARDS.filter(c=>!c.limitedOnly);$('#agr').innerHTML=`<option value="">🏠（不送房間）</option>`+L.map(c=>`<option value="${c.id}" ${own.has(c.id)?'disabled':''}>${own.has(c.id)?'✓ 已有・':''}${esc(c.name)}</option>`).join('');const n=L.filter(c=>own.has(c.id)).length;$('#agrh').textContent=`這個家已經有 ${n} / ${L.length} 間房間，打勾的是已經有的`};
+  const OWN=d.owned||DB.owned||{},roomOpts=()=>{const own=new Set(OWN[$('#agp').value]||[]),L=CARDS.filter(c=>!c.limitedOnly),A=L.filter(c=>!own.has(c.id));$('#agr').innerHTML=`<option value="">🏠（不送房間）</option>`+A.map(c=>`<option value="${c.id}">${esc(c.name)}</option>`).join('');$('#agrh').textContent=A.length?`這個家已經有 ${L.length-A.length} / ${L.length} 間，清單只列還沒有的`:'這個家所有房間都有了'};
   roomOpts();$('#agp').onchange=roomOpts;
   $('#agb').onclick=async()=>{const o={houseId:$('#agp').value,coins:+$('#agc').value||0,tickets:+$('#agt').value||0,item:$('#agi').value,n:+$('#agn').value||0,msg:$('#agm').value.trim(),room:$('#agr').value};if(o.room)o.roomName=cardById(o.room).name;
     if(!o.coins&&!o.tickets&&!(o.item&&o.n)&&!o.room)return toast('要送點什麼喔');try{await adminCall('adminGiftHouse',o);toast('送出了，禮物盒已經放在他們家 👑');['agc','agt','agn','agm'].forEach(k=>$('#'+k).value='');$('#agi').value='';$('#agr').value='';sync(true)}catch(e){toast(e.message)}};
@@ -3063,8 +3073,13 @@ async function adminSheet(){
   S.querySelectorAll('[data-icp]').forEach(b=>b.onclick=async()=>{try{await navigator.clipboard.writeText(b.dataset.icp);toast('已複製 '+b.dataset.icp)}catch(e){toast(b.dataset.icp)}});
   S.querySelectorAll('[data-ivd]').forEach(b=>b.onclick=async()=>{if(!armBtn(b,'確定？'))return;try{await adminCall('adminInviteVoid',{code:b.dataset.ivd});toast('作廢了');adminSheet()}catch(e){toast(e.message)}});
   S.querySelectorAll('[data-dpl]').forEach(b=>b.onclick=async()=>{if(!armBtn(b,'確定？'))return;try{await adminCall('adminDeletePlayer',{id:b.dataset.dpl});toast('刪掉了');adminSheet()}catch(e){toast(e.message)}});
-  $('#alsend').onclick=async()=>{const o={to:$('#alto').value,title:$('#alt').value.trim(),body:$('#alb').value.trim(),coins:+$('#alc').value||0,tickets:+$('#alk').value||0,item:$('#ali').value,n:+$('#aln').value||0};
-    if(!o.title)return toast('信要有標題喔');try{await adminCall('adminLetter',o);toast(o.to==='*'?'信寄給全部島民了 ✉️':o.to.startsWith('h:')?'信寄給全家了 ✉️':'信寄出了 ✉️');['alt','alb','alc','alk','aln'].forEach(k=>$('#'+k).value='');$('#ali').value='';sync(true)}catch(e){toast(e.message)}};
+  const letRooms=()=>{const to=$('#alto').value,L=CARDS.filter(c=>!c.limitedOnly);let A,tip;
+    if(to==='*'){const any=new Set();Object.values(OWN).forEach(o=>(o||[]).forEach(x=>any.add(x)));A=L.filter(c=>!any.has(c.id));tip=A.length?'寄給全島：只列全島都還沒有的房間':'寄給全島：沒有全島都沒有的房間'}
+    else{const hid=to.startsWith('h:')?to.slice(2):((d.players.find(p=>p.id===to)||{}).houseId||'');if(!hid){A=[];tip='這個人還沒有家，不能附房間'}else{const own=new Set(OWN[hid]||[]);A=L.filter(c=>!own.has(c.id));tip=A.length?`他們家已經有 ${L.length-A.length} / ${L.length} 間，清單只列還沒有的`:'他們家所有房間都有了'}}
+    $('#alr').innerHTML=`<option value="">🏠（不附房間）</option>`+A.map(c=>`<option value="${c.id}">${esc(c.name)}</option>`).join('');$('#alrh').textContent=tip};
+  letRooms();$('#alto').onchange=letRooms;
+  $('#alsend').onclick=async()=>{const o={to:$('#alto').value,title:$('#alt').value.trim(),body:$('#alb').value.trim(),coins:+$('#alc').value||0,tickets:+$('#alk').value||0,item:$('#ali').value,n:+$('#aln').value||0,room:$('#alr').value};if(o.room)o.roomName=cardById(o.room).name;
+    if(!o.title)return toast('信要有標題喔');try{await adminCall('adminLetter',o);toast(o.to==='*'?'信寄給全部島民了 ✉️':o.to.startsWith('h:')?'信寄給全家了 ✉️':'信寄出了 ✉️');['alt','alb','alc','alk','aln'].forEach(k=>$('#'+k).value='');$('#ali').value='';if(o.room){const hid=o.to==='*'?'':o.to.startsWith('h:')?o.to.slice(2):((d.players.find(p=>p.id===o.to)||{}).houseId||'');if(hid)OWN[hid]=(OWN[hid]||[]).concat(o.room)}letRooms();sync(true)}catch(e){toast(e.message)}};
   $('#aout').onclick=()=>{try{localStorage.removeItem('mhd_admin')}catch(e){}closeModal();toast('已登出島主')};
 }
 
@@ -3290,7 +3305,7 @@ async function manualRefresh(){if(refreshing)return;if(!ONLINE){toast('試做版
 const LGONE={},LSTATE={};
 function unreadLetters(){return (DB.letters||[]).filter(l=>!l.read).length}
 function lgIcon(l){return `<img class="lgi" src="assets/${l.read?'icon_mail_open':'icon_mail'}.webp" alt="" onerror="this.replaceWith('✉️')">`}
-function lgGift(l){const a=[];if(+l.coins)a.push(`🪙 ${l.coins}`);if(+l.tickets)a.push(`🎟️ ${l.tickets}`);if(l.item&&ITEMS[l.item]&&+l.n)a.push(`${ITEMS[l.item].name} ×${l.n}`);return a}
+function lgGift(l){const a=[];if(l.room)a.push(`🏠 ${esc(l.roomName||rName(l.room))}`);if(+l.coins)a.push(`🪙 ${l.coins}`);if(+l.tickets)a.push(`🎟️ ${l.tickets}`);if(l.item&&ITEMS[l.item]&&+l.n)a.push(`${ITEMS[l.item].name} ×${l.n}`);return a}
 function lettersSec(){const L=DB.letters||[];if(!L.length)return '';const u=unreadLetters();
   return `<div class="sec lgsec"><h4><span class="noic">✉️</span> 信箱${u?`<b class="lgu">${u} 封未讀</b>`:''}<span>${L.length} 封</span></h4>
     ${L.slice(0,3).map(l=>`<button class="lgrow${l.read?'':' unread'}" data-lg="${l.id}">${lgIcon(l)}<span class="t"><b>👑 島主｜${esc(l.title)}</b><small>${ago(l.at)}${lgGift(l).length&&!l.claimed?'・附禮物 🎁':''}</small></span>${l.read?'':'<i class="dot"></i>'}</button>`).join('')}
@@ -3310,7 +3325,7 @@ function openLetter(id,back){const l=(DB.letters||[]).find(x=>x.id===id);if(!l)r
   $('#lgb').onclick=back;
   $('#lgdel').onclick=e=>{if(!armBtn(e.target,'確定刪除？'))return;LGONE[id]=1;DB.letters=DB.letters.filter(x=>x.id!==id);updBell();toast('信刪掉了');back();if(ONLINE)call('hideLetter',{playerId:DB.me.id,letterId:id},true).catch(()=>{})};
   if($('#lgclaim'))$('#lgclaim').onclick=()=>{const G=DB.game;if(l.claimed||CLAIMED['l:'+id]){l.claimed=true;toast('這封信的禮物已經領過了');return openLetter(id,back)}markClaimed('l:'+id);l.claimed=true;LSTATE[id]=Object.assign(LSTATE[id]||{},{claimed:true});
-    if(+l.tickets)G.tickets=(G.tickets||0)+ +l.tickets;if(l.item&&ITEMS[l.item]&&+l.n)bagAdd(l.item,+l.n);const b=$('#lgclaim').getBoundingClientRect();grant(0,+l.coins||0,{x:b.left+b.width/2,y:b.top});save();updTix();sfx('gift');
+    if(+l.tickets)G.tickets=(G.tickets||0)+ +l.tickets;if(l.item&&ITEMS[l.item]&&+l.n)bagAdd(l.item,+l.n);if(l.room&&myHouse()){const hid=myHouse().id,own=new Set(DB.owned[hid]||[]);own.add(l.room);DB.owned[hid]=[...own]}const b=$('#lgclaim').getBoundingClientRect();grant(0,+l.coins||0,{x:b.left+b.width/2,y:b.top});save();updTix();sfx('gift');
     toast(`領到了：${g.join('、')} 🎉`);openLetter(id,back);
     call('claimLetter',{playerId:DB.me.id,letterId:id},true).catch(e=>{const dup=/領過/.test(e.message);if(!dup){l.claimed=false;delete LSTATE[id].claimed;delete CLAIMED['l:'+id]}G.coins=Math.max(0,(G.coins||0)-(+l.coins||0));if(+l.tickets)G.tickets-= +l.tickets;if(l.item&&+l.n)bagAdd(l.item,-l.n);save();updTix();toast(dup?'這封信的禮物之前已經領過了，剛剛的先收回喔':'領取沒成功：'+e.message)})}}
 // 有新信時跳出提示（每封只跳一次）
@@ -3322,7 +3337,7 @@ function announceLetters(){if(!DB.me)return;let seen=[];try{seen=JSON.parse(loca
     sfx('gift');$('#lgopen').onclick=()=>openLetter(nw[0].id,()=>$('#bell').click())};
   setTimeout(go,1800)}
 // ================= 自動更新：發現新版本就重新載入 =================
-const APP_VER='v1.54';
+const APP_VER='v1.55';
 function checkUpdate(){
   if(!/^https?:/.test(location.protocol)||!API_URL)return;
   if(!$('#modal').classList.contains('hidden'))return; // 正在填表單時不打斷
