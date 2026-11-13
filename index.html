@@ -779,6 +779,12 @@ img{-webkit-user-drag:none}
 .mrow .mn{flex:1;min-width:0;font-size:14px}.mrow .mn small{display:block;font-size:12px;color:var(--soft);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .mbody{background:#fff;border:2px solid var(--line);border-radius:12px;padding:12px;font-size:15px;line-height:1.6;white-space:pre-wrap;word-break:break-word}
 .mshot{display:block;max-width:100%;border-radius:12px;margin:8px auto}
+.mic{width:22px;height:22px;object-fit:contain;vertical-align:middle;margin-right:4px;flex:none}
+.mbtn{display:flex;align-items:center;justify-content:center;gap:2px}
+.mh3{display:flex;align-items:center;justify-content:center;gap:6px}
+.mtypes button{display:flex;align-items:center;justify-content:center;gap:2px}
+.mrow .mt .mic{width:30px;height:30px;margin:0}
+.giftopen .mic{width:84px;height:84px;margin:0}
 .chk{display:flex;align-items:center;gap:6px;font-size:13px;color:var(--soft);margin:6px 0}.chk input{width:18px;height:18px}
 .codebox .cbtns{display:flex;gap:4px;flex:none}
 .hglead{text-align:center;line-height:1.6}.hglead b{color:#7a4f10;font-size:15px}
@@ -2082,7 +2088,7 @@ $('#me').onclick=()=>{
     <div class="big3" style="margin-top:14px">
       ${h?`<button id="mhome"><span class="e">🏠</span><span>回我家<small>${esc(h.name)}</small></span></button>`:`<button id="mbuild"><span class="e">🏠</span><span>蓋我的家<small>選一塊空地</small></span></button><button id="mjoin"><span class="e">🔑</span><span>加入家人的家<small>需要家人密碼</small></span></button>`}
     </div>
-    <div class="row2" style="margin-top:10px"><button id="mguide">📲 加到主畫面</button><button id="minv">🔗 複製邀請連結</button></div>${ONLINE&&myHouse()?'<div class="row2"><button id="mmail">📮 島主信箱</button></div>':''}
+    <div class="row2" style="margin-top:10px"><button id="mguide">📲 加到主畫面</button><button id="minv">🔗 複製邀請連結</button></div>${ONLINE&&myHouse()?'<div class="row2"><button id="mmail" class="mbtn"><img class="mic" src="assets/icon_mail.webp" alt="">島主信箱</button></div>':''}
     <div class="row2" style="margin-top:8px"><button id="msnd">${sndOn?'🔊 音效：開':'🔇 音效：關'}</button>${ONLINE?`<button id="mpush">🔔 通知${OS_ON&&'Notification' in window&&Notification.permission==='granted'?'：開':''}</button>`:''}</div>
     <p class="lead" style="font-size:11px;opacity:.6;margin:8px 0 0">App 版本 ${typeof APP_VER!=='undefined'?APP_VER:''}</p>
     <div class="row2" style="margin-top:8px"><button id="mci">📅 每日簽到${((DB.game.ci||{}).last)===todayTW()?'（已簽）':''}</button><button id="mdm">📋 今日任務</button></div>
@@ -2265,7 +2271,7 @@ $('#bell').onclick=()=>{
     ${myHouse()?'':'<p class="lead">有家之後，這裡會通知你家的大小事</p>'}
     ${st.length?`<div class="sec" style="margin-top:0"><h4>📌 現在</h4>${st.map(x=>`<div class="frow"><span>${x.ic} ${esc(x.t)}</span></div>`).join('')}</div>`:''}
     ${lettersSec()}
-    ${myHouse()&&ONLINE?'<div class="row2" style="margin-top:8px"><button id="bmail">📮 寫信給島主（建議、回報、許願）</button></div>':''}
+    ${myHouse()&&ONLINE?'<div class="row2" style="margin-top:8px"><button id="bmail" class="mbtn"><img class="mic" src="assets/icon_mail.webp" alt="">寫信給島主（建議、回報、許願）</button></div>':''}
     <div class="sec"><h4>🏠 你家的新鮮事<span>最近 3 天</span></h4>${it.length?it.map(f=>`<div class="frow${f.isNew?' mine':''}"><span>${f.isNew?'<b class="dot"></b>':''}${esc(f.t)}</span><span class="ago">${ago(f.at)}</span></div>`).join(''):'<div class="locked">還沒有新鮮事</div>'}</div>
     <div class="row2" style="margin-top:14px">${myHouse()?'<button id="bhome">🏠 回我家</button>':''}<button data-close>關閉</button></div>`);
   if($('#bhome'))$('#bhome').onclick=()=>{closeModal();openHome(myHouse().id)};if($('#bmail'))$('#bmail').onclick=()=>mailAdminSheet();
@@ -2274,35 +2280,38 @@ $('#bell').onclick=()=>{
 };
 // ---------- 📮 島主信箱（v1.53） ----------
 const MAILT={bug:'🐞 回報問題',idea:'💡 建議',wish:'🌠 許願',talk:'💬 想說的話'};
+const MAILN={bug:'回報問題',idea:'建議',wish:'許願',talk:'想說的話'};
+const mic=(k,s)=>`<img class="mic" src="assets/icon_${k}.webp" alt="" style="width:${s||22}px;height:${s||22}px">`;
+const mtag=k=>MAILN[k]?mic(k)+MAILN[k]:'💬';
 function shrinkImg(file){return new Promise((ok,no)=>{const fr=new FileReader();fr.onerror=no;fr.onload=()=>{const im=new Image();im.onerror=no;im.onload=()=>{
   for(const [W,q] of [[520,.6],[420,.5],[340,.45],[280,.4]]){const s=Math.min(1,W/Math.max(im.width,im.height)),c=document.createElement('canvas');c.width=Math.round(im.width*s);c.height=Math.round(im.height*s);c.getContext('2d').drawImage(im,0,0,c.width,c.height);const d=c.toDataURL('image/jpeg',q);if(d.length<=44000)return ok(d)}no(new Error('截圖太大了'))};im.src=fr.result};fr.readAsDataURL(file)})}
 function mailAdminSheet(type){if(!DB.me)return onboarding();if(!ONLINE)return toast('試做版沒有島主信箱');let t=type||'idea',img='';
-  const draw=()=>{openModal(`<h3>📮 島主信箱</h3><p class="lead" style="text-align:center">遇到問題、有什麼建議，<br>或想許願新玩具、新衣服、新房間 🌠，都可以寫信給島主！</p>
-    <div class="mtypes">${Object.entries(MAILT).map(([k,v])=>`<button data-mt="${k}" class="${k===t?'on':''}">${v}</button>`).join('')}</div>
+  const draw=()=>{openModal(`<h3 class="mh3">${mic('mail',34)}島主信箱</h3><p class="lead" style="text-align:center">遇到問題、有什麼建議，<br>或想許願新玩具、新衣服、新房間，都可以寫信給島主！</p>
+    <div class="mtypes">${Object.entries(MAILT).map(([k,v])=>`<button data-mt="${k}" class="${k===t?'on':''}">${mtag(k)}</button>`).join('')}</div>
     <textarea id="mtx" maxlength="200" rows="5" placeholder="${t==='wish'?'例如：想要一隻會飛的小鯨魚玩具！':t==='bug'?'例如：在衣櫃按完成之後，帽子不見了':'想跟島主說什麼？'}"></textarea><div class="mcnt"><span id="mcn">0</span> / 200</div>
     <div class="row2"><label class="mimg"><input type="file" accept="image/*" id="mfile" hidden><span id="mimgl">📷 附一張截圖（可以不附）</span></label></div><div id="mprev"></div>
     <label class="chk"><input type="checkbox" id="manon"> 🙈 匿名寄出（島主不會知道是誰）</label><div class="err" id="merr"></div>
-    <div class="row2"><button data-close>取消</button><button class="primary" id="msend">寄出 📮</button></div>`);
+    <div class="row2"><button data-close>取消</button><button class="primary" id="msend">寄出</button></div>`);
     const tx=$('#mtx');tx.oninput=()=>{$('#mcn').textContent=tx.value.length;$('#merr').textContent=''};
     $('#sheet').querySelectorAll('[data-mt]').forEach(b=>b.onclick=()=>{const v=tx.value,a=$('#manon').checked;t=b.dataset.mt;draw();$('#mtx').value=v;$('#mcn').textContent=v.length;$('#manon').checked=a;showPrev()});
     const showPrev=()=>{$('#mprev').innerHTML=img?`<div class="mpv"><img src="${img}" alt=""><button id="mrm" aria-label="拿掉截圖">✕</button></div>`:'';$('#mimgl').textContent=img?'📷 換一張截圖':'📷 附一張截圖（可以不附）';if($('#mrm'))$('#mrm').onclick=()=>{img='';showPrev()}};showPrev();
     $('#mfile').onchange=async e=>{const f=e.target.files&&e.target.files[0];if(!f)return;try{img=await shrinkImg(f);showPrev()}catch(x){$('#merr').textContent='這張圖讀不進來，換一張試試'}};
     $('#msend').onclick=async()=>{const v=tx.value.trim();if(!v)return $('#merr').textContent='先寫點什麼再寄喔';const b=$('#msend');b.disabled=true;b.textContent='寄送中…';
       try{const r=await call('mailAdmin',{playerId:DB.me.id,type:t,text:v,img,anon:$('#manon').checked});sfx&&sfx('gift');
-        openModal(`<div style="text-align:center"><div class="giftopen">📮</div><h3>島主收到了！</h3><p class="lead">會盡快回你 🐾${r&&r.left!=null?`<br><small>今天還可以寫 ${r.left} 封</small>`:''}</p></div><div class="row2"><button data-close class="primary">好</button></div>`)}
-      catch(x){b.disabled=false;b.textContent='寄出 📮';$('#merr').textContent=x.message}}};
+        openModal(`<div style="text-align:center"><div class="giftopen">${mic('mail',84)}</div><h3>島主收到了！</h3><p class="lead">會盡快回你 🐾${r&&r.left!=null?`<br><small>今天還可以寫 ${r.left} 封</small>`:''}</p></div><div class="row2"><button data-close class="primary">好</button></div>`)}
+      catch(x){b.disabled=false;b.textContent='寄出';$('#merr').textContent=x.message}}};
   draw()}
 async function adminMailSheet(){let L;try{L=await adminCall('adminMailList')}catch(e){return toast(e.message)}
   const un=L.filter(m=>!m.read).length;
-  openModal(`<h3>📮 島民來信</h3><p class="lead">${L.length?`共 ${L.length} 封${un?`，<b>${un} 封未讀</b>`:''}`:'還沒有人寫信來'}</p>
-    <div class="mlist">${L.map(m=>`<button class="mrow${m.read?'':' unread'}" data-mid="${m.id}"><span class="mt">${MAILT[m.type]||'💬'}</span><span class="mn">${m.anon?'🙈 匿名':esc(m.nick)}${m.replied?' <small>✅ 已回</small>':''}<small>${esc(m.text.slice(0,24))}${m.text.length>24?'…':''}${m.img?' 📷':''}</small></span><span class="ago">${ago(m.at)}</span></button>`).join('')}</div>
+  openModal(`<h3 class="mh3">${mic('mail',34)}島民來信</h3><p class="lead">${L.length?`共 ${L.length} 封${un?`，<b>${un} 封未讀</b>`:''}`:'還沒有人寫信來'}</p>
+    <div class="mlist">${L.map(m=>`<button class="mrow${m.read?'':' unread'}" data-mid="${m.id}"><span class="mt">${mic(m.type in MAILN?m.type:'talk',30)}</span><span class="mn">${m.anon?'🙈 匿名':esc(m.nick)}${m.replied?' <small>✅ 已回</small>':''}<small>${esc(m.text.slice(0,24))}${m.text.length>24?'…':''}${m.img?' 📷':''}</small></span><span class="ago">${ago(m.at)}</span></button>`).join('')}</div>
     <div class="row2"><button id="amback">← 島主後台</button></div>`);
   $('#amback').onclick=adminSheet;
   $('#sheet').querySelectorAll('[data-mid]').forEach(b=>b.onclick=()=>adminMailOne(L.find(m=>m.id===b.dataset.mid)))}
 function adminMailOne(m){if(!m.read){m.read=true;adminCall('adminMailMark',{id:m.id,read:1}).catch(()=>{})}
-  openModal(`<h3>${MAILT[m.type]||'💬'}</h3><p class="lead">${m.anon?'🙈 匿名島民':`${esc(m.nick)}${m.house?'・'+esc(m.house):''}`}・${ago(m.at)}</p>
+  openModal(`<h3 class="mh3">${mtag(m.type)}</h3><p class="lead">${m.anon?'🙈 匿名島民':`${esc(m.nick)}${m.house?'・'+esc(m.house):''}`}・${ago(m.at)}</p>
     <div class="mbody">${esc(m.text)}</div>${m.img?`<img class="mshot" src="${m.img}" alt="截圖">`:''}
-    <div class="sec adm"><h4>💌 回信${m.replied?'<span>已經回過了</span>':''}</h4><textarea id="arb" maxlength="500" rows="3" placeholder="想回什麼？"></textarea>
+    <div class="sec adm"><h4>${mic('letter',20)} 回信${m.replied?'<span>已經回過了</span>':''}</h4><textarea id="arb" maxlength="500" rows="3" placeholder="想回什麼？"></textarea>
       <div class="row2"><input id="arc" type="number" min="0" placeholder="附金幣"><input id="art" type="number" min="0" placeholder="附抽卡券"></div>
       <div class="row2"><button class="primary" id="arsend">寄出回信</button></div></div>
     <div class="row2"><button id="amk">${m.read?'標成未讀':'標成已讀'}</button><button id="adel">🗑️ 刪除</button></div>
@@ -2312,7 +2321,7 @@ function adminMailOne(m){if(!m.read){m.read=true;adminCall('adminMailMark',{id:m
   $('#adel').onclick=async e=>{if(!armBtn(e.target,'確定刪除？'))return;try{await adminCall('adminMailDelete',{id:m.id});toast('刪掉了')}catch(x){toast(x.message)}adminMailSheet()};
   $('#arsend').onclick=async()=>{const body=$('#arb').value.trim();if(!body)return toast('先寫回信內容');
     const title='📮 島主回信：'+(MAILT[m.type]||'').replace(/^\S+\s/,'');
-    try{await adminCall('adminLetter',{to:m.fromId,title:title.slice(0,30),body,coins:+$('#arc').value||0,tickets:+$('#art').value||0});await adminCall('adminMailMark',{id:m.id,replied:1});m.replied=true;toast('回信寄出了 💌');adminMailSheet()}catch(e){toast(e.message)}}}
+    try{await adminCall('adminLetter',{to:m.fromId,title:title.slice(0,30),body,coins:+$('#arc').value||0,tickets:+$('#art').value||0});await adminCall('adminMailMark',{id:m.id,replied:1});m.replied=true;toast('回信寄出了');adminMailSheet()}catch(e){toast(e.message)}}}
 
 // ================= 加到主畫面 =================
 const isStandalone=()=>{try{return matchMedia('(display-mode: standalone)').matches||navigator.standalone===true}catch(e){return false}};
@@ -2991,7 +3000,7 @@ async function adminSheet(){
   DB.adminId=DB.me.id;
   const hs=d.houses.map(h=>`<option value="${h.id}">${esc(h.name)}</option>`).join(''),its=Object.entries(ITEMS).map(([id,i])=>`<option value="${id}">${i.emo} ${esc(i.name)}</option>`).join('');
   openModal(`<h3>👑 島主後台</h3>
-  <div class="row2" style="margin-bottom:8px"><button class="primary" id="amail">📮 島民來信</button></div>
+  <div class="row2" style="margin-bottom:8px"><button class="primary mbtn" id="amail"><img class="mic" src="assets/icon_mail.webp" alt="">島民來信</button></div>
   <div class="sec adm"><h4>🔑 邀請碼<span>${(d.invites||[]).filter(x=>!x.usedBy&&!x.void).length} 組可用</span></h4><p class="lead">每組只能用一次，給要蓋房子的朋友</p>
     <div class="row2"><input id="ainn" maxlength="20" placeholder="備註（例如：給小明）"><button id="ainb">產生 1 組</button></div>
     <div class="invl">${(d.invites||[]).slice(0,30).map(x=>`<div class="frow"><span><b class="code">${esc(x.code)}</b><small>${x.usedBy?`已被 ${esc(x.usedNick||'')} 使用`:x.void?'已作廢':'未使用'}${x.note?'・'+esc(x.note):''}</small></span>${!x.usedBy&&!x.void?`<span><button class="mini" data-icp="${esc(x.code)}">複製</button> <button class="mini" data-ivd="${esc(x.code)}">作廢</button></span>`:''}</div>`).join('')||'<div class="locked">還沒有邀請碼</div>'}</div></div>
