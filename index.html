@@ -792,6 +792,158 @@ img{-webkit-user-drag:none}
 .chk{display:flex;align-items:center;gap:6px;font-size:13px;color:var(--soft);margin:6px 0}.chk input{width:18px;height:18px}
 .codebox .cbtns{display:flex;gap:4px;flex:none}
 .hglead{text-align:center;line-height:1.6}.hglead b{color:#7a4f10;font-size:15px}
+<style id="layout-ocd-fix">
+/* =========================================================
+   1. 島主後台 (.adm) 版面修正：杜絕按鈕直排、擠壓與跑版
+   ========================================================= */
+
+/* 讓「產生 1 組」等單一按鈕在手機版乖乖待在右側、絕不直排，也不會撞到右上角 X */
+.adm .row2 {
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  flex-wrap: nowrap !important;
+}
+
+.adm .row2 > input,
+.adm .row2 > select {
+  flex: 1 1 auto !important;
+  min-width: 0 !important; /* 關鍵：允許輸入框縮小，不要硬擠按鈕 */
+}
+
+.adm .row2 > button {
+  flex: 0 0 auto !important; /* 關鍵：禁止按鈕被壓扁 */
+  width: auto !important;
+  white-space: nowrap !important; /* 關鍵：文字死守在同一行，絕不「產/生/1/組」 */
+  padding-left: 14px !important;
+  padding-right: 14px !important;
+}
+
+/* 如果該行只有一顆大按鈕（例如「島民來信」、「更新公告」、「送出」），讓它滿版整齊 */
+.adm .row2 > button:only-child {
+  width: 100% !important;
+}
+
+/* 避開彈窗右上角的關閉按鈕 (X) */
+#sheet h3 {
+  padding-right: 38px !important;
+}
+
+/* 邀請碼與玩家列表 (.frow)：左邊文字自動省略不撐開，右邊「複製 / 作廢」並排不折行 */
+.adm .frow {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 8px !important;
+}
+
+.adm .frow > span:first-child {
+  flex: 1 1 auto !important;
+  min-width: 0 !important;
+  overflow: hidden !important;
+}
+
+.adm .frow > span:first-child small {
+  display: block !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}
+
+.adm .frow > span:last-child {
+  flex: 0 0 auto !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 4px !important;
+  white-space: nowrap !important;
+}
+
+.adm .frow button.mini {
+  white-space: nowrap !important;
+  width: auto !important;
+  padding: 5px 10px !important;
+}
+
+/* 修正「📲 同時推播給大家」被 checkbox 擠出畫面外的問題 */
+.adm label.chk {
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  width: 100% !important;
+  margin: 10px 0 !important;
+  white-space: nowrap !important;
+  cursor: pointer !important;
+}
+
+.adm label.chk input[type="checkbox"] {
+  width: 18px !important;
+  height: 18px !important;
+  min-width: 18px !important;
+  flex: 0 0 18px !important;
+  margin: 0 !important;
+}
+
+
+/* =========================================================
+   2. 毛毛服飾店 (.clstick / .accgrid) 修正：
+      鎖定寵物預覽高度，大隻寵物絕不壓扁下方商品列表
+   ========================================================= */
+
+/* 取消整塊黏死佔滿螢幕高度，或限制頂部區塊的最大高度 */
+.clstick {
+  position: sticky !important;
+  top: 0 !important;
+  z-index: 10 !important;
+  background: inherit !important;
+}
+
+/* 限制寵物展示框高度，不管寵物多高多胖，框框大小永遠一致 */
+.clprev {
+  height: 200px !important;      /* 固定展示框高度，可依喜好微調 180px~220px */
+  max-height: 30vh !important;   /* 在小螢幕手機上最多只佔 30% 螢幕高 */
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  overflow: hidden !important;
+}
+
+/* 讓寵物本體容器維持正方/固定比例縮放，確保配件座標精準不跑位 */
+.clbody {
+  height: 100% !important;
+  max-height: 100% !important;
+  width: auto !important;
+  aspect-ratio: 1 / 1 !important; /* 維持原本正方形比例，拖曳配件座標才不會歪掉！ */
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+.clbody > img:first-child {
+  max-width: 100% !important;
+  max-height: 100% !important;
+  width: auto !important;
+  height: auto !important;
+  object-fit: contain !important;
+}
+
+/* 確保下方的配件商品網格區永遠有充足空間，不會被擠成一條縫 */
+.accgrid {
+  min-height: 170px !important;
+  padding-top: 8px !important;
+  padding-bottom: 12px !important;
+}
+
+/* 順便讓商品卡片裡的名稱與價格也整齊不亂折行 */
+.accgrid .acci span {
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  max-width: 100% !important;
+  display: block !important;
+}
+</style>
+
+
 </style>
 </head>
 <body>
