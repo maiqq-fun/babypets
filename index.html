@@ -785,6 +785,8 @@ img{-webkit-user-drag:none}
 .mtypes button{display:flex;align-items:center;justify-content:center;gap:2px}
 .mrow .mt .mic{width:30px;height:30px;margin:0}
 .giftopen .mic{width:84px;height:84px;margin:0}
+#mpush.pushoff{border-color:#f0a33a;background:#fff4d6;color:#7a4f10}
+.pic{display:inline-block;width:20px;font-size:13px}
 .chk{display:flex;align-items:center;gap:6px;font-size:13px;color:var(--soft);margin:6px 0}.chk input{width:18px;height:18px}
 .codebox .cbtns{display:flex;gap:4px;flex:none}
 .hglead{text-align:center;line-height:1.6}.hglead b{color:#7a4f10;font-size:15px}
@@ -957,7 +959,7 @@ async function sync(quiet){
   try{const d=await api('getState',Object.assign(cred(),{where:curWhere()}));
     Object.assign(DB,{houses:d.houses,pets:d.pets,weights:d.weights,medical:d.medical,expenses:d.expenses,notes:d.notes,feed:d.feed,famOk:d.famOk,players:d.players||[],tlogs:d.tlogs||[]});
     DB.houses.forEach(h=>{if(!Array.isArray(h.poops))h.poops=[]});
-    keepPending();DB.letters=(d.letters||[]).filter(l=>!LGONE[l.id]).map(l=>Object.assign(l,LSTATE[l.id]||{},CLAIMED['l:'+l.id]?{claimed:true}:{}));DB.drops=(d.drops||[]).filter(x=>!PICKED.has(x.id));DB.notice=d.notice||null;DB.kuji=d.kuji||DB.kuji||null;DB.online=d.online||[];setTimeout(checkAdminGifts,600);DB.rank=d.rank||DB.rank||null;osLogin();setTimeout(noticePop,1200);DB.dbl=d.dbl||'';DB.adminId=d.adminId||'';
+    keepPending();DB.letters=(d.letters||[]).filter(l=>!LGONE[l.id]).map(l=>Object.assign(l,LSTATE[l.id]||{},CLAIMED['l:'+l.id]?{claimed:true}:{}));DB.drops=(d.drops||[]).filter(x=>!PICKED.has(x.id));DB.notice=d.notice||null;DB.kuji=d.kuji||DB.kuji||null;DB.online=d.online||[];setTimeout(checkAdminGifts,600);DB.rank=d.rank||DB.rank||null;osLogin();pushCheckLater();setTimeout(noticePop,1200);DB.dbl=d.dbl||'';DB.adminId=d.adminId||'';
     setTimeout(announceLetters,0);setTimeout(updGuestBar,0);
     if(d.player&&DB.me){DB.me.code=d.player.code||DB.me.code;const ml=Array.isArray(d.player.mail)?d.player.mail:[];if(ml.length)claimMail(ml)}
     DB.owned={};d.houses.forEach(h=>DB.owned[h.id]=Array.isArray(h.owned)?h.owned:[]);
@@ -1273,7 +1275,7 @@ if(OS_ON){window.OneSignalDeferred=window.OneSignalDeferred||[];const sc=documen
   OneSignalDeferred.push(async OS=>{try{await OS.init({appId:OS_APP,notifyButton:{enable:false},autoResubscribe:true});osLogin()}catch(e){}})}
 function pushOff(){try{return localStorage.getItem('mhd_pushoff')==='1'}catch(e){return false}}
 function osLogin(){if(!OS_ON||!DB.me||osLogged===DB.me.id)return;osLogged=DB.me.id;const me=DB.me.id;OneSignalDeferred.push(async OS=>{try{
-  if(OS.User.externalId!==me)await OS.login(me);
+  if(OS.User.externalId!==me)await OS.login(me);pushCheckLater();
   if(Notification.permission==='granted'&&!pushOff()&&OS.User.PushSubscription.optedIn===false)await OS.User.PushSubscription.optIn()}catch(e){osLogged=''}})}
 function osState(){return new Promise(ok=>{if(!OS_ON||!window.OneSignalDeferred)return ok(null);const t=setTimeout(()=>ok(null),4000);
   OneSignalDeferred.push(async OS=>{clearTimeout(t);try{const ps=OS.User.PushSubscription;ok({ext:OS.User.externalId||'',opted:ps.optedIn,sub:ps.id||''})}catch(e){ok(null)}})})}
@@ -1286,12 +1288,12 @@ async function pushSheet(){const kinds=`<div class="sec"><h4>會通知你的事<
   openModal(`<div style="text-align:center"><div class="giftopen">🔔</div><h3>${on?'通知已開啟 ✅':'開啟通知'}</h3><p class="lead">${on?'毛孩有事會第一時間告訴你':perm==='denied'?'通知被關掉了，要到手機的「設定 → 通知 → 毛很多」打開':perm==='granted'?'手機允許了，但還沒跟你的帳號連上，按「開啟通知」重新連結':'毛孩肚子餓、有人送禮的時候，會傳通知給你'}</p><p class="lead" style="font-size:11px;opacity:.7">${st?`連線狀態：${st.sub?'手機已登記':'手機未登記'}・${st.ext===DB.me.id?'帳號已綁定':'帳號未綁定'}${st.opted===false?'・已關閉':''}`:'連線狀態：讀不到'}</p></div>${kinds}
     <div class="row2"><button data-close>關閉</button>${on?'<button id="poff">關閉通知</button>':perm==='denied'?'':'<button class="primary" id="pon">開啟通知</button>'}</div>`);
   if($('#pon'))$('#pon').onclick=()=>{osLogged='';try{localStorage.removeItem('mhd_pushoff')}catch(e){}const b=$('#pon');b.disabled=true;b.textContent='連線中…';OneSignalDeferred.push(async OS=>{try{if(OS.User.externalId&&OS.User.externalId!==DB.me.id)await OS.logout();await OS.Notifications.requestPermission();await OS.login(DB.me.id);osLogged=DB.me.id;if(OS.User.PushSubscription.optedIn===false)await OS.User.PushSubscription.optIn()}catch(e){}
-    setTimeout(async()=>{const s2=await osState();toast(Notification.permission==='granted'&&s2&&s2.ext===DB.me.id&&s2.sub?'通知開好了 🔔':'還沒連上，再按一次試試');pushSheet()},1200)})};
-  if($('#poff'))$('#poff').onclick=()=>OneSignalDeferred.push(async OS=>{try{localStorage.setItem('mhd_pushoff','1');await OS.User.PushSubscription.optOut()}catch(e){}toast('通知關掉了');closeModal()});
+    setTimeout(async()=>{const s2=await osState();pushStatus().then(pushReport);toast(Notification.permission==='granted'&&s2&&s2.ext===DB.me.id&&s2.sub?'通知開好了 🔔':'還沒連上，再按一次試試');pushSheet()},1200)})};
+  if($('#poff'))$('#poff').onclick=()=>OneSignalDeferred.push(async OS=>{try{localStorage.setItem('mhd_pushoff','1');await OS.User.PushSubscription.optOut()}catch(e){}toast('通知關掉了');pushStatus().then(pushReport);closeModal()});
 }
 // ---------- 👑 島主：玩家金幣、轉移碼 ----------
 function adminPlayerSheet(p){
-  openModal(`<h3>👑 ${esc(p.nick)}</h3><p class="lead">${p.house?esc(p.house):'沒有家'}・Lv.${p.lv}</p>
+  openModal(`<h3>👑 ${esc(p.nick)}</h3><p class="lead">${p.house?esc(p.house):'沒有家'}・Lv.${p.lv}<br>${p.pushSt?PUSHLBL[p.pushSt]||'':'❔ 通知：還沒回報（還沒用新版打開過）'}${p.pushAt?`<small>（${ago(+p.pushAt)}回報）</small>`:''}</p>
     <div class="sec adm"><h4>🪙 金幣</h4><p class="lead">現在 ${p.coins}。改了之後，他下次打開 App 就會變成新的數字</p><div class="row2"><input id="apc" type="number" min="0" value="${+p.coins||0}"><button id="apcb">設定</button></div></div>
     <div class="sec adm"><h4>🔑 轉移碼</h4><p class="lead">現在是 <b class="code">${esc(p.code||'—')}</b>，改掉後舊的立刻失效</p><input id="apk" maxlength="12" placeholder="新的轉移碼（6～12 個英文和數字）" autocapitalize="characters"><div class="row2"><button id="apkb">改成這個</button><button id="apkr">🎲 重新產生</button></div></div>
     <div class="row2"><button id="apback">← 島主後台</button></div>`);
@@ -2094,7 +2096,7 @@ $('#me').onclick=()=>{
       ${h?`<button id="mhome"><span class="e">🏠</span><span>回我家<small>${esc(h.name)}</small></span></button>`:`<button id="mbuild"><span class="e">🏠</span><span>蓋我的家<small>選一塊空地</small></span></button><button id="mjoin"><span class="e">🔑</span><span>加入家人的家<small>需要家人密碼</small></span></button>`}
     </div>
     <div class="row2" style="margin-top:10px"><button id="mguide">📲 加到主畫面</button><button id="minv">🔗 複製邀請連結</button></div>${ONLINE&&myHouse()?'<div class="row2"><button id="mmail" class="mbtn"><img class="mic" src="assets/icon_mail.webp" alt="">島主信箱</button></div>':''}
-    <div class="row2" style="margin-top:8px"><button id="msnd">${sndOn?'🔊 音效：開':'🔇 音效：關'}</button>${ONLINE?`<button id="mpush">🔔 通知${OS_ON&&'Notification' in window&&Notification.permission==='granted'?'：開':''}</button>`:''}</div>
+    <div class="row2" style="margin-top:8px"><button id="msnd">${sndOn?'🔊 音效：開':'🔇 音效：關'}</button>${ONLINE?`<button id="mpush">🔔 通知…</button>`:''}</div>
     <p class="lead" style="font-size:11px;opacity:.6;margin:8px 0 0">App 版本 ${typeof APP_VER!=='undefined'?APP_VER:''}</p>
     <div class="row2" style="margin-top:8px"><button id="mci">📅 每日簽到${((DB.game.ci||{}).last)===todayTW()?'（已簽）':''}</button><button id="mdm">📋 今日任務</button></div>
     ${ONLINE?`<div class="codebox"><div><small>我的轉移碼（換手機時用，截圖存起來）</small><b>${esc(DB.me.code||'同步後就會出現')}</b></div><span class="cbtns"><button id="mcode">複製</button> <button id="mcodee">✏️ 改</button></span></div>`:''}
@@ -2102,7 +2104,7 @@ $('#me').onclick=()=>{
     ${adminPw()?'<div class="row2" style="margin-top:10px"><button id="madmin">👑 島主後台</button></div>':''}
     <div class="row2" style="margin-top:10px"><button data-close>關閉</button></div>`);
   $('#mguide').onclick=()=>homeGuide(false);if($('#mmail'))$('#mmail').onclick=()=>mailAdminSheet();$('#msnd').onclick=()=>{sndOn=!sndOn;try{localStorage.setItem('mhd_snd',sndOn?'1':'0')}catch(e){}$('#msnd').textContent=sndOn?'🔊 音效：開':'🔇 音效：關';updSndBtns();if(sndOn)sfx('tap')};if($('#madmin'))$('#madmin').onclick=adminSheet;$('#mci').onclick=checkinSheet;$('#mdm').onclick=missionsSheet;if($('#mrec'))$('#mrec').onclick=recoverSheet;
-  if($('#mcodee'))$('#mcodee').onclick=()=>{if(!DB.me.code)return toast('同步後再改');codeSheet()};if($('#mpush'))$('#mpush').onclick=pushSheet;
+  if($('#mcodee'))$('#mcodee').onclick=()=>{if(!DB.me.code)return toast('同步後再改');codeSheet()};if($('#mpush')){$('#mpush').onclick=pushSheet;refreshPushBtn()}
   if($('#mcode'))$('#mcode').onclick=async()=>{const c=DB.me.code;if(!c)return;try{await navigator.clipboard.writeText(c);toast('轉移碼已複製 🔑')}catch(e){toast(c)}};
   $('#minv').onclick=async()=>{const u=inviteUrl();try{await navigator.clipboard.writeText(u);toast('邀請連結已複製，貼到 LINE 給朋友吧 🔗')}catch(e){toast(u)}};
   $('#msave').onclick=async()=>{const n=$('#mn').value.trim();if(!n)return toast('暱稱不能空白');
@@ -2327,6 +2329,19 @@ function adminMailOne(m){if(!m.read){m.read=true;adminCall('adminMailMark',{id:m
   $('#arsend').onclick=async()=>{const body=$('#arb').value.trim();if(!body)return toast('先寫回信內容');
     const title='📮 島主回信：'+(MAILT[m.type]||'').replace(/^\S+\s/,'');
     try{await adminCall('adminLetter',{to:m.fromId,title:title.slice(0,30),body,coins:+$('#arc').value||0,tickets:+$('#art').value||0});await adminCall('adminMailMark',{id:m.id,replied:1});m.replied=true;toast('回信寄出了');adminMailSheet()}catch(e){toast(e.message)}}}
+
+// ---------- 🔔 通知真實狀態＋回報給島主（v1.54） ----------
+const PUSHLBL={on:'🔔 通知：已開啟',off:'🔕 通知：未開啟',denied:'🔕 通知：被關掉',home:'📲 通知：要先加主畫面',na:'🔕 通知：不支援'};
+async function pushStatus(){if(!ONLINE||!DB.me)return '';if(isIOS&&!isStandalone())return 'home';if(!('Notification' in window)||!OS_ON)return 'na';
+  const perm=Notification.permission;if(perm==='denied')return 'denied';if(perm!=='granted')return 'off';
+  const st=await osState();return st&&st.ext===DB.me.id&&st.opted!==false&&st.sub?'on':'off'}
+function pushReport(s){if(!ONLINE||!DB.me||!s)return;let last='';try{last=localStorage.getItem('mhd_pushrep')||''}catch(e){}
+  const k=DB.me.id+':'+s+':'+todayTW();if(last===k)return;
+  call('pushState',{playerId:DB.me.id,st:s},true).then(()=>{try{localStorage.setItem('mhd_pushrep',k)}catch(e){}}).catch(()=>{})}
+async function refreshPushBtn(){const b=$('#mpush');if(!b)return;const s=await pushStatus();if(s&&$('#mpush')===b){b.textContent=PUSHLBL[s]||PUSHLBL.off;b.classList.toggle('pushoff',s!=='on')}pushReport(s)}
+let pushChecked=0;function pushCheckLater(){if(pushChecked||!ONLINE||!DB.me)return;pushChecked=1;setTimeout(()=>pushStatus().then(pushReport),5000)}
+const PUSHIC={on:'🔔',off:'🔕',denied:'🔕',home:'📲',na:'🔕'};
+function pushIc(p){return `<span class="pic" title="${p.pushSt?PUSHLBL[p.pushSt]||'':'還沒回報'}">${PUSHIC[p.pushSt]||'❔'}</span>`}
 
 // ================= 加到主畫面 =================
 const isStandalone=()=>{try{return matchMedia('(display-mode: standalone)').matches||navigator.standalone===true}catch(e){return false}};
@@ -3026,7 +3041,7 @@ async function adminSheet(){
     <div class="row2"><input id="alc" type="number" min="0" placeholder="金幣"><input id="alk" type="number" min="0" placeholder="抽卡券"></div>
     <div class="row2"><select id="ali"><option value="">（不附道具）</option>${its}</select><input id="aln" type="number" min="0" placeholder="數量" style="max-width:80px"></div>
     <div class="row2"><button id="alsend">寄出</button></div></div>
-  <div class="sec adm"><h4>🙋 玩家列表<span>${d.players.length} 人・全島 🪙${d.players.reduce((a,p)=>a+(+p.coins||0),0).toLocaleString()}</span></h4><p class="lead">照金幣多到少排，點 ⚙️ 可以改金幣、轉移碼</p><div class="plist">${d.players.slice().sort((a,b)=>(+b.coins||0)-(+a.coins||0)).map(p=>`<div class="frow"><span>${esc(p.nick)}<small>${p.house?esc(p.house):'沒有家'}・Lv.${p.lv}・🪙${p.coins}${p.createdAt?'・'+new Date(p.createdAt).toLocaleDateString('zh-TW',{month:'numeric',day:'numeric'})+' 加入':''}</small></span><span>${p.house?'':`<button class="mini danger" data-dpl="${p.id}">刪除</button> `}<button class="mini" data-code="${esc(p.code)}">${esc(p.code)||'—'}</button> <button class="mini" data-apl="${p.id}" aria-label="管理">⚙️</button></span></div>`).join('')}</div><p class="lead">點轉移碼可以複製，傳給換手機的朋友</p></div>
+  <div class="sec adm"><h4>🙋 玩家列表<span>${d.players.length} 人・🔔 ${d.players.filter(p=>p.pushSt==='on').length} 人有開通知・全島 🪙${d.players.reduce((a,p)=>a+(+p.coins||0),0).toLocaleString()}</span></h4><p class="lead">照金幣多到少排，點 ⚙️ 可以改金幣、轉移碼<br>🔔 收得到通知・🔕 沒開・📲 還沒加主畫面・❔ 還沒更新到新版</p><div class="plist">${d.players.slice().sort((a,b)=>(+b.coins||0)-(+a.coins||0)).map(p=>`<div class="frow"><span>${pushIc(p)}${esc(p.nick)}<small>${p.house?esc(p.house):'沒有家'}・Lv.${p.lv}・🪙${p.coins}${p.createdAt?'・'+new Date(p.createdAt).toLocaleDateString('zh-TW',{month:'numeric',day:'numeric'})+' 加入':''}</small></span><span>${p.house?'':`<button class="mini danger" data-dpl="${p.id}">刪除</button> `}<button class="mini" data-code="${esc(p.code)}">${esc(p.code)||'—'}</button> <button class="mini" data-apl="${p.id}" aria-label="管理">⚙️</button></span></div>`).join('')}</div><p class="lead">點轉移碼可以複製，傳給換手機的朋友</p></div>
   <div class="sec adm"><h4>🏠 家的管理</h4><div class="row2"><select id="ahh">${hs}</select></div>
     <div class="row2"><input id="ahp" type="password" placeholder="新的家人密碼（4 字以上）"><button id="ahpb">重設密碼</button></div>
     <div class="row2"><button id="ahrb" class="danger">收回成空地</button></div><p class="lead">收回會刪掉這個家的毛孩和紀錄，不能復原</p></div>
