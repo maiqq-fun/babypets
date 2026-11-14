@@ -977,7 +977,7 @@ img{-webkit-user-drag:none}
 <script>
 // ================= 常數 =================
 // 小島的地（v1.61 用排版工具自己排的）。0～13 是原本的地，6＝毛二街，14、15 是新增的
-const SLOTS=[[457,258],[662,277],[203,650],[379,576],[834,409],[535,501],[533,776],[679,634],[670,951],[478,1054],[236,401],[352,865],[890,734],[831,583],[189,871],[809,1099]];
+const SLOTS=[[400,279],[590,280],[237,634],[402,548],[795,334],[568,513],[517,781],[706,640],[696,885],[542,1062],[236,401],[377,941],[900,774],[853,557],[203,876],[778,1132]];
 const CENTER_POS={x:378,y:1283};   // 預留給島民中心
 const STYLE_NAMES={1:'粉紅陽台屋',2:'紅屋頂木屋',3:'蘑菇屋',4:'藤蔓石屋',5:'藍屋頂小屋',6:'麵包坊',7:'魔法師小屋',8:'燈塔屋',9:'南瓜屋',10:'海邊小屋',11:'人魚貝殼屋',12:'綠頂莊園',13:'草莓蛋糕屋',14:'鳳梨屋',15:'雪人小屋',16:'恐龍屋'};
 const SPECIES=[['狗','🐕'],['貓','🐈'],['兔','🐇'],['倉鼠','🐹'],['鳥','🐦'],['其他','🐾']];
@@ -1519,7 +1519,7 @@ function renderIsland(){
   {const sp=centerPos(),el=document.createElement('div');el.className='thing';el.setAttribute('role','button');el.tabIndex=0;el.setAttribute('aria-label','島民中心');
     Object.assign(el.style,ipct(sp.x,sp.y),{width:(HOUSE_W*SHOP_SC/1024*100)+'%',zIndex:sp.y});el.innerHTML=`<img src="assets/center_${p}.webp" alt="" onerror="this.src='assets/center_day.webp'">`;el.onclick=openCenter;box.appendChild(el);
     box.appendChild(signEl('島民中心',sp.x,sp.y,'center'));
-    if(DB.notice&&DB.notice.t){const gb=document.createElement('div');gb.className='bubble';gb.textContent='📌';Object.assign(gb.style,ipct(sp.x+45,sp.y-165),{zIndex:2001});box.appendChild(gb)}}
+    if(false){const gb=document.createElement('div');gb.className='bubble';gb.textContent='📌';Object.assign(gb.style,ipct(sp.x+45,sp.y-165),{zIndex:2001});box.appendChild(gb)}}
   $('#pickbar').classList.toggle('hidden',!picking);$('#ticker').classList.toggle('hidden',picking);
   renderMe();updTix();if(typeof updBell==='function')updBell();updOnline();
 }
@@ -2512,7 +2512,7 @@ function homeGuide(auto,then){
 (function(){if(!hgDue())return;let tries=0;const t=setInterval(()=>{if(++tries>60||!hgDue())return clearInterval(t);if(!$('#modal').classList.contains('hidden')||document.querySelector('.gacha'))return;clearInterval(t);homeGuide(true)},1200)})();
 
 // ================= 毛毛商店・背包・零食・禮物 =================
-const SHOP_POS={x:263,y:1144,style:6};
+const SHOP_POS={x:259,y:1166,style:6};
 const ITEMS={
   fish:{name:'小魚乾',emo:'🐟',kind:'treat',price:15,fav:['貓']},
   meat:{name:'肉泥',emo:'🥫',kind:'treat',price:20,fav:['貓']},
@@ -3391,7 +3391,8 @@ function centerPos(){const taken=DB.houses.some(h=>!isSpecialH(h)&&+h.slot===CEN
 const centerStaff=()=>{const L=DB.center&&Array.isArray(DB.center.staff)?DB.center.staff.filter(x=>x&&x.name):[];return (L.length?L:CENTER_STAFF0).slice(0,CENTER_STAFF_MAX)};
 const noticeLeft=n=>{if(!n||!+n.until)return '';const m=Math.max(0,Math.floor((+n.until-Date.now())/60000)),d=Math.floor(m/1440),h=Math.floor(m%1440/60);return d?`${d} 天 ${h} 小時`:h?`${h} 小時`:`${m%60} 分鐘`};
 let cEls=[];
-function openCenter(){sfx&&sfx('tap');let v=$('#centerv');if(v)v.remove();v=document.createElement('div');v.id='centerv';v.className='centerv';
+const pinSeen=()=>{try{return +(localStorage.getItem('mhd_pinseen')||0)}catch(e){return 0}};
+function openCenter(){sfx&&sfx('tap');try{if(DB.notice&&DB.notice.at)localStorage.setItem('mhd_pinseen',String(DB.notice.at))}catch(e){}let v=$('#centerv');if(v)v.remove();v=document.createElement('div');v.id='centerv';v.className='centerv';
   const n=DB.notice&&DB.notice.t?DB.notice:null;
   v.innerHTML=`<div class="chead"><button class="pill" id="cback">← 小島</button><div class="ctitle">島民中心<small>大家的服務處</small></div><span style="width:84px"></span></div>
     <div class="cwrap"><div class="cstage" id="cstage"><img class="cbg" src="assets/room_center.webp" alt="">
@@ -3505,16 +3506,24 @@ const guestN=c=>c>=28?3:c>=14?2:c>=4?1:0;
 let F2=null,f2Tick=0;
 function openFloor2(hid){const h=house(hid);if(!hasF2(h))return;sfx&&sfx('tap');
   const v=sceneOpen('f2v',esc(h.name),'🛏️ 二樓民宿',roomImg(h.room2||'basic1'),'<img class="mic" src="assets/icon_down.webp" alt="">一樓');F2={hid,placing:null};
-  const st=v.querySelector('.cstage');st.onclick=e=>f2Click(e);renderF2();clearInterval(f2Tick);f2Tick=setInterval(()=>{if(!$('#f2v'))return clearInterval(f2Tick);walkTick($('#f2v .cstage'));updRent()},3500)}
+  const st=v.querySelector('.cstage');st.onclick=e=>f2Click(e);renderF2();clearInterval(f2Tick);let f2n=0;f2Tick=setInterval(()=>{if(!$('#f2v'))return clearInterval(f2Tick);if(!document.hidden)f2Wander($('#f2v .cstage'));if(++f2n%4==0)updRent()},900)}
+// 二樓散步：跟公園同一套走法，但每隻休息時間到了就走（不會一開始定格）
+function f2Wander(st){st.querySelectorAll('.gnpc').forEach(el=>{if(el._busy||Date.now()<(el._rest||0))return;
+  const ang=Math.random()*Math.PI*2,dist=70+Math.random()*130,tx=clamp(el._x+Math.cos(ang)*dist,FLOOR.x0+40,FLOOR.x1-40),ty=clamp(el._y+Math.sin(ang)*dist*.6,FLOOR.y0+30,FLOOR.y1-20);
+  const d=Math.hypot(tx-el._x,ty-el._y);if(d<30){el._rest=Date.now()+800;return}const dur=d/60;el._busy=1;el.style.zIndex=Math.round(Math.max(el._y,ty));el.classList.toggle('flip',tx<el._x);el.classList.add('walking');
+  el.style.transition=`left ${dur}s linear,top ${dur}s linear`;Object.assign(el.style,hp(tx,ty));el._x=tx;el._y=ty;if(el._key)GPOS[el._key]={x:tx,y:ty};
+  setTimeout(()=>{el._busy=0;el._rest=Date.now()+2500+Math.random()*6000;el.classList.remove('walking');el.style.zIndex=Math.round(ty)},dur*1000)})}
 function renderF2(){const v=$('#f2v');if(!v||!F2)return;const h=house(F2.hid),st=v.querySelector('.cstage'),fam=isFamily(h.id);
   st.querySelector('.cbg').src=roomImg(h.room2||'basic1');st.querySelectorAll('.toy,.walker,.rentjar,.f2hint').forEach(x=>x.remove());
   (h.toys2||[]).forEach(t=>{const it=ITEMS[t.item]||{},el=document.createElement('button');el.className='toy'+(t.flip?' flip':'')+(it.an?' an-'+it.an:'')+(it.flat?' flat':'');el.innerHTML=itemIcon(t.item,'toyi');
     if(it.sz)el.style.setProperty('--sz',it.sz);Object.assign(el.style,hp(t.x,t.y),{zIndex:it.flat?1:Math.round(t.y)-300});
     el.onclick=e=>{e.stopPropagation();if(F2.placing)return toast('這裡有東西了，換個地方');if(fam)f2ToyMenu(t);else{el.classList.remove('bump');void el.offsetWidth;el.classList.add('bump')}};st.appendChild(el)});
   const c=comfortOf(h),gn=guestN(c),k=Math.floor(Date.now()/HOUR);
-  (guestPlan().inn[h.id]||[]).forEach((g,i)=>walker(st,g.img,200+i*220,1000+(i%2)*80,250,'',el=>guestTalk(g,'inn',el)));
+  // 旅客和寵物：記住位置，進來不久就開始各自散步（錯開出發）
+  const f2w=(el,key)=>{el.classList.add('gnpc');el._key=key;el._rest=Date.now()+300+Math.random()*2500;return el};
+  (guestPlan().inn[h.id]||[]).forEach((g,i)=>{const key='f2:'+h.id+':'+g.i,P0=GPOS[key]||(GPOS[key]={x:200+i*220,y:1000+(i%2)*80});f2w(walker(st,g.img,P0.x,P0.y,250,'',el=>guestTalk(g,'inn',el)),key)});
   if(F2.placing)f2Grid(st,h);
-  petsOf(h.id).filter(up2).forEach((p,i)=>walker(st,petBody(p),300+i*160,1080,200,p.name,el=>{sayOn(el,['二樓好好玩！','這裡是我的秘密基地','旅客好多喔～',`${p.name} 在二樓玩～`][Math.floor(Math.random()*4)]);if(DB.me&&Math.random()<.5)earn('pat')}));
+  petsOf(h.id).filter(up2).forEach((p,i)=>{const key='f2p:'+h.id+':'+(p.id||p.name),P0=GPOS[key]||(GPOS[key]={x:300+i*160,y:1080});f2w(walker(st,petBody(p),P0.x,P0.y,200,p.name,el=>{sayOn(el,['二樓好好玩！','這裡是我的秘密基地','旅客好多喔～',`${p.name} 在二樓玩～`][Math.floor(Math.random()*4)]);if(DB.me&&Math.random()<.5)earn('pat')}),key)});
   if(!gn&&!(h.toys2||[]).length){const tip=document.createElement('div');tip.className='f2hint';tip.textContent=fam?'二樓空空的，擺些玩具家具，旅客就會來住了':'二樓還在布置中';st.appendChild(tip)}
   const j=document.createElement('button');j.className='rentjar noic';j.id='rentjar';st.appendChild(j);j.onclick=e=>{e.stopPropagation();fam?collectRent():innInfo()};updRent();
   if(F2.placing){v.querySelector('.cbtns').innerHTML='<button class="act" id="f2x">✕ 取消擺放</button>';$('#f2x').onclick=()=>{F2.placing=null;renderF2()};return}
@@ -3658,10 +3667,10 @@ function decoForm(){const h=myHouse();if(!h)return toast('要有家才能申請�
   openModal(`<h3 class="mh3"><img class="mic" src="assets/icon_deco.webp" alt="" style="width:36px;height:36px">訂製裝潢</h3>
     ${wait?`<div class="locked">你家這個月已經申請過了<br>${Math.ceil((last+DECO_DAYS*864e5-Date.now())/864e5)} 天後可以再申請</div><div class="row2"><button data-close>好</button></div>`:`
     <p class="lead"><b>你希望打造什麼樣的房間呢？</b><br>描述得越仔細越好！畢竟裝潢一個月只能換一次<br><small>（例如：風格／主色系／主題／氣氛⋯）</small></p>
-    <textarea id="dtx" rows="6" maxlength="400" placeholder="例如：想要粉紅色和奶油色的星空房間，有一扇大圓窗看得到月亮，牆上掛小燈串，氣氛溫暖安靜，像睡前的感覺"></textarea><div class="mcnt"><span id="dcn">0</span> / 400</div>
+    <textarea id="dtx" rows="7" maxlength="400" style="display:block;width:100%;box-sizing:border-box;min-height:170px;font-size:16px" placeholder="例如：想要粉紅色和奶油色的星空房間，有一扇大圓窗看得到月亮，牆上掛小燈串，氣氛溫暖安靜，像睡前的感覺"></textarea><div class="mcnt"><span id="dcn">0</span> / 400</div>
     <div class="row2"><label class="mimg"><input type="file" accept="image/*" id="dfile" hidden><span id="dimgl">📷 附一張參考圖（可以不附）</span></label></div><div id="dprev"></div>
     <p class="lead" style="font-size:12px">一次 🪙${DECO_COST}・一個家一個月一次・做好的房間只屬於你家<br>申請完畢後請留意信箱 💌（如果做不出來，會全額退款）</p><div class="err" id="derr"></div>
-    <div class="row2"><button data-close>取消</button><button class="primary" id="dsend" ${(g.coins||0)>=DECO_COST?'':'disabled'}>送出（🪙${DECO_COST}）</button></div>`}`);
+    <div class="row2"><button data-close>取消</button><button class="primary" id="dsend" ${(g.coins||0)>=DECO_COST?'':'disabled'}>${(g.coins||0)>=DECO_COST?`送出（🪙${DECO_COST}）`:'金幣不夠'}</button></div>`}`);
   if(wait)return;const tx=$('#dtx');tx.oninput=()=>$('#dcn').textContent=tx.value.length;
   $('#dfile').onchange=async e=>{const f=e.target.files[0];if(!f)return;try{img=await shrinkImg(f);$('#dprev').innerHTML=`<img class="mshot" src="${img}" alt="">`;$('#dimgl').textContent='📷 換一張'}catch(x){$('#derr').textContent='這張圖讀不進來，換一張試試'}};
   $('#dsend').onclick=async e=>{const v=tx.value.trim();if(v.length<5)return $('#derr').textContent='多描述一點你想要的房間吧';const b=e.currentTarget;b.disabled=true;b.textContent='送出中…';
@@ -3677,7 +3686,7 @@ function adminDecoOne(m){const st=m.st||'wait',done=st==='done',no=st==='no';let
     ${!done&&!no?`<div class="sec adm"><h4><img class="mic" src="assets/icon_custom.webp" alt="">上傳做好的房間</h4>
       <input id="drn" maxlength="12" placeholder="房間名字（例如：小橘的星空房）">
       <div class="photo" style="margin-top:8px"><div class="pv" id="drp" style="aspect-ratio:848/1264;width:90px">🖼️</div><div class="info" id="dri">直的房間圖（會自動裁成 2:3）<div class="btns"><label>⬆️ 選圖<input type="file" accept="image/*" id="drf" hidden></label></div></div></div>
-      <textarea id="drr" rows="2" maxlength="300" placeholder="想跟他說的話（選填）"></textarea><div class="err" id="drerr"></div>
+      <textarea id="drr" rows="2" maxlength="300" style="display:block;width:100%;box-sizing:border-box" placeholder="想跟他說的話（選填）"></textarea><div class="err" id="drerr"></div>
       <div class="row2"><button class="primary" id="drok"><img class="mic" src="assets/icon_ok.webp" alt="">完成並寄給他</button></div>
       <div class="row2"><button id="drno"><img class="mic" src="assets/icon_no.webp" alt="">做不出來，退回並退款</button></div></div>`:''}
     <div class="row2"><button id="amb2">← 島民來信</button></div>`);
@@ -3702,7 +3711,7 @@ function toastOnce(n){try{const k='mhd_amailt',o=+(localStorage.getItem(k)||0);i
 
 // ================= 🌳 毛毛公園＋旅客（v1.70） =================
 // 公園是特別的「家」（id park）：毛孩可以遛去、島主免費布置；沒住民宿的旅客在公園散步、去島民家晃、或出去旅行
-const GIFT_DAY=5,GIFT_P=1,PARK_ID='park',PARK_POS={x:565,y:1262},PARK_SC=1.45,PARK_GUESTS=8;
+const GIFT_DAY=5,GIFT_P=1,PARK_ID='park',PARK_POS={x:510,y:1252},PARK_SC=1.45,PARK_GUESTS=8;
 const isParkH=h=>!!(h&&(h.kind==='park'||h.id===PARK_ID)),isSpecialH=h=>isShopH(h)||isParkH(h);
 GUESTS.push(...[['alpaca','羊駝'],['otter','水獺'],['fox','狐狸'],['sloth','樹懶'],['dog','小狗'],['penguin','企鵝'],['horse','小馬'],['sheep','綿羊'],['monkey','猴子'],['cow','乳牛'],['lion','獅子'],['zebra','斑馬']].map(([k,n])=>({img:`assets/guest_${k}.webp`,n:n+'旅客'})));
 GUESTS.forEach((g,i)=>g.i=i);
@@ -4187,7 +4196,7 @@ function announceLetters(){if(!DB.me)return;let seen=[];try{seen=JSON.parse(loca
     sfx('gift');$('#lgopen').onclick=()=>openLetter(nw[0].id,()=>$('#bell').click())};
   setTimeout(go,1800)}
 // ================= 自動更新：發現新版本就重新載入 =================
-const APP_VER='v1.70';
+const APP_VER='v1.72';
 function checkUpdate(){
   if(!/^https?:/.test(location.protocol)||!API_URL)return;
   if(!$('#modal').classList.contains('hidden'))return; // 正在填表單時不打斷
