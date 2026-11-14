@@ -876,8 +876,9 @@ img{-webkit-user-drag:none}
 
 <script>
 // ================= 常數 =================
-// 小島的地：四排交錯（3・4・3・4），每格都留了插名牌的空間。0～11 是原本的地（位置整理過），6＝毛二街，12、13 是新增的
-const SLOTS=[[500,345],[740,345],[260,345],[380,575],[140,575],[620,575],[740,805],[500,805],[860,1035],[380,1035],[260,805],[620,1035],[860,575],[140,1035]];
+// 小島的地（v1.61 用排版工具自己排的）。0～13 是原本的地，6＝毛二街，14、15 是新增的
+const SLOTS=[[457,258],[662,277],[203,650],[379,576],[834,409],[535,501],[533,776],[679,634],[670,951],[478,1054],[236,401],[352,865],[890,734],[831,583],[189,871],[809,1099]];
+const CENTER_POS={x:378,y:1283};   // 預留給島民中心
 const STYLE_NAMES={1:'粉紅陽台屋',2:'紅屋頂木屋',3:'蘑菇屋',4:'藤蔓石屋',5:'藍屋頂小屋',6:'麵包坊',7:'魔法師小屋',8:'燈塔屋',9:'南瓜屋',10:'海邊小屋',11:'人魚貝殼屋',12:'綠頂莊園',13:'草莓蛋糕屋',14:'鳳梨屋',15:'雪人小屋',16:'恐龍屋'};
 const SPECIES=[['狗','🐕'],['貓','🐈'],['兔','🐇'],['倉鼠','🐹'],['鳥','🐦'],['其他','🐾']];
 const SPK={狗:'dog',貓:'cat',兔:'rabbit',倉鼠:'hamster',鳥:'bird',其他:'other'};
@@ -1396,9 +1397,9 @@ function renderIsland(){
   renderMe();updTix();if(typeof updBell==='function')updBell();updOnline();
 }
 // 🪧 木頭名牌：插在房子前面，名字寫在牌子上（太長會自動縮小、最多兩行）
-const SIGN_W=136,SIGN_UP=25;
+const SIGN_W=122,SIGN_UP=22;
 function signLines(t){const c=[...String(t)],n=c.length;if(n<=5)return [t];const k=Math.ceil(n/2);return [c.slice(0,k).join(''),c.slice(k).join('')]}
-function signFs(t){const n=[...String(t)].length;return n<=4?2.6:n===5?2.15:n<=8?2.4:2.1}
+function signFs(t){const n=[...String(t)].length;return n<=4?2.35:n===5?1.95:n<=8?2.15:1.9}
 function signEl(name,x,y,cls){const el=document.createElement('div');el.className='sign'+(cls?' '+cls:'');
   el.innerHTML=`<img src="assets/sign.webp" alt=""><span style="font-size:${signFs(name)}cqw">${signLines(name).map(esc).join('<br>')}</span>`;
   Object.assign(el.style,ipct(x,y-SIGN_UP),{width:(SIGN_W/1024*100)+'%',zIndex:y+1});return el}
@@ -2363,7 +2364,7 @@ function homeGuide(auto,then){
 (function(){if(!hgDue())return;let tries=0;const t=setInterval(()=>{if(++tries>60||!hgDue())return clearInterval(t);if(!$('#modal').classList.contains('hidden')||document.querySelector('.gacha'))return;clearInterval(t);homeGuide(true)},1200)})();
 
 // ================= 毛毛商店・背包・零食・禮物 =================
-const SHOP_POS={x:520,y:1245,style:6};
+const SHOP_POS={x:203,y:1074,style:6};
 const ITEMS={
   fish:{name:'小魚乾',emo:'🐟',kind:'treat',price:15,fav:['貓']},
   meat:{name:'肉泥',emo:'🥫',kind:'treat',price:20,fav:['貓']},
@@ -3516,7 +3517,7 @@ function announceLetters(){if(!DB.me)return;let seen=[];try{seen=JSON.parse(loca
     sfx('gift');$('#lgopen').onclick=()=>openLetter(nw[0].id,()=>$('#bell').click())};
   setTimeout(go,1800)}
 // ================= 自動更新：發現新版本就重新載入 =================
-const APP_VER='v1.59';
+const APP_VER='v1.62';
 function checkUpdate(){
   if(!/^https?:/.test(location.protocol)||!API_URL)return;
   if(!$('#modal').classList.contains('hidden'))return; // 正在填表單時不打斷
