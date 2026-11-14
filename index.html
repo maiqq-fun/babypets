@@ -619,7 +619,7 @@ html,body,button,.island,.imap,.logo{touch-action:manipulation}
 .ibub.demonb{background:#3a2a2a;color:#ffe3c2}
 .irows .ticker.gold{background:linear-gradient(90deg,#ffe08a 0%,#ffd36e 60%,rgba(255,211,110,0) 100%)!important;color:#6b4500;font-weight:bold}
 .ncard{text-align:center;background:linear-gradient(#fff6d8,#ffe9a8);border:2px solid #e0a420;border-radius:18px;padding:16px 14px;margin-bottom:12px}
-.ncard .ncrown{font-size:40px;line-height:1}.ncard p{font-size:17px;line-height:1.6;margin:8px 0;white-space:pre-wrap}.ncard small{color:#a07a30}
+.ncard .ncrown{font-size:40px;line-height:1}.ncrown img{width:76px;height:76px;object-fit:contain}.ncard p{font-size:17px;line-height:1.6;margin:8px 0;white-space:pre-wrap}.ncard small{color:#a07a30}
 .gacha.wait .stage-area,.gacha.wait .hint2{opacity:0}
 .gacha .stage-area,.gacha .hint2{transition:opacity .35s}
 .toy.an-wob .ii img{transform-origin:50% 100%;animation:sway 2.2s ease-in-out infinite}
@@ -2325,7 +2325,7 @@ setInterval(()=>{if(feedView().length+(DB.notice&&DB.notice.t?1:0)>1){fi++;ticke
 function noticePop(){const n=DB.notice;if(!n||!n.t||!n.at)return;let seen=0;try{seen=+(localStorage.getItem('mhd_noticeseen')||0)}catch(e){}if(+n.at<=seen)return;
   let tries=0;const t=setInterval(()=>{if(++tries>40)return clearInterval(t);try{if(+(localStorage.getItem('mhd_noticeseen')||0)>=+n.at)return clearInterval(t)}catch(e){}if(!$('#modal').classList.contains('hidden')||picking||document.querySelector('.gacha'))return;clearInterval(t);
     try{localStorage.setItem('mhd_noticeseen',String(n.at))}catch(e){}
-    openModal(`<div class="ncard"><div class="ncrown">👑</div><h3>島主公告</h3><p>${esc(n.t)}</p><small>${ago(+n.at)}</small></div><div class="row2"><button data-close class="primary">知道了</button></div>`)},1500)}
+    openModal(`<div class="ncard"><div class="ncrown"><img src="assets/icon_notice.webp" alt=""></div><h3>島主公告</h3><p>${esc(n.t)}</p><small>${ago(+n.at)}</small></div><div class="row2"><button data-close class="primary">知道了</button></div>`)},1500)}
 $('#ticker').onclick=()=>{
   try{localStorage.setItem('mhd_feedseen',Date.now())}catch(e){}
   const G=feedGroups(),v=G.main,dl=G.daily,old=DB.feed.filter(f=>Date.now()-f.at>=24*HOUR).slice(0,20);
@@ -2356,7 +2356,7 @@ $('#bell').onclick=()=>{
   const st=notices(),it=bellItems();
   try{localStorage.setItem('mhd_bellseen',Date.now());localStorage.setItem('mhd_bellsig',noticeSig())}catch(e){}setTimeout(updBell,0);
   openModal(`<h3>🔔 通知</h3>
-    ${DB.notice&&DB.notice.t?`<div class="ncard" style="margin:0 0 12px;padding:10px 12px"><b>👑 島主公告</b><p style="font-size:15px;margin:6px 0 2px">${esc(DB.notice.t)}</p>${DB.notice.at?`<small>${ago(+DB.notice.at)}</small>`:''}</div>`:''}
+    ${DB.notice&&DB.notice.t?`<div class="ncard" style="margin:0 0 12px;padding:10px 12px"><b><img class="mic" src="assets/icon_notice.webp" alt="">島主公告</b><p style="font-size:15px;margin:6px 0 2px">${esc(DB.notice.t)}</p>${DB.notice.at?`<small>${ago(+DB.notice.at)}</small>`:''}</div>`:''}
     ${myHouse()?'':'<p class="lead">有家之後，這裡會通知你家的大小事</p>'}
     ${st.length?`<div class="sec" style="margin-top:0"><h4>📌 現在</h4>${st.map(x=>`<div class="frow"><span>${x.ic} ${esc(x.t)}</span></div>`).join('')}</div>`:''}
     ${lettersSec()}
@@ -2379,7 +2379,7 @@ function mailAdminSheet(type){if(!DB.me)return onboarding();if(!ONLINE)return to
     <div class="mtypes">${Object.entries(MAILT).map(([k,v])=>`<button data-mt="${k}" class="${k===t?'on':''}">${mtag(k)}</button>`).join('')}</div>
     <textarea id="mtx" maxlength="200" rows="5" placeholder="${t==='wish'?'例如：想要一隻會飛的小鯨魚玩具！':t==='bug'?'例如：在衣櫃按完成之後，帽子不見了':'想跟島主說什麼？'}"></textarea><div class="mcnt"><span id="mcn">0</span> / 200</div>
     <div class="row2"><label class="mimg"><input type="file" accept="image/*" id="mfile" hidden><span id="mimgl">📷 附一張截圖（可以不附）</span></label></div><div id="mprev"></div>
-    <label class="chk"><input type="checkbox" id="manon"> 🙈 匿名寄出（島主不會知道是誰）</label><div class="err" id="merr"></div>
+    <label class="chk"><input type="checkbox" id="manon"> <img class="mic" src="assets/icon_anon.webp" alt="">匿名寄出（島主不會知道是誰）</label><div class="err" id="merr"></div>
     <div class="row2"><button data-close>取消</button><button class="primary" id="msend">寄出</button></div>`);
     const tx=$('#mtx');tx.oninput=()=>{$('#mcn').textContent=tx.value.length;$('#merr').textContent=''};
     $('#sheet').querySelectorAll('[data-mt]').forEach(b=>b.onclick=()=>{const v=tx.value,a=$('#manon').checked;t=b.dataset.mt;draw();$('#mtx').value=v;$('#mcn').textContent=v.length;$('#manon').checked=a;showPrev()});
@@ -2393,12 +2393,12 @@ function mailAdminSheet(type){if(!DB.me)return onboarding();if(!ONLINE)return to
 async function adminMailSheet(){let L;try{L=await adminCall('adminMailList')}catch(e){return toast(e.message)}
   const un=L.filter(m=>!m.read).length;
   openModal(`<h3 class="mh3">${mic('mail',34)}島民來信</h3><p class="lead">${L.length?`共 ${L.length} 封${un?`，<b>${un} 封未讀</b>`:''}`:'還沒有人寫信來'}</p>
-    <div class="mlist">${L.map(m=>`<button class="mrow${m.read?'':' unread'}" data-mid="${m.id}"><span class="mt">${mic(m.type in MAILN?m.type:'talk',30)}</span><span class="mn">${m.anon?'🙈 匿名':esc(m.nick)}${m.replied?' <small>✅ 已回</small>':''}<small>${esc(m.text.slice(0,24))}${m.text.length>24?'…':''}${m.img?' 📷':''}</small></span><span class="ago">${ago(m.at)}</span></button>`).join('')}</div>
+    <div class="mlist">${L.map(m=>`<button class="mrow${m.read?'':' unread'}" data-mid="${m.id}"><span class="mt">${mic(m.type in MAILN?m.type:'talk',30)}</span><span class="mn">${m.anon?'<img class="mic" src="assets/icon_anon.webp" alt="">匿名':esc(m.nick)}${m.replied?' <small>✅ 已回</small>':''}<small>${esc(m.text.slice(0,24))}${m.text.length>24?'…':''}${m.img?' 📷':''}</small></span><span class="ago">${ago(m.at)}</span></button>`).join('')}</div>
     <div class="row2"><button id="amback">← 島主後台</button></div>`);
   $('#amback').onclick=adminSheet;
   $('#sheet').querySelectorAll('[data-mid]').forEach(b=>b.onclick=()=>adminMailOne(L.find(m=>m.id===b.dataset.mid)))}
 function adminMailOne(m){if(!m.read){m.read=true;adminCall('adminMailMark',{id:m.id,read:1}).catch(()=>{})}
-  openModal(`<h3 class="mh3">${mtag(m.type)}</h3><p class="lead">${m.anon?'🙈 匿名島民':`${esc(m.nick)}${m.house?'・'+esc(m.house):''}`}・${ago(m.at)}</p>
+  openModal(`<h3 class="mh3">${mtag(m.type)}</h3><p class="lead">${m.anon?'<img class="mic" src="assets/icon_anon.webp" alt="">匿名島民':`${esc(m.nick)}${m.house?'・'+esc(m.house):''}`}・${ago(m.at)}</p>
     <div class="mbody">${esc(m.text)}</div>${m.img?`<img class="mshot" src="${m.img}" alt="截圖">`:''}
     <div class="sec adm"><h4>${mic('letter',20)} 回信${m.replied?'<span>已經回過了</span>':''}</h4><textarea id="arb" maxlength="500" rows="3" placeholder="想回什麼？"></textarea>
       <div class="row2"><input id="arc" type="number" min="0" placeholder="附金幣"><input id="art" type="number" min="0" placeholder="附抽卡券"></div>
@@ -2789,6 +2789,41 @@ Object.assign(ITEMS,{
   crystal:{name:'開運水晶',emo:'🔮',kind:'toy',price:0,limited:true,sz:1.2,an:'glowp'}
 });
 // v1.36：新玩具與零食
+// v1.66 新玩具 32 款（黑白奶茶色系＋狗狗玩具）
+Object.assign(ITEMS,{
+  n_bowl:{name:'骨頭飼料碗',emo:'🥣',kind:'toy',price:50,sz:1.1},
+  n_catbed:{name:'黑貓耳睡床',emo:'🛏️',kind:'toy',price:110,sz:1.45},
+  n_cattree:{name:'貓咪公寓跳台',emo:'🐈',kind:'toy',price:150,sz:1.75},
+  n_fishrope:{name:'魚骨拉繩',emo:'🐟',kind:'toy',price:40,sz:1.05,an:'tumble'},
+  n_carrier:{name:'外出提籠',emo:'🧳',kind:'toy',price:90,sz:1.3},
+  n_catpillow:{name:'貓臉抱枕',emo:'🐱',kind:'toy',price:50,sz:1.15},
+  n_pawlamp:{name:'肉球小夜燈',emo:'🐾',kind:'toy',price:70,sz:1.15,an:'glowb'},
+  n_humid:{name:'貓耳加濕器',emo:'💨',kind:'toy',price:110,sz:1.25,fxk:'cloud'},
+  n_treatjar:{name:'骨頭零食罐',emo:'🫙',kind:'toy',price:60,sz:1.1},
+  n_litter:{name:'貓砂屋',emo:'🏠',kind:'toy',price:80,sz:1.35},
+  n_spacepack:{name:'太空艙背包',emo:'🎒',kind:'toy',price:100,sz:1.3},
+  n_cavebed:{name:'星星貓窩',emo:'⭐',kind:'toy',price:120,sz:1.45},
+  n_groom:{name:'美容工具籃',emo:'🪮',kind:'toy',price:70,sz:1.15},
+  n_bonecab:{name:'骨頭收納櫃',emo:'🗄️',kind:'toy',price:120,sz:1.5},
+  n_armchair:{name:'懶骨頭沙發',emo:'🛋️',kind:'toy',price:130,sz:1.5},
+  n_bookshelf:{name:'打盹書櫃',emo:'📚',kind:'toy',price:100,sz:1.4},
+  n_lava:{name:'熔岩燈',emo:'🔮',kind:'toy',price:80,sz:1.25,an:'glowp'},
+  n_diffuser:{name:'蝴蝶結香氛',emo:'🎀',kind:'toy',price:60,sz:1.15},
+  n_memoboard:{name:'照片網格板',emo:'🖼️',kind:'toy',price:70,sz:1.35},
+  n_mouse:{name:'小老鼠玩偶',emo:'🐭',kind:'toy',price:40,sz:1.0,an:'tumble'},
+  n_balltower:{name:'軌道球塔',emo:'🎡',kind:'toy',price:70,sz:1.15,an:'wob'},
+  n_ringrope:{name:'麻花拉環',emo:'⭕',kind:'toy',price:40,sz:1.05},
+  n_feeder:{name:'貓咪漏食球',emo:'🟤',kind:'toy',price:50,sz:1.05,an:'tumble'},
+  n_tunnel:{name:'貓咪隧道',emo:'🕳️',kind:'toy',price:90,sz:1.4},
+  n_springstar:{name:'彈簧星星',emo:'🌟',kind:'toy',price:50,sz:1.1,an:'wob'},
+  n_bonepillow:{name:'蝴蝶結骨頭枕',emo:'🦴',kind:'toy',price:50,sz:1.15},
+  n_ropeknot:{name:'拔河繩結',emo:'🪢',kind:'toy',price:35,sz:1.05},
+  n_dogplush:{name:'愛心狗狗玩偶',emo:'🐶',kind:'toy',price:60,sz:1.15,fxk:'heart'},
+  n_spikyball:{name:'刺刺球',emo:'🔵',kind:'toy',price:35,sz:1.0,an:'tumble'},
+  n_puzzleball:{name:'骨頭漏食球',emo:'🟣',kind:'toy',price:50,sz:1.05,an:'tumble'},
+  n_teether:{name:'彩虹潔牙圈',emo:'🌈',kind:'toy',price:40,sz:1.05},
+  n_frisbee:{name:'飛盤',emo:'🥏',kind:'toy',price:40,sz:1.05}
+});
 Object.assign(ITEMS,{
   tuna:{name:'鮪魚罐頭',emo:'🥫',kind:'treat',price:20,fav:['貓']},
   catgrass:{name:'貓草',emo:'🌿',kind:'treat',price:15,fav:['貓','兔']},
@@ -3300,11 +3335,11 @@ function openCenter(){sfx&&sfx('tap');let v=$('#centerv');if(v)v.remove();v=docu
   v.innerHTML=`<div class="chead"><button class="pill" id="cback">← 小島</button><div class="ctitle">島民中心<small>大家的服務處</small></div><span style="width:84px"></span></div>
     <div class="cwrap"><div class="cstage" id="cstage"><img class="cbg" src="assets/room_center.webp" alt="">
       <button class="cboard noic" id="cboard" style="left:${CBOARD[0]/RW*100}%;top:${CBOARD[1]/RH*100}%;width:${(CBOARD[2]-CBOARD[0])/RW*100}%;height:${(CBOARD[3]-CBOARD[1])/RH*100}%">
-        ${n?`<span class="cnote"><b>👑 島主公告</b>${esc(n.t)}</span>`:'<span class="cnote empty">目前沒有公告</span>'}</button></div></div>
+        ${n?`<span class="cnote"><b><img class="mic" style="width:1.4em;height:1.4em" src="assets/icon_notice.webp" alt="">島主公告</b>${esc(n.t)}</span>`:'<span class="cnote empty">目前沒有公告</span>'}</button></div></div>
     <div class="cbtns"><button class="act" id="cmail">${mic('mail',22)}寫信給島主</button><button class="act lockd" id="crenew"><img class="mic" src="assets/icon_renew.webp" alt="">都更</button><button class="act lockd" id="cexp"><img class="mic" src="assets/icon_expand.webp" alt="">擴建</button></div>`;
   document.body.appendChild(v);renderCenterStaff();
   $('#cback').onclick=closeCenter;$('#cmail').onclick=()=>mailAdminSheet();$('#crenew').onclick=()=>centerLocked('都更');$('#cexp').onclick=()=>centerLocked('擴建');
-  $('#cboard').onclick=()=>{const n=DB.notice&&DB.notice.t?DB.notice:null;openModal(n?`<div class="ncard"><div class="ncrown">👑</div><h3>島主公告</h3><p>${esc(n.t)}</p><small>${n.at?ago(+n.at):''}${noticeLeft(n)?`・還會貼 ${noticeLeft(n)}`:''}</small></div><div class="row2"><button data-close class="primary">知道了</button></div>`:`<h3>📌 公告欄</h3><p class="lead" style="text-align:center">目前沒有公告，島主貼新公告時會出現在這裡</p><div class="row2"><button data-close class="primary">好</button></div>`)};
+  $('#cboard').onclick=()=>{const n=DB.notice&&DB.notice.t?DB.notice:null;openModal(n?`<div class="ncard"><div class="ncrown"><img src="assets/icon_notice.webp" alt=""></div><h3>島主公告</h3><p>${esc(n.t)}</p><small>${n.at?ago(+n.at):''}${noticeLeft(n)?`・還會貼 ${noticeLeft(n)}`:''}</small></div><div class="row2"><button data-close class="primary">知道了</button></div>`:`<h3>📌 公告欄</h3><p class="lead" style="text-align:center">目前沒有公告，島主貼新公告時會出現在這裡</p><div class="row2"><button data-close class="primary">好</button></div>`)};
   try{call('ping',{playerId:DB.me&&DB.me.id,where:'center'},true).catch(()=>{})}catch(e){}}
 function closeCenter(){const v=$('#centerv');if(v)v.remove();cEls=[];renderIsland()}
 function renderCenterStaff(){const st=$('#cstage');if(!st)return;st.querySelectorAll('.staff,.counter').forEach(x=>x.remove());cEls=[];
@@ -3518,7 +3553,7 @@ async function adminSheet(){
   call('adminMailList',{adminPw:adminPw(),playerId:DB.me&&DB.me.id},true).then(L=>{if(!Array.isArray(L)||!$('#amail'))return;const un=L.filter(m=>!m.read);if(!un.length)return;
     const bd=document.createElement('span');bd.className='ubadge';bd.textContent=un.length>99?'99+':un.length;$('#amail').appendChild(bd);
     const box=$('#amprev');if(!box)return;
-    box.innerHTML=un.slice(0,3).map(m=>`<button class="mrow unread" data-pmid="${m.id}"><span class="mt">${mic(m.type in MAILN?m.type:'talk',30)}</span><span class="mn">${m.anon?'🙈 匿名':esc(m.nick)}<small>${esc(m.text.slice(0,24))}${m.text.length>24?'…':''}${m.img?' 📷':''}</small></span><span class="ago">${ago(m.at)}</span></button>`).join('')+(un.length>3?`<div class="lead" style="text-align:center;margin:0">還有 ${un.length-3} 封未讀，點上面「島民來信」看全部</div>`:'');
+    box.innerHTML=un.slice(0,3).map(m=>`<button class="mrow unread" data-pmid="${m.id}"><span class="mt">${mic(m.type in MAILN?m.type:'talk',30)}</span><span class="mn">${m.anon?'<img class="mic" src="assets/icon_anon.webp" alt="">匿名':esc(m.nick)}<small>${esc(m.text.slice(0,24))}${m.text.length>24?'…':''}${m.img?' 📷':''}</small></span><span class="ago">${ago(m.at)}</span></button>`).join('')+(un.length>3?`<div class="lead" style="text-align:center;margin:0">還有 ${un.length-3} 封未讀，點上面「島民來信」看全部</div>`:'');
     box.querySelectorAll('[data-pmid]').forEach(b=>b.onclick=()=>adminMailOne(L.find(m=>m.id===b.dataset.pmid)))}).catch(()=>{});
   $('#anb').onclick=async()=>{const t=$('#an').value.trim();if(!t)return toast('先寫公告內容');const days=+$('#andays').value;try{await adminCall('adminNotice',{text:t,days,push:!!($('#anp')&&$('#anp').checked)});const at=Date.now();DB.notice={t,at,until:days?at+days*864e5:0};fi=0;tickerShow();ok('公告貼上了 📣');adminSheet()}catch(e){toast(e.message)}};
   if($('#anx'))$('#anx').onclick=async e=>{if(!armBtn(e.currentTarget,'確定撤下？'))return;try{await adminCall('adminNotice',{text:''});DB.notice=null;fi=0;tickerShow();ok('公告撤下了');adminSheet()}catch(x){toast(x.message)}};
@@ -3807,7 +3842,7 @@ function announceLetters(){if(!DB.me)return;let seen=[];try{seen=JSON.parse(loca
     sfx('gift');$('#lgopen').onclick=()=>openLetter(nw[0].id,()=>$('#bell').click())};
   setTimeout(go,1800)}
 // ================= 自動更新：發現新版本就重新載入 =================
-const APP_VER='v1.65';
+const APP_VER='v1.66';
 function checkUpdate(){
   if(!/^https?:/.test(location.protocol)||!API_URL)return;
   if(!$('#modal').classList.contains('hidden'))return; // 正在填表單時不打斷
