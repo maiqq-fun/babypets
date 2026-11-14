@@ -899,7 +899,7 @@ img{-webkit-user-drag:none}
 @keyframes spopup{0%{opacity:0;margin-top:10px}15%{opacity:1;margin-top:0}80%{opacity:1}100%{opacity:0;margin-top:-30px}}
 .plot{position:absolute;width:30%;transform:translate(-50%,-100%);border:0;background:none;padding:0;cursor:pointer}
 .plot .soil{display:block;width:100%;filter:drop-shadow(0 4px 3px rgba(60,35,15,.25))}
-.plot .crop{position:absolute;left:0;right:0;margin:0 auto;bottom:38%;width:62%;transform-origin:50% 100%;animation:sway 3.6s ease-in-out infinite;pointer-events:none}
+.plot .crop{position:absolute;left:0;right:0;margin:0 auto;bottom:38%;width:62%;transform-origin:50% 100%;animation:sway 3.6s ease-in-out infinite;pointer-events:auto;cursor:pointer}
 .plot .crop.c1{width:42%}.plot .crop.c3{width:70%}
 .plab{position:absolute;transform:translateX(-50%);cursor:pointer;background:rgba(255,250,238,.95);border-radius:999px;padding:1px 8px;font-size:clamp(10px,2.9cqw,13px);white-space:nowrap;color:#6b3f1d}
 .plab.ripe{background:#fff3b0;color:#b4401a;font-weight:700;animation:sbbob 1.4s ease-in-out infinite}
@@ -3581,7 +3581,7 @@ function renderFarm(){const v=$('#farmv');if(!v||!FM)return;const h=house(FM.hid
   $('#fmseed').onclick=()=>fam?shopSheet('seed'):toast('點有作物的田就能幫忙澆水，一格每小時可以澆一次');
   $('#fmsell').onclick=()=>fam?(house(SHOP_ID)?tradeSheet('sell','crop'):toast('毛二街還沒開')):farmHelp()}
 function farmHelp(){openModal(`<h3>🌱 農田怎麼玩</h3><p class="lead">種子在毛毛商店買。種下去 8 小時成熟；每澆一次水快 1 小時，一格最多澆 3 次、每次要隔 1 小時（朋友也可以幫忙澆）。<br>收成的作物可以拿去毛二街全價賣掉，或換成零食（打 8 折）。金蘋果有機會多長出一個錢袋！</p>
-  <table class="ftab"><tr><th>作物</th><th>種子</th><th>賣價</th></tr><tr><td>🍅 小番茄</td><td>🪙10</td><td>🪙20</td></tr><tr><td>🎃 南瓜</td><td>🪙30</td><td>🪙70</td></tr><tr><td>🍎 金蘋果</td><td>🪙80</td><td>🪙90＋錢袋？</td></tr></table>
+  <table class="ftab"><tr><th>作物</th><th>種子</th><th>賣價</th></tr><tr><td>🍅 小番茄</td><td>🪙10</td><td>🪙20</td></tr><tr><td>🎃 南瓜</td><td>🪙30</td><td>🪙70</td></tr><tr><td>🍎 金蘋果</td><td>🪙80</td><td>🪙90（可能有錢袋）</td></tr></table>
   <div class="row2"><button data-close class="primary">好</button></div>`)}
 async function plotTap(i){if(!needMe())return;const h=house(FM.hid),f=farmOf(h),fam=isFamily(h.id),c=f.p[i],now=Date.now();
   if(i>=f.n){if(!fam)return toast('這格還沒開放');const g=DB.game;
@@ -3598,7 +3598,7 @@ async function plotTap(i){if(!needMe())return;const h=house(FM.hid),f=farmOf(h),
   try{const r=await call('farmWater',{playerId:DB.me.id,houseId:h.id,i});f.p[i]=r;sfx('sweep');if(!fam)earn('water');renderFarm();const P=PLOTS[i];scenePop($('#farmv .cstage'),'<img src="assets/icon_water.webp" alt="" style="width:56px"> 快 1 小時！',P[0],P[1]-200);
     if(!fam&&ONLINE)feedPush(`${DB.me.nick} 幫「${h.name}」的田澆水 💧`)}catch(e){toast(e.message)}}
 function seedPick(i){const g=DB.game;
-  openModal(`<h3>🌱 要種什麼？</h3><div class="shopgrid">${Object.entries(CROP).map(([k,c])=>{const s=ITEMS[c.seed],n=bag()[c.seed]||0;return `<div class="si">${itemIcon(c.seed,'big')}<div class="sn">${c.n}</div><div class="sf">賣 🪙${ITEMS[c.item].price}${k==='apple'?'＋錢袋？':''}</div>
+  openModal(`<h3>🌱 要種什麼？</h3><div class="shopgrid">${Object.entries(CROP).map(([k,c])=>{const s=ITEMS[c.seed],n=bag()[c.seed]||0;return `<div class="si">${itemIcon(c.seed,'big')}<div class="sn">${c.n}</div><div class="sf">賣 🪙${ITEMS[c.item].price}${k==='apple'?'・可能有錢袋':''}</div>
     ${n?`<button data-pl="${k}">種下（有 ${n}）</button>`:`<button data-pb="${k}" ${(g.coins||0)>=s.price?'':'disabled'}>🪙${s.price} 買來種</button>`}</div>`}).join('')}</div>
     <div class="hint">8 小時成熟，澆水可以更快</div><div class="row2"><button data-close>取消</button></div>`);
   const plant=async k=>{const h=house(FM.hid),f=farmOf(h);try{const r=await call('farmPlant',Object.assign(cred(),{houseId:h.id,i,c:k}));bagAdd(CROP[k].seed,-1);f.p[i]=r;closeModal();sfx('pat');renderFarm();toast(`種下${CROP[k].n}了 🌱`)}catch(e){toast(e.message)}};
