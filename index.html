@@ -823,6 +823,7 @@ img{-webkit-user-drag:none}
 .counter{position:absolute;transform:translate(-50%,-100%);border:0;background:none;padding:0;cursor:pointer}
 .counter img{display:block;width:100%;pointer-events:none;filter:drop-shadow(0 6px 4px rgba(60,35,15,.25))}
 .placing .staff,.placing .counter{pointer-events:none}
+.cstage.placing .toy,.cstage.placing .f2hint,.cstage.placing .rentjar{pointer-events:none}
 .si s{color:#b0a090}
 .tm .ic img.stf{width:34px;height:42px;object-fit:contain;display:block}
 @media (prefers-reduced-motion:reduce){.staff>img{animation:none}}
@@ -1739,7 +1740,7 @@ function renderFoot2(){
   $('#nightdim').classList.toggle('on',isNight());
 }
 function renderHome(){
-  const h=house(home.id);$('#feed').style.display='';$('#board').style.display='';$('#addnote').style.display='';
+  const h=house(home.id);$('#feed').style.display='';$('#board').style.display='';$('#addnote').style.display='';$('#notebook').style.display='';
   if(isParkH(h))return renderParkHome(h);
   if(isShopH(h))return renderShopHome(h);
   $('#feed').textContent='🍖 餵飯';$('#feed').onclick=()=>feedNow();$('#sweep').style.display='';$('#giftbtn').style.display='';
@@ -1769,7 +1770,7 @@ function renderBoard(){
   if($('#boardadd'))$('#boardadd').onclick=noteForm;
   $('#notebook').textContent=`📒 ${all.length}`;
 }
-function noteBook(){
+function noteBook(){if(isParkH(house(home.id)))return;
   const all=DB.notes.filter(n=>n.houseId===home.id).sort((a,c)=>c.createdAt-a.createdAt);
   openModal(`<h3>📒 ${esc(house(home.id).name)} 的留言簿</h3><p class="lead">共 ${all.length} 張便利貼，軟木板上只貼最新的 6 張</p>
     ${all.length?all.map(n=>`<button class="nb" data-id="${n.id}" style="background:${n.color}"><span>${esc(n.text)}</span><small>— ${esc(n.by)}・${ago(n.createdAt)}</small></button>`).join(''):'<div class="locked">還沒有人留言</div>'}
@@ -1790,7 +1791,7 @@ function needMe(){if(!DB.me){onboarding();return false}if(ONLINE&&!myHouse()){pr
 function privateNote(){openModal(`<div style="text-align:center"><div class="giftopen">🔒</div><h3>這是私人小島</h3><p class="lead">要島主邀請才能加入，加入之後就可以摸毛孩、留言、送禮囉</p></div>
   <div class="row2"><button data-close>先逛逛</button><button class="primary" id="pvj">我有邀請碼／家人密碼</button></div>`);$('#pvj').onclick=()=>{closeModal();onboarding()}}
 function noteForm(){
-  if(!needMe())return;let color=NOTE_COLORS[0];const h=house(home.id);
+  if(isParkH(house(home.id)))return;if(!needMe())return;let color=NOTE_COLORS[0];const h=house(home.id);
   openModal(`<h3>📝 在「${esc(h.name)}」貼便利貼</h3>
     ${fld('nt','想說的話（40 字以內）',`<textarea id="nt" maxlength="40" placeholder="例如：今天也好可愛！"></textarea>`)}<div class="count" id="ntc">0 / 40</div>
     <div class="flabel">便利貼顏色</div><div class="swatches" id="ncol">${NOTE_COLORS.map((c,i)=>`<button style="background:${c}" data-c="${c}" class="${i?'':'on'}" aria-label="顏色 ${i+1}"></button>`).join('')}</div>
@@ -3508,13 +3509,14 @@ function openFloor2(hid){const h=house(hid);if(!hasF2(h))return;sfx&&sfx('tap');
   const v=sceneOpen('f2v',esc(h.name),'🛏️ 二樓民宿',roomImg(h.room2||'basic1'),'<img class="mic" src="assets/icon_down.webp" alt="">一樓');F2={hid,placing:null};
   const st=v.querySelector('.cstage');st.onclick=e=>f2Click(e);renderF2();clearInterval(f2Tick);let f2n=0;f2Tick=setInterval(()=>{if(!$('#f2v'))return clearInterval(f2Tick);if(!document.hidden)f2Wander($('#f2v .cstage'));if(++f2n%4==0)updRent()},900)}
 // 二樓散步：跟公園同一套走法，但每隻休息時間到了就走（不會一開始定格）
-function f2Wander(st){st.querySelectorAll('.gnpc').forEach(el=>{if(el._busy||Date.now()<(el._rest||0))return;
-  const ang=Math.random()*Math.PI*2,dist=70+Math.random()*130,tx=clamp(el._x+Math.cos(ang)*dist,FLOOR.x0+40,FLOOR.x1-40),ty=clamp(el._y+Math.sin(ang)*dist*.6,FLOOR.y0+30,FLOOR.y1-20);
-  const d=Math.hypot(tx-el._x,ty-el._y);if(d<30){el._rest=Date.now()+800;return}const dur=d/60;el._busy=1;el.style.zIndex=Math.round(Math.max(el._y,ty));el.classList.toggle('flip',tx<el._x);el.classList.add('walking');
+function f2Floor(){const h=F2&&house(F2.hid),G=roomGrid(h&&h.room2||'basic1');return {x0:Math.max(G.t[0],G.b[0])+45,x1:Math.min(G.t[1],G.b[1])-45,y0:G.y0+35,y1:1200}}
+function f2Wander(st){const FL=f2Floor();st.querySelectorAll('.gnpc').forEach(el=>{if(el._busy||Date.now()<(el._rest||0))return;
+  const ang=Math.random()*Math.PI*2,dist=90+Math.random()*150,tx=clamp(el._x+Math.cos(ang)*dist,FL.x0+40,FL.x1-40),ty=clamp(el._y+Math.sin(ang)*dist*.6,FL.y0+30,FL.y1-20);
+  const d=Math.hypot(tx-el._x,ty-el._y);if(d<40){el._rest=Date.now()+300;return}const dur=d/60;el._busy=1;el.style.zIndex=Math.round(Math.max(el._y,ty));el.classList.toggle('flip',tx<el._x);el.classList.add('walking');
   el.style.transition=`left ${dur}s linear,top ${dur}s linear`;Object.assign(el.style,hp(tx,ty));el._x=tx;el._y=ty;if(el._key)GPOS[el._key]={x:tx,y:ty};
-  setTimeout(()=>{el._busy=0;el._rest=Date.now()+2500+Math.random()*6000;el.classList.remove('walking');el.style.zIndex=Math.round(ty)},dur*1000)})}
+  setTimeout(()=>{el._busy=0;el._rest=Date.now()+1500+Math.random()*3500;el.classList.remove('walking');el.style.zIndex=Math.round(ty)},dur*1000)})}
 function renderF2(){const v=$('#f2v');if(!v||!F2)return;const h=house(F2.hid),st=v.querySelector('.cstage'),fam=isFamily(h.id);
-  st.querySelector('.cbg').src=roomImg(h.room2||'basic1');st.querySelectorAll('.toy,.walker,.rentjar,.f2hint').forEach(x=>x.remove());
+  st.querySelector('.cbg').src=roomImg(h.room2||'basic1');st.querySelectorAll('.toy,.walker,.rentjar,.f2hint,.ggrid').forEach(x=>x.remove());st.classList.toggle('placing',!!F2.placing);
   (h.toys2||[]).forEach(t=>{const it=ITEMS[t.item]||{},el=document.createElement('button');el.className='toy'+(t.flip?' flip':'')+(it.an?' an-'+it.an:'')+(it.flat?' flat':'');el.innerHTML=itemIcon(t.item,'toyi');
     if(it.sz)el.style.setProperty('--sz',it.sz);Object.assign(el.style,hp(t.x,t.y),{zIndex:it.flat?1:Math.round(t.y)-300});
     el.onclick=e=>{e.stopPropagation();if(F2.placing)return toast('這裡有東西了，換個地方');if(fam)f2ToyMenu(t);else{el.classList.remove('bump');void el.offsetWidth;el.classList.add('bump')}};st.appendChild(el)});
@@ -3740,20 +3742,20 @@ function renderGuestsOnFloor(f,h){const P=guestPlan(),L=isParkH(h)?P.park:P.visi
   L.slice(0,6).forEach((g,i)=>{const key=h.id+':'+g.i;let P0=GPOS[key];
     if(!P0){let best=null,bd=-1;for(let t=0;t<24;t++){const q={x:FLOOR.x0+50+hash01(key+'x'+t)*(FLOOR.x1-FLOOR.x0-100),y:FLOOR.y0+50+hash01(key+'y'+t)*(FLOOR.y1-FLOOR.y0-80)};
         const d=taken.length?Math.min(...taken.map(o=>Math.hypot((o.x-q.x)*.8,o.y-q.y))):1;if(d>bd){bd=d;best=q}}P0=GPOS[key]=best;taken.push(best)}
-    const el=walker(f,g.img,P0.x,P0.y,isParkH(h)?190:220,'',e=>guestTalk(g,where,e));el.classList.add('gnpc');el._key=key})}
+    const el=walker(f,g.img,P0.x,P0.y,isParkH(h)?190:220,'',e=>guestTalk(g,where,e));el.classList.add('gnpc');el._key=key;el._rest=Date.now()+300+Math.random()*2500})}
 const GPOS={};
 // 旅客散步：每次只走附近一小段、慢慢走，走完會停一陣子
-function guestWander(f){f.querySelectorAll('.gnpc').forEach(el=>{if(el._busy||Date.now()<(el._rest||0)||Math.random()<.6)return;
-  const ang=Math.random()*Math.PI*2,dist=60+Math.random()*120,tx=clamp(el._x+Math.cos(ang)*dist,FLOOR.x0+40,FLOOR.x1-40),ty=clamp(el._y+Math.sin(ang)*dist*.6,FLOOR.y0+30,FLOOR.y1-20);
-  const d=Math.hypot(tx-el._x,ty-el._y);if(d<30)return;const dur=d/55;el._busy=1;el.style.zIndex=Math.round(Math.max(el._y,ty));el.classList.toggle('flip',tx<el._x);el.classList.add('walking');
+function guestWander(f){f.querySelectorAll('.gnpc').forEach(el=>{if(el._busy||Date.now()<(el._rest||0))return;
+  const ang=Math.random()*Math.PI*2,dist=80+Math.random()*140,tx=clamp(el._x+Math.cos(ang)*dist,FLOOR.x0+40,FLOOR.x1-40),ty=clamp(el._y+Math.sin(ang)*dist*.6,FLOOR.y0+30,FLOOR.y1-20);
+  const d=Math.hypot(tx-el._x,ty-el._y);if(d<40){el._rest=Date.now()+300;return}const dur=d/55;el._busy=1;el.style.zIndex=Math.round(Math.max(el._y,ty));el.classList.toggle('flip',tx<el._x);el.classList.add('walking');
   el.style.transition=`left ${dur}s linear,top ${dur}s linear`;Object.assign(el.style,hp(tx,ty));el._x=tx;el._y=ty;if(el._key)GPOS[el._key]={x:tx,y:ty};
-  setTimeout(()=>{el._busy=0;el._rest=Date.now()+4000+Math.random()*8000;el.classList.remove('walking');el.style.zIndex=Math.round(ty)},dur*1000)})}
-setInterval(()=>{const f=$('#floor');if(!f||!home||$('#home').classList.contains('hidden')||document.hidden)return;if(f.querySelector('.gnpc'))guestWander(f)},2500);
+  setTimeout(()=>{el._busy=0;el._rest=Date.now()+2000+Math.random()*4000;el.classList.remove('walking');el.style.zIndex=Math.round(ty)},dur*1000)})}
+setInterval(()=>{const f=$('#floor');if(!f||!home||$('#home').classList.contains('hidden')||document.hidden)return;if(f.querySelector('.gnpc'))guestWander(f)},900);
 // ---------- 公園的畫面（用家的畫面，按鈕不一樣） ----------
 function renderParkHome(h){const ad=!!adminPw();
   $('#famtools').innerHTML=ad?'<button class="act" id="fp1">🧸 布置</button>':'';if($('#fp1'))$('#fp1').onclick=toyPlacer;
   $('#feed').style.display='none';$('#sweep').style.display='none';$('#giftbtn').style.display='none';
-  $('#walkbtn').style.display='';$('#walkbtn').onclick=walkForm;$('#board').style.display='none';$('#addnote').style.display='none';
+  $('#walkbtn').style.display='';$('#walkbtn').onclick=walkForm;$('#board').style.display='none';$('#addnote').style.display='none';$('#notebook').style.display='none';
   $('#emptyhome').innerHTML='';renderFloor();renderFoot2()}
 
 // ================= 頁尾與啟動 =================
@@ -4196,7 +4198,7 @@ function announceLetters(){if(!DB.me)return;let seen=[];try{seen=JSON.parse(loca
     sfx('gift');$('#lgopen').onclick=()=>openLetter(nw[0].id,()=>$('#bell').click())};
   setTimeout(go,1800)}
 // ================= 自動更新：發現新版本就重新載入 =================
-const APP_VER='v1.72';
+const APP_VER='v1.74';
 function checkUpdate(){
   if(!/^https?:/.test(location.protocol)||!API_URL)return;
   if(!$('#modal').classList.contains('hidden'))return; // 正在填表單時不打斷
