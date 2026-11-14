@@ -870,8 +870,8 @@ img{-webkit-user-drag:none}
 .chead .pill{border:0;border-radius:999px;padding:9px 16px;font-size:16px;background:#fff6e6;box-shadow:0 0 0 2px var(--wood);color:var(--ink)}
 .ctitle{background:#fff6e6;border-radius:999px;padding:4px 18px;text-align:center;font-weight:700;font-size:18px;color:#3f6b2a;box-shadow:0 0 0 2px var(--wood);line-height:1.2}
 .ctitle small{display:block;font-size:11px;font-weight:400;color:#8a7a60}
-.cwrap{flex:1;min-height:0;width:100%;display:flex;justify-content:center;align-items:flex-start}
-.cstage{position:relative;height:100%;max-width:100%;aspect-ratio:848/1264;container-type:inline-size;overflow:hidden}
+.cwrap{flex:1;min-height:0;width:100%;display:flex;justify-content:center;align-items:flex-start;overflow:hidden}
+.cstage{position:relative;height:100%;flex:none;aspect-ratio:848/1264;container-type:inline-size;overflow:hidden}
 .cbg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
 .cboard{position:absolute;border:0;background:none;padding:5%;display:flex;align-items:center;justify-content:center;cursor:pointer}
 .cnote{background:#fffbe0;border-radius:4px;box-shadow:0 3px 6px rgba(80,40,10,.3);padding:6px 8px;font-size:clamp(10px,3.1cqw,15px);line-height:1.4;color:#5a4030;transform:rotate(-2deg);max-height:100%;overflow:hidden;display:-webkit-box;-webkit-line-clamp:5;-webkit-box-orient:vertical;text-align:left}
@@ -885,6 +885,32 @@ img{-webkit-user-drag:none}
 .cmenu button{display:flex;align-items:center;gap:10px;text-align:left;border:2px solid #f0d9a8;background:#fff;border-radius:14px;padding:10px 12px;font-size:15px;color:var(--ink)}
 .cmenu button .mic{width:30px;height:30px;font-size:22px;text-align:center}
 .cmenu small{display:block;color:#999;font-size:12px}
+/* 📐 擴建：二樓民宿、農田 */
+.scene .cstage{cursor:default}
+.walker>img{display:block;height:100%;width:auto;transform-origin:50% 100%;animation:sbreathe 3.4s ease-in-out infinite;filter:drop-shadow(0 4px 3px rgba(60,35,15,.25));pointer-events:none}
+.walker.walking>img{animation:swalk .55s ease-in-out infinite}
+.rentjar{position:absolute;left:12%;top:3%;z-index:3000;display:flex;align-items:center;gap:4px;background:rgba(255,250,238,.95);border:2px solid #f3cf62;border-radius:999px;padding:3px 10px 3px 4px;font-size:clamp(11px,3.2cqw,15px)}
+.rentjar img{width:2.2em;height:2.2em;object-fit:contain}.rentjar small{color:#e8603c;font-weight:700}
+.rentjar.full{animation:sbbob 1.4s ease-in-out infinite;box-shadow:0 0 12px #ffd76b}
+.f2hint{position:absolute;left:50%;top:72%;transform:translateX(-50%);background:rgba(255,250,238,.9);border-radius:12px;padding:8px 12px;font-size:clamp(11px,3.2cqw,14px);color:#7a5a3a;white-space:nowrap;z-index:5}
+.toy.bump .ii img{animation:tumble .6s ease-in-out!important}
+.spop{position:absolute;transform:translate(-50%,-100%);background:#fff;border-radius:999px;padding:3px 10px;font-weight:700;color:#7a4a00;z-index:4000;display:flex;align-items:center;gap:4px;animation:spopup 1.6s ease-out forwards;white-space:nowrap;font-size:clamp(11px,3.4cqw,15px)}
+.spop .ii{width:1.8em;height:1.8em}
+@keyframes spopup{0%{opacity:0;margin-top:10px}15%{opacity:1;margin-top:0}80%{opacity:1}100%{opacity:0;margin-top:-30px}}
+.plot{position:absolute;width:30%;transform:translate(-50%,-100%);border:0;background:none;padding:0;cursor:pointer}
+.plot .soil{display:block;width:100%;filter:drop-shadow(0 4px 3px rgba(60,35,15,.25))}
+.plot .crop{position:absolute;left:0;right:0;margin:0 auto;bottom:38%;width:62%;transform-origin:50% 100%;animation:sway 3.6s ease-in-out infinite;pointer-events:none}
+.plot .crop.c1{width:42%}.plot .crop.c3{width:70%}
+.plab{position:absolute;transform:translateX(-50%);cursor:pointer;background:rgba(255,250,238,.95);border-radius:999px;padding:1px 8px;font-size:clamp(10px,2.9cqw,13px);white-space:nowrap;color:#6b3f1d}
+.plab.ripe{background:#fff3b0;color:#b4401a;font-weight:700;animation:sbbob 1.4s ease-in-out infinite}
+.ftab{width:100%;border-collapse:collapse;margin:8px 0;font-size:14px}.ftab td,.ftab th{border-bottom:1px solid #eee;padding:5px;text-align:center}
+.si .cx{margin-top:4px;background:#fff3e0}
+.expc{display:flex;align-items:center;gap:10px;border:2px solid #f0d9a8;background:#fff;border-radius:14px;padding:10px;margin:8px 0;text-align:left}
+.expc>img{width:52px;height:52px;object-fit:contain}.expc>div{flex:1}.expc small{display:block;color:#888;font-size:12px}
+.expc>span{font-size:13px;color:#b07a10}.expc>span.ok{color:#3f8a2a}
+.apbox{border:2px solid #f0d9a8;border-radius:12px;padding:8px 10px;margin:6px 0;background:#fffdf6}.apbox small{display:block;color:#888}.apbox p{margin:4px 0}.apbox input{width:100%;margin:4px 0}
+.f2tag{position:absolute;transform:translate(-50%,-50%);background:#8a62c9;color:#fff;font-weight:700;border-radius:6px;padding:0 4px;font-size:clamp(8px,1.6cqw,11px);line-height:1.5;pointer-events:none;box-shadow:0 1px 0 rgba(0,0,0,.2)}
+.f2tag.farm{background:none;box-shadow:none;padding:0}.f2tag.farm img{width:clamp(14px,3cqw,22px);display:block}
 </style>
 </head>
 <body>
@@ -1066,7 +1092,7 @@ async function sync(quiet){
   try{const d=await api('getState',Object.assign(cred(),{where:curWhere()}));
     Object.assign(DB,{houses:d.houses,pets:d.pets,weights:d.weights,medical:d.medical,expenses:d.expenses,notes:d.notes,feed:d.feed,famOk:d.famOk,players:d.players||[],tlogs:d.tlogs||[]});
     DB.houses.forEach(h=>{if(!Array.isArray(h.poops))h.poops=[]});
-    keepPending();DB.letters=(d.letters||[]).filter(l=>!LGONE[l.id]).map(l=>Object.assign(l,LSTATE[l.id]||{},CLAIMED['l:'+l.id]?{claimed:true}:{}));DB.drops=(d.drops||[]).filter(x=>!PICKED.has(x.id));DB.notice=d.notice&&d.notice.t&&!(+d.notice.until&&Date.now()>+d.notice.until)?d.notice:null;DB.center=d.center||DB.center||null;DB.kuji=d.kuji||DB.kuji||null;DB.online=d.online||[];setTimeout(checkAdminGifts,600);DB.rank=d.rank||DB.rank||null;osLogin();pushCheckLater();setTimeout(noticePop,1200);DB.dbl=d.dbl||'';DB.adminId=d.adminId||'';DB.star=d.star||null;if(d.player)DB.starDone=+d.player.starDone||0;
+    keepPending();DB.letters=(d.letters||[]).filter(l=>!LGONE[l.id]).map(l=>Object.assign(l,LSTATE[l.id]||{},CLAIMED['l:'+l.id]?{claimed:true}:{}));DB.drops=(d.drops||[]).filter(x=>!PICKED.has(x.id));DB.notice=d.notice&&d.notice.t&&!(+d.notice.until&&Date.now()>+d.notice.until)?d.notice:null;DB.center=d.center||DB.center||null;DB.applies=d.applies||[];DB.kuji=d.kuji||DB.kuji||null;DB.online=d.online||[];setTimeout(checkAdminGifts,600);DB.rank=d.rank||DB.rank||null;osLogin();pushCheckLater();setTimeout(noticePop,1200);DB.dbl=d.dbl||'';DB.adminId=d.adminId||'';DB.star=d.star||null;if(d.player)DB.starDone=+d.player.starDone||0;
     setTimeout(announceLetters,0);setTimeout(updGuestBar,0);
     if(d.player&&DB.me){DB.me.code=d.player.code||DB.me.code;const ml=Array.isArray(d.player.mail)?d.player.mail:[];if(ml.length)claimMail(ml)}
     DB.owned={};d.houses.forEach(h=>DB.owned[h.id]=Array.isArray(h.owned)?h.owned:[]);
@@ -1128,6 +1154,15 @@ const LOCAL={
   recoverPlayer(){throw new Error('試做版不能用轉移碼')},claimMail(){return true},
   adminLogin(){return {players:(DB.players||[]).map(p=>({id:p.id,nick:p.nick,code:'MH-DEMO00',house:(house(p.houseId)||{}).name||'',houseId:p.houseId||'',lv:1,coins:0,tickets:0})),houses:DB.houses.filter(h=>!isShopH(h)).map(h=>({id:h.id,name:h.name})),shopMgr:(house(SHOP_ID)||{}).mgr||[],drops:(DB.drops||[]).length,notice:DB.notice,dbl:DB.dbl}},
   adminNotice({text,days}){const at=Date.now();DB.notice=text?{t:text,at,until:+days?at+days*864e5:0}:null;return true},
+  applyExpand({houseId,kind,note,lv}){const h=house(houseId);if(+lv<15)throw new Error('要 Lv.15 以上才能申請擴建');if((DB.applies||[]).some(a=>a.houseId===houseId&&a.st==='wait'))throw new Error('你家已經有一張申請在等島主看了');
+    const a={id:uid(),kind,houseId,house:h.name,playerId:DB.me.id,nick:DB.me.nick,note:note||'',cost:1000,at:Date.now(),st:'wait',reply:''};return a},
+  adminApplyDecide({id,ok,reply}){const a=(DB.applies||[]).find(x=>x.id===id);if(!a||a.st!=='wait')throw new Error('這張申請已經處理過了');const h=house(a.houseId);a.st=ok?'ok':'no';a.reply=reply||'';
+    if(ok){if(a.kind==='floor2')Object.assign(h,{floor2:1,room2:h.room2||'basic1',toys2:h.toys2||[],inn:{at:Date.now()}});else h.farm={n:4,p:[]}}else grant(0,a.cost);return a},
+  innCollect({houseId}){const h=house(houseId),c=rentNow(h);if(c>0)h.inn={at:Date.now()};return {coins:c,comfort:comfortOf(h)}},
+  farmPlant({houseId,i,c}){const f=farmOf(house(houseId));if(i>=f.n)throw new Error('這格還沒開放');if(f.p[i])throw new Error('這格已經種東西了');return f.p[i]={c,at:Date.now(),w:[]}},
+  farmWater({houseId,i}){const c=farmOf(house(houseId)).p[i];if(!c)throw new Error('這格還沒種東西');c.w=(c.w||[]).concat({t:Date.now()});return c},
+  farmHarvest({houseId,i}){const f=farmOf(house(houseId)),c=f.p[i];if(!c||Date.now()<ripeAt(c))throw new Error('還沒成熟喔');f.p[i]=null;return {c:c.c,bag:c.c==='apple'&&Math.random()<.2?50+Math.floor(Math.random()*16)*10:0}},
+  farmBuyPlot({houseId}){const f=farmOf(house(houseId));if(f.n>=6)throw new Error('最多 6 格');f.n++;return {n:f.n}},
   adminCenter({staff}){DB.center=Object.assign({},DB.center||{},{staff});return {staff}},adminDouble({on}){DB.dbl=on?todayTW():'';return true},
   adminRain({houseId,n}){for(let i=0;i<(+n||1);i++){const h=houseId?house(houseId):DB.houses[~~(Math.random()*DB.houses.length)];(DB.drops=DB.drops||[]).push({id:uid(),houseId:h.id,x:Math.round(FLOOR.x0+40+Math.random()*(FLOOR.x1-FLOOR.x0-80)),y:Math.round(FLOOR.y0+20+Math.random()*(FLOOR.y1-FLOOR.y0-40))})}return true},
   readLetter(){return true},hideLetter(){return true},claimLetter({letterId}){const l=(DB.letters||[]).find(x=>x.id===letterId)||{};return {coins:l.coins,tickets:l.tickets,item:l.item,n:l.n}},adminLetter(o){(DB.letters=DB.letters||[]).unshift({id:uid(),title:o.title,body:o.body,at:Date.now(),coins:+o.coins||0,tickets:+o.tickets||0,item:o.item||'',n:+o.n||0,read:false,claimed:false,all:o.to==='*'});return true},adminGiftHouse({houseId,coins,tickets,item,n,msg,room}){const h=house(houseId);(h.gifts=h.gifts||[]).push({id:uid(),admin:true,from:'島主',coins,tickets,item,n,msg,room,opened:[],at:Date.now(),x:Math.round(FLOOR.x0+60+Math.random()*(FLOOR.x1-FLOOR.x0-120)),y:Math.round(FLOOR.y0+40+Math.random()*150)});return true},adminResetPw(){return true},adminRemoveHouse({houseId}){return LOCAL.deleteHouse({houseId})},
@@ -1449,6 +1484,8 @@ function renderIsland(){
     el.onclick=()=>h?openHome(h.id):lotClick(i);
     box.appendChild(el);
     if(h)box.appendChild(signEl(h.name,x,y,isFamily(h.id)?'mine':''));
+    if(h&&hasF2(h)){const t=document.createElement('div');t.className='f2tag';t.textContent='2F';Object.assign(t.style,ipct(x+SIGN_W/2-6,y-SIGN_UP-4),{zIndex:y+2});box.appendChild(t)}
+    if(h&&hasFarm(h)){const t=document.createElement('div');t.className='f2tag farm';t.innerHTML='<img src="assets/icon_farm.webp" alt="">';Object.assign(t.style,ipct(x-SIGN_W/2+6,y-SIGN_UP-4),{zIndex:y+2});box.appendChild(t)}
     else{const lb=document.createElement('div');lb.className='label lot';lb.textContent='＋';Object.assign(lb.style,ipct(x,y+6),{zIndex:2000});box.appendChild(lb)}
     if(h&&guestsOf(h.id).length){const gb=document.createElement('div');gb.className='bubble';gb.textContent='🐾';Object.assign(gb.style,ipct(x-40,y-150),{zIndex:2001});box.appendChild(gb)}
     if(h&&demonShown(h)){const gb=document.createElement('div');gb.className='ibub demonb';gb.innerHTML='<img src="assets/demon_head.webp" alt="">餓魔出沒！';Object.assign(gb.style,ipct(x,y-135),{zIndex:2002});box.appendChild(gb)}
@@ -1657,7 +1694,7 @@ function openHome(hid,keep){
   $('#island').classList.add('hidden');$('#home').classList.remove('hidden');
   setHname(h);useRoom(h);$('#roombg').src=roomImg(h.room);$('#hback').style.backgroundImage=`url(${roomImg(h.room)})`;if(!ONLINE)spawnPoops(h);
   const prev=home&&home.id===hid?home.pets:[];
-  const plist=petsOf(hid).filter(p=>!outAt(p.id)||outAt(p.id).id===hid).concat(guestsOf(hid).map(g=>pet(g.petId)).filter(p=>p.houseId!==hid));
+  const plist=petsOf(hid).filter(p=>(!outAt(p.id)||outAt(p.id).id===hid)&&!up2(p)).concat(guestsOf(hid).map(g=>pet(g.petId)).filter(p=>p.houseId!==hid));
   home={id:hid,pets:plist.map((p,i)=>{const o=prev.find(q=>q.id===p.id);
     return Object.assign(o?Object.assign(o,{el:null,tentEl:null}):{id:p.id,x:220+(i%3)*200,y:900+(i%2)*120,tx:0,ty:0,state:'idle',until:performance.now()+500+i*600,facing:1,hop:0,anim:null,welcome:!keep},{guest:p.houseId!==hid})}),bowl:null};
   if(!keep&&home.pets.length){home.pets.forEach((r,i)=>{r.tx=300+i*120;r.ty=1110;r.state='walk';r.goal='welcome'})}
@@ -1689,6 +1726,8 @@ function renderHome(){
   if(isShopH(h))return renderShopHome(h);
   $('#feed').textContent='🍖 餵飯';$('#feed').onclick=()=>feedNow();$('#sweep').style.display='';$('#giftbtn').style.display='';
   $('#famtools').innerHTML=isFamily(h.id)?`<button class="act" id="ft1">＋ 毛孩</button><button class="act" id="ft2">⚙️ 家</button>`:(DB.me&&!DB.me.houseId?`<button class="act" id="ft3">🔑 我是家人</button>`:'');
+  if(hasF2(h)||hasFarm(h)){$('#famtools').insertAdjacentHTML('beforeend',(hasF2(h)?'<button class="act" id="ftup"><img class="mic" src="assets/icon_up.webp" alt="">二樓</button>':'')+(hasFarm(h)?'<button class="act" id="ftfarm"><img class="mic" src="assets/icon_farm.webp" alt="">農田</button>':''));
+    if($('#ftup'))$('#ftup').onclick=()=>openFloor2(h.id);if($('#ftfarm'))$('#ftfarm').onclick=()=>openFarm(h.id)}
   if($('#ft1'))$('#ft1').onclick=()=>petForm(h.id);
   if($('#ft2'))$('#ft2').onclick=()=>houseSettings(h.id);
   if($('#ft3'))$('#ft3').onclick=()=>joinFlow(h.id);
@@ -2498,14 +2537,14 @@ let shopTab='treat';
 function shopSheet(tab){
   if(!DB.me)return onboarding();if(tab)shopTab=tab;
   const g=DB.game,coins=g.coins||0,bd=DB.pets.some(p=>isBirthday(p.birthday));
-  if(shopTab==='ticket')shopTab='kuji';const tabs=[['treat','🍤 零食'],['toy','🧸 玩具'],['kuji','<img class="tabic" src="assets/kuji_icon.webp" alt="">一番賞'],['acc','👗 服飾'],['bag','🎒 背包']];
+  if(shopTab==='ticket')shopTab='kuji';const tabs=[['treat','🍤 零食'],['toy','🧸 玩具'],['kuji','<img class="tabic" src="assets/kuji_icon.webp" alt="">一番賞'],['acc','👗 服飾'],['seed','🌱 種子'],['bag','🎒 背包']];
   let body='';
-  if(shopTab==='treat'||shopTab==='toy'){
+  if(shopTab==='treat'||shopTab==='toy'||shopTab==='seed'){
     const list=Object.entries(ITEMS).filter(([id,it])=>it.kind===shopTab&&!it.limited&&(!it.bday||bd));
     body=`<div class="shopgrid">${list.map(([id,it])=>`<div class="si">${itemIcon(id,'big')}<div class="sn">${it.name}</div>
       ${it.fav&&it.fav.length?`<div class="sf">${it.fav.join('、')}最愛</div>`:it.bday?'<div class="sf">今天有毛孩生日限定</div>':'<div class="sf">&nbsp;</div>'}
       <button data-buy="${id}" ${coins>=it.price?'':'disabled'}>🪙 ${it.price}</button><small>${bag()[id]?`背包裡有 ${bag()[id]}`:''}</small></div>`).join('')}</div>
-      <div class="hint">${shopTab==='treat'?`零食可以去任何人家餵毛孩，每隻毛孩一天最多吃 ${TREAT_MAX} 個；也可以包成禮物送人`:'玩具可以擺在自己家，也可以送給朋友，會放在他們家的地上'}</div>`}
+      <div class="hint">${shopTab==='seed'?'種子要種在農田裡（在島民中心申請擴建農田），8 小時成熟，收成拿去毛二街賣':shopTab==='treat'?`零食可以去任何人家餵毛孩，每隻毛孩一天最多吃 ${TREAT_MAX} 個；也可以包成禮物送人`:'玩具可以擺在自己家，也可以送給朋友，會放在他們家的地上'}</div>`}
   if(shopTab==='kuji')body=kujiBody(coins);
   if(shopTab==='bag'){const L=bagList(),SB=starEv()&&starG().n&&!starDone()?`<div class="sbbag"><img src="assets/sb_happy.webp" alt=""><div><b>⭐ 星寶 × ${starG().n}</b><small>毛球的好朋友，不能送也不能賣・集滿 ${STAR_GOAL} 次去找毛球</small></div></div>`:'';body=SB+(L.length?`<div class="shopgrid">${L.map(([id,n])=>`<div class="si">${itemIcon(id,'big')}<div class="sn">${ITEMS[id].name}</div><div class="sf">× ${n}</div></div>`).join('')}</div><div class="hint">零食：在別人家點毛孩 →「🍤 零食」。玩具：自己家點「🧸 玩具」擺出來，或在朋友家點「🎁 送禮」</div>`:(SB?'':'<div class="locked">背包是空的，買點東西吧</div>'))}
   openModal(`<h3>🏪 毛毛商店</h3><p class="lead">我的金幣：<b class="coinv">🪙 ${coins}</b></p>
@@ -3123,7 +3162,8 @@ function tradeSheet(tab,sub){if(!needMe())return;if(tab)tradeTab=tab;if(sub)sell
     body=L.length?`<div class="shopgrid">${L.map(x=>{const pr=shopPrice(x.t,x.item),has=x.t==='acc'&&own.has(x.item),lim=x.t==='item'&&ITEMS[x.item].limited;
       return `<div class="si">${shopIcon(x.t,x.item)}<div class="sn">${esc(shopName(x.t,x.item))}</div><div class="sf"><s>原價 ${shopBase(x.t,x.item)}</s>${lim?' ✨限定':x.t==='acc'?' 👗':''}</div><button data-sb="${x.id}" ${coins>=pr&&!has?'':'disabled'}>${has?'已擁有':'🪙 '+pr}</button><small>${x.src==='p'?(x.by?esc(x.by)+' 寄賣':'島民寄賣'):'店家補貨'}</small></div>`}).join('')}</div>`:'<div class="locked">架上空空的，晚點再來撿便宜</div>';
     body+=`<div class="hint">二手價都是原價的一半・限定玩具以 🪙${LIMIT_BASE} 當原價・每天店家會補 3 樣新貨</div>`}
-  else if(sellSub==='bag'){const L=bagList();
+  else if(sellSub==='crop'){body=cropSellBody()}
+  else if(sellSub==='bag'){const L=bagList().filter(([id])=>!['seed','crop'].includes(ITEMS[id].kind));
     body=L.length?`<div class="shopgrid">${L.map(([id,n])=>`<div class="si">${itemIcon(id,'big')}<div class="sn">${esc(ITEMS[id].name)}</div><div class="sf">× ${n}${ITEMS[id].limited?' ✨限定':''}</div><button data-ss="${id}">賣 🪙 ${shopPrice('item',id)}</button></div>`).join('')}</div>`:'<div class="locked">背包是空的</div>';
     body+='<div class="hint">按一次會問你確定，再按一次才會賣・擺在家裡的玩具要先「收回背包」才能賣</div>'}
   else{const L=[...own].filter(id=>ACC[id]);
@@ -3132,11 +3172,11 @@ function tradeSheet(tab,sub){if(!needMe())return;if(tab)tradeTab=tab;if(sub)sell
     body+='<div class="hint">配件是全家共用的，賣掉後全家的衣櫃都會少這件，毛孩身上戴著的也會脫下來</div>'}
   openModal(`<h3>🛍️ 毛二街</h3><p class="lead">我的金幣：<b class="coinv">🪙 ${coins}</b>・收購和賣出都是原價的一半</p>
     <div class="tabs3"><button data-tt="buy" class="${tradeTab==='buy'?'on':''}">🛍️ 買二手</button><button data-tt="sell" class="${tradeTab==='sell'?'on':''}">💰 賣東西</button></div>
-    ${tradeTab==='sell'?`<div class="rtabs"><button data-st="bag" class="${sellSub==='bag'?'on':''}">🎒 背包</button><button data-st="acc" class="${sellSub==='acc'?'on':''}">👗 衣櫃配件</button></div>`:''}
+    ${tradeTab==='sell'?`<div class="rtabs"><button data-st="bag" class="${sellSub==='bag'?'on':''}">🎒 背包</button><button data-st="acc" class="${sellSub==='acc'?'on':''}">👗 衣櫃配件</button><button data-st="crop" class="${sellSub==='crop'?'on':''}">🌱 作物</button></div>`:''}
     ${body}<div class="row2" style="margin-top:12px"><button data-close>關閉</button></div>`);
   const S=$('#sheet');
   S.querySelectorAll('[data-tt]').forEach(b=>b.onclick=()=>tradeSheet(b.dataset.tt));
-  S.querySelectorAll('[data-st]').forEach(b=>b.onclick=()=>tradeSheet('sell',b.dataset.st));
+  S.querySelectorAll('[data-st]').forEach(b=>b.onclick=()=>tradeSheet('sell',b.dataset.st));if(sellSub==='crop')cropBind(S);
   const pushStock=it=>{if(it&&it.id&&!(s.stock||[]).some(y=>y.id===it.id))(s.stock=s.stock||[]).push(it)};
   S.querySelectorAll('[data-sb]').forEach(b=>b.onclick=async()=>{const x=(s.stock||[]).find(y=>y.id===b.dataset.sb);if(!x)return;const pr=shopPrice(x.t,x.item),nm=shopName(x.t,x.item);
     if((g.coins||0)<pr)return toast('金幣不夠喔');if(x.t==='acc'&&!myHouse())return toast('有家之後才能買配件');
@@ -3324,7 +3364,7 @@ function adminStarBind(){const go=async(on,b)=>{if(!armBtn(b,on?'確定開始？
 const CENTER_SLOT=15,CENTER_STAFF_MAX=3,CTR={x:424,y:1010,w:560},CBOARD=[418,355,718,585];
 const CENTER_STAFF0=[{id:'c1',name:'Amy',img:'assets/center_npc_idle.webp',img2:'assets/center_npc_wave.webp',about:''}];
 const CSTAFF_POS=[{x:424,y:880,h:280},{x:160,y:1150,h:270},{x:690,y:1160,h:270}];
-const CENTER_SAY=['歡迎來到島民中心！','有什麼需要幫忙的嗎？','想跟島主說的話，都可以寫信喔','今天的公告看了嗎？','都更和擴建還在準備中，敬請期待！','我是 Amy，請多指教 🐷'];
+const CENTER_SAY=['歡迎來到島民中心！','有什麼需要幫忙的嗎？','想跟島主說的話，都可以寫信喔','今天的公告看了嗎？','擴建二樓民宿和農田，都可以在這裡申請喔','我是 Amy，請多指教 🐷'];
 // 島民中心的位置：第 16 塊地（如果那塊已經有人蓋了，就退回沙灘上的預留位置）
 function centerPos(){const taken=DB.houses.some(h=>!isShopH(h)&&+h.slot===CENTER_SLOT);return taken?CENTER_POS:{x:SLOTS[CENTER_SLOT][0],y:SLOTS[CENTER_SLOT][1]}}
 const centerStaff=()=>{const L=DB.center&&Array.isArray(DB.center.staff)?DB.center.staff.filter(x=>x&&x.name):[];return (L.length?L:CENTER_STAFF0).slice(0,CENTER_STAFF_MAX)};
@@ -3336,9 +3376,9 @@ function openCenter(){sfx&&sfx('tap');let v=$('#centerv');if(v)v.remove();v=docu
     <div class="cwrap"><div class="cstage" id="cstage"><img class="cbg" src="assets/room_center.webp" alt="">
       <button class="cboard noic" id="cboard" style="left:${CBOARD[0]/RW*100}%;top:${CBOARD[1]/RH*100}%;width:${(CBOARD[2]-CBOARD[0])/RW*100}%;height:${(CBOARD[3]-CBOARD[1])/RH*100}%">
         ${n?`<span class="cnote"><b><img class="mic" style="width:1.4em;height:1.4em" src="assets/icon_notice.webp" alt="">島主公告</b>${esc(n.t)}</span>`:'<span class="cnote empty">目前沒有公告</span>'}</button></div></div>
-    <div class="cbtns"><button class="act" id="cmail">${mic('mail',22)}寫信給島主</button><button class="act lockd" id="crenew"><img class="mic" src="assets/icon_renew.webp" alt="">都更</button><button class="act lockd" id="cexp"><img class="mic" src="assets/icon_expand.webp" alt="">擴建</button></div>`;
+    <div class="cbtns"><button class="act" id="cmail">${mic('mail',22)}寫信給島主</button><button class="act lockd" id="crenew"><img class="mic" src="assets/icon_renew.webp" alt="">都更</button><button class="act" id="cexp"><img class="mic" src="assets/icon_expand.webp" alt="">擴建</button></div>`;
   document.body.appendChild(v);renderCenterStaff();
-  $('#cback').onclick=closeCenter;$('#cmail').onclick=()=>mailAdminSheet();$('#crenew').onclick=()=>centerLocked('都更');$('#cexp').onclick=()=>centerLocked('擴建');
+  $('#cback').onclick=closeCenter;$('#cmail').onclick=()=>mailAdminSheet();$('#crenew').onclick=()=>centerLocked('都更');$('#cexp').onclick=centerExpand;
   $('#cboard').onclick=()=>{const n=DB.notice&&DB.notice.t?DB.notice:null;openModal(n?`<div class="ncard"><div class="ncrown"><img src="assets/icon_notice.webp" alt=""></div><h3>島主公告</h3><p>${esc(n.t)}</p><small>${n.at?ago(+n.at):''}${noticeLeft(n)?`・還會貼 ${noticeLeft(n)}`:''}</small></div><div class="row2"><button data-close class="primary">知道了</button></div>`:`<h3>📌 公告欄</h3><p class="lead" style="text-align:center">目前沒有公告，島主貼新公告時會出現在這裡</p><div class="row2"><button data-close class="primary">好</button></div>`)};
   try{call('ping',{playerId:DB.me&&DB.me.id,where:'center'},true).catch(()=>{})}catch(e){}}
 function closeCenter(){const v=$('#centerv');if(v)v.remove();cEls=[];renderIsland()}
@@ -3357,10 +3397,10 @@ function centerTap(i){const s=centerStaff()[i]||CENTER_STAFF0[0],el=cEls[i];sfx&
 function centerMenu(s){openModal(`<div class="mqd"><img src="${esc(s.img2||s.img||CENTER_STAFF0[0].img2)}" alt="" style="width:120px"><div class="mqbub">我是 ${esc(s.name)}，有什麼可以幫你的嗎？</div></div>
   <div class="cmenu"><button id="cm1">${mic('mail',30)}<span><b>寫信給島主</b><small>回報問題、建議、許願</small></span></button>
     <button id="cm2" class="lockd"><img class="mic" src="assets/icon_renew.webp" alt=""><span><b>申請都更・外牆整修</b><small>🔒 準備中</small></span></button>
-    <button id="cm3" class="lockd"><img class="mic" src="assets/icon_expand.webp" alt=""><span><b>申請擴建</b><small>🔒 準備中</small></span></button>
+    <button id="cm3"><img class="mic" src="assets/icon_expand.webp" alt=""><span><b>申請擴建</b><small>二樓民宿、農田（Lv15・🪙1000）</small></span></button>
     <button id="cm4"><span class="mic">📌</span><span><b>看公告</b><small>${DB.notice&&DB.notice.t?'島主有新公告喔':'目前沒有公告'}</small></span></button></div>
   <div class="row2"><button data-close>掰掰</button></div>`);
-  $('#cm1').onclick=()=>mailAdminSheet();$('#cm2').onclick=()=>centerLocked('都更');$('#cm3').onclick=()=>centerLocked('擴建');$('#cm4').onclick=()=>{closeModal();$('#cboard')&&$('#cboard').click()}}
+  $('#cm1').onclick=()=>mailAdminSheet();$('#cm2').onclick=()=>centerLocked('都更');$('#cm3').onclick=centerExpand;$('#cm4').onclick=()=>{closeModal();$('#cboard')&&$('#cboard').click()}}
 function centerLocked(k){openModal(`<div style="text-align:center"><img src="assets/icon_${k==='擴建'?'expand':'renew'}.webp" alt="" style="width:90px"><h3>🔒 ${k}還在準備中</h3><p class="lead">${k==='擴建'?'之後可以加蓋二樓（Lv15 以上、🪙1000、島主審核）':'之後可以換房子的外觀（Lv7 以上、🪙300、島主審核）'}<br>敬請期待！</p></div><div class="row2"><button data-close class="primary">好</button></div>`)}
 // 工讀生在島民中心走來走去（跟毛二街店員一樣）
 setInterval(()=>{if(!$('#centerv')||document.hidden)return;cEls.forEach((el,i)=>{if(!el||!el.isConnected||el._busy||Math.random()<.45)return;const P=CSTAFF_POS[i]||CSTAFF_POS[0],cx=el._x==null?P.x:el._x,cy=el._y==null?P.y:el._y;let tx,ty;
@@ -3402,6 +3442,179 @@ function cStaffForm(i){const L=centerStaff().map(x=>Object.assign({},x)),isNew=i
 }
 // 公告到期就自動拿掉（每分鐘檢查）
 setInterval(()=>{const n=DB.notice;if(n&&+n.until&&Date.now()>+n.until){DB.notice=null;try{tickerShow();updBell()}catch(e){}}},60000);
+
+// ================= 📐 擴建：二樓民宿＋農田（v1.67） =================
+// 在島民中心申請（Lv15 以上、各 🪙1000、島主審核，駁回會寄信退錢）
+const EXP_COST=1000,EXP_LV=15,INN_CAP_H=12,FARM_N0=4,FARM_MAX=6,FARM_GROW_H=8,FARM_WMAX=3,PLOT_COST=300;
+const EXPN={floor2:'二樓民宿',farm:'農田'};
+const CROP={tomato:{n:'小番茄',seed:'seed_tomato',item:'c_tomato'},pumpkin:{n:'南瓜',seed:'seed_pumpkin',item:'c_pumpkin'},apple:{n:'金蘋果',seed:'seed_apple',item:'c_apple'}};
+Object.assign(ITEMS,{
+  seed_tomato:{name:'小番茄種子',emo:'🌱',kind:'seed',price:10,crop:'tomato'},
+  seed_pumpkin:{name:'南瓜種子',emo:'🌱',kind:'seed',price:30,crop:'pumpkin'},
+  seed_apple:{name:'金蘋果種子',emo:'🌱',kind:'seed',price:80,crop:'apple'},
+  c_tomato:{name:'小番茄',emo:'🍅',kind:'crop',price:20},
+  c_pumpkin:{name:'南瓜',emo:'🎃',kind:'crop',price:70},
+  c_apple:{name:'金蘋果',emo:'🍎',kind:'crop',price:130}});
+REW.water={x:2,c:1,cap:10,after:{x:0,c:0},n:'幫忙澆水'};
+const hasF2=h=>!!(h&&+h.floor2),hasFarm=h=>!!(h&&h.farm&&typeof h.farm==='object');
+// 毛孩上二樓：每 30 分鐘決定一次（大家看到的一樣）；肚子餓、睡覺、出門玩的留在一樓
+function up2(p){const h=house(p.houseId);if(!hasF2(h)||isHungry(p)||outAt(p.id))return false;try{if(sleepState(p))return false}catch(e){}return hash01(p.id+'up'+Math.floor(Date.now()/1800000))<0.4}
+// ---------- 共用：全螢幕場景 ----------
+function sceneOpen(id,title,sub,bg,back){let v=$('#'+id);if(v)v.remove();v=document.createElement('div');v.id=id;v.className='centerv scene';
+  v.innerHTML=`<div class="chead"><button class="pill" data-back>${back||'← 回去'}</button><div class="ctitle">${title}<small>${sub||''}</small></div><span style="width:84px"></span></div>
+    <div class="cwrap"><div class="cstage"><img class="cbg" src="${bg}" alt=""></div></div><div class="cbtns"></div>`;
+  document.body.appendChild(v);v.querySelector('[data-back]').onclick=()=>{v.remove();if(home&&!$('#home').classList.contains('hidden'))openHome(home.id,true)};return v}
+const stageXY=(st,e)=>{const r=st.getBoundingClientRect();return {x:(e.clientX-r.left)/r.width*RW,y:(e.clientY-r.top)/r.height*RH}};
+function scenePop(st,txt,x,y){const el=document.createElement('div');el.className='spop';el.innerHTML=txt;Object.assign(el.style,hp(x,y));st.appendChild(el);setTimeout(()=>el.remove(),1600)}
+// 會走來走去的角色（毛孩、旅客）
+function walker(st,img,x,y,h,name,onTap){const el=document.createElement('button');el.className='staff walker noic';el.innerHTML=`<img src="${img}" alt="">${name?`<span class="snm">${esc(name)}</span>`:''}`;
+  Object.assign(el.style,hp(x,y),{height:(h/RH*100)+'%',zIndex:Math.round(y)});el._x=x;el._y=y;el.onclick=e=>{e.stopPropagation();onTap&&onTap(el)};st.appendChild(el);return el}
+function walkTick(st){st.querySelectorAll('.walker').forEach(el=>{if(el._busy||Math.random()<.5)return;const tx=FLOOR.x0+40+Math.random()*(FLOOR.x1-FLOOR.x0-80),ty=FLOOR.y0+30+Math.random()*(FLOOR.y1-FLOOR.y0-40);
+  const d=Math.hypot(tx-el._x,ty-el._y);if(d<40)return;const dur=d/100;el._busy=1;el.classList.toggle('flip',tx<el._x);el.classList.add('walking');el.style.transition=`left ${dur}s linear,top ${dur}s linear`;
+  el.style.zIndex=Math.round(Math.max(el._y,ty));Object.assign(el.style,hp(tx,ty));el._x=tx;el._y=ty;setTimeout(()=>{el._busy=0;el.classList.remove('walking');el.style.zIndex=Math.round(ty)},dur*1000)})}
+function sayOn(el,t){el.querySelectorAll('.say').forEach(x=>x.remove());const b=document.createElement('div');b.className='say';b.textContent=t;el.appendChild(b);setTimeout(()=>{b.classList.add('out');setTimeout(()=>b.remove(),400)},3000)}
+// ================= 🛏️ 二樓民宿 =================
+const GUESTS=[{img:'assets/guest_bunny.webp',n:'兔兔旅客'},{img:'assets/guest_cat.webp',n:'橘貓旅客'},{img:'assets/guest_duck.webp',n:'鴨鴨旅客'},{img:'assets/guest_bear.webp',n:'熊熊旅客'}];
+const GUEST_SAY=['這裡好舒服～','玩具好多喔！','我還想再住一晚','老闆，早餐幾點？','這間民宿五顆星 ⭐','帶了紀念品給你～','窗外的風景好棒'];
+const comfortOf=h=>Math.min(TOY_MAX,(h.toys2||[]).length)*2;
+const rentRate=h=>comfortOf(h)/8;   // 每小時的租金
+function rentNow(h){const inn=h.inn&&typeof h.inn==='object'?h.inn:{at:Date.now()},hrs=Math.min(INN_CAP_H,Math.max(0,(Date.now()-(+inn.at||Date.now()))/HOUR));return Math.floor(hrs*rentRate(h))}
+const guestN=c=>c>=28?3:c>=14?2:c>=4?1:0;
+let F2=null,f2Tick=0;
+function openFloor2(hid){const h=house(hid);if(!hasF2(h))return;sfx&&sfx('tap');
+  const v=sceneOpen('f2v',esc(h.name)+'・二樓','🛏️ 民宿',roomImg(h.room2||'basic1'),'<img class="mic" src="assets/icon_down.webp" alt="">一樓');F2={hid,placing:null};
+  const st=v.querySelector('.cstage');st.onclick=e=>f2Click(e);renderF2();clearInterval(f2Tick);f2Tick=setInterval(()=>{if(!$('#f2v'))return clearInterval(f2Tick);walkTick($('#f2v .cstage'));updRent()},3500)}
+function renderF2(){const v=$('#f2v');if(!v||!F2)return;const h=house(F2.hid),st=v.querySelector('.cstage'),fam=isFamily(h.id);
+  st.querySelector('.cbg').src=roomImg(h.room2||'basic1');st.querySelectorAll('.toy,.walker,.rentjar,.f2hint').forEach(x=>x.remove());
+  (h.toys2||[]).forEach(t=>{const it=ITEMS[t.item]||{},el=document.createElement('button');el.className='toy'+(t.flip?' flip':'')+(it.an?' an-'+it.an:'')+(it.flat?' flat':'');el.innerHTML=itemIcon(t.item,'toyi');
+    if(it.sz)el.style.setProperty('--sz',it.sz);Object.assign(el.style,hp(t.x,t.y),{zIndex:it.flat?1:Math.round(t.y)-300});
+    el.onclick=e=>{e.stopPropagation();if(F2.placing)return toast('這裡有東西了，換個地方');if(fam)f2ToyMenu(t);else{el.classList.remove('bump');void el.offsetWidth;el.classList.add('bump')}};st.appendChild(el)});
+  const c=comfortOf(h),gn=guestN(c),k=Math.floor(Date.now()/HOUR);
+  GUESTS.map((g,i)=>({g,o:hash01(h.id+k+'g'+i)})).sort((a,b)=>a.o-b.o).slice(0,gn).forEach(({g},i)=>walker(st,g.img,200+i*220,1000+(i%2)*80,250,'',el=>sayOn(el,GUEST_SAY[Math.floor(Math.random()*GUEST_SAY.length)])));
+  petsOf(h.id).filter(up2).forEach((p,i)=>walker(st,petBody(p),300+i*160,1080,200,p.name,el=>{sayOn(el,['二樓好好玩！','這裡是我的秘密基地','旅客好多喔～',`${p.name} 在二樓玩～`][Math.floor(Math.random()*4)]);if(DB.me&&Math.random()<.5)earn('pat')}));
+  if(!gn&&!(h.toys2||[]).length){const tip=document.createElement('div');tip.className='f2hint';tip.textContent=fam?'二樓空空的，擺些玩具家具，旅客就會來住了':'二樓還在布置中';st.appendChild(tip)}
+  const j=document.createElement('button');j.className='rentjar noic';j.id='rentjar';st.appendChild(j);j.onclick=e=>{e.stopPropagation();fam?collectRent():innInfo()};updRent();
+  v.querySelector('.cbtns').innerHTML=fam?`<button class="act" id="f2toy">🧸 擺設</button><button class="act" id="f2bg">🎨 背景</button><button class="act" id="f2rent"><img class="mic" src="assets/icon_rent.webp" alt="">收租</button><button class="act" id="f2info"><img class="mic" src="assets/icon_comfort.webp" alt="">${c}</button>`
+    :`<button class="act" id="f2info"><img class="mic" src="assets/icon_comfort.webp" alt="">舒適度 ${c}</button>`;
+  if($('#f2toy'))$('#f2toy').onclick=f2Placer;if($('#f2bg'))$('#f2bg').onclick=f2Bg;if($('#f2rent'))$('#f2rent').onclick=collectRent;$('#f2info').onclick=innInfo}
+function updRent(){const j=$('#rentjar');if(!j||!F2)return;const h=house(F2.hid),n=rentNow(h),full=n>=Math.floor(INN_CAP_H*rentRate(h))&&n>0;
+  j.innerHTML=`<img src="assets/icon_rent.webp" alt=""><b>🪙 ${n}</b>${full?'<small>存滿了！</small>':''}`;j.classList.toggle('full',full)}
+function innInfo(){const h=house(F2.hid),c=comfortOf(h);openModal(`<div style="text-align:center"><img src="assets/icon_inn.webp" alt="" style="width:90px"><h3>🛏️ ${esc(h.name)} 民宿</h3>
+  <p class="lead">舒適度 <b>${c}</b>（二樓每擺一個玩具 +2，最多 ${TOY_MAX*2}）<br>現在有 ${guestN(c)} 位旅客・每小時租金 🪙${rentRate(h).toFixed(1)}</p>
+  <p class="lead" style="font-size:13px">租金會存在存錢筒，最多存 ${INN_CAP_H} 小時，家人回來按「收租」就能拿到<br>舒適度 4 以上有 1 位旅客、14 以上 2 位、28 以上 3 位</p></div><div class="row2"><button data-close class="primary">好</button></div>`)}
+async function collectRent(){const h=house(F2.hid);if(!isFamily(h.id))return innInfo();const est=rentNow(h);if(est<=0)return toast(comfortOf(h)?'存錢筒還是空的，晚點再來收':'二樓還沒有玩具，旅客不會來住喔');
+  try{const r=await call('innCollect',Object.assign(cred(),{houseId:h.id}));if(!r.coins)return toast('存錢筒還是空的');h.inn={at:Date.now(),last:r.coins};
+    const j=$('#rentjar'),b=j?j.getBoundingClientRect():null;grant(0,r.coins,b?{x:b.left+b.width/2,y:b.top}:null);sfx('coin');toast(`💰 收到 ${r.coins} 金幣租金！`);updRent()}catch(e){toast(e.message)}}
+function f2Bg(){const h=house(F2.hid);openModal(`<h3>🎨 二樓的背景</h3><p class="lead">從你家收集到的房間裡選一個</p><div class="field">${roomPicker('f2rm',h.room2||'basic1',h.id)}</div><div class="row2"><button data-close>取消</button><button class="primary" id="f2rok">換上</button></div>`);
+  let room=h.room2||'basic1';bindRoom('f2rm',v=>room=v);
+  $('#f2rok').onclick=async()=>{try{await call('updateHouse',Object.assign(cred(),{patch:{room2:room}}));h.room2=room;closeModal();renderF2();toast('換好了 🎨')}catch(e){toast(e.message)}}}
+function f2Placer(){const h=house(F2.hid),L=bagList('toy');if((h.toys2||[]).length>=TOY_MAX)return toast(`二樓最多放 ${TOY_MAX} 個玩具`);
+  openModal(`<h3>🧸 布置二樓</h3><p class="lead">每擺一個玩具，舒適度 +2，旅客會越來越多</p>${L.length?`<div class="shopgrid">${L.map(([id,n])=>`<button class="si pick" data-p="${id}">${itemIcon(id,'big')}<div class="sn">${ITEMS[id].name}</div><div class="sf">× ${n}</div></button>`).join('')}</div>`:'<div class="locked">背包裡沒有玩具</div>'}
+    <div class="row2" style="margin-top:12px"><button data-close>取消</button><button id="goshop2">🏪 去商店</button></div>`);
+  $('#goshop2').onclick=()=>shopSheet('toy');$('#sheet').querySelectorAll('[data-p]').forEach(b=>b.onclick=()=>{closeModal();F2.placing={item:b.dataset.p};toast('點地板放下')})}
+function f2ToyMenu(t){const h=house(F2.hid);openModal(`<h3>${itemIcon(t.item)} ${esc((ITEMS[t.item]||{}).name||'玩具')}</h3>
+  <div class="row2"><button id="tmv2">↔️ 移動</button><button id="tfl2">🔁 翻面</button></div><div class="row2"><button id="tbk2">🎒 收回背包</button><button data-close>取消</button></div>`);
+  $('#tmv2').onclick=()=>{closeModal();F2.placing={toy:t};toast('點地板，放到新的位置')};
+  $('#tfl2').onclick=()=>{t.flip=!t.flip;closeModal();renderF2();call('moveToy',Object.assign(cred(),{toyId:t.id,x:t.x,y:t.y,flip:t.flip,floor:2}),true).catch(e=>toast(e.message))};
+  $('#tbk2').onclick=()=>{h.toys2=(h.toys2||[]).filter(x=>x!==t);bagAdd(t.item,1);closeModal();renderF2();toast('收回背包了');
+    call('removeToy',Object.assign(cred(),{toyId:t.id,floor:2}),true).catch(e=>{(h.toys2=h.toys2||[]).push(t);bagAdd(t.item,-1);renderF2();toast(e.message)})}}
+function f2Click(e){if(!F2||!F2.placing)return;const st=$('#f2v .cstage');let {x,y}=stageXY(st,e);if(y<FLOOR.y0-20)return toast('要放在地板上喔');
+  x=Math.round(clamp(x,FLOOR.x0+20,FLOOR.x1-20));y=Math.round(clamp(y,FLOOR.y0,FLOOR.y1));const h=house(F2.hid),P=F2.placing;F2.placing=null;
+  if(P.toy){Object.assign(P.toy,{x,y});renderF2();call('moveToy',Object.assign(cred(),{toyId:P.toy.id,x,y,flip:!!P.toy.flip,floor:2}),true).catch(er=>toast(er.message));return}
+  const tmp={id:'tmp'+uid(),item:P.item,x,y};bagAdd(P.item,-1);(h.toys2=h.toys2||[]).push(tmp);renderF2();toast('擺好了 🧸');
+  call('placeToy',Object.assign(cred(),{item:P.item,x,y,floor:2}),true).then(t=>{tmp.id=t.id}).catch(er=>{h.toys2=(h.toys2||[]).filter(z=>z!==tmp);bagAdd(P.item,1);renderF2();toast(er.message)})}
+// ================= 🌱 農田 =================
+const PLOTS=[[255,650],[595,650],[255,895],[595,895],[255,1140],[595,1140]];
+const ripeAt=c=>+c.at+(FARM_GROW_H-Math.min(FARM_WMAX,(c.w||[]).length))*HOUR;
+const lastW=c=>{const w=c.w||[];if(!w.length)return 0;const x=w[w.length-1];return +(x&&x.t||x)||0};
+function farmOf(h){const f=h.farm&&typeof h.farm==='object'?h.farm:{n:FARM_N0,p:[]};f.n=+f.n||FARM_N0;f.p=Array.isArray(f.p)?f.p:[];while(f.p.length<FARM_MAX)f.p.push(null);h.farm=f;return f}
+const fmLeft=ms=>{const m=Math.max(0,Math.ceil(ms/60000)),h=Math.floor(m/60);return h?`${h} 小時 ${m%60} 分`:`${m} 分`};
+let FM=null,fmTick=0;
+function openFarm(hid){const h=house(hid);if(!hasFarm(h))return;sfx&&sfx('tap');
+  const v=sceneOpen('farmv',esc(h.name)+'的農田','8 小時成熟・澆水快 1 小時','assets/room_farm.webp','← 回家');FM={hid};renderFarm();
+  clearInterval(fmTick);fmTick=setInterval(()=>{if(!$('#farmv'))return clearInterval(fmTick);renderFarm()},30000)}
+function renderFarm(){const v=$('#farmv');if(!v||!FM)return;const h=house(FM.hid),f=farmOf(h),st=v.querySelector('.cstage'),fam=isFamily(h.id),now=Date.now();
+  st.querySelectorAll('.plot,.plab').forEach(x=>x.remove());
+  PLOTS.forEach(([x,y],i)=>{const el=document.createElement('button');el.className='plot noic';const c=f.p[i],lock=i>=f.n;let crop='',lab='';
+    if(lock)lab=fam?`🔒 加開 🪙${PLOT_COST}`:'🔒';
+    else if(!c)lab=fam?'＋ 種東西':'空地';
+    else{const ra=ripeAt(c),ripe=now>=ra,prog=1-(ra-now)/(FARM_GROW_H*HOUR),stg=ripe?3:prog<.35?1:2;crop=`<img class="crop c${stg}" src="assets/crop_${c.c}_${stg}.webp" alt="">`;
+      const wn=(c.w||[]).length,can=!ripe&&wn<FARM_WMAX&&now-lastW(c)>=HOUR;lab=ripe?(fam?'✨ 可以收成！':'✨ 成熟了'):`${fmLeft(ra-now)}${can?'・💧可澆水':wn>=FARM_WMAX?'・💧滿了':''}`}
+    const wet=c&&now-lastW(c)<HOUR;
+    el.innerHTML=`<img class="soil" src="assets/plot_${lock?'lock':wet?'wet':'dry'}.webp" alt="">${crop}`;
+    Object.assign(el.style,hp(x,y),{zIndex:y});el.onclick=e=>{e.stopPropagation();plotTap(i)};st.appendChild(el);
+    const lb=document.createElement('span');lb.className='plab'+(c&&now>=ripeAt(c)?' ripe':'');lb.innerHTML=lab;Object.assign(lb.style,hp(x,y+6),{zIndex:3000});lb.onclick=e=>{e.stopPropagation();plotTap(i)};st.appendChild(lb)});
+  v.querySelector('.cbtns').innerHTML=`<button class="act" id="fmseed">${fam?'🌱 買種子':'💧 幫忙澆水'}</button><button class="act" id="fmsell"><img class="mic" src="assets/icon_harvest.webp" alt="">${fam?'作物拿去賣':'怎麼玩'}</button>`;
+  $('#fmseed').onclick=()=>fam?shopSheet('seed'):toast('點有作物的田就能幫忙澆水，一格每小時可以澆一次');
+  $('#fmsell').onclick=()=>fam?(house(SHOP_ID)?tradeSheet('sell','crop'):toast('毛二街還沒開')):farmHelp()}
+function farmHelp(){openModal(`<h3>🌱 農田怎麼玩</h3><p class="lead">種子在毛毛商店買。種下去 8 小時成熟；每澆一次水快 1 小時，一格最多澆 3 次、每次要隔 1 小時（朋友也可以幫忙澆）。<br>收成的作物可以拿去毛二街全價賣掉，或換成零食（打 8 折）。金蘋果有機會多長出一個錢袋！</p>
+  <table class="ftab"><tr><th>作物</th><th>種子</th><th>賣價</th></tr><tr><td>🍅 小番茄</td><td>🪙10</td><td>🪙20</td></tr><tr><td>🎃 南瓜</td><td>🪙30</td><td>🪙70</td></tr><tr><td>🍎 金蘋果</td><td>🪙80</td><td>🪙130＋錢袋？</td></tr></table>
+  <div class="row2"><button data-close class="primary">好</button></div>`)}
+async function plotTap(i){if(!needMe())return;const h=house(FM.hid),f=farmOf(h),fam=isFamily(h.id),c=f.p[i],now=Date.now();
+  if(i>=f.n){if(!fam)return toast('這格還沒開放');const g=DB.game;
+    return openModal(`<div style="text-align:center"><img src="assets/plot_lock.webp" alt="" style="width:110px"><h3>加開一格田？</h3><p class="lead">花 🪙${PLOT_COST} 多開一格（最多 ${FARM_MAX} 格）<br>我的金幣：🪙${g.coins||0}</p></div><div class="row2"><button data-close>取消</button><button class="primary" id="pbuy" ${(g.coins||0)>=PLOT_COST?'':'disabled'}>🪙 ${PLOT_COST} 開墾</button></div>`)||($('#pbuy').onclick=async()=>{
+      try{const r=await call('farmBuyPlot',Object.assign(cred(),{houseId:h.id}));g.coins-=PLOT_COST;save();updTix&&updTix();f.n=r.n;closeModal();renderFarm();toast('開墾好了 🌱')}catch(e){toast(e.message)}})}
+  if(!c){if(!fam)return toast('這格還沒種東西');return seedPick(i)}
+  if(now>=ripeAt(c)){if(!fam)return toast('成熟了！等主人來收成');
+    try{const r=await call('farmHarvest',Object.assign(cred(),{houseId:h.id,i}));f.p[i]=null;bagAdd(CROP[r.c].item,1);sfx('gift');renderFarm();
+      const P=PLOTS[i],st=$('#farmv .cstage');scenePop(st,`${itemIcon(CROP[r.c].item)} +1`,P[0],P[1]-200);
+      if(r.bag){grant(0,r.bag);setTimeout(()=>{scenePop(st,`<img src="assets/icon_moneyburst.webp" alt="" style="width:60px"> +${r.bag}`,P[0],P[1]-280);toast(`💰 金蘋果樹上還掛著一個錢袋：${r.bag} 金幣！`)},500)}
+      else toast(`收成了 ${CROP[r.c].n}！放進背包了`)}catch(e){toast(e.message)}return}
+  const wn=(c.w||[]).length;if(wn>=FARM_WMAX)return toast(`這格已經澆滿 3 次了，還要 ${fmLeft(ripeAt(c)-now)}`);
+  if(now-lastW(c)<HOUR)return toast(`剛剛才澆過，${fmLeft(HOUR-(now-lastW(c)))}後可以再澆`);
+  try{const r=await call('farmWater',{playerId:DB.me.id,houseId:h.id,i});f.p[i]=r;sfx('sweep');if(!fam)earn('water');renderFarm();const P=PLOTS[i];scenePop($('#farmv .cstage'),'<img src="assets/icon_water.webp" alt="" style="width:56px"> 快 1 小時！',P[0],P[1]-200);
+    if(!fam&&ONLINE)feedPush(`${DB.me.nick} 幫「${h.name}」的田澆水 💧`)}catch(e){toast(e.message)}}
+function seedPick(i){const g=DB.game;
+  openModal(`<h3>🌱 要種什麼？</h3><div class="shopgrid">${Object.entries(CROP).map(([k,c])=>{const s=ITEMS[c.seed],n=bag()[c.seed]||0;return `<div class="si">${itemIcon(c.seed,'big')}<div class="sn">${c.n}</div><div class="sf">賣 🪙${ITEMS[c.item].price}${k==='apple'?'＋錢袋？':''}</div>
+    ${n?`<button data-pl="${k}">種下（有 ${n}）</button>`:`<button data-pb="${k}" ${(g.coins||0)>=s.price?'':'disabled'}>🪙${s.price} 買來種</button>`}</div>`}).join('')}</div>
+    <div class="hint">8 小時成熟，澆水可以更快</div><div class="row2"><button data-close>取消</button></div>`);
+  const plant=async k=>{const h=house(FM.hid),f=farmOf(h);try{const r=await call('farmPlant',Object.assign(cred(),{houseId:h.id,i,c:k}));bagAdd(CROP[k].seed,-1);f.p[i]=r;closeModal();sfx('pat');renderFarm();toast(`種下${CROP[k].n}了 🌱`)}catch(e){toast(e.message)}};
+  $('#sheet').querySelectorAll('[data-pl]').forEach(b=>b.onclick=()=>plant(b.dataset.pl));
+  $('#sheet').querySelectorAll('[data-pb]').forEach(b=>b.onclick=()=>{const s=ITEMS[CROP[b.dataset.pb].seed];if((g.coins||0)<s.price)return;g.coins-=s.price;bagAdd(CROP[b.dataset.pb].seed,1);updTix&&updTix();plant(b.dataset.pb)})}
+// 毛二街：作物全價賣掉，或換零食（零食打 8 折，剩下的零頭換成金幣）
+function cropSellBody(){const L=bagList('crop');return (L.length?`<div class="shopgrid">${L.map(([id,n])=>`<div class="si">${itemIcon(id,'big')}<div class="sn">${esc(ITEMS[id].name)}</div><div class="sf">× ${n}</div><button data-cs="${id}">賣 🪙 ${ITEMS[id].price}</button><button data-cx="${id}" class="cx">🍪 換零食</button></div>`).join('')}</div>`:'<div class="locked">還沒有作物，去農田種一些吧</div>')
+  +'<div class="hint">作物照全價收購・換零食時零食打 8 折，剩下的零頭換成金幣</div>'}
+function cropBind(S){S.querySelectorAll('[data-cs]').forEach(b=>b.onclick=()=>{const id=b.dataset.cs,it=ITEMS[id];if(!(bag()[id]>0))return;bagAdd(id,-1);grant(0,it.price);sfx('coin');toast(`賣掉 ${it.name}，拿到 ${it.price} 金幣`);tradeSheet('sell','crop')});
+  S.querySelectorAll('[data-cx]').forEach(b=>b.onclick=()=>cropSwap(b.dataset.cx))}
+function cropSwap(id){const it=ITEMS[id],T=Object.entries(ITEMS).filter(([k,x])=>x.kind==='treat'&&!x.bday&&!x.limited&&x.price>0);
+  openModal(`<h3>🍪 用 ${esc(it.name)} 換零食</h3><p class="lead">一個${esc(it.name)}值 🪙${it.price}，零食打 8 折</p><div class="shopgrid">${T.map(([k,x])=>{const p=Math.max(1,Math.round(x.price*.8)),n=Math.floor(it.price/p),r=it.price-n*p;
+    return `<button class="si pick" data-tw="${k}">${itemIcon(k,'big')}<div class="sn">${esc(x.name)}</div><div class="sf">換 ${n} 個${r?`＋🪙${r}`:''}</div></button>`}).join('')}</div><div class="row2"><button id="cxb">← 回去</button></div>`);
+  $('#cxb').onclick=()=>tradeSheet('sell','crop');
+  $('#sheet').querySelectorAll('[data-tw]').forEach(b=>b.onclick=()=>{if(!(bag()[id]>0))return;const x=ITEMS[b.dataset.tw],p=Math.max(1,Math.round(x.price*.8)),n=Math.floor(it.price/p),r=it.price-n*p;
+    bagAdd(id,-1);bagAdd(b.dataset.tw,n);if(r)grant(0,r);sfx('gift');toast(`換到 ${n} 個${x.name}${r?`＋${r} 金幣`:''}！`);tradeSheet('sell','crop')})}
+// ================= 🏛️ 島民中心：擴建申請 =================
+function expStatus(h,k){if(k==='floor2'&&hasF2(h))return 'done';if(k==='farm'&&hasFarm(h))return 'done';const a=(DB.applies||[]).find(x=>x.houseId===h.id&&x.kind===k&&x.st==='wait');return a?'wait':''}
+function centerExpand(){const h=myHouse();if(!h)return toast('要有家才能申請擴建');const g=DB.game,lv=g.lv||1,wait=(DB.applies||[]).some(x=>x.houseId===h.id&&x.st==='wait');
+  const card=(k,ic,desc)=>{const s=expStatus(h,k);return `<div class="expc"><img src="assets/icon_${ic}.webp" alt=""><div><b>${EXPN[k]}</b><small>${desc}</small></div>${s==='done'?'<span class="ok">已擴建</span>':s==='wait'?'<span>審核中</span>':`<button data-ap="${k}" ${wait?'disabled':''}>申請</button>`}</div>`};
+  openModal(`<h3 class="mh3"><img class="mic" src="assets/icon_expand.webp" alt="" style="width:34px;height:34px">申請擴建</h3>
+    <p class="lead">Lv.${EXP_LV} 以上・每一種 🪙${EXP_COST}・島主審核（沒通過會全額退錢）<br>你現在 Lv.${lv}・🪙${g.coins||0}</p>
+    ${card('floor2','inn','加蓋二樓：另外布置一層，毛孩會上去玩，旅客來住會付租金')}
+    ${card('farm','farm','門口開一塊田：種番茄、南瓜、金蘋果，收成拿去賣')}
+    ${wait?'<p class="lead" style="font-size:12px">你家已經有一張申請在等島主看，處理完才能再申請</p>':''}
+    <div class="row2"><button id="myap">📋 我的申請</button><button data-close>關閉</button></div>`);
+  $('#myap').onclick=myApplies;
+  $('#sheet').querySelectorAll('[data-ap]').forEach(b=>b.onclick=()=>applyForm(b.dataset.ap))}
+function applyForm(k){const h=myHouse(),g=DB.game;if((g.lv||1)<EXP_LV)return toast(`要 Lv.${EXP_LV} 以上才能申請，再加油一下！`);if((g.coins||0)<EXP_COST)return toast(`金幣不夠，要 🪙${EXP_COST}`);
+  openModal(`<h3>申請擴建${EXPN[k]}</h3><p class="lead">送出時先扣 🪙${EXP_COST}，島主核准就蓋好；沒通過會寄信退錢</p>
+    ${fld('apn','想跟島主說的話（選填）','<input id="apn" maxlength="60" placeholder="例如：想開一間貓咪民宿！">')}<div class="err" id="aperr"></div>
+    <div class="row2"><button id="apb">← 回去</button><button class="primary" id="apok">送出申請（🪙${EXP_COST}）</button></div>`);
+  $('#apb').onclick=centerExpand;
+  $('#apok').onclick=async e=>{const btn=e.currentTarget;btn.disabled=true;
+    try{const a=await call('applyExpand',Object.assign(cred(),{houseId:h.id,kind:k,note:$('#apn').value.trim(),lv:g.lv||1}));g.coins=(g.coins||0)-EXP_COST;save();updTix&&updTix();(DB.applies=DB.applies||[]).unshift(a);
+      openModal(`<div style="text-align:center"><img src="assets/icon_renew.webp" alt="" style="width:90px"><h3>申請送出了！</h3><p class="lead">島主看過之後會寄信通知你 🐾</p></div><div class="row2"><button data-close class="primary">好</button></div>`)}
+    catch(x){$('#aperr').textContent=x.message;btn.disabled=false}}}
+function myApplies(){const L=(DB.applies||[]).filter(a=>myHouse()&&a.houseId===myHouse().id);
+  openModal(`<h3>📋 我家的申請</h3>${L.length?L.map(a=>`<div class="frow"><span><b>${EXPN[a.kind]||a.kind}</b><small>${esc(a.nick||'')}・${ago(+a.at)}${a.reply?`<br>島主：${esc(a.reply)}`:''}</small></span><span>${a.st==='ok'?'<img class="mic" src="assets/icon_ok.webp" alt="">核准':a.st==='no'?'<img class="mic" src="assets/icon_no.webp" alt="">沒通過':'⏳ 審核中'}</span></div>`).join(''):'<div class="locked">還沒有申請過</div>'}
+    <div class="row2"><button id="myb">← 回去</button></div>`);$('#myb').onclick=centerExpand}
+// ---------- 👑 島主：審核擴建 ----------
+function adminApplySec(d){const L=(d.applies||[]),W=L.filter(a=>a.st==='wait');
+  return `<div class="sec adm"><h4><img class="mic" src="assets/icon_expand.webp" alt="">擴建申請<span>${W.length} 張等你看</span></h4>
+    ${W.map(a=>`<div class="apbox"><b>${esc(a.house)}・${EXPN[a.kind]||a.kind}</b><small>${esc(a.nick)}・${ago(+a.at)}・已付 🪙${a.cost||EXP_COST}</small>${a.note?`<p>「${esc(a.note)}」</p>`:''}
+      <input data-apr="${a.id}" maxlength="100" placeholder="回覆（選填）"><div class="row2"><button data-apn="${a.id}"><img class="mic" src="assets/icon_no.webp" alt="">駁回（退錢）</button><button class="primary" data-apy="${a.id}"><img class="mic" src="assets/icon_ok.webp" alt="">核准</button></div></div>`).join('')||'<div class="locked">目前沒有申請</div>'}
+    ${L.filter(a=>a.st!=='wait').slice(0,5).map(a=>`<div class="frow"><span>${esc(a.house)}・${EXPN[a.kind]||a.kind}<small>${esc(a.nick)}</small></span><span>${a.st==='ok'?'✅':'❌'}</span></div>`).join('')}</div>`}
+function adminApplyBind(){const go=async(id,ok,b)=>{if(!armBtn(b,ok?'確定核准？':'確定駁回？'))return;const inp=document.querySelector(`[data-apr="${id}"]`);
+  try{await adminCall('adminApplyDecide',{id,ok:ok?1:0,reply:inp?inp.value.trim():''});toast(ok?'核准了，已經寄信通知 🏗️':'駁回了，錢會退還給他');if(ONLINE)sync(true);adminSheet()}catch(e){toast(e.message)}};
+  document.querySelectorAll('[data-apy]').forEach(b=>b.onclick=e=>go(b.dataset.apy,1,e.currentTarget));document.querySelectorAll('[data-apn]').forEach(b=>b.onclick=e=>go(b.dataset.apn,0,e.currentTarget))}
 
 // ================= 頁尾與啟動 =================
 function renderFoot(){
@@ -3537,6 +3750,7 @@ async function adminSheet(){
     <div class="row2"><select id="alr"></select></div><p class="lead" id="alrh" style="margin:0"></p>
     <div class="row2"><button id="alsend">寄出</button></div></div>
   <div class="sec adm"><h4>🙋 玩家列表<span>${d.players.length} 人・🔔 ${d.players.filter(p=>p.pushSt==='on').length} 人有開通知・全島 🪙${d.players.reduce((a,p)=>a+(+p.coins||0),0).toLocaleString()}</span></h4><p class="lead">照金幣多到少排，點 ⚙️ 可以改金幣、轉移碼<br>🔔 收得到通知・🔕 沒開・📲 還沒加主畫面・❔ 還沒更新到新版</p><div class="plist">${d.players.slice().sort((a,b)=>(+b.coins||0)-(+a.coins||0)).map(p=>`<div class="frow"><span>${pushIc(p)}${esc(p.nick)}<small>${p.house?esc(p.house):'沒有家'}・Lv.${p.lv}・🪙${p.coins}${p.createdAt?'・'+new Date(p.createdAt).toLocaleDateString('zh-TW',{month:'numeric',day:'numeric'})+' 加入':''}</small></span><span>${p.house?'':`<button class="mini danger" data-dpl="${p.id}">刪除</button> `}<button class="mini" data-code="${esc(p.code)}">${esc(p.code)||'—'}</button> <button class="mini" data-apl="${p.id}" aria-label="管理">⚙️</button></span></div>`).join('')}</div><p class="lead">點轉移碼可以複製，傳給換手機的朋友</p></div>
+  ${adminApplySec(d)}
   ${adminCenterSec()}
   ${adminStarSec(d)}
   <div class="sec adm"><h4>👔 毛二街店長<span>最多 ${SHOP_MGR_MAX} 位</span></h4><p class="lead">店長可以換店的背景、擺玩具、管理店員（最多 ${SHOP_STAFF_MAX} 位）</p>
@@ -3547,7 +3761,7 @@ async function adminSheet(){
     <div class="row2"><button id="ahrb" class="danger">收回成空地</button></div><p class="lead">收回會刪掉這個家的毛孩和紀錄，不能復原</p></div>
   <div class="row2"><button id="aout">登出島主</button><button data-close class="primary">關閉</button></div>`);
   const S=$('#sheet'),ok=m=>{toast(m);sync(true)};
-  adminStarBind();adminCenterBind();
+  adminStarBind();adminCenterBind();adminApplyBind();
   $('#asmb').onclick=async()=>{const ids=[...new Set([$('#asm0').value,$('#asm1').value].filter(Boolean))];try{await adminCall('adminShopMgr',{ids});const sh=house(SHOP_ID);if(sh)sh.mgr=ids;ok(ids.length?'店長指派好了 👔':'店長都拿掉了')}catch(e){toast(e.message)}};
   $('#amail').onclick=adminMailSheet;
   call('adminMailList',{adminPw:adminPw(),playerId:DB.me&&DB.me.id},true).then(L=>{if(!Array.isArray(L)||!$('#amail'))return;const un=L.filter(m=>!m.read);if(!un.length)return;
@@ -3842,7 +4056,7 @@ function announceLetters(){if(!DB.me)return;let seen=[];try{seen=JSON.parse(loca
     sfx('gift');$('#lgopen').onclick=()=>openLetter(nw[0].id,()=>$('#bell').click())};
   setTimeout(go,1800)}
 // ================= 自動更新：發現新版本就重新載入 =================
-const APP_VER='v1.66';
+const APP_VER='v1.67';
 function checkUpdate(){
   if(!/^https?:/.test(location.protocol)||!API_URL)return;
   if(!$('#modal').classList.contains('hidden'))return; // 正在填表單時不打斷
