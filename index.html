@@ -944,10 +944,12 @@ function lockSheet(on){const sh=$('#sheet');if(!sh)return;if(lastTap&&sh.contain
   const pr=sh.querySelector('.row2 .primary');if(pr){if(on){if(!pr.dataset.txt){pr.dataset.txt=pr.textContent;pr.textContent='送出中…'}}else if(pr.dataset.txt){pr.textContent=pr.dataset.txt;delete pr.dataset.txt}}}
 let busyN=0,busyT=null;function busy(on){busyN+=on?1:-1;clearTimeout(busyT);if(busyN>0)busyT=setTimeout(()=>{if(busyN>0)$('#busy').classList.remove('hidden')},350);else $('#busy').classList.add('hidden')}
 const cred=()=>({playerId:DB.me&&DB.me.id,houseId:DB.me&&DB.me.houseId,pw:DB.me&&DB.me.pw});
+// 後端忙線（鎖定逾時＝請求根本沒被執行）時，自動等一下再試，最多 2 次
+async function apiRetry(action,payload){for(let i=0;;i++){try{return await api(action,payload)}catch(e){if(i<2&&/鎖定逾時/.test(e.message)){await new Promise(r=>setTimeout(r,2500));continue}throw e}}}
 async function call(action,payload,quiet){
   if(!ONLINE){const r=LOCAL[action](payload||{});save();return r}
   if(!quiet){busy(true);lockSheet(true)}
-  try{return await api(action,payload)}catch(e){if(/Failed to fetch|NetworkError|Load failed/.test(e.message))throw new Error('連不上小島，請檢查網路再試一次');throw e}
+  try{return await apiRetry(action,payload)}catch(e){if(/Failed to fetch|NetworkError|Load failed/.test(e.message))throw new Error('連不上小島，請檢查網路再試一次');if(/鎖定逾時/.test(e.message))throw new Error('小島現在有點忙，等一下再試一次');throw e}
   finally{if(!quiet){busy(false);lockSheet(false)}}
 }
 // 剛做完的動作先記在手機上，避免同步回來的舊資料把它蓋掉
