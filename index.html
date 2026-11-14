@@ -803,6 +803,14 @@ img{-webkit-user-drag:none}
 
 /* 島主後台：島民來信未讀徽章 */
 .mbtn .ubadge{background:#e0453a;color:#fff;border-radius:999px;padding:1px 8px;font-size:12px;line-height:1.5;margin-left:6px}
+/* v1.58 🪧 木頭名牌 */
+.imap{container-type:inline-size}
+.sign{position:absolute;transform:translateX(-50%);pointer-events:none;filter:drop-shadow(0 2px 2px rgba(80,45,15,.3))}
+.sign>img{display:block;width:100%;height:auto}
+.sign>span{position:absolute;left:7%;right:7%;top:6%;height:60%;display:flex;align-items:center;justify-content:center;text-align:center;line-height:1.12;color:#6b3f1d;font-weight:bold;white-space:nowrap;overflow:hidden;text-shadow:0 1px 0 rgba(255,240,215,.7)}
+.sign.mine{filter:drop-shadow(0 0 5px rgba(255,140,80,.95)) drop-shadow(0 2px 2px rgba(80,45,15,.3))}.sign.mine>span{color:#b4401a}
+.sign.shop>span{color:#7a4a00}.sign.shop2>span{color:#5a3a8a}
+.sign .ii.ic{width:1.15em;height:1.15em}
 /* v1.56 🛍️ 毛二街 */
 .label.shop2{background:#efe2ff;border-color:#8a62c9;color:#5a3a8a}
 .staff{position:absolute;transform:translate(-50%,-100%);border:0;background:none;padding:0;cursor:pointer;display:block}
@@ -868,8 +876,9 @@ img{-webkit-user-drag:none}
 
 <script>
 // ================= 常數 =================
-const SLOTS=[[560,370],[770,420],[430,470],[270,580],[160,680],[560,650],[770,710],[620,850],[850,860],[470,990],[270,970],[700,1070]];
-const STYLE_NAMES={1:'粉紅陽台屋',2:'紅屋頂木屋',3:'蘑菇屋',4:'藤蔓石屋',5:'藍屋頂小屋',6:'麵包坊',7:'魔法師小屋',8:'燈塔屋',9:'南瓜屋',10:'海邊小屋',11:'人魚貝殼屋',12:'綠頂莊園'};
+// 小島的地：四排交錯（3・4・3・4），每格都留了插名牌的空間。0～11 是原本的地（位置整理過），6＝毛二街，12、13 是新增的
+const SLOTS=[[500,345],[740,345],[260,345],[380,575],[140,575],[620,575],[740,805],[500,805],[860,1035],[380,1035],[260,805],[620,1035],[860,575],[140,1035]];
+const STYLE_NAMES={1:'粉紅陽台屋',2:'紅屋頂木屋',3:'蘑菇屋',4:'藤蔓石屋',5:'藍屋頂小屋',6:'麵包坊',7:'魔法師小屋',8:'燈塔屋',9:'南瓜屋',10:'海邊小屋',11:'人魚貝殼屋',12:'綠頂莊園',13:'草莓蛋糕屋',14:'鳳梨屋',15:'雪人小屋',16:'恐龍屋'};
 const SPECIES=[['狗','🐕'],['貓','🐈'],['兔','🐇'],['倉鼠','🐹'],['鳥','🐦'],['其他','🐾']];
 const SPK={狗:'dog',貓:'cat',兔:'rabbit',倉鼠:'hamster',鳥:'bird',其他:'other'};
 const defHead=s=>`assets/pet_head_${SPK[s]||'other'}.webp`,defBody=s=>`assets/pet_body_${SPK[s]||'other'}.webp`;
@@ -882,7 +891,7 @@ const MED_TYPES=['看診','疫苗','驅蟲','健檢','手術','用藥','其他']
 const EXP_CATS=['飼料','零食','用品','醫療','美容','保險','其他'];
 const HOUR=3600e3;
 // 🛍️ 毛二街（二手店）：當成一個特別的「家」，id 固定 shop2，佔第 7 塊地（slot 6）
-const SHOP_ID='shop2',SHOP_SLOT=6,SHOP2_POS={x:770,y:710},SHOP_RATE=.5,LIMIT_BASE=150,SHOP_STAFF_MAX=3,SHOP_MGR_MAX=2;
+const SHOP_ID='shop2',SHOP_SLOT=6,SHOP2_POS={x:SLOTS[6][0],y:SLOTS[6][1]},SHOP_RATE=.5,LIMIT_BASE=150,SHOP_STAFF_MAX=3,SHOP_MGR_MAX=2;
 const SHOP_STAFF0=[{id:'s1',name:'阿二',img:'assets/shop2_npc_idle.webp',img2:'assets/shop2_npc_wave.webp',about:''}];
 const isShopH=h=>!!(h&&(h.kind==='shop'||h.id===SHOP_ID));
 function shopSeed(){return {id:SHOP_ID,kind:'shop',slot:SHOP_SLOT,style:0,name:'毛二街',motto:'二手好物・撿便宜',room:'shop2',owned:[],poops:[],poopAt:Date.now(),toys:[],gifts:[],mgr:[],staff:JSON.parse(JSON.stringify(SHOP_STAFF0)),stock:[],rday:'',createdAt:Date.now()}}
@@ -1369,8 +1378,8 @@ function renderIsland(){
     el.innerHTML=`<img src="assets/${h?'house'+h.style:'empty_lot'}_${p}.webp" alt="">`;
     el.onclick=()=>h?openHome(h.id):lotClick(i);
     box.appendChild(el);
-    const lb=document.createElement('div');lb.className='label'+(h?(isFamily(h.id)?' mine':''):' lot');lb.textContent=h?(isFamily(h.id)?'🏠 ':'')+h.name:'＋';
-    Object.assign(lb.style,ipct(x,y+6),{zIndex:2000});box.appendChild(lb);
+    if(h)box.appendChild(signEl(h.name,x,y,isFamily(h.id)?'mine':''));
+    else{const lb=document.createElement('div');lb.className='label lot';lb.textContent='＋';Object.assign(lb.style,ipct(x,y+6),{zIndex:2000});box.appendChild(lb)}
     if(h&&guestsOf(h.id).length){const gb=document.createElement('div');gb.className='bubble';gb.textContent='🐾';Object.assign(gb.style,ipct(x-40,y-150),{zIndex:2001});box.appendChild(gb)}
     if(h&&demonShown(h)){const gb=document.createElement('div');gb.className='ibub demonb';gb.innerHTML='<img src="assets/demon_head.webp" alt="">餓魔出沒！';Object.assign(gb.style,ipct(x,y-135),{zIndex:2002});box.appendChild(gb)}
     else if(h){const hp2=petsOf(h.id).find(pp=>isHungry(pp));if(hp2){const gb=document.createElement('div');gb.className='ibub';gb.innerHTML=`<img src="${petHead(hp2)}" alt="">救救我🍖`;Object.assign(gb.style,ipct(x,y-135),{zIndex:2002});box.appendChild(gb)}}
@@ -1378,14 +1387,21 @@ function renderIsland(){
   });
   {const sp=SHOP_POS,el=document.createElement('div');el.className='thing';el.setAttribute('role','button');el.tabIndex=0;el.setAttribute('aria-label','毛毛商店');
     Object.assign(el.style,ipct(sp.x,sp.y),{width:(HOUSE_W/1024*100)+'%',zIndex:sp.y});el.innerHTML=`<img src="assets/${SHOP_IMG?'shop':'house'+sp.style}_${p}.webp" alt="" onerror="this.src='assets/house${sp.style}_${p}.webp'">`;el.onclick=()=>shopSheet();box.appendChild(el);
-    const lb=document.createElement('div');lb.className='label shop';lb.textContent='🏪 毛毛商店';Object.assign(lb.style,ipct(sp.x,sp.y+6),{zIndex:2000});box.appendChild(lb)}
+    box.appendChild(signEl('毛毛商店',sp.x,sp.y,'shop'))}
   {const sp=SHOP2_POS,sh=house(SHOP_ID),el=document.createElement('div');el.className='thing';el.setAttribute('role','button');el.tabIndex=0;el.setAttribute('aria-label','毛二街');
     Object.assign(el.style,ipct(sp.x,sp.y),{width:(HOUSE_W/1024*100)+'%',zIndex:sp.y});el.innerHTML=`<img src="assets/shop2_${p}.webp" alt="" onerror="this.src='assets/shop2_day.webp'">`;el.onclick=()=>sh?openHome(SHOP_ID):toast('毛二街還在裝潢中，等島主更新後端 🛠️');box.appendChild(el);
-    const lb=document.createElement('div');lb.className='label shop2';lb.textContent='🛍️ 毛二街';Object.assign(lb.style,ipct(sp.x,sp.y+6),{zIndex:2000});box.appendChild(lb);
+    box.appendChild(signEl('毛二街',sp.x,sp.y,'shop2'));
     if(sh&&guestsOf(SHOP_ID).length){const gb=document.createElement('div');gb.className='bubble';gb.textContent='🐾';Object.assign(gb.style,ipct(sp.x-40,sp.y-150),{zIndex:2001});box.appendChild(gb)}}
   $('#pickbar').classList.toggle('hidden',!picking);$('#ticker').classList.toggle('hidden',picking);
   renderMe();updTix();if(typeof updBell==='function')updBell();updOnline();
 }
+// 🪧 木頭名牌：插在房子前面，名字寫在牌子上（太長會自動縮小、最多兩行）
+const SIGN_W=136,SIGN_UP=25;
+function signLines(t){const c=[...String(t)],n=c.length;if(n<=5)return [t];const k=Math.ceil(n/2);return [c.slice(0,k).join(''),c.slice(k).join('')]}
+function signFs(t){const n=[...String(t)].length;return n<=4?2.6:n===5?2.15:n<=8?2.4:2.1}
+function signEl(name,x,y,cls){const el=document.createElement('div');el.className='sign'+(cls?' '+cls:'');
+  el.innerHTML=`<img src="assets/sign.webp" alt=""><span style="font-size:${signFs(name)}cqw">${signLines(name).map(esc).join('<br>')}</span>`;
+  Object.assign(el.style,ipct(x,y-SIGN_UP),{width:(SIGN_W/1024*100)+'%',zIndex:y+1});return el}
 function renderMe(){
   const h=myHouse();const p=h&&petsOf(h.id)[0];
   $('#me').innerHTML=`<img class="meic" src="assets/icon_me.webp" alt="" onerror="this.replaceWith('🙂')">`;
@@ -2347,7 +2363,7 @@ function homeGuide(auto,then){
 (function(){if(!hgDue())return;let tries=0;const t=setInterval(()=>{if(++tries>60||!hgDue())return clearInterval(t);if(!$('#modal').classList.contains('hidden')||document.querySelector('.gacha'))return;clearInterval(t);homeGuide(true)},1200)})();
 
 // ================= 毛毛商店・背包・零食・禮物 =================
-const SHOP_POS={x:520,y:1220,style:6};
+const SHOP_POS={x:520,y:1245,style:6};
 const ITEMS={
   fish:{name:'小魚乾',emo:'🐟',kind:'treat',price:15,fav:['貓']},
   meat:{name:'肉泥',emo:'🥫',kind:'treat',price:20,fav:['貓']},
@@ -2882,11 +2898,14 @@ async function snapshot(){
     if(isNight()){x.fillStyle='rgba(20,25,60,.3)';x.fillRect(0,0,W,H)}
   }else{
     title='毛毛島';const pr=period(),sx=W/1024,sy=H/1536;const lb0=document.querySelector('.label'),kk=W/((lb0&&lb0.parentElement&&lb0.parentElement.clientWidth)||390),fsI=Math.min(13,Math.max(10,(document.documentElement.clientWidth||390)*0.027))*kk;
-    const bg=await loadImg(`assets/island_${pr}.webp`);if(bg)x.drawImage(bg,0,0,W,H);
+    const bg=await loadImg(`assets/island2_${pr}.webp`);if(bg)x.drawImage(bg,0,bg.naturalHeight*0.12524,bg.naturalWidth,bg.naturalHeight*0.73988,0,0,W,H);const signImg=await loadImg('assets/sign.webp');
     const used=new Map(DB.houses.filter(hh=>!isShopH(hh)).map(hh=>[hh.slot,hh])),items=SLOTS.map((s,i)=>({s,h:used.get(i)})).filter(o=>o.h).concat([{s:[SHOP_POS.x,SHOP_POS.y],shop:true}]).concat(house(SHOP_ID)?[{s:[SHOP2_POS.x,SHOP2_POS.y],shop2:true}]:[]).sort((a,b)=>a.s[1]-b.s[1]);
     for(const o of items){const [hx,hy]=o.s,im=await loadImg(o.shop2?`assets/shop2_${pr}.webp`:o.shop?`assets/${SHOP_IMG?'shop':'house'+SHOP_POS.style}_${pr}.webp`:`assets/house${o.h.style}_${pr}.webp`);drawFit(im,hx*sx,hy*sy,HOUSE_W*sx);
-      if(o.shop2){lbl('🛍️ 毛二街',hx*sx,(hy+6)*sy,fsI,{bg:'#efe2ff',bd:'#8a62c9',fg:'#5a3a8a',px:9*kk,py:2*kk,bw:1.5*kk});continue}
-      {const mine=!o.shop&&isFamily(o.h.id);lbl(o.shop?'🏪 毛毛商店':(mine?'🏠 ':'')+o.h.name,hx*sx,(hy+6)*sy,fsI,o.shop?{bg:'#ffe9a8',bd:'#e0a420',fg:'#7a5200',px:9*kk,py:2*kk,bw:1.5*kk}:mine?{bg:'#fff0e6',bd:cssv('--accent')||'#ff9a6b',fg:'#b4532a',px:9*kk,py:2*kk,bw:1.5*kk}:{bg:'rgba(255,250,238,.93)',bd:cssv('--wood')||'#b98d62',fg:'#6b4b33',px:9*kk,py:2*kk,bw:1.5*kk})}}
+      {const nm=o.shop2?'毛二街':o.shop?'毛毛商店':o.h.name,mine=!o.shop&&!o.shop2&&isFamily(o.h.id),sw=SIGN_W*sx,sh2=signImg?sw*signImg.naturalHeight/signImg.naturalWidth:sw*.64,top=(hy-SIGN_UP)*sy;
+        if(signImg){x.save();if(mine){x.shadowColor='rgba(255,140,80,.95)';x.shadowBlur=10}x.drawImage(signImg,hx*sx-sw/2,top,sw,sh2);x.restore()}
+        const fs=W*signFs(nm)/100;x.font=`bold ${fs}px ${FONT}`;x.fillStyle=o.shop2?'#5a3a8a':o.shop?'#7a4a00':mine?'#b4401a':'#6b3f1d';x.textAlign='center';x.textBaseline='middle';
+        const L=signLines(nm);
+        const cy=top+sh2*.36;L.forEach((t,k)=>x.fillText(t,hx*sx,cy+(k-(L.length-1)/2)*fs*1.12))}}
   }
   x.restore();
   // 相框底部
@@ -3080,7 +3099,7 @@ else setTimeout(dailyLogin,800);
 
 // ================= 圖示：自動把 emoji 換成素材 =================
 const ICMAP={'🏆':'assets/icon_rank.webp','👗':'assets/icon_closet.webp','📣':'megaphone','🔒':'lock','🌐':'globe','♂':'male','♀':'female','🎒':'bag','✅':'check','⚠':'warn','🏷':'tag','🎴':'pack','⏳':'hourglass','🛏':'bed','🌙':'moon','☀':'sun','🏥':'clinic','⏰':'alarm','☁':'cloud','🧧':'redpacket','📌':'pin','💧':'drop','🌡':'thermo','💉':'syringe','💊':'pill','🪥':'toothbrush','👁':'eye','🪮':'comb','🚶':'walk','💦':'pee','🤢':'vomit','🛁':'bath','✂':'scissors','🏃':'shoes','😴':'sleep','🔢':'number','🔁':'repeat','🐕':'dog','🐈':'cat','🐇':'rabbit','🐹':'hamster','🐦':'bird',
-  '✨':'assets/fx_star.webp','⭐':'assets/fx_star.webp','★':'assets/fx_star.webp','🎉':'assets/fx_firework.webp','💕':'assets/fx_heart.webp','💖':'assets/fx_heart.webp','❤':'assets/fx_heart.webp','💤':'assets/fx_z.webp','🎵':'assets/fx_notes.webp','💰':'assets/money_bag.webp','💩':'assets/poop.webp','🍤':'assets/item_cookie.webp','🍚':'bowl','🦴':'assets/item_bone.webp','🏡':'home','🙋':'family','👥':'family','🐾':'paws','🏠':'home','←':'back','＋':'add','🙂':'me','📲':'install','🔗':'link','🔊':'sound','🔇':'mute','📅':'calendar','📋':'tasks','🔑':'key','👑':'crown','💬':'chat','💛':'mood','✏':'pencil','⚖':'scale','🩺':'medical','🧾':'wallet','🎂':'cake','🍖':'bowl','📝':'note','🎁':'gift','🦮':'leash','🧹':'broom','📒':'book','🧸':'toy','📷':'camera','🔔':'bell','🎟':'ticket','🪙':'coin','💗':'heart','🏪':'shop','⚙':'gear','🤚':'hand','🪪':'id'};
+  '✨':'assets/fx_star.webp','⭐':'assets/fx_star.webp','★':'assets/fx_star.webp','🎉':'assets/fx_firework.webp','💕':'assets/fx_heart.webp','💖':'assets/fx_heart.webp','❤':'assets/fx_heart.webp','💤':'assets/fx_z.webp','🎵':'assets/fx_notes.webp','💰':'assets/money_bag.webp','💩':'assets/poop.webp','🍤':'assets/item_cookie.webp','🍚':'bowl','🦴':'assets/item_bone.webp','🏡':'home','🙋':'family','👥':'family','🐾':'paws','🏠':'home','←':'back','＋':'add','🙂':'me','📲':'install','🔗':'link','🔊':'sound','🔇':'mute','📅':'calendar','📋':'tasks','🔑':'key','👑':'crown','💬':'chat','💛':'mood','✏':'pencil','⚖':'scale','🩺':'medical','🧾':'wallet','🎂':'cake','🍖':'bowl','📝':'note','🎁':'gift','🦮':'leash','🧹':'broom','📒':'book','🧸':'toy','📷':'camera','🔔':'bell','🎟':'ticket','🪙':'coin','💗':'heart','🏪':'shop','⚙':'gear','🛍':'buy2','👔':'staff','🤚':'hand','🪪':'id'};
 const ICRE=new RegExp('('+Object.keys(ICMAP).sort((a,b)=>b.length-a.length).join('|')+')️?','gu');
 function iconizeNode(t){const v=t.nodeValue;if(!v||!ICRE.test(v))return;ICRE.lastIndex=0;const pa=t.parentNode;if(!pa||pa.closest('.ii,textarea,script,style,.noic,option,title'))return;
   const f=document.createDocumentFragment();let last=0;v.replace(ICRE,(m,k,i)=>{if(i>last)f.appendChild(document.createTextNode(v.slice(last,i)));const sp=document.createElement('span');sp.className='ii ic';const v0=ICMAP[k];sp.innerHTML=`<img src="${v0.includes('/')?v0:'assets/icon_'+v0+'.webp'}" alt="" onerror="this.remove()"><b>${m}</b>`;f.appendChild(sp);last=i+m.length;return m});
@@ -3497,7 +3516,7 @@ function announceLetters(){if(!DB.me)return;let seen=[];try{seen=JSON.parse(loca
     sfx('gift');$('#lgopen').onclick=()=>openLetter(nw[0].id,()=>$('#bell').click())};
   setTimeout(go,1800)}
 // ================= 自動更新：發現新版本就重新載入 =================
-const APP_VER='v1.57';
+const APP_VER='v1.59';
 function checkUpdate(){
   if(!/^https?:/.test(location.protocol)||!API_URL)return;
   if(!$('#modal').classList.contains('hidden'))return; // 正在填表單時不打斷
