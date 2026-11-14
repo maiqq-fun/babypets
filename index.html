@@ -1497,9 +1497,9 @@ function renderIsland(){
     el.onclick=()=>h?openHome(h.id):lotClick(i);
     box.appendChild(el);
     if(h)box.appendChild(signEl(h.name,x,y,isFamily(h.id)?'mine':''));
+    else{const lb=document.createElement('div');lb.className='label lot';lb.textContent='＋';Object.assign(lb.style,ipct(x,y+6),{zIndex:2000});box.appendChild(lb)}
     if(h&&hasF2(h)){const t=document.createElement('div');t.className='f2tag';t.textContent='2F';Object.assign(t.style,ipct(x+SIGN_W/2-6,y-SIGN_UP-4),{zIndex:y+2});box.appendChild(t)}
     if(h&&hasFarm(h)){const t=document.createElement('div');t.className='f2tag farm';t.innerHTML='<img src="assets/icon_farm.webp" alt="">';Object.assign(t.style,ipct(x-SIGN_W/2+6,y-SIGN_UP-4),{zIndex:y+2});box.appendChild(t)}
-    else{const lb=document.createElement('div');lb.className='label lot';lb.textContent='＋';Object.assign(lb.style,ipct(x,y+6),{zIndex:2000});box.appendChild(lb)}
     if(h&&guestsOf(h.id).length){const gb=document.createElement('div');gb.className='bubble';gb.textContent='🐾';Object.assign(gb.style,ipct(x-40,y-150),{zIndex:2001});box.appendChild(gb)}
     if(h&&demonShown(h)){const gb=document.createElement('div');gb.className='ibub demonb';gb.innerHTML='<img src="assets/demon_head.webp" alt="">餓魔出沒！';Object.assign(gb.style,ipct(x,y-135),{zIndex:2002});box.appendChild(gb)}
     else if(h){const hp2=petsOf(h.id).find(pp=>isHungry(pp));if(hp2){const gb=document.createElement('div');gb.className='ibub';gb.innerHTML=`<img src="${petHead(hp2)}" alt="">救救我🍖`;Object.assign(gb.style,ipct(x,y-135),{zIndex:2002});box.appendChild(gb)}}
@@ -1722,7 +1722,7 @@ function openHome(hid,keep){
   if(ONLINE&&!keep){sync(true);pingWhere()}
   if(!keep&&isFamily(hid)&&demonOf(h))setTimeout(()=>{if(home&&home.id===hid&&demonOf(house(hid)))demonWelcome(house(hid))},1400);
   if(isShopH(h)&&!keep)setTimeout(shopRestockMaybe,500);
-  $('#foot').innerHTML=isParkH(h)?'毛毛公園：旅客和大家的毛孩都會來這裡散步。點旅客可以聊天，每天第一次聊天會收到小禮物；可以帶毛孩來遛遛。':isShopH(h)?'毛二街：點櫃檯或店員可以買二手、賣東西。收購和賣出都是原價的一半。':isFamily(hid)?'這是你家！右上可以新增毛孩、編輯家。點毛孩可以摸頭、看身分證、記錄體重醫療支出。':'朋友家：清地上的便便、餵飯、點毛孩摸頭、在軟木板貼便利貼。睡覺中的毛孩不能打擾喔。';
+  $('#foot').innerHTML=isParkH(h)?'毛毛公園：旅客和大家的毛孩都會來這裡散步。點旅客可以聊天，有時會收到小禮物；可以帶毛孩來遛遛。':isShopH(h)?'毛二街：點櫃檯或店員可以買二手、賣東西。收購和賣出都是原價的一半。':isFamily(hid)?'這是你家！右上可以新增毛孩、編輯家。點毛孩可以摸頭、看身分證、記錄體重醫療支出。':'朋友家：清地上的便便、餵飯、點毛孩摸頭、在軟木板貼便利貼。睡覺中的毛孩不能打擾喔。';
   window.scrollTo(0,0);
 }
 function renderFoot2(){
@@ -1739,7 +1739,7 @@ function renderFoot2(){
   $('#nightdim').classList.toggle('on',isNight());
 }
 function renderHome(){
-  const h=house(home.id);$('#feed').style.display='';$('#board').style.display='';
+  const h=house(home.id);$('#feed').style.display='';$('#board').style.display='';$('#addnote').style.display='';
   if(isParkH(h))return renderParkHome(h);
   if(isShopH(h))return renderShopHome(h);
   $('#feed').textContent='🍖 餵飯';$('#feed').onclick=()=>feedNow();$('#sweep').style.display='';$('#giftbtn').style.display='';
@@ -2711,7 +2711,7 @@ let placing=null;
 // ---------- 每間房間的地板範圍（v1.40）----------
 const RF_Y1=1240,RF_DEF={y0:770,t:[105,745],b:[20,828],x:[]};
 const RFLOOR={
-  park:{y0:560,t:[20,828],b:[0,848]},
+  park:{y0:380,t:[110,740],b:[0,848],x:[[0,985,250,1264],[600,985,848,1264]]},
   starhouse:{y0:820,t:[60,800],b:[0,848]},
   basic1:{},basic2:{},basic3:{},
   shop2:{y0:830,t:[100,840],b:[0,848],x:[[0,800,95,860],[230,800,630,1005]]},
@@ -3702,7 +3702,7 @@ function toastOnce(n){try{const k='mhd_amailt',o=+(localStorage.getItem(k)||0);i
 
 // ================= 🌳 毛毛公園＋旅客（v1.70） =================
 // 公園是特別的「家」（id park）：毛孩可以遛去、島主免費布置；沒住民宿的旅客在公園散步、去島民家晃、或出去旅行
-const PARK_ID='park',PARK_POS={x:565,y:1262},PARK_SC=1.45,PARK_GUESTS=8;
+const GIFT_DAY=5,GIFT_P=1,PARK_ID='park',PARK_POS={x:565,y:1262},PARK_SC=1.45,PARK_GUESTS=8;
 const isParkH=h=>!!(h&&(h.kind==='park'||h.id===PARK_ID)),isSpecialH=h=>isShopH(h)||isParkH(h);
 GUESTS.push(...[['alpaca','羊駝'],['otter','水獺'],['fox','狐狸'],['sloth','樹懶'],['dog','小狗'],['penguin','企鵝'],['horse','小馬'],['sheep','綿羊'],['monkey','猴子'],['cow','乳牛'],['lion','獅子'],['zebra','斑馬']].map(([k,n])=>({img:`assets/guest_${k}.webp`,n:n+'旅客'})));
 GUESTS.forEach((g,i)=>g.i=i);
@@ -3720,21 +3720,31 @@ const GUEST_LINES={park:['公園的空氣好好～','今天天氣真好','我在
 // 跟旅客說話：每隻每天第一次會送小禮物（每天最多 5 份）
 function guestTalk(g,where,el){if(!needMe())return;const P=guestPlan(),L=GUEST_LINES[where]||GUEST_SAY;let t=L[Math.floor(Math.random()*L.length)];
   if(where!=='inn'&&P.top&&Math.random()<.4)t=`聽說「${P.top.name}」的二樓很舒服！`;sayOn(el,t);sfx('tap');
-  const gm=DB.game,d=todayTW();if(!gm.gt||gm.gt.d!==d)gm.gt={d,ids:[]};if(gm.gt.ids.includes(g.i)||gm.gt.ids.length>=5)return;gm.gt.ids.push(g.i);
+  const gm=DB.game,d=todayTW();if(!gm.gt||gm.gt.d!==d)gm.gt={d,ids:[]};if(!gm.gt.n)gm.gt.n=0;if(gm.gt.ids.includes(g.i)||gm.gt.n>=GIFT_DAY)return;gm.gt.ids.push(g.i);save();if(Math.random()>GIFT_P)return;gm.gt.n++;
   const r=Math.random(),T=Object.entries(ITEMS).filter(([k,x])=>x.kind==='treat'&&!x.bday&&!x.limited&&x.price>0),Y=Object.entries(ITEMS).filter(([k,x])=>x.kind==='toy'&&!x.limited&&x.price>0&&x.price<=60);
-  if(r<.6){const [id,x]=T[Math.floor(Math.random()*T.length)];bagAdd(id,1);setTimeout(()=>{sfx('gift');toast(`${g.n}送你一個「${x.name}」！放進背包了 🎁`)},600)}
-  else if(r<.85){const [id,x]=Y[Math.floor(Math.random()*Y.length)];bagAdd(id,1);setTimeout(()=>{sfx('gift');toast(`${g.n}送你一個玩具「${x.name}」！放進背包了 🎁`)},600)}
-  else{save();setTimeout(()=>earn('visit'),600)}}
+  if(r<.7){const [id,x]=T[Math.floor(Math.random()*T.length)];bagAdd(id,1);setTimeout(()=>{sfx('gift');toast(`${g.n}送你一個「${x.name}」！放進背包了 🎁`)},600)}
+  else{const [id,x]=Y[Math.floor(Math.random()*Y.length)];bagAdd(id,1);setTimeout(()=>{sfx('gift');toast(`${g.n}送你一個玩具「${x.name}」！放進背包了 🎁`)},600)}}
 // 在房間地板上放旅客（公園：好幾隻；一般家：來晃的那 1 隻）
 function renderGuestsOnFloor(f,h){const P=guestPlan(),L=isParkH(h)?P.park:P.visit[h.id]?[P.visit[h.id]]:[],where=isParkH(h)?'park':'visit';
-  L.slice(0,8).forEach((g,i)=>{const k=hash01(h.id+'gx'),x=FLOOR.x0+50+((k+i*0.618)%1)*(FLOOR.x1-FLOOR.x0-100),y=FLOOR.y0+40+((k*7+i*0.381)%1)*(FLOOR.y1-FLOOR.y0-60);
-    const el=walker(f,g.img,x,y,isParkH(h)?230:250,'',e=>guestTalk(g,where,e));el.classList.add('gnpc')})}
-setInterval(()=>{const f=$('#floor');if(!f||!home||$('#home').classList.contains('hidden')||document.hidden)return;if(f.querySelector('.gnpc'))walkTick(f)},3500);
+  // 位置：隨機挑點，但離其他旅客越遠越好（不會排成一排或擠在一起）
+  const taken=L.slice(0,6).map(g=>GPOS[h.id+':'+g.i]).filter(Boolean);
+  L.slice(0,6).forEach((g,i)=>{const key=h.id+':'+g.i;let P0=GPOS[key];
+    if(!P0){let best=null,bd=-1;for(let t=0;t<24;t++){const q={x:FLOOR.x0+50+hash01(key+'x'+t)*(FLOOR.x1-FLOOR.x0-100),y:FLOOR.y0+50+hash01(key+'y'+t)*(FLOOR.y1-FLOOR.y0-80)};
+        const d=taken.length?Math.min(...taken.map(o=>Math.hypot((o.x-q.x)*.8,o.y-q.y))):1;if(d>bd){bd=d;best=q}}P0=GPOS[key]=best;taken.push(best)}
+    const el=walker(f,g.img,P0.x,P0.y,isParkH(h)?190:220,'',e=>guestTalk(g,where,e));el.classList.add('gnpc');el._key=key})}
+const GPOS={};
+// 旅客散步：每次只走附近一小段、慢慢走，走完會停一陣子
+function guestWander(f){f.querySelectorAll('.gnpc').forEach(el=>{if(el._busy||Date.now()<(el._rest||0)||Math.random()<.6)return;
+  const ang=Math.random()*Math.PI*2,dist=60+Math.random()*120,tx=clamp(el._x+Math.cos(ang)*dist,FLOOR.x0+40,FLOOR.x1-40),ty=clamp(el._y+Math.sin(ang)*dist*.6,FLOOR.y0+30,FLOOR.y1-20);
+  const d=Math.hypot(tx-el._x,ty-el._y);if(d<30)return;const dur=d/55;el._busy=1;el.style.zIndex=Math.round(Math.max(el._y,ty));el.classList.toggle('flip',tx<el._x);el.classList.add('walking');
+  el.style.transition=`left ${dur}s linear,top ${dur}s linear`;Object.assign(el.style,hp(tx,ty));el._x=tx;el._y=ty;if(el._key)GPOS[el._key]={x:tx,y:ty};
+  setTimeout(()=>{el._busy=0;el._rest=Date.now()+4000+Math.random()*8000;el.classList.remove('walking');el.style.zIndex=Math.round(ty)},dur*1000)})}
+setInterval(()=>{const f=$('#floor');if(!f||!home||$('#home').classList.contains('hidden')||document.hidden)return;if(f.querySelector('.gnpc'))guestWander(f)},2500);
 // ---------- 公園的畫面（用家的畫面，按鈕不一樣） ----------
 function renderParkHome(h){const ad=!!adminPw();
   $('#famtools').innerHTML=ad?'<button class="act" id="fp1">🧸 布置</button>':'';if($('#fp1'))$('#fp1').onclick=toyPlacer;
   $('#feed').style.display='none';$('#sweep').style.display='none';$('#giftbtn').style.display='none';
-  $('#walkbtn').style.display='';$('#walkbtn').onclick=walkForm;$('#board').style.display='none';
+  $('#walkbtn').style.display='';$('#walkbtn').onclick=walkForm;$('#board').style.display='none';$('#addnote').style.display='none';
   $('#emptyhome').innerHTML='';renderFloor();renderFoot2()}
 
 // ================= 頁尾與啟動 =================
