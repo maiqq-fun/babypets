@@ -1606,7 +1606,9 @@ function renderFoot2(){
   const own=petsOf(h.id),gs=guestsOf(h.id).map(g=>pet(g.petId)).filter(p=>p.houseId!==h.id);
   const heads=own.concat(gs).map(p=>{const o=outAt(p.id),away=o&&o.id!==h.id,sl=!away&&sleepState(p);return `<button class="ph1${away?' away':''}" data-pid="${p.id}" title="${esc(p.name)}"><img src="${!away&&petDemon(p)?'assets/demon_head.webp':petHead(p)}" alt="">${away?'<i>🐾</i>':sl?'<i>💤</i>':p.houseId!==h.id?'<i>🏠</i>':''}</button>`}).join('');
   $('#petheads').innerHTML=heads;$('#petheads').querySelectorAll('[data-pid]').forEach(b=>b.onclick=()=>{const pid=b.dataset.pid,pp=pet(pid),o=outAt(pid);if(o&&o.id!==h.id){if(pp.houseId===h.id&&isFamily(h.id))return recallSheet(pp,o);toast(`${pp.name} 出門去 ${o.name} 玩了 🐾`)}idCard(pid)});
-  $('#visits').style.display=M.length||L.length?'':'none';
+  const dm=!SH&&!isFamily(h.id)&&demonOf(h);
+  if(dm&&+dm.until>Date.now()){const mins=Math.ceil((+dm.until-Date.now())/60000);$('#visits').insertAdjacentHTML('beforeend',`<div>😇 餓魔被救回來了，${mins>=60?Math.floor(mins/60)+' 小時 '+(mins%60)+' 分':mins+' 分鐘'}後又會變回餓魔（主人回家才會真的好）</div>`)}
+  $('#visits').style.display=M.length||L.length||(dm&&+dm.until>Date.now())?'':'none';
   $('#nightdim').classList.toggle('on',isNight());
 }
 function renderHome(){
@@ -1785,8 +1787,8 @@ function petMenu(r,p){
   const h=house(home.id),f=fullness(p),md=mood(p,h);
   const m=document.createElement('div');m.className='petmenu';Object.assign(m.style,hp(clamp(r.x,150,700),r.y-215*(r.ar||1)*petScale(r.y)-10));
   m.innerHTML=`<div class="pm-h"><b>${r.demon?'餓魔':''}${esc(p.name)}</b>${p.trait?`<span class="tr">${esc(p.trait)}</span>`:''}</div>
-    <div class="pm-s">🍖 ${bar(f,'#ff9a6b')}</div><div class="pm-s">💛 ${bar(md,'#f4c542')}</div>
-    <div class="pm-b"><button data-a="pat">🤚 摸頭</button>${r.guest?'':'<button data-a="feed">🍚 餵牠</button>'}<button data-a="treat">🍤 零食</button>${!r.guest&&!r.demon&&isFamily(p.houseId)?'<button data-a="closet">👗</button>':''}<button data-a="id">🪪</button></div>`;
+    ${r.demon&&!isFamily(h.id)?(()=>{const d=demonOf(h)||{};return `<div class="pm-s">😈 ${bar(Math.min(100,(+d.prog||0)/DEMON_GOAL*100),'#ff6f91')} ${+d.prog||0}/${DEMON_GOAL}</div><div class="pm-s" style="font-size:11px;color:var(--soft)">摸頭+1・餵飯+3・零食+2・玩具+2</div>`})():`<div class="pm-s">🍖 ${bar(f,'#ff9a6b')}</div><div class="pm-s">💛 ${bar(md,'#f4c542')}</div>`}
+    <div class="pm-b"><button data-a="pat">🤚 摸頭</button>${r.guest?'':`<button data-a="feed">🍚 ${r.demon&&!isFamily(h.id)?'餵餓魔':'餵牠'}</button>`}<button data-a="treat">🍤 零食</button>${!r.guest&&!r.demon&&isFamily(p.houseId)?'<button data-a="closet">👗</button>':''}<button data-a="id">🪪</button></div>`;
   m.onclick=e=>{const b=e.target.closest('button');if(!b)return;m.remove();
     if(b.dataset.a==='id')return idCard(p.id);
     if(b.dataset.a==='closet')return closetSheet(p.id);
@@ -1801,9 +1803,20 @@ function petMenu(r,p){
 }
 $('#feed').onclick=()=>feedNow();
 // 餵飯：only＝只餵這一隻（點毛孩選單「🍚 餵牠」或睡覺選單「幫牠留飯」）
+// 😈 朋友家的餓魔：不管毛孩飽不飽都能放一碗飯，算解救進度（同一人同一種 10 分鐘算一次）
+function feedDemon(h){
+  if(home.bowl)return toast('碗裡還有飯喔，等餓魔吃完');
+  const R=home.pets.filter(r=>!r.guest&&!r.sleep&&r.el);
+  home.bowl={empty:false};renderFloor();
+  R.forEach((r,i)=>{r.tx=BOWL.x+(i%2?75:-75)*(1+Math.floor(i/2));r.ty=BOWL.y-10;r.state='walk';r.goal='eat';r.fast=false;r.anim=null});
+  setTimeout(()=>{if(home&&home.bowl){home.bowl.empty=true;renderFloor()}},4200);setTimeout(()=>{if(home){home.bowl=null;renderFloor()}},7000);
+  const hungry=petsOf(h.id).filter(p=>fullness(p)<80).map(p=>p.id);
+  if(hungry.length){const now=Date.now(),day=todayTW();hungry.forEach(id=>{const p=pet(id);p.lastFed=now;p.meals=(p.mealDay===day?(+p.meals||0):0)+1;p.mealDay=day;FED[id]={t:now,v:now,m:p.meals,d:day}});call('feedPets',{playerId:DB.me.id,houseId:h.id,petIds:hungry},true).catch(()=>{})}
+  toast('你放了一碗飯給餓魔 🍖');earn('feed');demonHelp('feed')}
 function feedNow(only){
   if(!needMe())return;if(!home.pets.length)return toast('這個家還沒有毛孩');
-  const h=house(home.id),cand=only?[only]:home.pets.filter(r=>!r.guest),full=[],eat=[],nap=[];
+  const h=house(home.id);if(!isFamily(h.id)&&demonShown(h))return feedDemon(h);
+  const cand=only?[only]:home.pets.filter(r=>!r.guest),full=[],eat=[],nap=[];
   cand.forEach(r=>{const p=pet(r.id);if(!p)return;if(canEat(p))full.push(p.name);else if(r.sleep)nap.push(r);else eat.push(r)});
   const away=only?[]:petsOf(h.id).filter(p=>{const o=outAt(p.id);return o&&o.id!==h.id&&fullness(p)<80});
   const awayMsg=away.length?`${away.map(p=>p.name).join('、')} 在外面玩，叫牠回家才能吃`:'';
@@ -1935,8 +1948,8 @@ function petForm(hid,pid){
       <div class="info" id="binfo">${p.body?'已上傳全身圖':'還沒上傳，會先用預設圖'}<div class="btns">${p.body?'<button id="bdel">移除</button>':''}</div></div></div>
       <div class="hint">想直接用自己喜歡的圖也可以，綠底或透明背景效果最好</div></div>
     <div class="err" id="perr"></div>
-    <div class="row2 sticky"><button data-close>取消</button><button class="primary" id="psave">${isNew?'加入這個家':'儲存'}</button></div>
-    ${isNew?'':'<button class="btn-d" id="pdel">刪除這隻毛孩的所有資料</button>'}`,false,p.card);
+    ${isNew?'':'<button class="btn-d" id="pdel" style="margin-bottom:6px">刪除這隻毛孩的所有資料</button>'}
+    <div class="row2 sticky"><button data-close>取消</button><button class="primary" id="psave">${isNew?'加入這個家':'儲存'}</button></div>`,false,p.card);
   const upd=()=>{$('#ptxt').textContent=PROMPT_BODY({species:choiceVal('psp'),breed:$('#pb').value.trim()})};upd();$('#pb').oninput=upd;
   bindChoice('psp',v=>{upd();if(!p.head)$('#hpv').innerHTML=`<img src="${defHead(v)}" alt="">`;if(!p.body)$('#bpv').innerHTML=`<img src="${defBody(v)}" alt="">`});bindChoice('psx');bindChoice('pfx');bindChoice('ptr');
   $('#pcc').onclick=e=>{const b=e.target.closest('button');if(!b)return;p.card=b.dataset.c;$('#sheet').style.setProperty('--cc',p.card);$('#pcc').querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===b))};
@@ -3517,7 +3530,7 @@ function announceLetters(){if(!DB.me)return;let seen=[];try{seen=JSON.parse(loca
     sfx('gift');$('#lgopen').onclick=()=>openLetter(nw[0].id,()=>$('#bell').click())};
   setTimeout(go,1800)}
 // ================= 自動更新：發現新版本就重新載入 =================
-const APP_VER='v1.62';
+const APP_VER='v1.63';
 function checkUpdate(){
   if(!/^https?:/.test(location.protocol)||!API_URL)return;
   if(!$('#modal').classList.contains('hidden'))return; // 正在填表單時不打斷
