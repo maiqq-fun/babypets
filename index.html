@@ -809,7 +809,7 @@ img{-webkit-user-drag:none}
 .sign>img{display:block;width:100%;height:auto}
 .sign>span{position:absolute;left:7%;right:7%;top:6%;height:60%;display:flex;align-items:center;justify-content:center;text-align:center;line-height:1.12;color:#6b3f1d;font-weight:bold;white-space:nowrap;overflow:hidden;text-shadow:0 1px 0 rgba(255,240,215,.7)}
 .sign.mine{filter:drop-shadow(0 0 5px rgba(255,140,80,.95)) drop-shadow(0 2px 2px rgba(80,45,15,.3))}.sign.mine>span{color:#b4401a}
-.sign.shop>span{color:#7a4a00}.sign.shop2>span{color:#5a3a8a}
+.sign.shop>span{color:#7a4a00}.sign.shop2>span{color:#5a3a8a}.sign.center>span{color:#3f6b2a}
 .sign .ii.ic{width:1.15em;height:1.15em}
 /* v1.56 🛍️ 毛二街 */
 .label.shop2{background:#efe2ff;border-color:#8a62c9;color:#5a3a8a}
@@ -864,6 +864,27 @@ img{-webkit-user-drag:none}
 .ru-card img{width:70px;border-radius:10px;box-shadow:0 0 0 3px #f3cf62,0 0 16px #ffe36b}
 .ru-bub small{display:block;color:#999;font-size:12px;margin-top:4px}
 .reunion .gbtns{position:relative;z-index:2}
+/* 🏛️ 島民中心 */
+.centerv{position:fixed;inset:0;z-index:3500;background:#3b2a20;display:flex;flex-direction:column;align-items:center}
+.chead{width:100%;max-width:560px;display:flex;align-items:center;justify-content:space-between;padding:calc(env(safe-area-inset-top) + 10px) 12px 8px;box-sizing:border-box}
+.chead .pill{border:0;border-radius:999px;padding:9px 16px;font-size:16px;background:#fff6e6;box-shadow:0 0 0 2px var(--wood);color:var(--ink)}
+.ctitle{background:#fff6e6;border-radius:999px;padding:4px 18px;text-align:center;font-weight:700;font-size:18px;color:#3f6b2a;box-shadow:0 0 0 2px var(--wood);line-height:1.2}
+.ctitle small{display:block;font-size:11px;font-weight:400;color:#8a7a60}
+.cwrap{flex:1;min-height:0;width:100%;display:flex;justify-content:center;align-items:flex-start}
+.cstage{position:relative;height:100%;max-width:100%;aspect-ratio:848/1264;container-type:inline-size;overflow:hidden}
+.cbg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.cboard{position:absolute;border:0;background:none;padding:5%;display:flex;align-items:center;justify-content:center;cursor:pointer}
+.cnote{background:#fffbe0;border-radius:4px;box-shadow:0 3px 6px rgba(80,40,10,.3);padding:6px 8px;font-size:clamp(10px,3.1cqw,15px);line-height:1.4;color:#5a4030;transform:rotate(-2deg);max-height:100%;overflow:hidden;display:-webkit-box;-webkit-line-clamp:5;-webkit-box-orient:vertical;text-align:left}
+.cnote b{display:block;font-size:.85em;color:#b4401a}
+.cnote.empty{background:rgba(255,251,224,.75);color:#9a8a70}
+.cbtns{display:flex;gap:8px;justify-content:center;padding:10px 12px calc(env(safe-area-inset-bottom) + 12px);flex-wrap:wrap}
+.cbtns .act{display:flex;align-items:center}
+.lockd{opacity:.65}
+.snm.cs{border-color:#6a9a4a;color:#3f6b2a}
+.cmenu{display:flex;flex-direction:column;gap:8px;margin:10px 0}
+.cmenu button{display:flex;align-items:center;gap:10px;text-align:left;border:2px solid #f0d9a8;background:#fff;border-radius:14px;padding:10px 12px;font-size:15px;color:var(--ink)}
+.cmenu button .mic{width:30px;height:30px;font-size:22px;text-align:center}
+.cmenu small{display:block;color:#999;font-size:12px}
 </style>
 </head>
 <body>
@@ -1045,7 +1066,7 @@ async function sync(quiet){
   try{const d=await api('getState',Object.assign(cred(),{where:curWhere()}));
     Object.assign(DB,{houses:d.houses,pets:d.pets,weights:d.weights,medical:d.medical,expenses:d.expenses,notes:d.notes,feed:d.feed,famOk:d.famOk,players:d.players||[],tlogs:d.tlogs||[]});
     DB.houses.forEach(h=>{if(!Array.isArray(h.poops))h.poops=[]});
-    keepPending();DB.letters=(d.letters||[]).filter(l=>!LGONE[l.id]).map(l=>Object.assign(l,LSTATE[l.id]||{},CLAIMED['l:'+l.id]?{claimed:true}:{}));DB.drops=(d.drops||[]).filter(x=>!PICKED.has(x.id));DB.notice=d.notice||null;DB.kuji=d.kuji||DB.kuji||null;DB.online=d.online||[];setTimeout(checkAdminGifts,600);DB.rank=d.rank||DB.rank||null;osLogin();pushCheckLater();setTimeout(noticePop,1200);DB.dbl=d.dbl||'';DB.adminId=d.adminId||'';DB.star=d.star||null;if(d.player)DB.starDone=+d.player.starDone||0;
+    keepPending();DB.letters=(d.letters||[]).filter(l=>!LGONE[l.id]).map(l=>Object.assign(l,LSTATE[l.id]||{},CLAIMED['l:'+l.id]?{claimed:true}:{}));DB.drops=(d.drops||[]).filter(x=>!PICKED.has(x.id));DB.notice=d.notice&&d.notice.t&&!(+d.notice.until&&Date.now()>+d.notice.until)?d.notice:null;DB.center=d.center||DB.center||null;DB.kuji=d.kuji||DB.kuji||null;DB.online=d.online||[];setTimeout(checkAdminGifts,600);DB.rank=d.rank||DB.rank||null;osLogin();pushCheckLater();setTimeout(noticePop,1200);DB.dbl=d.dbl||'';DB.adminId=d.adminId||'';DB.star=d.star||null;if(d.player)DB.starDone=+d.player.starDone||0;
     setTimeout(announceLetters,0);setTimeout(updGuestBar,0);
     if(d.player&&DB.me){DB.me.code=d.player.code||DB.me.code;const ml=Array.isArray(d.player.mail)?d.player.mail:[];if(ml.length)claimMail(ml)}
     DB.owned={};d.houses.forEach(h=>DB.owned[h.id]=Array.isArray(h.owned)?h.owned:[]);
@@ -1106,7 +1127,8 @@ const LOCAL={
   pickCoin({dropId}){const d=(DB.drops||[]).find(x=>x.id===dropId);if(!d)throw new Error('慢了一步，錢被別人撿走了 😆');DB.drops=DB.drops.filter(x=>x.id!==dropId);const r=Math.random(),a=r<.6?5+~~(Math.random()*6):r<.85?12+~~(Math.random()*9):r<.95?25+~~(Math.random()*16):r<.99?50+~~(Math.random()*31):100+~~(Math.random()*51);const amt=a*(DB.dbl===todayTW()?2:1);feedPush(`${DB.me.nick} 在 ${house(d.houseId).name} 撿到 ${amt} 金幣 💰`);return {amt}},
   recoverPlayer(){throw new Error('試做版不能用轉移碼')},claimMail(){return true},
   adminLogin(){return {players:(DB.players||[]).map(p=>({id:p.id,nick:p.nick,code:'MH-DEMO00',house:(house(p.houseId)||{}).name||'',houseId:p.houseId||'',lv:1,coins:0,tickets:0})),houses:DB.houses.filter(h=>!isShopH(h)).map(h=>({id:h.id,name:h.name})),shopMgr:(house(SHOP_ID)||{}).mgr||[],drops:(DB.drops||[]).length,notice:DB.notice,dbl:DB.dbl}},
-  adminNotice({text}){DB.notice=text?{t:text,at:Date.now()}:null;return true},adminDouble({on}){DB.dbl=on?todayTW():'';return true},
+  adminNotice({text,days}){const at=Date.now();DB.notice=text?{t:text,at,until:+days?at+days*864e5:0}:null;return true},
+  adminCenter({staff}){DB.center=Object.assign({},DB.center||{},{staff});return {staff}},adminDouble({on}){DB.dbl=on?todayTW():'';return true},
   adminRain({houseId,n}){for(let i=0;i<(+n||1);i++){const h=houseId?house(houseId):DB.houses[~~(Math.random()*DB.houses.length)];(DB.drops=DB.drops||[]).push({id:uid(),houseId:h.id,x:Math.round(FLOOR.x0+40+Math.random()*(FLOOR.x1-FLOOR.x0-80)),y:Math.round(FLOOR.y0+20+Math.random()*(FLOOR.y1-FLOOR.y0-40))})}return true},
   readLetter(){return true},hideLetter(){return true},claimLetter({letterId}){const l=(DB.letters||[]).find(x=>x.id===letterId)||{};return {coins:l.coins,tickets:l.tickets,item:l.item,n:l.n}},adminLetter(o){(DB.letters=DB.letters||[]).unshift({id:uid(),title:o.title,body:o.body,at:Date.now(),coins:+o.coins||0,tickets:+o.tickets||0,item:o.item||'',n:+o.n||0,read:false,claimed:false,all:o.to==='*'});return true},adminGiftHouse({houseId,coins,tickets,item,n,msg,room}){const h=house(houseId);(h.gifts=h.gifts||[]).push({id:uid(),admin:true,from:'島主',coins,tickets,item,n,msg,room,opened:[],at:Date.now(),x:Math.round(FLOOR.x0+60+Math.random()*(FLOOR.x1-FLOOR.x0-120)),y:Math.round(FLOOR.y0+40+Math.random()*150)});return true},adminResetPw(){return true},adminRemoveHouse({houseId}){return LOCAL.deleteHouse({houseId})},
   addTLog({log}){const l=Object.assign({},log,{id:uid(),createdAt:Date.now(),by:DB.me.nick});(DB.tlogs=DB.tlogs||[]).push(l);return l},
@@ -1419,7 +1441,7 @@ function renderIsland(){
   document.querySelectorAll('#island .bg').forEach(b=>b.classList.toggle('on',b.dataset.p===p));$('#iback').style.backgroundImage=`url(assets/island2_${p}.webp)`;
   document.querySelectorAll('#bar button').forEach(b=>b.classList.toggle('on',b.dataset.p===mode));
   const box=$('#things');box.innerHTML='';const used=new Map(DB.houses.filter(h=>!isShopH(h)).map(h=>[h.slot,h]));
-  SLOTS.map((s,i)=>({s,i})).filter(o=>o.i!==SHOP_SLOT||used.has(o.i)).sort((a,b)=>a.s[1]-b.s[1]).forEach(({s:[x,y],i})=>{
+  SLOTS.map((s,i)=>({s,i})).filter(o=>(o.i!==SHOP_SLOT&&o.i!==CENTER_SLOT)||used.has(o.i)).sort((a,b)=>a.s[1]-b.s[1]).forEach(({s:[x,y],i})=>{
     const h=used.get(i);const el=document.createElement('div');el.className='thing'+(!h&&picking?' pick':'');
     el.setAttribute('role','button');el.tabIndex=0;el.setAttribute('aria-label',h?h.name:'空地，可以蓋房子');
     Object.assign(el.style,ipct(x,y),{width:((h?HOUSE_W:LOT_W)/1024*100)+'%',zIndex:y});
@@ -1440,6 +1462,10 @@ function renderIsland(){
     Object.assign(el.style,ipct(sp.x,sp.y),{width:(HOUSE_W*SHOP_SC/1024*100)+'%',zIndex:sp.y});el.innerHTML=`<img src="assets/shop2_${p}.webp" alt="" onerror="this.src='assets/shop2_day.webp'">`;el.onclick=()=>sh?openHome(SHOP_ID):toast('毛二街還在裝潢中，等島主更新後端 🛠️');box.appendChild(el);
     box.appendChild(signEl('毛二街',sp.x,sp.y,'shop2'));
     if(sh&&guestsOf(SHOP_ID).length){const gb=document.createElement('div');gb.className='bubble';gb.textContent='🐾';Object.assign(gb.style,ipct(sp.x-40,sp.y-150),{zIndex:2001});box.appendChild(gb)}}
+  {const sp=centerPos(),el=document.createElement('div');el.className='thing';el.setAttribute('role','button');el.tabIndex=0;el.setAttribute('aria-label','島民中心');
+    Object.assign(el.style,ipct(sp.x,sp.y),{width:(HOUSE_W*SHOP_SC/1024*100)+'%',zIndex:sp.y});el.innerHTML=`<img src="assets/center_${p}.webp" alt="" onerror="this.src='assets/center_day.webp'">`;el.onclick=openCenter;box.appendChild(el);
+    box.appendChild(signEl('島民中心',sp.x,sp.y,'center'));
+    if(DB.notice&&DB.notice.t){const gb=document.createElement('div');gb.className='bubble';gb.textContent='📌';Object.assign(gb.style,ipct(sp.x+45,sp.y-165),{zIndex:2001});box.appendChild(gb)}}
   $('#pickbar').classList.toggle('hidden',!picking);$('#ticker').classList.toggle('hidden',picking);
   renderMe();updTix();if(typeof updBell==='function')updBell();updOnline();
 }
@@ -2291,7 +2317,7 @@ function tickerShow(){
   const list=v.length?v:feedGroups().daily.slice(0,1);
   if(!list.length&&!(DB.notice&&DB.notice.t)){el.style.display='none';return}el.style.display='';
   const unread=DB.feed.filter(f=>f.at>seen&&!(DB.me&&f.t.startsWith(DB.me.nick+' '))).length;
-  const NT=DB.notice&&DB.notice.t&&(!DB.notice.at||Date.now()-DB.notice.at<24*HOUR)?{t:'👑 島主公告：'+DB.notice.t,n:1,mine:false,nt:1}:null,L2=[];list.forEach((x,i)=>{if(NT&&i%5===0)L2.push(NT);L2.push(x)});if(!L2.length&&NT)L2.push(NT);const f=L2[fi%L2.length];el.style.opacity=0;
+  const NT=DB.notice&&DB.notice.t&&(+DB.notice.until||!DB.notice.at||Date.now()-DB.notice.at<24*HOUR)?{t:'👑 島主公告：'+DB.notice.t,n:1,mine:false,nt:1}:null,L2=[];list.forEach((x,i)=>{if(NT&&i%5===0)L2.push(NT);L2.push(x)});if(!L2.length&&NT)L2.push(NT);const f=L2[fi%L2.length];el.style.opacity=0;
   setTimeout(()=>{el.classList.toggle('gold',!!f.nt);el.innerHTML=`${unread?`<b class="unread">${unread>99?'99+':unread}</b>`:'📣'} ${esc(feedText(f))}`;el.style.opacity=1},L2.length>1?300:0);
 }
 setInterval(()=>{if(feedView().length+(DB.notice&&DB.notice.t?1:0)>1){fi++;tickerShow()}},4000);
@@ -2968,11 +2994,11 @@ async function snapshot(){
   }else{
     title='毛毛島';const pr=period(),sx=W/1024,sy=H/1536;const lb0=document.querySelector('.label'),kk=W/((lb0&&lb0.parentElement&&lb0.parentElement.clientWidth)||390),fsI=Math.min(13,Math.max(10,(document.documentElement.clientWidth||390)*0.027))*kk;
     const bg=await loadImg(`assets/island2_${pr}.webp`);if(bg)x.drawImage(bg,0,bg.naturalHeight*0.12524,bg.naturalWidth,bg.naturalHeight*0.73988,0,0,W,H);const signImg=await loadImg('assets/sign.webp');
-    const used=new Map(DB.houses.filter(hh=>!isShopH(hh)).map(hh=>[hh.slot,hh])),items=SLOTS.map((s,i)=>({s,h:used.get(i)})).filter(o=>o.h).concat([{s:[SHOP_POS.x,SHOP_POS.y],shop:true}]).concat(house(SHOP_ID)?[{s:[SHOP2_POS.x,SHOP2_POS.y],shop2:true}]:[]).sort((a,b)=>a.s[1]-b.s[1]);
-    for(const o of items){const [hx,hy]=o.s,im=await loadImg(o.shop2?`assets/shop2_${pr}.webp`:o.shop?`assets/${SHOP_IMG?'shop':'house'+SHOP_POS.style}_${pr}.webp`:`assets/house${o.h.style}_${pr}.webp`);drawFit(im,hx*sx,hy*sy,HOUSE_W*(o.shop||o.shop2?SHOP_SC:1)*sx);
-      {const nm=o.shop2?'毛二街':o.shop?'毛毛商店':o.h.name,mine=!o.shop&&!o.shop2&&isFamily(o.h.id),sw=SIGN_W*sx,sh2=signImg?sw*signImg.naturalHeight/signImg.naturalWidth:sw*.64,top=(hy-SIGN_UP)*sy;
+    const used=new Map(DB.houses.filter(hh=>!isShopH(hh)).map(hh=>[hh.slot,hh])),items=SLOTS.map((s,i)=>({s,h:used.get(i)})).filter(o=>o.h).concat([{s:[SHOP_POS.x,SHOP_POS.y],shop:true}]).concat(house(SHOP_ID)?[{s:[SHOP2_POS.x,SHOP2_POS.y],shop2:true}]:[]).concat([{s:[centerPos().x,centerPos().y],ctr:true}]).sort((a,b)=>a.s[1]-b.s[1]);
+    for(const o of items){const [hx,hy]=o.s,im=await loadImg(o.ctr?`assets/center_${pr}.webp`:o.shop2?`assets/shop2_${pr}.webp`:o.shop?`assets/${SHOP_IMG?'shop':'house'+SHOP_POS.style}_${pr}.webp`:`assets/house${o.h.style}_${pr}.webp`);drawFit(im,hx*sx,hy*sy,HOUSE_W*(o.shop||o.shop2||o.ctr?SHOP_SC:1)*sx);
+      {const nm=o.ctr?'島民中心':o.shop2?'毛二街':o.shop?'毛毛商店':o.h.name,mine=!o.shop&&!o.shop2&&!o.ctr&&isFamily(o.h.id),sw=SIGN_W*sx,sh2=signImg?sw*signImg.naturalHeight/signImg.naturalWidth:sw*.64,top=(hy-SIGN_UP)*sy;
         if(signImg){x.save();if(mine){x.shadowColor='rgba(255,140,80,.95)';x.shadowBlur=10}x.drawImage(signImg,hx*sx-sw/2,top,sw,sh2);x.restore()}
-        const fs=W*signFs(nm)/100;x.font=`bold ${fs}px ${FONT}`;x.fillStyle=o.shop2?'#5a3a8a':o.shop?'#7a4a00':mine?'#b4401a':'#6b3f1d';x.textAlign='center';x.textBaseline='middle';
+        const fs=W*signFs(nm)/100;x.font=`bold ${fs}px ${FONT}`;x.fillStyle=o.ctr?'#3f6b2a':o.shop2?'#5a3a8a':o.shop?'#7a4a00':mine?'#b4401a':'#6b3f1d';x.textAlign='center';x.textBaseline='middle';
         const L=signLines(nm);
         const cy=top+sh2*.36;L.forEach((t,k)=>x.fillText(t,hx*sx,cy+(k-(L.length-1)/2)*fs*1.12))}}
   }
@@ -3257,6 +3283,91 @@ function adminStarSec(d){const S=d.star||DB.star,E=S&&+S.start?{start:+S.start,e
 function adminStarBind(){const go=async(on,b)=>{if(!armBtn(b,on?'確定開始？':'確定結束？'))return;try{const r=await adminCall('adminStar',{on:on?1:0});DB.star=r;updStarBtn();toast(on?'⭐ 星寶活動開始了！':'星寶活動結束了');adminSheet()}catch(e){toast(e.message)}};
   if($('#astar1'))$('#astar1').onclick=e=>go(1,e.currentTarget);if($('#astar0'))$('#astar0').onclick=e=>go(0,e.currentTarget)}
 
+// ================= 🏛️ 島民中心（v1.65） =================
+// 小島右下（第 16 塊地）。裡面：背景＋櫃檯＋工讀生（預設 Amy，島主可改，最多 3 位）；軟木板貼島主公告
+// 服務：📮 寫信給島主、🏗️ 申請都更／📐 擴建（還沒開放，先鎖著）
+const CENTER_SLOT=15,CENTER_STAFF_MAX=3,CTR={x:424,y:1010,w:560},CBOARD=[418,355,718,585];
+const CENTER_STAFF0=[{id:'c1',name:'Amy',img:'assets/center_npc_idle.webp',img2:'assets/center_npc_wave.webp',about:''}];
+const CSTAFF_POS=[{x:424,y:880,h:280},{x:160,y:1150,h:270},{x:690,y:1160,h:270}];
+const CENTER_SAY=['歡迎來到島民中心！','有什麼需要幫忙的嗎？','想跟島主說的話，都可以寫信喔','今天的公告看了嗎？','都更和擴建還在準備中，敬請期待！','我是 Amy，請多指教 🐷'];
+// 島民中心的位置：第 16 塊地（如果那塊已經有人蓋了，就退回沙灘上的預留位置）
+function centerPos(){const taken=DB.houses.some(h=>!isShopH(h)&&+h.slot===CENTER_SLOT);return taken?CENTER_POS:{x:SLOTS[CENTER_SLOT][0],y:SLOTS[CENTER_SLOT][1]}}
+const centerStaff=()=>{const L=DB.center&&Array.isArray(DB.center.staff)?DB.center.staff.filter(x=>x&&x.name):[];return (L.length?L:CENTER_STAFF0).slice(0,CENTER_STAFF_MAX)};
+const noticeLeft=n=>{if(!n||!+n.until)return '';const m=Math.max(0,Math.floor((+n.until-Date.now())/60000)),d=Math.floor(m/1440),h=Math.floor(m%1440/60);return d?`${d} 天 ${h} 小時`:h?`${h} 小時`:`${m%60} 分鐘`};
+let cEls=[];
+function openCenter(){sfx&&sfx('tap');let v=$('#centerv');if(v)v.remove();v=document.createElement('div');v.id='centerv';v.className='centerv';
+  const n=DB.notice&&DB.notice.t?DB.notice:null;
+  v.innerHTML=`<div class="chead"><button class="pill" id="cback">← 小島</button><div class="ctitle">島民中心<small>大家的服務處</small></div><span style="width:84px"></span></div>
+    <div class="cwrap"><div class="cstage" id="cstage"><img class="cbg" src="assets/room_center.webp" alt="">
+      <button class="cboard noic" id="cboard" style="left:${CBOARD[0]/RW*100}%;top:${CBOARD[1]/RH*100}%;width:${(CBOARD[2]-CBOARD[0])/RW*100}%;height:${(CBOARD[3]-CBOARD[1])/RH*100}%">
+        ${n?`<span class="cnote"><b>👑 島主公告</b>${esc(n.t)}</span>`:'<span class="cnote empty">目前沒有公告</span>'}</button></div></div>
+    <div class="cbtns"><button class="act" id="cmail">${mic('mail',22)}寫信給島主</button><button class="act lockd" id="crenew"><img class="mic" src="assets/icon_renew.webp" alt="">都更</button><button class="act lockd" id="cexp"><img class="mic" src="assets/icon_expand.webp" alt="">擴建</button></div>`;
+  document.body.appendChild(v);renderCenterStaff();
+  $('#cback').onclick=closeCenter;$('#cmail').onclick=()=>mailAdminSheet();$('#crenew').onclick=()=>centerLocked('都更');$('#cexp').onclick=()=>centerLocked('擴建');
+  $('#cboard').onclick=()=>{const n=DB.notice&&DB.notice.t?DB.notice:null;openModal(n?`<div class="ncard"><div class="ncrown">👑</div><h3>島主公告</h3><p>${esc(n.t)}</p><small>${n.at?ago(+n.at):''}${noticeLeft(n)?`・還會貼 ${noticeLeft(n)}`:''}</small></div><div class="row2"><button data-close class="primary">知道了</button></div>`:`<h3>📌 公告欄</h3><p class="lead" style="text-align:center">目前沒有公告，島主貼新公告時會出現在這裡</p><div class="row2"><button data-close class="primary">好</button></div>`)};
+  try{call('ping',{playerId:DB.me&&DB.me.id,where:'center'},true).catch(()=>{})}catch(e){}}
+function closeCenter(){const v=$('#centerv');if(v)v.remove();cEls=[];renderIsland()}
+function renderCenterStaff(){const st=$('#cstage');if(!st)return;st.querySelectorAll('.staff,.counter').forEach(x=>x.remove());cEls=[];
+  centerStaff().forEach((s,i)=>{const P=CSTAFF_POS[i]||CSTAFF_POS[0],el=document.createElement('button');el.className='staff noic';el.setAttribute('aria-label','工讀生 '+s.name);
+    el.innerHTML=`<img src="${esc(s.img||CENTER_STAFF0[0].img)}" alt="" onerror="this.onerror=null;this.src='${CENTER_STAFF0[0].img}'"><span class="snm cs">${esc(s.name)}</span>`;
+    Object.assign(el.style,hp(P.x,P.y),{height:(P.h/RH*100)+'%',zIndex:Math.round(P.y)});el.onclick=e=>{e.stopPropagation();centerTap(i)};st.appendChild(el);cEls[i]=el});
+  const c=document.createElement('button');c.className='counter noic';c.setAttribute('aria-label','服務櫃檯');c.innerHTML='<img src="assets/center_counter.webp" alt="">';
+  Object.assign(c.style,hp(CTR.x,CTR.y),{width:(CTR.w/RW*100)+'%',zIndex:CTR.y});c.onclick=e=>{e.stopPropagation();centerTap(0)};st.appendChild(c)}
+function centerSay(i,text){const el=cEls[i];if(!el||!el.isConnected)return;const s=centerStaff()[i]||{};
+  const own=String(s.about||'').split('\n').map(x=>x.trim()).filter(Boolean),L=own.length&&Math.random()<.6?own:CENTER_SAY,t=text||L[Math.floor(Math.random()*L.length)];
+  el.querySelectorAll('.say').forEach(x=>x.remove());const b=document.createElement('div');b.className='say';b.textContent=t;el.appendChild(b);setTimeout(()=>{b.classList.add('out');setTimeout(()=>b.remove(),400)},4000)}
+function centerTap(i){const s=centerStaff()[i]||CENTER_STAFF0[0],el=cEls[i];sfx&&sfx('tap');
+  if(el&&s.img2){const im=el.querySelector('img');im.src=s.img2;clearTimeout(el._t);el._t=setTimeout(()=>{if(im.isConnected)im.src=s.img||CENTER_STAFF0[0].img},2600)}
+  centerSay(i);centerMenu(s)}
+function centerMenu(s){openModal(`<div class="mqd"><img src="${esc(s.img2||s.img||CENTER_STAFF0[0].img2)}" alt="" style="width:120px"><div class="mqbub">我是 ${esc(s.name)}，有什麼可以幫你的嗎？</div></div>
+  <div class="cmenu"><button id="cm1">${mic('mail',30)}<span><b>寫信給島主</b><small>回報問題、建議、許願</small></span></button>
+    <button id="cm2" class="lockd"><img class="mic" src="assets/icon_renew.webp" alt=""><span><b>申請都更・外牆整修</b><small>🔒 準備中</small></span></button>
+    <button id="cm3" class="lockd"><img class="mic" src="assets/icon_expand.webp" alt=""><span><b>申請擴建</b><small>🔒 準備中</small></span></button>
+    <button id="cm4"><span class="mic">📌</span><span><b>看公告</b><small>${DB.notice&&DB.notice.t?'島主有新公告喔':'目前沒有公告'}</small></span></button></div>
+  <div class="row2"><button data-close>掰掰</button></div>`);
+  $('#cm1').onclick=()=>mailAdminSheet();$('#cm2').onclick=()=>centerLocked('都更');$('#cm3').onclick=()=>centerLocked('擴建');$('#cm4').onclick=()=>{closeModal();$('#cboard')&&$('#cboard').click()}}
+function centerLocked(k){openModal(`<div style="text-align:center"><img src="assets/icon_${k==='擴建'?'expand':'renew'}.webp" alt="" style="width:90px"><h3>🔒 ${k}還在準備中</h3><p class="lead">${k==='擴建'?'之後可以加蓋二樓（Lv15 以上、🪙1000、島主審核）':'之後可以換房子的外觀（Lv7 以上、🪙300、島主審核）'}<br>敬請期待！</p></div><div class="row2"><button data-close class="primary">好</button></div>`)}
+// 工讀生在島民中心走來走去（跟毛二街店員一樣）
+setInterval(()=>{if(!$('#centerv')||document.hidden)return;cEls.forEach((el,i)=>{if(!el||!el.isConnected||el._busy||Math.random()<.45)return;const P=CSTAFF_POS[i]||CSTAFF_POS[0],cx=el._x==null?P.x:el._x,cy=el._y==null?P.y:el._y;let tx,ty;
+  if(el._away&&Math.random()<.6){tx=P.x;ty=P.y;el._away=0}else if(i===0){tx=250+Math.random()*350;ty=P.y;el._away=1}else{tx=140+Math.random()*560;ty=1060+Math.random()*130;el._away=1}
+  const d=Math.hypot(tx-cx,ty-cy);if(d<30)return;const dur=d/110;el._busy=1;el._x=tx;el._y=ty;el.classList.toggle('flip',tx<cx);el.classList.add('walking');
+  el.style.transition=`left ${dur}s linear,top ${dur}s linear`;el.style.zIndex=Math.round(Math.max(cy,ty));Object.assign(el.style,hp(tx,ty));
+  setTimeout(()=>{el._busy=0;el.classList.remove('walking');if(!el._away)el.classList.remove('flip');el.style.zIndex=Math.round(ty)},dur*1000)})},4000);
+// ---------- 👑 島主：工讀生設定 ----------
+const PROMPT_CSTAFF='可愛的 3D 黏土風工讀生角色，［寫你想要的樣子，例如：穿黃色背心、掛名牌的小豬］，全身、正面站立，［待機：微笑揮手／打招呼：開心拿著筆和板子］，跟 Amy 一樣的比例和畫風，純綠色背景 #00FF00，沒有文字';
+function adminCenterSec(){const L=centerStaff();return `<div class="sec adm"><h4>🏛️ 島民中心工讀生<span>${L.length} / ${CENTER_STAFF_MAX}</span></h4>
+  ${L.map((s,i)=>`<div class="frow"><span><img src="${esc(s.img||CENTER_STAFF0[0].img)}" alt="" style="width:34px;height:34px;object-fit:contain;vertical-align:middle"> <b>${esc(s.name)}</b></span><span><button class="mini" data-cse="${i}">編輯</button>${L.length>1?` <button class="mini" data-csd="${i}">移除</button>`:''}</span></div>`).join('')}
+  <div class="row2">${L.length<CENTER_STAFF_MAX?'<button id="csadd">＋ 新增工讀生</button>':''}<button id="csgo">🏛️ 去島民中心看看</button></div></div>`}
+function adminCenterBind(){document.querySelectorAll('[data-cse]').forEach(b=>b.onclick=()=>cStaffForm(+b.dataset.cse));
+  document.querySelectorAll('[data-csd]').forEach(b=>b.onclick=async e=>{if(!armBtn(e.currentTarget,'確定移除？'))return;const L=centerStaff().filter((x,j)=>j!==+b.dataset.csd);if(await saveCStaff(L)){toast('移除了');adminSheet()}});
+  if($('#csadd'))$('#csadd').onclick=()=>cStaffForm(-1);$('#csgo').onclick=()=>{closeModal();openCenter()}}
+async function saveCStaff(L){try{const r=await adminCall('adminCenter',{staff:L});DB.center=Object.assign({},DB.center||{},{staff:r&&r.staff||L});if($('#centerv'))renderCenterStaff();return true}catch(e){toast(e.message);return false}}
+function cStaffForm(i){const L=centerStaff().map(x=>Object.assign({},x)),isNew=i<0,st=isNew?{id:uid(),name:'',img:'',img2:'',about:''}:L[i];
+  openModal(`<h3>${isNew?'＋ 新增工讀生':'✏️ 編輯 '+esc(st.name)}</h3>
+    ${fld('csn','名字',`<input id="csn" maxlength="8" value="${esc(st.name)}" placeholder="例如：Amy">`)}
+    ${fld('csa','會說的話',`<textarea id="csa" rows="3" maxlength="90" placeholder="一行一句，最多 3 句">${esc(st.about||'')}</textarea>`,'沒填的話會說預設的招呼語')}
+    <div class="field"><div class="flabel">角色圖（綠底圖，會自動去背）</div>
+      <details><summary>看畫圖指令</summary><div class="prompt">${esc(PROMPT_CSTAFF)}</div></details>
+      <div class="photo" style="margin-top:8px"><div class="pv check" id="csp1"><img src="${esc(st.img||CENTER_STAFF0[0].img)}" alt=""></div><div class="info" id="csi1">站著的圖<div class="btns"><label>⬆️ 上傳<input type="file" accept="image/*" id="csf1" hidden></label></div></div></div>
+      <div class="photo" style="margin-top:8px"><div class="pv check" id="csp2">${st.img2?`<img src="${esc(st.img2)}" alt="">`:'👋'}</div><div class="info" id="csi2">打招呼的圖（選填）<div class="btns"><label>⬆️ 上傳<input type="file" accept="image/*" id="csf2" hidden></label></div></div></div>
+      ${!isNew?'<div class="row2"><button id="csdef">↺ 換回 Amy 的圖</button></div>':''}</div>
+    <div class="err" id="cserr"></div>
+    <div class="row2 sticky"><button id="csback">返回</button><button class="primary" id="csok">${isNew?'加入':'儲存'}</button></div>`);
+  $('#csback').onclick=adminSheet;
+  const up=k=>async e=>{const f=e.target.files[0];if(!f)return;const info=$('#csi'+k).firstChild;info.textContent='處理中…';
+    try{const r=await makeBody(f);st['img'+(k===2?'2':'')]=r.url;$('#csp'+k).innerHTML=`<img src="${r.url}" alt="">`;info.textContent=r.mode==='green'?'✅ 已去掉綠色背景':r.mode==='alpha'?'✅ 透明背景':'⚠️ 這好像不是綠底圖'}catch(x){info.textContent='這張圖讀不了，換一張試試'}};
+  $('#csf1').onchange=up(1);$('#csf2').onchange=up(2);
+  if($('#csdef'))$('#csdef').onclick=()=>{st.img=CENTER_STAFF0[0].img;st.img2=CENTER_STAFF0[0].img2;$('#csp1').innerHTML=`<img src="${st.img}" alt="">`;$('#csp2').innerHTML=`<img src="${st.img2}" alt="">`};
+  $('#csok').onclick=async e=>{const name=$('#csn').value.trim();if(!name)return $('#cserr').textContent='幫工讀生取個名字';const btn=e.target;btn.disabled=true;
+    try{st.name=name;st.about=$('#csa').value.split('\n').map(x=>x.trim()).filter(Boolean).slice(0,3).join('\n');if(!st.img)st.img=CENTER_STAFF0[0].img;
+      if(ONLINE)for(const k of ['img','img2'])if(String(st[k]||'').startsWith('data:')){btn.textContent='上傳圖片…';st[k]=(await call('upload',Object.assign(cred(),{dataUrl:st[k]}))).url}
+      const list=isNew?L.concat([st]):L.map((x,j)=>j===i?st:x);
+      if(await saveCStaff(list)){toast(isNew?`${name} 來上班了 🏛️`:'存好了');adminSheet()}else{btn.disabled=false;btn.textContent=isNew?'加入':'儲存'}}
+    catch(x){$('#cserr').textContent=x.message;btn.disabled=false;btn.textContent=isNew?'加入':'儲存'}};
+}
+// 公告到期就自動拿掉（每分鐘檢查）
+setInterval(()=>{const n=DB.notice;if(n&&+n.until&&Date.now()>+n.until){DB.notice=null;try{tickerShow();updBell()}catch(e){}}},60000);
+
 // ================= 頁尾與啟動 =================
 function renderFoot(){
   $('#inote').textContent=ONLINE?'':'試做版：資料只存在這支手機的瀏覽器裡，別人看不到。';
@@ -3371,7 +3482,8 @@ async function adminSheet(){
   <div class="sec adm"><h4>🔑 邀請碼<span>${(d.invites||[]).filter(x=>!x.usedBy&&!x.void).length} 組可用</span></h4><p class="lead">每組只能用一次，給要蓋房子的朋友</p>
     <div class="row2"><input id="ainn" maxlength="20" placeholder="備註（例如：給小明）"><button id="ainb">產生 1 組</button></div>
     <div class="invl">${(d.invites||[]).slice(0,30).map(x=>`<div class="frow"><span><b class="code">${esc(x.code)}</b><small>${x.usedBy?`已被 ${esc(x.usedNick||'')} 使用`:x.void?'已作廢':'未使用'}${x.note?'・'+esc(x.note):''}</small></span>${!x.usedBy&&!x.void?`<span><button class="mini" data-icp="${esc(x.code)}">複製</button> <button class="mini" data-ivd="${esc(x.code)}">作廢</button></span>`:''}</div>`).join('')||'<div class="locked">還沒有邀請碼</div>'}</div></div>
-  <div class="sec adm"><h4>📣 公告（跑馬燈置頂）</h4><input id="an" maxlength="60" placeholder="留空＝取消公告" value="${esc(d.notice&&d.notice.t||'')}"><label class="chk"><input type="checkbox" id="anp"> 📲 同時推播給大家</label><div class="row2"><button id="anb">更新公告</button></div></div>
+  <div class="sec adm"><h4>📣 公告<span>${d.notice&&d.notice.t?(+d.notice.until?(Date.now()<+d.notice.until?'還會貼 '+noticeLeft(d.notice):'已到期'):'一直顯示'):'沒有公告'}</span></h4><p class="lead">會貼在島民中心的公告欄、通知、跑馬燈；到期自動撤下</p><input id="an" maxlength="60" placeholder="寫公告內容" value="${esc(d.notice&&d.notice.t&&!(+d.notice.until&&Date.now()>+d.notice.until)?d.notice.t:'')}">
+    <div class="row2" style="margin-top:6px"><select id="andays"><option value="1">貼 1 天</option><option value="3" selected>貼 3 天</option><option value="7">貼 7 天</option><option value="0">一直顯示</option></select></div><label class="chk"><input type="checkbox" id="anp"> 📲 同時推播給大家</label><div class="row2"><button id="anb" class="primary">貼上公告</button>${d.notice&&d.notice.t?'<button id="anx" class="danger">撤下公告</button>':''}</div></div>
   <div class="sec adm"><h4>✨ 雙倍日</h4><p class="lead">今天${d.dbl===todayTW()?'<b>是</b>':'不是'}雙倍日（金幣、愛心值、撿到的錢都 ×2，到半夜 12 點結束）</p><div class="row2"><button id="adb">${d.dbl===todayTW()?'關掉雙倍日':'今天開雙倍日'}</button></div></div>
   <div class="sec adm"><h4>💰 撒錢</h4><p class="lead">島上現在有 ${d.drops} 個錢袋還沒被撿</p>
     <div class="row2"><select id="arh"><option value="">隨機幾家</option>${hs}</select><input id="arn" type="number" min="1" max="10" value="3" style="max-width:80px" aria-label="幾袋"></div>
@@ -3390,6 +3502,7 @@ async function adminSheet(){
     <div class="row2"><select id="alr"></select></div><p class="lead" id="alrh" style="margin:0"></p>
     <div class="row2"><button id="alsend">寄出</button></div></div>
   <div class="sec adm"><h4>🙋 玩家列表<span>${d.players.length} 人・🔔 ${d.players.filter(p=>p.pushSt==='on').length} 人有開通知・全島 🪙${d.players.reduce((a,p)=>a+(+p.coins||0),0).toLocaleString()}</span></h4><p class="lead">照金幣多到少排，點 ⚙️ 可以改金幣、轉移碼<br>🔔 收得到通知・🔕 沒開・📲 還沒加主畫面・❔ 還沒更新到新版</p><div class="plist">${d.players.slice().sort((a,b)=>(+b.coins||0)-(+a.coins||0)).map(p=>`<div class="frow"><span>${pushIc(p)}${esc(p.nick)}<small>${p.house?esc(p.house):'沒有家'}・Lv.${p.lv}・🪙${p.coins}${p.createdAt?'・'+new Date(p.createdAt).toLocaleDateString('zh-TW',{month:'numeric',day:'numeric'})+' 加入':''}</small></span><span>${p.house?'':`<button class="mini danger" data-dpl="${p.id}">刪除</button> `}<button class="mini" data-code="${esc(p.code)}">${esc(p.code)||'—'}</button> <button class="mini" data-apl="${p.id}" aria-label="管理">⚙️</button></span></div>`).join('')}</div><p class="lead">點轉移碼可以複製，傳給換手機的朋友</p></div>
+  ${adminCenterSec()}
   ${adminStarSec(d)}
   <div class="sec adm"><h4>👔 毛二街店長<span>最多 ${SHOP_MGR_MAX} 位</span></h4><p class="lead">店長可以換店的背景、擺玩具、管理店員（最多 ${SHOP_STAFF_MAX} 位）</p>
     ${[0,1].map(i=>{const cur=(d.shopMgr||shopMgrs())[i]||'';return `<div class="row2"><select id="asm${i}"><option value="">（不指派）</option>${d.players.filter(p=>p.houseId).map(p=>`<option value="${p.id}" ${p.id===cur?'selected':''}>${esc(p.nick)}${p.house?'（'+esc(p.house)+'）':''}</option>`).join('')}</select></div>`}).join('')}
@@ -3399,7 +3512,7 @@ async function adminSheet(){
     <div class="row2"><button id="ahrb" class="danger">收回成空地</button></div><p class="lead">收回會刪掉這個家的毛孩和紀錄，不能復原</p></div>
   <div class="row2"><button id="aout">登出島主</button><button data-close class="primary">關閉</button></div>`);
   const S=$('#sheet'),ok=m=>{toast(m);sync(true)};
-  adminStarBind();
+  adminStarBind();adminCenterBind();
   $('#asmb').onclick=async()=>{const ids=[...new Set([$('#asm0').value,$('#asm1').value].filter(Boolean))];try{await adminCall('adminShopMgr',{ids});const sh=house(SHOP_ID);if(sh)sh.mgr=ids;ok(ids.length?'店長指派好了 👔':'店長都拿掉了')}catch(e){toast(e.message)}};
   $('#amail').onclick=adminMailSheet;
   call('adminMailList',{adminPw:adminPw(),playerId:DB.me&&DB.me.id},true).then(L=>{if(!Array.isArray(L)||!$('#amail'))return;const un=L.filter(m=>!m.read);if(!un.length)return;
@@ -3407,7 +3520,8 @@ async function adminSheet(){
     const box=$('#amprev');if(!box)return;
     box.innerHTML=un.slice(0,3).map(m=>`<button class="mrow unread" data-pmid="${m.id}"><span class="mt">${mic(m.type in MAILN?m.type:'talk',30)}</span><span class="mn">${m.anon?'🙈 匿名':esc(m.nick)}<small>${esc(m.text.slice(0,24))}${m.text.length>24?'…':''}${m.img?' 📷':''}</small></span><span class="ago">${ago(m.at)}</span></button>`).join('')+(un.length>3?`<div class="lead" style="text-align:center;margin:0">還有 ${un.length-3} 封未讀，點上面「島民來信」看全部</div>`:'');
     box.querySelectorAll('[data-pmid]').forEach(b=>b.onclick=()=>adminMailOne(L.find(m=>m.id===b.dataset.pmid)))}).catch(()=>{});
-  $('#anb').onclick=async()=>{const t=$('#an').value.trim();try{await adminCall('adminNotice',{text:t,push:!!($('#anp')&&$('#anp').checked)});DB.notice=t?{t}:null;fi=0;tickerShow();ok(t?'公告更新了 📣':'公告取消了')}catch(e){toast(e.message)}};
+  $('#anb').onclick=async()=>{const t=$('#an').value.trim();if(!t)return toast('先寫公告內容');const days=+$('#andays').value;try{await adminCall('adminNotice',{text:t,days,push:!!($('#anp')&&$('#anp').checked)});const at=Date.now();DB.notice={t,at,until:days?at+days*864e5:0};fi=0;tickerShow();ok('公告貼上了 📣');adminSheet()}catch(e){toast(e.message)}};
+  if($('#anx'))$('#anx').onclick=async e=>{if(!armBtn(e.currentTarget,'確定撤下？'))return;try{await adminCall('adminNotice',{text:''});DB.notice=null;fi=0;tickerShow();ok('公告撤下了');adminSheet()}catch(x){toast(x.message)}};
   $('#adb').onclick=async()=>{const on=d.dbl!==todayTW();try{await adminCall('adminDouble',{on});DB.dbl=on?todayTW():'';updHud();ok(on?'今天是雙倍日了 ✨':'雙倍日關掉了');adminSheet()}catch(e){toast(e.message)}};
   $('#arb').onclick=async()=>{try{await adminCall('adminRain',{houseId:$('#arh').value,n:+$('#arn').value||1,amt:+$('#ara').value||0});ok('撒好了，等大家去撿 💰');adminSheet()}catch(e){toast(e.message)}};
   const OWN=d.owned||DB.owned||{},roomOpts=()=>{const own=new Set(OWN[$('#agp').value]||[]),L=CARDS.filter(c=>!c.limitedOnly),A=L.filter(c=>!own.has(c.id));$('#agr').innerHTML=`<option value="">🏠（不送房間）</option>`+A.map(c=>`<option value="${c.id}">${esc(c.name)}${c.r==='H'?'（隱藏版）':''}</option>`).join('');$('#agrh').textContent=A.length?`這個家已經有 ${L.length-A.length} / ${L.length} 間，清單只列還沒有的`:'這個家所有房間都有了'};
@@ -3693,7 +3807,7 @@ function announceLetters(){if(!DB.me)return;let seen=[];try{seen=JSON.parse(loca
     sfx('gift');$('#lgopen').onclick=()=>openLetter(nw[0].id,()=>$('#bell').click())};
   setTimeout(go,1800)}
 // ================= 自動更新：發現新版本就重新載入 =================
-const APP_VER='v1.64';
+const APP_VER='v1.65';
 function checkUpdate(){
   if(!/^https?:/.test(location.protocol)||!API_URL)return;
   if(!$('#modal').classList.contains('hidden'))return; // 正在填表單時不打斷
