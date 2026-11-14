@@ -998,7 +998,10 @@ function save(){
 }
 // ---------- 連線 ----------
 async function api(action,payload){
-  const res=await fetch(API_URL,{method:'POST',body:JSON.stringify(Object.assign({action},payload||{}))});
+  // 最多等 30 秒（上傳照片 60 秒），不會一直卡在「處理中」
+  const ac=typeof AbortController!=='undefined'?new AbortController():null,tm=ac&&setTimeout(()=>ac.abort(),action==='upload'?60000:30000);let res;
+  try{res=await fetch(API_URL,{method:'POST',body:JSON.stringify(Object.assign({action},payload||{})),signal:ac?ac.signal:undefined})}
+  catch(e){if(e&&e.name==='AbortError')throw new Error('小島回應太慢了，等一下再試一次');throw e}finally{clearTimeout(tm)}
   const j=await res.json();if(!j.ok)throw new Error(j.error||'連線失敗');return j.data;
 }
 let lastTap=null;document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest('#sheet button');if(b)lastTap=b},true);
@@ -1127,6 +1130,7 @@ const LOCAL={
   shopStaff({staff}){house(SHOP_ID).staff=staff;return {staff}},
   adminShopMgr({ids}){house(SHOP_ID).mgr=ids;return {mgr:ids}},
   adminStar({on}){const t=Date.now();DB.star=on?{start:t,end:t+14*864e5}:Object.assign({},DB.star||{},{end:t});if(on)feedPush('⭐ 探險家毛球來到島上了！他好像在找什麼……');return DB.star},
+  starNote({n}){if(+n===5)feedPush(`⭐ ${DB.me.nick} 已經幫毛球找到一半的星寶了！`);return true},
   starClaim({n}){const E=starEv();if(!E||!E.on)throw new Error('活動已經結束了');if(DB.starDone)throw new Error('你已經領過了');if(+n<STAR_GOAL)throw new Error('星寶還沒找齊喔');return {coins:STAR_COINS,room:STAR_ROOM}},
   deleteHouse({houseId}){const ids=petsOf(houseId).map(p=>p.id);DB.pets=DB.pets.filter(p=>p.houseId!==houseId);['weights','medical','expenses'].forEach(k=>DB[k]=DB[k].filter(x=>!ids.includes(x.petId)));
     DB.notes=DB.notes.filter(n=>n.houseId!==houseId);const h=house(houseId);DB.houses=DB.houses.filter(x=>x.id!==houseId);feedPush(`${DB.me.nick} 拆掉了「${h.name}」`);return true},
@@ -1405,7 +1409,7 @@ function checkAdminGifts(){const L=myGiftsUnopened().filter(g=>g.admin);if(!L.le
     $('#aggo').onclick=()=>{closeModal();openHome(myHouse().id)}},1000)}
 
 // ================= 小島 =================
-const HOUSE_W=150,LOT_W=110,SHOP_IMG=true;let mode='auto',picking=false;
+const HOUSE_W=150,LOT_W=110,SHOP_IMG=true,SHOP_SC=1.25;let mode='auto',picking=false;   // SHOP_SC：毛毛商店、毛二街比一般房子大一點
 function taipeiHour(){try{return +new Intl.DateTimeFormat('en-US',{timeZone:'Asia/Taipei',hour:'numeric',hour12:false}).format(new Date())%24}catch(e){return new Date().getHours()}}
 function autoPeriod(){const h=taipeiHour();return h>=5&&h<7?'dawn':h>=7&&h<17?'day':h>=17&&h<19?'sunset':'night'}
 const period=()=>mode==='auto'?autoPeriod():mode;
@@ -1430,10 +1434,10 @@ function renderIsland(){
     if(h&&petsOf(h.id).some(pp=>isBirthday(pp.birthday))){const bb=document.createElement('div');bb.className='bubble';bb.textContent='🎂';Object.assign(bb.style,ipct(x+40,y-150),{zIndex:2001});box.appendChild(bb)}
   });
   {const sp=SHOP_POS,el=document.createElement('div');el.className='thing';el.setAttribute('role','button');el.tabIndex=0;el.setAttribute('aria-label','毛毛商店');
-    Object.assign(el.style,ipct(sp.x,sp.y),{width:(HOUSE_W/1024*100)+'%',zIndex:sp.y});el.innerHTML=`<img src="assets/${SHOP_IMG?'shop':'house'+sp.style}_${p}.webp" alt="" onerror="this.src='assets/house${sp.style}_${p}.webp'">`;el.onclick=()=>shopSheet();box.appendChild(el);
+    Object.assign(el.style,ipct(sp.x,sp.y),{width:(HOUSE_W*SHOP_SC/1024*100)+'%',zIndex:sp.y});el.innerHTML=`<img src="assets/${SHOP_IMG?'shop':'house'+sp.style}_${p}.webp" alt="" onerror="this.src='assets/house${sp.style}_${p}.webp'">`;el.onclick=()=>shopSheet();box.appendChild(el);
     box.appendChild(signEl('毛毛商店',sp.x,sp.y,'shop'))}
   {const sp=SHOP2_POS,sh=house(SHOP_ID),el=document.createElement('div');el.className='thing';el.setAttribute('role','button');el.tabIndex=0;el.setAttribute('aria-label','毛二街');
-    Object.assign(el.style,ipct(sp.x,sp.y),{width:(HOUSE_W/1024*100)+'%',zIndex:sp.y});el.innerHTML=`<img src="assets/shop2_${p}.webp" alt="" onerror="this.src='assets/shop2_day.webp'">`;el.onclick=()=>sh?openHome(SHOP_ID):toast('毛二街還在裝潢中，等島主更新後端 🛠️');box.appendChild(el);
+    Object.assign(el.style,ipct(sp.x,sp.y),{width:(HOUSE_W*SHOP_SC/1024*100)+'%',zIndex:sp.y});el.innerHTML=`<img src="assets/shop2_${p}.webp" alt="" onerror="this.src='assets/shop2_day.webp'">`;el.onclick=()=>sh?openHome(SHOP_ID):toast('毛二街還在裝潢中，等島主更新後端 🛠️');box.appendChild(el);
     box.appendChild(signEl('毛二街',sp.x,sp.y,'shop2'));
     if(sh&&guestsOf(SHOP_ID).length){const gb=document.createElement('div');gb.className='bubble';gb.textContent='🐾';Object.assign(gb.style,ipct(sp.x-40,sp.y-150),{zIndex:2001});box.appendChild(gb)}}
   $('#pickbar').classList.toggle('hidden',!picking);$('#ticker').classList.toggle('hidden',picking);
@@ -1754,7 +1758,7 @@ function renderFloor(){
     Object.assign(te.style,hp(sp.x-tw/2,sp.y-tw*0.98),{width:(tw/RW*100)+'%',zIndex:Math.round(sp.y)});
     te.onclick=e=>{e.stopPropagation();sleepMenu(r,p)};
     r.tentEl=te;r.tent=sp;f.appendChild(te);r.sleep=undefined;petLook(r);placePet(r)});
-  if(isShopH(h))renderStaff(f,h);else renderStar(f,h);
+  if(isShopH(h)){renderStaff(f,h);lastStarSig=starSig()}else renderStar(f,h);
   $('#home').classList.toggle('placing',!!placing);if(placing)drawGrid();else if($('#gcancel'))$('#gcancel').remove();
 }
 // 外觀：餓到縮小、生氣（每幾秒算一次）
@@ -1796,7 +1800,7 @@ function tick(now){
   home.pets.forEach(r=>{if(!r.el)return;const p=pet(r.id);if(!p)return;
     if(r.sleep){placePet(r);return}
     if(r.state==='idle'&&now>r.until&&!r.anim){
-      const hungry=!r.demon&&isHungry(p)&&!home.bowl;
+      const hungry=!r.demon&&!r.guest&&isHungry(p)&&!home.bowl;
       if(r.demon){r.di=DEMON_IMG[Math.floor(Math.random()*2)];r.dw=DEMON_WALK[Math.floor(Math.random()*2)]}
       if(r.angry&&Math.random()<0.3){startAnim(r,'stomp');r.until=now+2600;fx('💢',r.x+30,r.y-190*petScale(r.y));if(Math.random()<0.6)petSay(r,null,['哼！','哼！不理你','生氣氣💢'][Math.floor(Math.random()*3)]);placePet(r);return}
       const a=hungry&&Math.random()<0.6?'stare':pickAct(p);
@@ -1862,7 +1866,8 @@ function feedNow(only){
   const cand=only?[only]:home.pets.filter(r=>!r.guest),full=[],eat=[],nap=[];
   cand.forEach(r=>{const p=pet(r.id);if(!p)return;if(canEat(p))full.push(p.name);else if(r.sleep)nap.push(r);else eat.push(r)});
   const away=only?[]:petsOf(h.id).filter(p=>{const o=outAt(p.id);return o&&o.id!==h.id&&fullness(p)<80});
-  const awayMsg=away.length?`${away.map(p=>p.name).join('、')} 在外面玩，叫牠回家才能吃`:'';
+  const gh=only?[]:home.pets.filter(r=>r.guest&&pet(r.id)&&fullness(pet(r.id))<80).map(r=>pet(r.id).name);
+  const awayMsg=[away.length?`${away.map(p=>p.name).join('、')} 在外面玩，叫牠回家才能吃`:'',gh.length?`${gh.join('、')} 是來玩的，要回自己家才能吃喔`:''].filter(Boolean).join('；');
   if(eat.length&&home.bowl){if(!nap.length)return toast('碗裡還有飯喔，等牠們吃完');eat.length=0}
   if(!eat.length&&!nap.length){if(!full.length)return toast(awayMsg||'現在沒有毛孩要吃飯');
     return toast((only?`${full[0]} 還飽飽的，晚點再餵`:full.length===cand.length?'大家都吃飽飽了～':`${full.join('、')} 還飽飽的`)+(awayMsg?'；'+awayMsg:''))}
@@ -2422,7 +2427,7 @@ function homeGuide(auto,then){
 (function(){if(!hgDue())return;let tries=0;const t=setInterval(()=>{if(++tries>60||!hgDue())return clearInterval(t);if(!$('#modal').classList.contains('hidden')||document.querySelector('.gacha'))return;clearInterval(t);homeGuide(true)},1200)})();
 
 // ================= 毛毛商店・背包・零食・禮物 =================
-const SHOP_POS={x:203,y:1074,style:6};
+const SHOP_POS={x:263,y:1144,style:6};
 const ITEMS={
   fish:{name:'小魚乾',emo:'🐟',kind:'treat',price:15,fav:['貓']},
   meat:{name:'肉泥',emo:'🥫',kind:'treat',price:20,fav:['貓']},
@@ -2964,7 +2969,7 @@ async function snapshot(){
     title='毛毛島';const pr=period(),sx=W/1024,sy=H/1536;const lb0=document.querySelector('.label'),kk=W/((lb0&&lb0.parentElement&&lb0.parentElement.clientWidth)||390),fsI=Math.min(13,Math.max(10,(document.documentElement.clientWidth||390)*0.027))*kk;
     const bg=await loadImg(`assets/island2_${pr}.webp`);if(bg)x.drawImage(bg,0,bg.naturalHeight*0.12524,bg.naturalWidth,bg.naturalHeight*0.73988,0,0,W,H);const signImg=await loadImg('assets/sign.webp');
     const used=new Map(DB.houses.filter(hh=>!isShopH(hh)).map(hh=>[hh.slot,hh])),items=SLOTS.map((s,i)=>({s,h:used.get(i)})).filter(o=>o.h).concat([{s:[SHOP_POS.x,SHOP_POS.y],shop:true}]).concat(house(SHOP_ID)?[{s:[SHOP2_POS.x,SHOP2_POS.y],shop2:true}]:[]).sort((a,b)=>a.s[1]-b.s[1]);
-    for(const o of items){const [hx,hy]=o.s,im=await loadImg(o.shop2?`assets/shop2_${pr}.webp`:o.shop?`assets/${SHOP_IMG?'shop':'house'+SHOP_POS.style}_${pr}.webp`:`assets/house${o.h.style}_${pr}.webp`);drawFit(im,hx*sx,hy*sy,HOUSE_W*sx);
+    for(const o of items){const [hx,hy]=o.s,im=await loadImg(o.shop2?`assets/shop2_${pr}.webp`:o.shop?`assets/${SHOP_IMG?'shop':'house'+SHOP_POS.style}_${pr}.webp`:`assets/house${o.h.style}_${pr}.webp`);drawFit(im,hx*sx,hy*sy,HOUSE_W*(o.shop||o.shop2?SHOP_SC:1)*sx);
       {const nm=o.shop2?'毛二街':o.shop?'毛毛商店':o.h.name,mine=!o.shop&&!o.shop2&&isFamily(o.h.id),sw=SIGN_W*sx,sh2=signImg?sw*signImg.naturalHeight/signImg.naturalWidth:sw*.64,top=(hy-SIGN_UP)*sy;
         if(signImg){x.save();if(mine){x.shadowColor='rgba(255,140,80,.95)';x.shadowBlur=10}x.drawImage(signImg,hx*sx-sw/2,top,sw,sh2);x.restore()}
         const fs=W*signFs(nm)/100;x.font=`bold ${fs}px ${FONT}`;x.fillStyle=o.shop2?'#5a3a8a':o.shop?'#7a4a00':mine?'#b4401a':'#6b3f1d';x.textAlign='center';x.textBaseline='middle';
@@ -3156,7 +3161,7 @@ function staffForm(i){const s=house(SHOP_ID),L=shopStaffList(s).map(x=>Object.as
 
 // ================= ⭐ 星寶活動：毛球的星寶（v1.64） =================
 // 島主在後台按「開始」後兩週；每個人各自算：星寶一天 4 個時段出現、每人每天最多找到 3 次（不告訴玩家）、集滿 10 次去找毛球
-const STAR_GOAL=10,STAR_DAY_MAX=3,STAR_WIN_H=1.5,STAR_SEGS=[[7,11],[12,16],[18,22],[22.5,27]],MQ_EVERY=30*60000,STAR_ROOM='starhouse',STAR_COINS=500;
+const NXT='<img class="mic" src="assets/icon_next.webp" alt="">下一句',STAR_GOAL=10,STAR_DAY_MAX=3,STAR_WIN_H=1.5,STAR_SEGS=[[7,11],[12,16],[18,22],[22.5,27]],MQ_EVERY=30*60000,STAR_ROOM='starhouse',STAR_COINS=500;
 function starEv(){const s=DB.star;if(!s||!+s.start)return null;const end=+s.end||(+s.start+14*864e5),now=Date.now();return {start:+s.start,end,on:now>=+s.start&&now<end}}
 function starG(){const g=DB.game;if(!g.star||typeof g.star!=='object')g.star={n:0,day:'',dn:0,got:[],met:false,done:false};if(!Array.isArray(g.star.got))g.star.got=[];return g.star}
 const starDone=()=>!!(starG().done||DB.starDone);
@@ -3187,14 +3192,14 @@ setInterval(()=>{if(!home||$('#home').classList.contains('hidden')||!$('#modal')
 const sbIcons=n=>`<div class="sbprog">${Array.from({length:STAR_GOAL},(_,i)=>`<img src="assets/sb_happy.webp" alt="" class="${i<n?'on':''}">`).join('')}</div>`;
 function starPick(sp,el){if(!needMe())return;const s=starToday();if(s.got.includes(sp.w.id))return;
   s.got=s.got.concat(sp.w.id).slice(-60);s.n=Math.min(STAR_GOAL,(+s.n||0)+1);s.dn=(+s.dn||0)+1;save();sfx('gift');
-  el.classList.add('picked');fx('✨',sp.x,sp.y-60);setTimeout(()=>el.remove(),700);updStarBtn();
+  el.classList.add('picked');fx('✨',sp.x,sp.y-60);if(s.n===5)call('starNote',Object.assign(cred(),{n:5}),true).catch(()=>{});setTimeout(()=>el.remove(),700);updStarBtn();
   const say=['被、被發現了！','嗚……你看到我了……','你、你是毛球的朋友嗎？'][Math.floor(Math.random()*3)];
   setTimeout(()=>openModal(`<div style="text-align:center"><div class="giftopen"><img src="assets/sb_wow.webp" alt="" style="width:120px"></div><h3>⭐ 找到星寶了！</h3><p class="lead">「${say}」</p>${sbIcons(s.n)}
     <p class="lead">${s.n} / ${STAR_GOAL}${s.n>=STAR_GOAL?'・集滿了！快去找毛球吧！他也躲在大家家裡':'・她一溜煙又躲到別的地方去了'}</p></div><div class="row2"><button data-close class="primary">好</button></div>`),500)}
 // ---------- 毛球的對話 ----------
 function mqSay(img,text,btns){openModal(`<div class="mqd"><img src="assets/${img}.webp" alt=""><div class="mqbub">${text}</div></div>${btns||'<div class="row2"><button data-close class="primary">好</button></div>'}`)}
 function mqSeq(lines,endBtn,onEnd){let i=0;const show=()=>{const L=lines[i],last=i===lines.length-1;
-  mqSay(L[0],esc(L[1]),`<div class="row2">${last?`<button class="primary" id="mqend">${endBtn}</button>`:'<button class="primary" id="mqn">▶ 下一句</button>'}</div>`);
+  mqSay(L[0],esc(L[1]),`<div class="row2">${last?`<button class="primary" id="mqend">${endBtn}</button>`:'<button class="primary" id="mqn"><img class="mic" src="assets/icon_next.webp" alt="">下一句</button>'}</div>`);
   if($('#mqn'))$('#mqn').onclick=()=>{i++;show()};if($('#mqend'))$('#mqend').onclick=()=>{closeModal();onEnd&&onEnd()}};show()}
 function mqTalk(){if(!needMe())return;const s=starToday(),E=starEv();if(!E)return;sfx('tap');
   if(s.n>=STAR_GOAL)return reunion();
@@ -3202,6 +3207,8 @@ function mqTalk(){if(!needMe())return;const s=starToday(),E=starEv();if(!E)retur
       ['mq_worry','她好像躲進島上大家的家裡了。你可以幫我找找看嗎？'],['mq_worry','找到她的時候，她會在地上發呆，輕輕點她一下就好。'],['mq_worry','等你找到 10 次，再來找我好不好？我也會在島上到處找……']],'交給我！',()=>{s.met=true;save();toast('⭐ 去大家家裡找星寶吧！')});
   const n=s.n,left=E.end-Date.now();let img='mq_worry',t;
   if(s.dn>=STAR_DAY_MAX)t='星寶今天好像玩累了，跑去睡覺了……明天再一起找吧！';
+  else if(!starWin(Date.now()))t=['星寶現在躲起來睡覺了……晚點再來找找看吧！','噓……星寶好像在睡午覺，現在怎麼找都找不到，晚點再來吧','星寶現在不知道躲到哪裡睡著了，等她醒來再一起找！'][Math.floor(Math.random()*3)];
+  else if(s.got.includes(starWin(Date.now()).id))t='你剛剛找到星寶的時候，她又一溜煙跑去躲起來了……晚點再來找找看！';
   else if(left<2*864e5&&Math.random()<.5)t='我們差不多要離開這座島了……如果還沒找齊，要加油喔！';
   else if(n>=5&&Math.random()<.6){img='mq_happy';t=[`已經 ${n} 次了！我感覺星寶就快回來了！`,'你好厲害！再一下下就好了！'][Math.floor(Math.random()*2)]}
   else t=['你找到我了！星寶有沒有消息？','我剛剛好像聽到星寶在笑……可是轉頭又不見了。','星寶最喜歡軟軟的東西，可能會躲在有玩具的家？','她晚上也會出來喔，有時候半夜特別活潑。',`你已經幫我找到 ${n} 次了，謝謝你……`][Math.floor(Math.random()*5)];
@@ -3214,7 +3221,7 @@ function starLeft(){const E=starEv();if(!E)return '';const m=Math.max(0,Math.flo
 // ---------- 重逢動畫 ----------
 function reunion(){if(document.querySelector('.reunion'))return;const s=starG(),ov=document.createElement('div');ov.className='gacha reunion';
   ov.innerHTML=`<div class="rays" id="rays"></div><div class="ru-stage"><img class="ru-mq" src="assets/mq_worry.webp" alt=""><img class="ru-sb" src="assets/sb_happy.webp" alt=""><img class="ru-both" src="assets/mq_reunion.webp" alt=""></div>
-    <div class="ru-bub" id="rub"></div><div class="gbtns on"><button class="primary" id="run">▶ 下一句</button></div>`;
+    <div class="ru-bub" id="rub"></div><div class="gbtns on"><button class="primary" id="run"><img class="mic" src="assets/icon_next.webp" alt="">下一句</button></div>`;
   document.body.appendChild(ov);const bub=ov.querySelector('#rub'),btn=ov.querySelector('#run');let step=0,claimed=null;
   const say=t=>{bub.innerHTML=t;bub.classList.remove('in');void bub.offsetWidth;bub.classList.add('in')};
   const S=[
@@ -3229,7 +3236,7 @@ function reunion(){if(document.querySelector('.reunion'))return;const s=starG(),
       const c=+claimed.coins||STAR_COINS,room=claimed.room||STAR_ROOM,mh=myHouse();if(mh){const o=new Set(DB.owned[mh.id]||[]);o.add(room);DB.owned[mh.id]=[...o]}
       s.done=true;DB.starDone=Date.now();save();const r=btn.getBoundingClientRect();grant(0,c,{x:r.left+r.width/2,y:r.top});sfx('ssr');burst(ov,28);
       say(`<div class="ru-card"><img src="${roomImg(room)}" alt=""><div><b>限定房「${esc(cardById(room).name)}」</b><br>🪙 ${c} 金幣</div></div><small>房間可以到「⚙️ 家」換上</small>`);
-      btn.disabled=false;btn.textContent='▶ 下一句';if(ONLINE)feedPush(`⭐ ${DB.me.nick} 幫毛球找回了星寶！`)},
+      btn.disabled=false;btn.innerHTML=NXT;if(ONLINE)feedPush(`⭐ ${DB.me.nick} 幫毛球找回了星寶！`)},
     ()=>{say('毛球＆星寶：「我們要繼續去探險了！要好好照顧你家的毛孩喔～掰掰！」');btn.textContent='掰掰 👋'},
     ()=>{ov.classList.add('bye');btn.disabled=true;setTimeout(()=>{ov.remove();updStarBtn();if(home&&!$('#home').classList.contains('hidden'))renderFloor()},1700)}];
   btn.onclick=()=>{step++;const f=S[step];if(f)f()};S[0]()}
@@ -3470,7 +3477,7 @@ let lastTapS=0;document.addEventListener('click',e=>{const b=e.target.closest&&e
 
 // ================= 💬 毛孩說話 =================
 const SAY={"idle": ["今天也很可愛吧", "想出去玩～", "好無聊喔", "我要來搗蛋囉😜", "有人要陪我玩嗎？", "我是全世界最可愛的{名字}", "窗外有鳥！", "伸個懶腰～", "今天天氣不錯耶", "你在看我嗎？", "哼哼～"], "morning": ["早安！☀️", "還想再睡一下…", "早餐呢？", "新的一天開始囉～"], "night": ["愛睏😪", "有點睏了…", "今天好累喔", "差不多該睡了💤"], "hungry": ["好餓喔…", "飯呢？", "肚子在叫了", "有人要餵我嗎？🍖", "我可以吃東西嗎？", "碗是空的…"], "full": ["吃飽飽了～", "好好吃！", "肚子圓滾滾", "謝謝招待！"], "pat": ["再摸一下嘛！", "舒胡啦！", "最喜歡你了 💕", "呼嚕嚕～"], "treat": ["好好吃！", "還有嗎？", "謝謝你～", "零食最棒了"], "fav": ["這個我最愛！💖", "你怎麼知道！", "幸福～", "天啊太好吃了"], "visitor": ["你好呀！", "要一起玩嗎？", "歡迎來我家～", "你是誰呀？", "{主人}來了！"], "away": ["這裡好好玩！", "這是誰的家呀？", "我交到新朋友了", "有點想家…"], "poop": ["誰來掃一下…", "不是我拉的！", "好臭喔…", "快幫我清乾淨～"], "toy": ["拆家時間到！", "陪我玩嘛～", "看我的厲害！"], "gift": ["有禮物耶！🎁", "是給我的嗎？", "快拆快拆！"], "woke": ["嗯…？", "我醒了啦…", "好吧，陪你玩一下"], "bday": ["可以跟我說那四個字嗎🎂", "要記得送我禮物喔🎁", "我又長大一歲了！", "生日快樂我自己～"], "dbl": ["今天是幸運日！", "快來陪我玩賺金幣～"]};
-Object.assign(SAY,{demon:['餓…餓扁了…','有沒有吃的…','主人呢…','我要吃掉你喔','嗷嗚～～','給我飯！'],angry:['哼！','不理你了','生氣氣💢']});SAY.hungry=(SAY.hungry||[]).concat(['肚子咕嚕～']);
+Object.assign(SAY,{demon:['餓…餓扁了…','有沒有吃的…','主人呢…','我要吃掉你喔','嗷嗚～～','給我飯！'],angry:['哼！','不理你了','生氣氣💢']});SAY.hungry=(SAY.hungry||[]).concat(['肚子咕嚕～']);SAY.ghungry=['肚子餓了，想回家吃飯～','玩到肚子餓了…','好想回家吃飯喔'];
 function greets(p){return String(p.about||'').split('\n').map(x=>x.trim()).filter(Boolean).slice(0,3)}
 function fillSay(t,p){return t.replace(/\{名字\}/g,p.name).replace(/\{主人\}/g,DB.me?DB.me.nick:'你')}
 function situation(r,p){const h=house(home.id),hr=+new Date(Date.now()+8*3600e3).getUTCHours(),c=[];
@@ -3478,7 +3485,7 @@ function situation(r,p){const h=house(home.id),hr=+new Date(Date.now()+8*3600e3)
   if(r.guest)c.push('away','away');
   else if(DB.me&&!isFamily(h.id))c.push('visitor','visitor');
   if(r.demon)return 'demon';
-  if(isHungry(p))c.push('hungry','hungry','hungry');
+  if(isHungry(p)){const k=r.guest?'ghungry':'hungry';c.push(k,k,k)}
   if((h.poops||[]).length)c.push('poop');
   if((h.toys||[]).length)c.push('toy');
   if(DB.dbl===todayTW())c.push('dbl');
