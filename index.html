@@ -809,6 +809,25 @@ img{-webkit-user-drag:none}
 
 /* 島主後台：島民來信未讀徽章 */
 .mbtn .ubadge{background:#e0453a;color:#fff;border-radius:999px;padding:1px 8px;font-size:12px;line-height:1.5;margin-left:6px}
+
+/* ===== 二手店 ===== */
+#shopwrap{position:relative;height:100vh;height:100dvh;overflow:hidden;display:flex;flex-direction:column;justify-content:flex-start}
+#shopwrap.hidden{display:none!important}
+#shopwrap .sback{position:absolute;inset:-40px;background-size:cover;background-position:center;filter:blur(22px) brightness(.55);z-index:0}
+#shopwrap>*:not(.sback){position:relative;z-index:1}
+#shopwrap .top{position:relative;order:-1;width:100%;max-width:520px;margin:0 auto;padding:8px 14px 6px;justify-content:flex-start;gap:6px}
+#shopwrap .top .sname{margin:0 auto;max-width:62%}
+#shopstage{flex:none;width:100%;max-width:min(100%,520px,calc((100dvh - 150px) * 2 / 3));aspect-ratio:848/1264;background:#3a2a22;container-type:inline-size}
+#sfloor{position:absolute;inset:0}
+.sthing{position:absolute;transform:translate(-50%,-100%);pointer-events:none}
+.sthing img{display:block;width:100%;height:auto}
+#snpc{pointer-events:auto;cursor:pointer}
+#snpc .sbody{height:100%;transform-origin:50% 100%}
+#snpc img{width:auto;height:100%}
+.sbub{position:absolute;transform:translate(-50%,-100%);background:#fffaf0;border:2px solid var(--wood,#8a6a4a);border-radius:14px;padding:5px 11px;font-size:clamp(11px,3.4cqw,15px);white-space:nowrap;z-index:5000;box-shadow:0 2px 0 rgba(0,0,0,.15);pointer-events:none}
+#shopwrap .actions{position:relative;left:auto;bottom:auto;transform:none;justify-content:center;margin:10px auto 0;flex-wrap:wrap;align-items:center}
+#shopwrap .sinfo{font-size:13px;padding:6px 12px}
+#shopwrap:not(.hidden)~#foot{display:none}
 </style>
 </head>
 <body>
@@ -854,6 +873,12 @@ img{-webkit-user-drag:none}
   <div class="top hbar"><button class="pill" id="back">← 小島</button><div class="pill housename" id="hname"></div><button class="pill cam" id="camh" aria-label="拍照">📷</button></div>
   <div class="actions hbar"><button class="act" id="feed">🍖 餵飯</button><button class="act" id="addnote">📝 留言</button><button class="act" id="giftbtn">🎁 送禮</button><button class="act" id="walkbtn">🦮 遛遛</button><button class="act" id="sweep">🧹 打掃</button><button class="act" id="notebook">📒</button></div>
   <div class="hrow hbar" id="hrow"><button class="circle sndb noic" id="sndH" aria-label="音效開關"></button><span id="hudslot"></span><button class="circle gohome" id="gohome" aria-label="回我家">🏠</button></div>
+</div>
+<div id="shopwrap" class="hidden">
+  <div class="sback" id="sback"></div>
+  <div class="stage" id="shopstage"><img class="bg" id="sbg" alt=""><div id="sfloor"></div></div>
+  <div class="top"><button class="pill" id="sbackbtn">← 小島</button><div class="pill sname" id="sname"></div></div>
+  <div class="actions" id="sactions"></div>
 </div>
 <div class="foot" id="foot"></div>
 <div id="modal" class="modal hidden"><div class="sheet" id="sheet" role="dialog" aria-modal="true"></div></div>
@@ -978,7 +1003,7 @@ let syncing=false;
 async function sync(quiet){
   if(!ONLINE||syncing)return;syncing=true;
   try{const d=await api('getState',Object.assign(cred(),{where:curWhere()}));
-    Object.assign(DB,{houses:d.houses,pets:d.pets,weights:d.weights,medical:d.medical,expenses:d.expenses,notes:d.notes,feed:d.feed,famOk:d.famOk,players:d.players||[],tlogs:d.tlogs||[]});
+    Object.assign(DB,{houses:d.houses,pets:d.pets,weights:d.weights,medical:d.medical,expenses:d.expenses,notes:d.notes,feed:d.feed,famOk:d.famOk,players:d.players||[],tlogs:d.tlogs||[],shop:d.shop||null});
     DB.houses.forEach(h=>{if(!Array.isArray(h.poops))h.poops=[]});
     keepPending();DB.letters=(d.letters||[]).filter(l=>!LGONE[l.id]).map(l=>Object.assign(l,LSTATE[l.id]||{},CLAIMED['l:'+l.id]?{claimed:true}:{}));DB.drops=(d.drops||[]).filter(x=>!PICKED.has(x.id));DB.notice=d.notice||null;DB.kuji=d.kuji||DB.kuji||null;DB.online=d.online||[];setTimeout(checkAdminGifts,600);DB.rank=d.rank||DB.rank||null;osLogin();pushCheckLater();setTimeout(noticePop,1200);DB.dbl=d.dbl||'';DB.adminId=d.adminId||'';
     setTimeout(announceLetters,0);setTimeout(updGuestBar,0);
@@ -992,6 +1017,7 @@ async function sync(quiet){
   finally{syncing=false}
 }
 function rerender(){
+  if(shopV){if(shopOn())renderShop();else closeShop();tickerShow();updBell();return}
   if(home&&house(home.id)){setHname(house(home.id));$('#roombg').src=roomImg(house(home.id).room);const ids=petsOf(home.id).map(p=>p.id).join();if(ids!==home.pets.map(r=>r.id).join())openHome(home.id,true);else renderHome()}
   else if(home){$('#back').click()}
   else renderIsland();
@@ -1347,7 +1373,7 @@ function renderIsland(){
   document.querySelectorAll('#bar button').forEach(b=>b.classList.toggle('on',b.dataset.p===mode));
   const box=$('#things');box.innerHTML='';const used=new Map(DB.houses.map(h=>[h.slot,h]));
   SLOTS.map((s,i)=>({s,i})).sort((a,b)=>a.s[1]-b.s[1]).forEach(({s:[x,y],i})=>{
-    const h=used.get(i);const el=document.createElement('div');el.className='thing'+(!h&&picking?' pick':'');
+    const h=used.get(i);if(i===SHOP_SLOT&&!h&&shopOn()){shopThing(box,x,y);return}const el=document.createElement('div');el.className='thing'+(!h&&picking?' pick':'');
     el.setAttribute('role','button');el.tabIndex=0;el.setAttribute('aria-label',h?h.name:'空地，可以蓋房子');
     Object.assign(el.style,ipct(x,y),{width:((h?HOUSE_W:LOT_W)/1024*100)+'%',zIndex:y});
     el.innerHTML=`<img src="assets/${h?'house'+h.style:'empty_lot'}_${p}.webp" alt="">`;
@@ -3052,6 +3078,113 @@ let logoTaps=0,logoT=0;
 (function(){const lg=document.querySelector('#island .logo');lg.style.setProperty('pointer-events','auto','important');
   let lgT=null;lg.addEventListener('click',()=>{const n=Date.now();logoTaps=n-logoT<800?logoTaps+1:1;logoT=n;clearTimeout(lgT);if(logoTaps>=5){logoTaps=0;adminSheet();return}lgT=setTimeout(()=>{if(logoTaps===1)manualRefresh()},700)});
   let lpT=null;lg.addEventListener('touchstart',()=>{lpT=setTimeout(()=>{lpT=null;adminSheet()},1500)},{passive:true});['touchend','touchmove','touchcancel'].forEach(ev=>lg.addEventListener(ev,()=>{if(lpT){clearTimeout(lpT);lpT=null}},{passive:true}));lg.addEventListener('contextmenu',e=>e.preventDefault())})();
+// ================= 二手店（NPC 店） =================
+var shopV=false,shopRaf=0,shopLast=0,shopS=null;
+const SHOP_SLOT=4,SHOP_SPD=95;
+const SHOP_DEF={bg:'assets/room_shop.webp',idle:'assets/shop_npc_idle.webp',talk:'assets/shop_npc_wave.webp',counter:'assets/shop_counter.webp'};
+const SHOP_C={x:330,y:1010,w:500},SHOP_NH=330,SHOP_BACK=960,SHOP_FRONT=1110,SHOP_OUT=690;
+const SHOP_SAY=['歡迎光臨～','今天有什麼想賣的嗎？','貨架還在整理，很快就開張囉！','這裡的東西都很便宜喔～','慢慢逛，不買也沒關係～'];
+const shopOn=()=>!!(DB.shop&&DB.shop.open);
+const isShopMgr=()=>!!(DB.me&&DB.shop&&Array.isArray(DB.shop.managers)&&DB.shop.managers.includes(DB.me.id));
+const shopImgs=()=>{const s=DB.shop||{};return {bg:s.bg||SHOP_DEF.bg,idle:s.npc||SHOP_DEF.idle,talk:s.npc2||SHOP_DEF.talk}};
+function shopThing(box,x,y){
+  const nm=(DB.shop&&DB.shop.name)||'二手店',el=document.createElement('div');
+  el.className='thing';el.setAttribute('role','button');el.tabIndex=0;el.setAttribute('aria-label',nm);
+  Object.assign(el.style,ipct(x,y),{width:((HOUSE_W+10)/1024*100)+'%',zIndex:y});
+  el.innerHTML='<img src="assets/shop2.webp" alt="">';el.onclick=openShop;box.appendChild(el);
+  const lb=document.createElement('div');lb.className='label shop';lb.textContent='🏪 '+nm;
+  Object.assign(lb.style,ipct(x,y+6),{zIndex:2000});box.appendChild(lb)}
+function openShop(){
+  if(!shopOn())return;if(!DB.me)return onboarding();
+  shopV=true;$('#island').classList.add('hidden');$('#shopwrap').classList.remove('hidden');
+  renderShop(true);shopLast=performance.now();cancelAnimationFrame(shopRaf);shopRaf=requestAnimationFrame(shopTick);window.scrollTo(0,0)}
+function closeShop(){
+  shopV=false;cancelAnimationFrame(shopRaf);$('#shopwrap').classList.add('hidden');$('#island').classList.remove('hidden');
+  renderIsland();window.scrollTo(0,0)}
+function renderShop(init){
+  const s=DB.shop||{},im=shopImgs(),fl=$('#sfloor');
+  if($('#sbg').getAttribute('src')!==im.bg){$('#sbg').src=im.bg;$('#sback').style.backgroundImage=`url("${im.bg}")`}
+  $('#sname').textContent='🏪 '+(s.name||'二手店');
+  if(init||!$('#snpc')){
+    fl.innerHTML=`<div class="sthing" id="scounter" style="left:${SHOP_C.x/RW*100}%;top:${SHOP_C.y/RH*100}%;width:${SHOP_C.w/RW*100}%;z-index:${SHOP_C.y}"><img src="${SHOP_DEF.counter}" alt=""></div><div class="sthing" id="snpc" role="button" aria-label="店長" style="height:${SHOP_NH/RH*100}%"><div class="sbody"><img src="${im.idle}" alt="" data-s="${im.idle}"></div></div><div class="sbub" id="sbub" style="display:none"></div>`;
+    $('#snpc').onclick=shopTalk;
+    const t=performance.now();shopS={x:330,y:SHOP_BACK,path:[],wait:0,face:1,moving:false,talkUntil:0,bubUntil:0,lapAt:t+9000,shiftAt:t+3000}}
+  $('#sactions').innerHTML=(isShopMgr()?'<button class="act" id="sdec">🎨 佈置店面</button>':'')+'<span class="pill sinfo">🛍️ 貨架整理中，很快開張</span>';
+  if($('#sdec'))$('#sdec').onclick=shopDecor}
+function shopSay(){const b=$('#sbub');if(b)b.textContent=SHOP_SAY[Math.floor(Math.random()*SHOP_SAY.length)]}
+function shopTalk(){const S=shopS;if(!S)return;const now=performance.now();S.talkUntil=now+2600;S.bubUntil=now+2600;shopSay();try{sfx('tap')}catch(e){}}
+function shopTick(now){
+  if(!shopV)return;shopRaf=requestAnimationFrame(shopTick);
+  const S=shopS,n=$('#snpc');if(!S||!n)return;
+  const dt=Math.min(.1,Math.max(0,(now-shopLast)/1000));shopLast=now;
+  if(S.wait>0){S.wait-=dt*1000;S.moving=false}
+  else if(S.path.length){
+    const w=S.path[0],dx=w.x-S.x,dy=w.y-S.y,d=Math.hypot(dx,dy),st=SHOP_SPD*dt;
+    if(d<=st){S.x=w.x;S.y=w.y;S.wait=w.wait||0;S.path.shift();S.moving=false;
+      if(w.talk){S.talkUntil=now+(w.wait||2000);S.bubUntil=S.talkUntil;shopSay()}}
+    else{S.x+=dx/d*st;S.y+=dy/d*st;S.moving=true;if(Math.abs(dx)>4)S.face=dx>0?1:-1}
+  }else{
+    S.moving=false;S.face=1;
+    if(now>S.lapAt){
+      // 大部分時間待在櫃檯後面，偶爾繞出櫃檯右邊走到前面逛一圈
+      S.path=[{x:SHOP_OUT,y:SHOP_BACK},{x:SHOP_OUT,y:SHOP_FRONT},{x:520,y:SHOP_FRONT,wait:2600,talk:true},{x:SHOP_OUT,y:SHOP_FRONT},{x:SHOP_OUT,y:SHOP_BACK},{x:240+Math.random()*200,y:SHOP_BACK}];
+      S.lapAt=now+45000+Math.random()*40000;S.shiftAt=now+10000}
+    else if(now>S.shiftAt){S.path=[{x:230+Math.random()*230,y:SHOP_BACK-10+Math.random()*20,wait:600}];S.shiftAt=now+4000+Math.random()*5000}}
+  const im=shopImgs(),talk=S.talkUntil>now,want=talk?im.talk:im.idle,img=n.querySelector('img');
+  if(img.dataset.s!==want){img.dataset.s=want;img.src=want}
+  n.style.left=(S.x/RW*100)+'%';n.style.top=(S.y/RH*100)+'%';n.style.zIndex=Math.round(S.y);
+  const ph=now/105,bob=S.moving?Math.abs(Math.sin(ph))*.9:0,tilt=S.moving?Math.sin(ph)*2.2:0;
+  n.querySelector('.sbody').style.transform=`scaleX(${talk?1:S.face}) translateY(${-bob}cqw) rotate(${tilt}deg)`;
+  const bb=$('#sbub');
+  if(now<S.bubUntil){bb.style.display='block';bb.style.left=(Math.min(700,Math.max(150,S.x))/RW*100)+'%';bb.style.top=((S.y-SHOP_NH-6)/RH*100)+'%'}else bb.style.display='none'}
+$('#sbackbtn').onclick=closeShop;
+// ---------- 店長：佈置店面 ----------
+function pickFile(cb){const i=document.createElement('input');i.type='file';i.accept='image/*';i.onchange=()=>{if(i.files&&i.files[0])cb(i.files[0])};i.click()}
+function shopKeyGreen(c,x){
+  const w=c.width,h=c.height,d=x.getImageData(0,0,w,h),a=d.data,gr=i=>a[i+1]>180&&a[i]<110&&a[i+2]<110;
+  if(!(gr(0)&&gr((w-1)*4)&&gr((h-1)*w*4)))return;   // 四個角不是綠色就不處理
+  for(let i=0;i<a.length;i+=4){const r=a[i],g=a[i+1],b=a[i+2],m=Math.max(r,b),dd=g-m;
+    if(dd>40)a[i+3]=Math.min(a[i+3],dd>=130?0:255-(dd-40)*255/90);
+    if(dd>10&&a[i+3]>0)a[i+1]=Math.min(g,m+10)}
+  x.putImageData(d,0,0)}
+function shopTrim(c){
+  const w=c.width,h=c.height,a=c.getContext('2d').getImageData(0,0,w,h).data;let x0=w,y0=h,x1=-1,y1=-1;
+  for(let y=0;y<h;y++)for(let x=0;x<w;x++)if(a[(y*w+x)*4+3]>10){if(x<x0)x0=x;if(x>x1)x1=x;if(y<y0)y0=y;if(y>y1)y1=y}
+  if(x1<0)return c;const o=document.createElement('canvas');o.width=x1-x0+1;o.height=y1-y0+1;
+  o.getContext('2d').drawImage(c,x0,y0,o.width,o.height,0,0,o.width,o.height);return o}
+async function shopPrep(file,kind){
+  const img=await fileToImg(file);
+  if(kind==='bg'){
+    const W=960,H=Math.round(W*RH/RW),c=document.createElement('canvas');c.width=W;c.height=H;
+    const r=W/H,ir=img.width/img.height;let sw=img.width,sh=img.height,sx=0,sy=0;
+    if(ir>r){sw=img.height*r;sx=(img.width-sw)/2}else{sh=img.width/r;sy=(img.height-sh)/2}
+    c.getContext('2d').drawImage(img,sx,sy,sw,sh,0,0,W,H);
+    let u=c.toDataURL('image/webp',.82);if(!u.startsWith('data:image/webp'))u=c.toDataURL('image/jpeg',.82);return u}
+  const s=Math.min(1,440/img.height);let c=document.createElement('canvas');c.width=Math.max(1,Math.round(img.width*s));c.height=Math.max(1,Math.round(img.height*s));
+  const x=c.getContext('2d',{willReadFrequently:true});x.drawImage(img,0,0,c.width,c.height);shopKeyGreen(c,x);c=shopTrim(c);
+  let u=c.toDataURL('image/webp',.88);if(!u.startsWith('data:image/webp'))u=c.toDataURL('image/png');return u}
+async function shopSkin(kind,file){
+  try{const body={playerId:DB.me.id,kind};if(file)body.dataUrl=await shopPrep(file,kind);else body.reset=true;
+    DB.shop=await call('shopSetSkin',body);renderShop();shopDecor();toast(file?'換好了 ✨':'還原了')}
+  catch(e){toast(e.message||'沒換成功')}}
+function shopDecor(){
+  const s=DB.shop||{};
+  openModal(`<h3>🎨 佈置店面</h3><p class="lead">兩位店長都可以改，換完大家馬上看得到。${s.by?`<br><small>最後佈置：${esc(s.by)}</small>`:''}</p>
+  <div class="sec"><h4>🖼️ 店的背景</h4><p class="lead">建議直式 2:3 的圖，會自動裁成店內的比例</p><div class="row2"><button id="sdbg">選一張圖</button><button id="sdbg0">還原預設</button></div></div>
+  <div class="sec"><h4>🧑‍💼 店長圖</h4><p class="lead">要去背的圖，綠幕背景也可以，會自動去背</p>
+    <div class="row2"><button id="sdn1">換站姿（平常）</button><button id="sdn10">還原</button></div>
+    <div class="row2"><button id="sdn2">換互動圖（被點到）</button><button id="sdn20">還原</button></div></div>
+  <div class="row2"><button data-close class="primary">完成</button></div>`);
+  const B=(id,kind,reset)=>{$(id).onclick=()=>reset?shopSkin(kind,null):pickFile(f=>shopSkin(kind,f))};
+  B('#sdbg','bg');B('#sdbg0','bg',1);B('#sdn1','npc');B('#sdn10','npc',1);B('#sdn2','npc2');B('#sdn20','npc2',1)}
+// ---------- 島主後台：開店、指派店長 ----------
+function shopAdminHtml(d){
+  const s=DB.shop||{},m=s.managers||[],ps=d.players||[],
+  opt=i=>`<option value="">（空缺）</option>`+ps.map(p=>`<option value="${p.id}"${m[i]===p.id?' selected':''}>${esc(p.nick)}${p.house?'・'+esc(p.house):''}</option>`).join('');
+  return `<div class="sec adm"><h4>🏪 二手店<span>${shopOn()?'營業中':'還沒開'}</span></h4><p class="lead">開在島上左邊那塊空地（第 5 塊）。兩位店長可以換店的背景和店長圖。</p>
+  <div class="row2"><input id="ashn" maxlength="10" placeholder="店名" value="${esc(s.name||'二手店')}"></div>
+  <div class="row2"><select id="ashm1">${opt(0)}</select></div><div class="row2"><select id="ashm2">${opt(1)}</select></div>
+  <div class="row2"><button id="ashs" class="primary">${shopOn()?'儲存':'開店'}</button>${shopOn()?'<button id="ashc" class="danger">關店</button>':''}</div></div>`}
 const adminPw=()=>{try{return localStorage.getItem('mhd_admin')||''}catch(e){return ''}};
 async function adminCall(a,o){return call(a,Object.assign({adminPw:adminPw(),playerId:DB.me&&DB.me.id},o||{}))}
 function giftDesc(g){const a=[];if(+g.coins)a.push('🪙'+g.coins);if(+g.tickets)a.push('🎟️'+g.tickets);if(g.item&&+g.n)a.push(((ITEMS[g.item]||{}).name||g.item)+'×'+g.n);return a.join(' ')||'禮物'}
@@ -3089,6 +3222,7 @@ async function adminSheet(){
     <div class="row2"><select id="alr"></select></div><p class="lead" id="alrh" style="margin:0"></p>
     <div class="row2"><button id="alsend">寄出</button></div></div>
   <div class="sec adm"><h4>🙋 玩家列表<span>${d.players.length} 人・🔔 ${d.players.filter(p=>p.pushSt==='on').length} 人有開通知・全島 🪙${d.players.reduce((a,p)=>a+(+p.coins||0),0).toLocaleString()}</span></h4><p class="lead">照金幣多到少排，點 ⚙️ 可以改金幣、轉移碼<br>🔔 收得到通知・🔕 沒開・📲 還沒加主畫面・❔ 還沒更新到新版</p><div class="plist">${d.players.slice().sort((a,b)=>(+b.coins||0)-(+a.coins||0)).map(p=>`<div class="frow"><span>${pushIc(p)}${esc(p.nick)}<small>${p.house?esc(p.house):'沒有家'}・Lv.${p.lv}・🪙${p.coins}${p.createdAt?'・'+new Date(p.createdAt).toLocaleDateString('zh-TW',{month:'numeric',day:'numeric'})+' 加入':''}</small></span><span>${p.house?'':`<button class="mini danger" data-dpl="${p.id}">刪除</button> `}<button class="mini" data-code="${esc(p.code)}">${esc(p.code)||'—'}</button> <button class="mini" data-apl="${p.id}" aria-label="管理">⚙️</button></span></div>`).join('')}</div><p class="lead">點轉移碼可以複製，傳給換手機的朋友</p></div>
+  ${shopAdminHtml(d)}
   <div class="sec adm"><h4>🏠 家的管理</h4><div class="row2"><select id="ahh">${hs}</select></div>
     <div class="row2"><input id="ahp" type="password" placeholder="新的家人密碼（4 字以上）"><button id="ahpb">重設密碼</button></div>
     <div class="row2"><button id="ahrb" class="danger">收回成空地</button></div><p class="lead">收回會刪掉這個家的毛孩和紀錄，不能復原</p></div>
@@ -3118,6 +3252,8 @@ async function adminSheet(){
   S.querySelectorAll('[data-code]').forEach(b=>b.onclick=async()=>{const c=b.dataset.code;if(!c)return;try{await navigator.clipboard.writeText(c);toast('轉移碼已複製：'+c)}catch(e){toast(c)}});
   $('#ahpb').onclick=async()=>{const v=$('#ahp').value;if(v.length<4)return toast('密碼至少 4 個字');try{await adminCall('adminResetPw',{houseId:$('#ahh').value,pw:await hashPw(v)});toast('密碼重設好了，記得告訴他們家 🔑')}catch(e){toast(e.message)}};
   $('#ahrb').onclick=async()=>{const h=house($('#ahh').value);if(!h||!window.confirm(`確定要把「${h.name}」收回成空地嗎？毛孩和紀錄都會刪掉，不能復原。`))return;try{await adminCall('adminRemoveHouse',{houseId:h.id});closeModal();ok('收回了')}catch(e){toast(e.message)}};
+  $('#ashs').onclick=async()=>{const was=shopOn(),ms=[$('#ashm1').value,$('#ashm2').value].filter(Boolean);if(ms.length===2&&ms[0]===ms[1])return toast('兩位店長不能是同一個人');try{DB.shop=await adminCall('adminSetShop',{open:true,name:$('#ashn').value,managers:ms});closeModal();ok(was?'存好了':'開店了 🏪')}catch(e){toast(e.message)}};
+  if($('#ashc'))$('#ashc').onclick=async()=>{if(!window.confirm('確定要關店嗎？地圖上的店會變回空地。'))return;try{DB.shop=await adminCall('adminSetShop',{open:false});closeModal();ok('關店了')}catch(e){toast(e.message)}};
   $('#ainb').onclick=async()=>{try{const r=await adminCall('adminInviteNew',{n:1,note:$('#ainn').value.trim()});const c=r&&r[0];try{await navigator.clipboard.writeText(c)}catch(e){}toast(`邀請碼 ${c} 已複製 🔑`);adminSheet()}catch(e){toast(e.message)}};
   S.querySelectorAll('[data-icp]').forEach(b=>b.onclick=async()=>{try{await navigator.clipboard.writeText(b.dataset.icp);toast('已複製 '+b.dataset.icp)}catch(e){toast(b.dataset.icp)}});
   S.querySelectorAll('[data-ivd]').forEach(b=>b.onclick=async()=>{if(!armBtn(b,'確定？'))return;try{await adminCall('adminInviteVoid',{code:b.dataset.ivd});toast('作廢了');adminSheet()}catch(e){toast(e.message)}});
