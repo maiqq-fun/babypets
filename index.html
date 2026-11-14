@@ -43,7 +43,6 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
   width:2em;height:2em;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 0 rgba(0,0,0,.15);
   animation:bob 1.8s ease-in-out infinite;pointer-events:none}
 .bubble::after{content:"";position:absolute;bottom:-5px;left:50%;margin-left:-5px;border:5px solid transparent;border-top-color:#fff;border-bottom:0}
-@keyframes bob{0%,100%{margin-top:0}50%{margin-top:-5px}}
 .top{position:absolute;left:0;right:0;top:0;display:flex;align-items:center;justify-content:space-between;gap:8px;padding:12px 14px;pointer-events:none;z-index:3000}
 .top>*{pointer-events:auto}
 .title{font-size:clamp(26px,8vw,38px);color:#fff;letter-spacing:3px;pointer-events:none!important;
@@ -385,9 +384,8 @@ b.dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:#ff
 
 .si.sending,button.sending{opacity:.6;position:relative;pointer-events:none}
 .si.sending::after,button.sending::after{content:'送出中…';position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(255,250,238,.8);border-radius:inherit;font-size:13px;color:#7a5a40}
-.gift.coin{animation:bob 2.4s ease-in-out infinite}.gift.coin.grab{animation:none;opacity:.5}
+.gift.coin{animation:bob 2.4s ease-in-out infinite}
 @keyframes bob{0%,100%{margin-top:0}50%{margin-top:-6px}}
-.coinbig{font-size:34px;color:#c98a00;margin:4px 0}
 .hud{position:absolute;right:12px;top:66px;z-index:3000;display:flex;align-items:center;gap:6px;padding:3px 10px 3px 4px;border:2px solid var(--wood);border-radius:999px;background:rgba(255,250,238,.94);box-shadow:0 2px 0 rgba(0,0,0,.12);font-size:12px;color:#6b4b33;font-family:inherit}
 .hud img{display:block}
 .hud .hlv{position:relative;width:30px;height:34px;flex:none}.hud .hlv img{width:100%;height:100%;object-fit:contain}
@@ -405,9 +403,9 @@ b.dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:#ff
 .sheet select,.sheet input[type=number]{border:1.5px solid #e6d3bd;border-radius:12px;padding:8px;font-size:16px;background:#fff;min-width:0;flex:1}
 button.danger{color:#d0453a!important;border-color:#f0b8b0!important}
 .card.gold .back{background-image:url(assets/card_back_gold.webp);border-color:#ffe9a8;box-shadow:0 0 0 3px #f5c542,0 0 40px rgba(255,210,80,.9);animation:gpulse 1.4s ease-in-out infinite}
-.card.gold .back::after,.card.gold .front::after{content:'';position:absolute;inset:0;background:linear-gradient(115deg,transparent 30%,rgba(255,255,255,.75) 45%,rgba(255,255,255,0) 60%);background-size:250% 100%;animation:shine 1.8s linear infinite;pointer-events:none}
+.card.gold .back::after,.card.gold .front::after{content:'';position:absolute;inset:0;background:linear-gradient(115deg,transparent 30%,rgba(255,255,255,.75) 45%,rgba(255,255,255,0) 60%);background-size:250% 100%;animation:gshine 1.8s linear infinite;pointer-events:none}
 .card.gold .front{box-shadow:0 0 0 2px #fff,0 0 50px rgba(255,215,90,1),0 0 90px rgba(255,180,220,.8)}
-@keyframes shine{from{background-position:150% 0}to{background-position:-100% 0}}
+@keyframes gshine{from{background-position:150% 0}to{background-position:-100% 0}}
 @keyframes gpulse{0%,100%{filter:brightness(1)}50%{filter:brightness(1.15)}}
 @media (prefers-reduced-motion:reduce){.card.gold .back,.card.gold .back::after,.card.gold .front::after,.gift.coin{animation:none}}
 .adm h4{justify-content:flex-start!important;gap:6px}.adm input:not([type=number]):not([type=password]),.adm input[type=password]{width:100%;box-sizing:border-box;border:1.5px solid #e6d3bd;border-radius:12px;padding:9px 10px;font-size:16px;background:#fff;margin-top:6px}.adm .row2{margin-top:8px}
@@ -423,7 +421,6 @@ button.danger{color:#d0453a!important;border-color:#f0b8b0!important}
 .ibot>*{pointer-events:auto}
 .trow{display:flex;gap:8px;align-items:center;width:100%;max-width:300px;pointer-events:none}.trow>*{pointer-events:auto}
 .trow .ticker{position:relative;left:auto;right:auto;bottom:auto;flex:1;min-width:0}
-.trow .cam2{flex:none;width:40px;height:40px;font-size:18px}
 .ibot .bar{position:relative;left:auto;bottom:auto;transform:none}
 .ibot .bar button{padding:5px 9px}
 .inote{font-size:11px;color:rgba(255,255,255,.8);text-shadow:0 1px 2px rgba(0,0,0,.5);text-align:center;pointer-events:none}
@@ -443,7 +440,6 @@ html,body{height:100%;overflow:hidden;overscroll-behavior:none}
 #homewrap .hudH{margin-top:8px}
 #homewrap #foot{padding:8px 16px 0;font-size:12px;line-height:1.5;text-align:center;max-width:520px;margin:0 auto}
 #home.hidden~#foot{display:none}
-.shakebag{animation:shake .5s ease-in-out infinite}
 .xclose{position:sticky;top:0;float:right;margin:-6px -4px -34px 0;width:34px;height:34px;border-radius:50%;border:1.5px solid #e6d3bd;background:#fff;color:#8a6a50;font-size:16px;line-height:1;z-index:5;box-shadow:0 2px 6px rgba(0,0,0,.08)}
 
 .irows{position:absolute;left:0;right:0;top:75.5%;display:flex;flex-direction:column;align-items:center;gap:8px;padding:0 14px;z-index:3000}
@@ -697,8 +693,6 @@ html,body,button,.island,.imap,.logo{touch-action:manipulation}
 .acci em{font-style:normal;font-size:10.5px;color:var(--soft);min-height:1.2em}
 .acci.on{border-color:#ff8fab;background:#fff0f4}.acci.on em{color:#e0607e;font-weight:bold}
 .acci.buy img{opacity:.55}.acci.buy em{color:#8a5a10}.acci.armed{border-color:#f0a33a;background:#fff6e2}.acci.armed em{color:#c46a00;font-weight:bold}
-.adjbox{position:absolute;transform:translate(-50%,-50%);border:2px dashed #4a90e2;border-radius:6px;cursor:move;touch-action:none}
-.adjh{position:absolute;right:-11px;bottom:-11px;width:22px;height:22px;border-radius:50%;background:#4a90e2;border:2px solid #fff;cursor:nwse-resize}
 .irow2{position:absolute;left:14px;display:flex;align-items:center;gap:8px;z-index:3001;pointer-events:auto}
 .irow2.hidden{display:none}
 .rankb img{width:72%;height:72%;object-fit:contain}
@@ -809,6 +803,18 @@ img{-webkit-user-drag:none}
 
 /* 島主後台：島民來信未讀徽章 */
 .mbtn .ubadge{background:#e0453a;color:#fff;border-radius:999px;padding:1px 8px;font-size:12px;line-height:1.5;margin-left:6px}
+/* v1.56 🛍️ 毛二街 */
+.label.shop2{background:#efe2ff;border-color:#8a62c9;color:#5a3a8a}
+.staff{position:absolute;transform:translate(-50%,-100%);border:0;background:none;padding:0;cursor:pointer;display:block}
+.staff>img{display:block;height:100%;width:auto;transform-origin:50% 100%;animation:breathe 3.6s ease-in-out infinite;filter:drop-shadow(0 4px 3px rgba(60,35,15,.25));pointer-events:none}
+.staff .snm{position:absolute;left:50%;top:-1.6em;transform:translateX(-50%);font-size:clamp(10px,2.6cqw,13px);background:rgba(255,250,238,.92);border:1.5px solid #8a62c9;color:#5a3a8a;border-radius:999px;padding:0 8px;white-space:nowrap;pointer-events:none}
+.staff .say{bottom:calc(100% + 2em)}
+.counter{position:absolute;transform:translate(-50%,-100%);border:0;background:none;padding:0;cursor:pointer}
+.counter img{display:block;width:100%;pointer-events:none;filter:drop-shadow(0 6px 4px rgba(60,35,15,.25))}
+.placing .staff,.placing .counter{pointer-events:none}
+.si s{color:#b0a090}
+.tm .ic img.stf{width:34px;height:42px;object-fit:contain;display:block}
+@media (prefers-reduced-motion:reduce){.staff>img{animation:none}}
 </style>
 </head>
 <body>
@@ -865,17 +871,21 @@ img{-webkit-user-drag:none}
 const SLOTS=[[560,370],[770,420],[430,470],[270,580],[160,680],[560,650],[770,710],[620,850],[850,860],[470,990],[270,970],[700,1070]];
 const STYLE_NAMES={1:'粉紅陽台屋',2:'紅屋頂木屋',3:'蘑菇屋',4:'藤蔓石屋',5:'藍屋頂小屋',6:'麵包坊',7:'魔法師小屋',8:'燈塔屋',9:'南瓜屋',10:'海邊小屋',11:'人魚貝殼屋',12:'綠頂莊園'};
 const SPECIES=[['狗','🐕'],['貓','🐈'],['兔','🐇'],['倉鼠','🐹'],['鳥','🐦'],['其他','🐾']];
-const spEmoji=s=>(SPECIES.find(x=>x[0]===s)||SPECIES[5])[1];
 const SPK={狗:'dog',貓:'cat',兔:'rabbit',倉鼠:'hamster',鳥:'bird',其他:'other'};
 const defHead=s=>`assets/pet_head_${SPK[s]||'other'}.webp`,defBody=s=>`assets/pet_body_${SPK[s]||'other'}.webp`;
 const petHead=p=>p.head||defHead(p.species),petBody=p=>p.body||defBody(p.species);
 const ROOMS=[['basic1','木質暖陽'],['basic2','復古木屋'],['basic3','森林小屋']];
-const roomImg=id=>ROOMS.some(r=>r[0]===id)?`assets/room_${id}.webp`:(typeof CARDS!=='undefined'&&CARDS.some(c=>c.id===id))?`assets/room_card_${id}.webp`:'assets/room_basic1.webp';
+const roomImg=id=>id==='shop2'?'assets/room_shop2.webp':ROOMS.some(r=>r[0]===id)?`assets/room_${id}.webp`:(typeof CARDS!=='undefined'&&CARDS.some(c=>c.id===id))?`assets/room_card_${id}.webp`:'assets/room_basic1.webp';
 const CARD_COLORS=[['蜜桃橘','#ff9a6b'],['櫻花粉','#f48fb1'],['天空藍','#64b5f6'],['薄荷綠','#5fbf95'],['薰衣草','#9b8cff'],['奶茶棕','#b98d62']];
 const NOTE_COLORS=['#ffe98a','#ffc7d4','#bfe3ff','#c9f0c0','#ffd6a8'];
 const MED_TYPES=['看診','疫苗','驅蟲','健檢','手術','用藥','其他'];
 const EXP_CATS=['飼料','零食','用品','醫療','美容','保險','其他'];
 const HOUR=3600e3;
+// 🛍️ 毛二街（二手店）：當成一個特別的「家」，id 固定 shop2，佔第 7 塊地（slot 6）
+const SHOP_ID='shop2',SHOP_SLOT=6,SHOP2_POS={x:770,y:710},SHOP_RATE=.5,LIMIT_BASE=150,SHOP_STAFF_MAX=3,SHOP_MGR_MAX=2;
+const SHOP_STAFF0=[{id:'s1',name:'阿二',img:'assets/shop2_npc_idle.webp',img2:'assets/shop2_npc_wave.webp',about:''}];
+const isShopH=h=>!!(h&&(h.kind==='shop'||h.id===SHOP_ID));
+function shopSeed(){return {id:SHOP_ID,kind:'shop',slot:SHOP_SLOT,style:0,name:'毛二街',motto:'二手好物・撿便宜',room:'shop2',owned:[],poops:[],poopAt:Date.now(),toys:[],gifts:[],mgr:[],staff:JSON.parse(JSON.stringify(SHOP_STAFF0)),stock:[],rday:'',createdAt:Date.now()}}
 
 // ================= 本機資料（試做版存在這支手機的瀏覽器） =================
 const KEY='maohenduo_proto_v4';
@@ -909,14 +919,14 @@ function seed(){
     H(3,4,'毛球莊','兩隻狗一隻貓',[{name:'毛球',species:'狗',breed:'博美',sex:'♂',birthday:'2019-12-24',color:'奶油',about:'看到鏡子會吵架',trait:'活潑'},{name:'黑糖',species:'貓',breed:'米克斯',sex:'♀',birthday:'2022-06-10',color:'黑',about:'夜行性',trait:'高冷'}]),
     H(4,5,'小白窩','',[{name:'小白',species:'狗',breed:'柴犬',sex:'♀',birthday:'2021-09-09',color:'白柴',about:'不給摸屁股',trait:'高冷'}]),
     H(5,6,'胖虎麵包坊','',[{name:'胖虎',species:'狗',breed:'法鬥',sex:'♂',birthday:'2022-01-15',color:'虎斑',about:'打呼很大聲',trait:'愛睡'}]),
-    H(6,9,'南瓜家','',[{name:'南瓜',species:'兔',breed:'垂耳兔',sex:'♀',birthday:'2023-10-31',color:'橘',about:'會自己開籠子',trait:'活潑'}]),
+    H(7,9,'南瓜家','',[{name:'南瓜',species:'兔',breed:'垂耳兔',sex:'♀',birthday:'2023-10-31',color:'橘',about:'會自己開籠子',trait:'活潑'}]),
     H(8,10,'海風小屋','',[{name:'浪浪',species:'狗',breed:'米克斯',sex:'♂',birthday:'2024-03-03',color:'黑白',about:'剛被收編，還在適應',trait:'黏人'}]),
     H(9,12,'可可莊園','',[{name:'可可',species:'倉鼠',breed:'黃金鼠',sex:'♀',birthday:'2025-05-05',color:'奶茶',about:'臉頰永遠塞滿',trait:'貪吃'}]),
   ];
   const pets=[],weights=[];let no=1;
   houses.forEach(h=>{h._pets.forEach(p=>{const id=uid();pets.push({id,houseId:h.id,no:no++,breed:'',fixed:'',chip:'',allergy:'',card:CARD_COLORS[(no)%6][1],createdAt:now-86400e3*4,...p});
     const base={狗:6,貓:4.2,兔:1.8,倉鼠:0.12}[p.species]||3;
-    [['2026-05-01',0.92],['2026-07-01',0.96],['2026-09-01',0.99],['2026-11-01',1]].forEach(([d,k])=>weights.push({id:uid(),petId:id,date:d,kg:+(base*k).toFixed(2),createdAt:now}))});delete h._pets});
+    [['2026-05-01',0.92],['2026-07-01',0.96],['2026-09-01',0.99],['2026-11-01',1]].forEach(([d,k])=>weights.push({id:uid(),petId:id,date:d,kg:+(base*k).toFixed(2),createdAt:now}))});delete h._pets});houses.push(shopSeed());
   return {v:2,me:null,houses,pets,weights,medical:[],expenses:[],notes:[
     {id:uid(),houseId:houses[1].id,by:'阿橘',text:'豆花今天好可愛！下次帶罐罐來',color:'#ffe98a',createdAt:now-HOUR*3},
     {id:uid(),houseId:houses[1].id,by:'小白',text:'週末一起去狗公園嗎？',color:'#bfe3ff',createdAt:now-HOUR*2}],
@@ -928,7 +938,8 @@ function emptyGame(){return {coins:0,tickets:1,prog:{poop:0,note:0,feed:0,weight
 function load(){
   if(ONLINE){let o={};try{o=JSON.parse(localStorage.getItem(OKEY)||'{}')}catch(e){}
     return {me:o.me||null,game:o.game||emptyGame(),houses:[],pets:[],weights:[],medical:[],expenses:[],notes:[],feed:[],owned:{},famOk:false,players:[],tlogs:[]}}
-  try{const s=localStorage.getItem(KEY);if(s)return JSON.parse(s)}catch(e){}return seed()}
+  let db=null;try{const s=localStorage.getItem(KEY);if(s)db=JSON.parse(s)}catch(e){}if(!db)db=seed();
+  if(!db.houses.some(isShopH)){const sh=shopSeed();if(db.houses.some(h=>h.slot===SHOP_SLOT))sh.slot=-1;db.houses.push(sh)}return db}
 let pushT;
 function save(){
   try{if(ONLINE)localStorage.setItem(OKEY,JSON.stringify({me:DB.me,game:DB.game}));else localStorage.setItem(KEY,JSON.stringify(DB))}catch(e){toast('手機空間不夠，這次的變更可能沒存到')}
@@ -1024,7 +1035,6 @@ const LOCAL={
   addNote({note}){const n={id:uid(),houseId:note.houseId,by:DB.me.nick,byId:DB.me.id,text:note.text,color:note.color,createdAt:Date.now()};DB.notes.push(n);feedPush(`${DB.me.nick} 在 ${house(note.houseId).name} 貼了便利貼 📝`);return n},
   deleteNote({id}){DB.notes=DB.notes.filter(x=>x.id!==id);return true},
   cleanPoop({houseId}){const h=house(houseId),nm=(petsOf(houseId)[0]||{}).name||h.name;feedPush(`${DB.me.nick} 幫 ${nm} 清了大便 🧹`);return {gone:false}},
-  feed({houseId}){feedPush(`${DB.me.nick} 在 ${house(houseId).name} 餵了飯 🍖`);return true},
   drawCard({houseId,cardId,feedText}){const o=new Set(DB.owned[houseId]||[]);o.add(cardId);DB.owned[houseId]=[...o];if(feedText)feedPush(feedText);return {owned:DB.owned[houseId]}},
   upload({dataUrl}){return {url:dataUrl}},
   feedPets({petIds}){feedPush(`${DB.me.nick} 餵了 ${petIds.map(id=>pet(id).name).join('、')} 🍖`);return true},
@@ -1041,10 +1051,10 @@ const LOCAL={
   walkHome(){return true},
   pickCoin({dropId}){const d=(DB.drops||[]).find(x=>x.id===dropId);if(!d)throw new Error('慢了一步，錢被別人撿走了 😆');DB.drops=DB.drops.filter(x=>x.id!==dropId);const r=Math.random(),a=r<.6?5+~~(Math.random()*6):r<.85?12+~~(Math.random()*9):r<.95?25+~~(Math.random()*16):r<.99?50+~~(Math.random()*31):100+~~(Math.random()*51);const amt=a*(DB.dbl===todayTW()?2:1);feedPush(`${DB.me.nick} 在 ${house(d.houseId).name} 撿到 ${amt} 金幣 💰`);return {amt}},
   recoverPlayer(){throw new Error('試做版不能用轉移碼')},claimMail(){return true},
-  adminLogin(){return {players:(DB.players||[]).map(p=>({id:p.id,nick:p.nick,code:'MH-DEMO00',house:(house(p.houseId)||{}).name||'',houseId:p.houseId||'',lv:1,coins:0,tickets:0})),houses:DB.houses.map(h=>({id:h.id,name:h.name})),drops:(DB.drops||[]).length,notice:DB.notice,dbl:DB.dbl}},
+  adminLogin(){return {players:(DB.players||[]).map(p=>({id:p.id,nick:p.nick,code:'MH-DEMO00',house:(house(p.houseId)||{}).name||'',houseId:p.houseId||'',lv:1,coins:0,tickets:0})),houses:DB.houses.filter(h=>!isShopH(h)).map(h=>({id:h.id,name:h.name})),shopMgr:(house(SHOP_ID)||{}).mgr||[],drops:(DB.drops||[]).length,notice:DB.notice,dbl:DB.dbl}},
   adminNotice({text}){DB.notice=text?{t:text,at:Date.now()}:null;return true},adminDouble({on}){DB.dbl=on?todayTW():'';return true},
   adminRain({houseId,n}){for(let i=0;i<(+n||1);i++){const h=houseId?house(houseId):DB.houses[~~(Math.random()*DB.houses.length)];(DB.drops=DB.drops||[]).push({id:uid(),houseId:h.id,x:Math.round(FLOOR.x0+40+Math.random()*(FLOOR.x1-FLOOR.x0-80)),y:Math.round(FLOOR.y0+20+Math.random()*(FLOOR.y1-FLOOR.y0-40))})}return true},
-  adminGive(){return true},readLetter(){return true},hideLetter(){return true},claimLetter({letterId}){const l=(DB.letters||[]).find(x=>x.id===letterId)||{};return {coins:l.coins,tickets:l.tickets,item:l.item,n:l.n}},adminLetter(o){(DB.letters=DB.letters||[]).unshift({id:uid(),title:o.title,body:o.body,at:Date.now(),coins:+o.coins||0,tickets:+o.tickets||0,item:o.item||'',n:+o.n||0,read:false,claimed:false,all:o.to==='*'});return true},adminGiftHouse({houseId,coins,tickets,item,n,msg,room}){const h=house(houseId);(h.gifts=h.gifts||[]).push({id:uid(),admin:true,from:'島主',coins,tickets,item,n,msg,room,opened:[],at:Date.now(),x:Math.round(FLOOR.x0+60+Math.random()*(FLOOR.x1-FLOOR.x0-120)),y:Math.round(FLOOR.y0+40+Math.random()*150)});return true},adminResetPw(){return true},adminRemoveHouse({houseId}){return LOCAL.deleteHouse({houseId})},
+  readLetter(){return true},hideLetter(){return true},claimLetter({letterId}){const l=(DB.letters||[]).find(x=>x.id===letterId)||{};return {coins:l.coins,tickets:l.tickets,item:l.item,n:l.n}},adminLetter(o){(DB.letters=DB.letters||[]).unshift({id:uid(),title:o.title,body:o.body,at:Date.now(),coins:+o.coins||0,tickets:+o.tickets||0,item:o.item||'',n:+o.n||0,read:false,claimed:false,all:o.to==='*'});return true},adminGiftHouse({houseId,coins,tickets,item,n,msg,room}){const h=house(houseId);(h.gifts=h.gifts||[]).push({id:uid(),admin:true,from:'島主',coins,tickets,item,n,msg,room,opened:[],at:Date.now(),x:Math.round(FLOOR.x0+60+Math.random()*(FLOOR.x1-FLOOR.x0-120)),y:Math.round(FLOOR.y0+40+Math.random()*150)});return true},adminResetPw(){return true},adminRemoveHouse({houseId}){return LOCAL.deleteHouse({houseId})},
   addTLog({log}){const l=Object.assign({},log,{id:uid(),createdAt:Date.now(),by:DB.me.nick});(DB.tlogs=DB.tlogs||[]).push(l);return l},
   deleteTLog({id}){DB.tlogs=(DB.tlogs||[]).filter(x=>x.id!==id);return true},
   visit(){return true},ping(){return true},
@@ -1059,6 +1069,12 @@ const LOCAL={
   kujiGiftRoom({toHouseId,room}){const o=new Set(DB.owned[toHouseId]||[]);o.add(room);DB.owned[toHouseId]=[...o];return true},
   demonHelp({houseId,kind}){const h=house(houseId),d=h&&h.demon;if(!d)return {none:true};return {prog:d.prog,until:d.until||0}},
   demonEnd({houseId}){const h=house(houseId);delete h.demon;return {}},
+  shopBuy({stockId,name}){const s=house(SHOP_ID),it=(s.stock||[]).find(x=>x.id===stockId);if(!it)throw new Error('慢了一步，這個被別人買走了 😆');s.stock=s.stock.filter(x=>x!==it);feedPush(`🛍️ ${DB.me.nick} 在毛二街撿到便宜：${name||it.item}`);return {item:it.item,t:it.t}},
+  shopSell({item,t,name}){const s=house(SHOP_ID);(s.stock=s.stock||[]).push({id:uid(),item,t,at:Date.now(),src:'p',by:DB.me.nick});while(s.stock.length>40){const i=s.stock.findIndex(x=>x.src!=='p');s.stock.splice(i>=0?i:0,1)}feedPush(`💰 ${DB.me.nick} 把 ${name||item} 賣給毛二街`);return {ok:true}},
+  shopRestock({items}){const s=house(SHOP_ID),d=todayTW();if(s.rday===d)return {stock:s.stock};(items||[]).slice(0,3).forEach(x=>(s.stock=s.stock||[]).push({id:uid(),item:x.item,t:x.t,at:Date.now(),src:'s'}));s.rday=d;return {stock:s.stock}},
+  shopUpdate({patch}){const s=house(SHOP_ID);if(patch.room)s.room=patch.room;if(patch.motto!==undefined)s.motto=patch.motto;return true},
+  shopStaff({staff}){house(SHOP_ID).staff=staff;return {staff}},
+  adminShopMgr({ids}){house(SHOP_ID).mgr=ids;return {mgr:ids}},
   deleteHouse({houseId}){const ids=petsOf(houseId).map(p=>p.id);DB.pets=DB.pets.filter(p=>p.houseId!==houseId);['weights','medical','expenses'].forEach(k=>DB[k]=DB[k].filter(x=>!ids.includes(x.petId)));
     DB.notes=DB.notes.filter(n=>n.houseId!==houseId);const h=house(houseId);DB.houses=DB.houses.filter(x=>x.id!==houseId);feedPush(`${DB.me.nick} 拆掉了「${h.name}」`);return true},
 };
@@ -1245,7 +1261,7 @@ const RB={coin:{t:'💰財神爺欽點',d:'這週撿最多錢的人',u:v=>'$'+v.
 let rankTab='coin';
 function titlesOf(pid){const L=DB.rank&&DB.rank.last&&DB.rank.last.win;if(!L||!pid)return [];return ['coin','poop','visit'].filter(b=>L[b]&&L[b][0]&&L[b][0].id===pid).map(b=>RB[b].t)}
 function popKing(petId){const L=DB.rank&&DB.rank.last&&DB.rank.last.win;return !!(L&&L.pop&&L.pop[0]&&L.pop[0].id===petId)}
-function titleTag(pid){return titlesOf(pid).map(t=>`<b class="ttag">${t}</b>`).join('')}
+function titleTag(pid){return titlesOf(pid).concat(pid&&shopMgrs().includes(pid)?['👔毛二街店長']:[]).map(t=>`<b class="ttag">${t}</b>`).join('')}
 const nickOf=id=>((DB.players||[]).find(p=>p.id===id)||{}).nick||(DB.me&&DB.me.id===id?DB.me.nick:'（已離開）');
 function rankName(b,id){if(b==='pop'){const p=pet(id);return p?`${esc(p.name)}<small>${esc((house(p.houseId)||{}).name||'')}</small>`:'（已離開）'}return esc(nickOf(id))}
 function rankSheet(tab){if(tab)rankTab=tab;const R=DB.rank,b=rankTab,B=RB[b];
@@ -1345,8 +1361,8 @@ function renderIsland(){
   const p=period();
   document.querySelectorAll('#island .bg').forEach(b=>b.classList.toggle('on',b.dataset.p===p));$('#iback').style.backgroundImage=`url(assets/island2_${p}.webp)`;
   document.querySelectorAll('#bar button').forEach(b=>b.classList.toggle('on',b.dataset.p===mode));
-  const box=$('#things');box.innerHTML='';const used=new Map(DB.houses.map(h=>[h.slot,h]));
-  SLOTS.map((s,i)=>({s,i})).sort((a,b)=>a.s[1]-b.s[1]).forEach(({s:[x,y],i})=>{
+  const box=$('#things');box.innerHTML='';const used=new Map(DB.houses.filter(h=>!isShopH(h)).map(h=>[h.slot,h]));
+  SLOTS.map((s,i)=>({s,i})).filter(o=>o.i!==SHOP_SLOT||used.has(o.i)).sort((a,b)=>a.s[1]-b.s[1]).forEach(({s:[x,y],i})=>{
     const h=used.get(i);const el=document.createElement('div');el.className='thing'+(!h&&picking?' pick':'');
     el.setAttribute('role','button');el.tabIndex=0;el.setAttribute('aria-label',h?h.name:'空地，可以蓋房子');
     Object.assign(el.style,ipct(x,y),{width:((h?HOUSE_W:LOT_W)/1024*100)+'%',zIndex:y});
@@ -1363,6 +1379,10 @@ function renderIsland(){
   {const sp=SHOP_POS,el=document.createElement('div');el.className='thing';el.setAttribute('role','button');el.tabIndex=0;el.setAttribute('aria-label','毛毛商店');
     Object.assign(el.style,ipct(sp.x,sp.y),{width:(HOUSE_W/1024*100)+'%',zIndex:sp.y});el.innerHTML=`<img src="assets/${SHOP_IMG?'shop':'house'+sp.style}_${p}.webp" alt="" onerror="this.src='assets/house${sp.style}_${p}.webp'">`;el.onclick=()=>shopSheet();box.appendChild(el);
     const lb=document.createElement('div');lb.className='label shop';lb.textContent='🏪 毛毛商店';Object.assign(lb.style,ipct(sp.x,sp.y+6),{zIndex:2000});box.appendChild(lb)}
+  {const sp=SHOP2_POS,sh=house(SHOP_ID),el=document.createElement('div');el.className='thing';el.setAttribute('role','button');el.tabIndex=0;el.setAttribute('aria-label','毛二街');
+    Object.assign(el.style,ipct(sp.x,sp.y),{width:(HOUSE_W/1024*100)+'%',zIndex:sp.y});el.innerHTML=`<img src="assets/shop2_${p}.webp" alt="" onerror="this.src='assets/shop2_day.webp'">`;el.onclick=()=>sh?openHome(SHOP_ID):toast('毛二街還在裝潢中，等島主更新後端 🛠️');box.appendChild(el);
+    const lb=document.createElement('div');lb.className='label shop2';lb.textContent='🛍️ 毛二街';Object.assign(lb.style,ipct(sp.x,sp.y+6),{zIndex:2000});box.appendChild(lb);
+    if(sh&&guestsOf(SHOP_ID).length){const gb=document.createElement('div');gb.className='bubble';gb.textContent='🐾';Object.assign(gb.style,ipct(sp.x-40,sp.y-150),{zIndex:2001});box.appendChild(gb)}}
   $('#pickbar').classList.toggle('hidden',!picking);$('#ticker').classList.toggle('hidden',picking);
   renderMe();updTix();if(typeof updBell==='function')updBell();updOnline();
 }
@@ -1424,7 +1444,7 @@ function updGuestBar(){let g=$('#guestbar');if(!g){g=document.createElement('but
   const show=ONLINE&&!myHouse();g.style.display=show?'':'none';g.textContent=DB.me?'🔒 還沒有家・點這裡加入':'🔒 參觀中・點這裡加入'}
 function joinFlow(hid){
   const fresh=!DB.me;const mine=myHouse();if(mine){toast(`你已經是「${mine.name}」的家人，要先退出才能加入別的家`);return}
-  const list=DB.houses.slice().sort((a,b)=>a.name.localeCompare(b.name,'zh-Hant'));
+  const list=DB.houses.filter(h=>!isShopH(h)).sort((a,b)=>a.name.localeCompare(b.name,'zh-Hant'));
   openModal(`<h3>🔑 加入家人的家</h3><p class="lead">選一個家，輸入家人告訴你的密碼</p>
     ${fld('jh','哪一個家？',`<select id="jh">${list.map(h=>`<option value="${h.id}" ${h.id===hid?'selected':''}>${esc(h.name)}（${membersOf(h.id).length}/${MAX_MEMBERS}）</option>`).join('')}</select>`)}
     ${fld('jp','家人密碼',`<input id="jp" type="password" autocomplete="off">`,'試做版的示範家庭，密碼都是 1234')}
@@ -1494,7 +1514,7 @@ function roomPicker(id,cur,hid){const list=roomChoices(hid);return `<div class="
 function bindRoom(id,cb){const g=$('#'+id);g.onclick=e=>{const b=e.target.closest('button');if(!b)return;g.querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===b));cb(b.dataset.v)}}
 // ================= 家裡 =================
 const RW=848,RH=1264,FLOOR={x0:110,x1:750,y0:840,y1:1170};
-const BOARDS={basic1:[432,352,698,536],basic2:[422,335,710,547],basic3:[433,346,700,534],study:[456,286,689,486],garden:[428,255,680,479],cafe:[444,297,681,499],beach:[417,275,698,492],sakura:[435,270,701,507],forest:[432,266,690,492],cloud:[429,265,686,495],xmas:[433,269,689,505],ocean:[428,275,683,496],star:[425,248,690,507],space:[431,280,693,467],dessert:[432,270,762,456],arcade:[432,277,742,462],library:[440,284,742,452],washitsu:[448,280,735,462],circus:[434,302,733,463],cabin:[432,288,738,462],party:[445,281,738,462],pinkroom:[422,236,737,422],sweetdevil:[430,245,705,476],ufobase:[420,262,738,455],street:[426,261,733,455],pearl:[402,248,733,470],surf:[412,250,708,460],nightmkt:[412,280,720,462],redcheck:[422,240,745,435],princess:[426,263,755,457],hiphop:[412,268,764,479],hawaiicat:[430,265,712,460],calibeach:[467,181,798,420],snoopy:[481,173,793,412],stussy:[474,195,815,439]};
+const BOARDS={shop2:[420,232,822,445],basic1:[432,352,698,536],basic2:[422,335,710,547],basic3:[433,346,700,534],study:[456,286,689,486],garden:[428,255,680,479],cafe:[444,297,681,499],beach:[417,275,698,492],sakura:[435,270,701,507],forest:[432,266,690,492],cloud:[429,265,686,495],xmas:[433,269,689,505],ocean:[428,275,683,496],star:[425,248,690,507],space:[431,280,693,467],dessert:[432,270,762,456],arcade:[432,277,742,462],library:[440,284,742,452],washitsu:[448,280,735,462],circus:[434,302,733,463],cabin:[432,288,738,462],party:[445,281,738,462],pinkroom:[422,236,737,422],sweetdevil:[430,245,705,476],ufobase:[420,262,738,455],street:[426,261,733,455],pearl:[402,248,733,470],surf:[412,250,708,460],nightmkt:[412,280,720,462],redcheck:[422,240,745,435],princess:[426,263,755,457],hiphop:[412,268,764,479],hawaiicat:[430,265,712,460],calibeach:[467,181,798,420],snoopy:[481,173,793,412],stussy:[474,195,815,439]};
 const BOWL={x:424,y:1150};
 const hp=(x,y)=>({left:(x/RW*100)+'%',top:(y/RH*100)+'%'});
 let home=null,raf=0,last=0;
@@ -1512,7 +1532,6 @@ const TWO=8*HOUR;const twMin=t=>{const d=new Date(t+TWO);return d.getUTCHours()*
 const twDay=t=>new Date(t+TWO).toISOString().slice(0,10);
 function dayStart(t){const d=new Date(t+TWO);return t-(d.getUTCHours()*60+d.getUTCMinutes())*60000-d.getUTCSeconds()*1000-d.getUTCMilliseconds()}
 function fullness(p,now){if(!p.lastFed)return 55;return clamp(Math.round(100-((now||Date.now())-p.lastFed)/HOUR*100/12),0,100)}
-function mealsToday(p){return p.mealDay===todayTW()?(+p.meals||0):0}
 function mood(p,h){const now=Date.now(),pats=(Array.isArray(p.pats)?p.pats:[]).filter(t=>now-t<3*HOUR).length;
   const vis=h.visits&&h.visits.day===todayTW()?(h.visits.list||[]).length:0;
   return clamp(35+15*Math.min(3,pats)+10*Math.min(2,vis)+8*Math.min(3,p.treatDay===todayTW()?(+p.treatN||0):0)+(fullness(p)>=50?10:-10)-10*Math.min(3,(h.poops||[]).length),0,100)}
@@ -1558,13 +1577,14 @@ function openHome(hid,keep){
     call('visit',{playerId:DB.me.id,houseId:hid},true).catch(()=>{});visitReward(hid);renderFoot2()}
   if(ONLINE&&!keep){sync(true);pingWhere()}
   if(!keep&&isFamily(hid)&&demonOf(h))setTimeout(()=>{if(home&&home.id===hid&&demonOf(house(hid)))demonWelcome(house(hid))},1400);
-  $('#foot').innerHTML=isFamily(hid)?'這是你家！右上可以新增毛孩、編輯家。點毛孩可以摸頭、看身分證、記錄體重醫療支出。':'朋友家：清地上的便便、餵飯、點毛孩摸頭、在軟木板貼便利貼。睡覺中的毛孩不能打擾喔。';
+  if(isShopH(h)&&!keep)setTimeout(shopRestockMaybe,500);
+  $('#foot').innerHTML=isShopH(h)?'毛二街：點櫃檯或店員可以買二手、賣東西。收購和賣出都是原價的一半。':isFamily(hid)?'這是你家！右上可以新增毛孩、編輯家。點毛孩可以摸頭、看身分證、記錄體重醫療支出。':'朋友家：清地上的便便、餵飯、點毛孩摸頭、在軟木板貼便利貼。睡覺中的毛孩不能打擾喔。';
   window.scrollTo(0,0);
 }
 function renderFoot2(){
   const h=house(home.id),L=h.visits&&h.visits.day===todayTW()?h.visits.list||[]:[];
-  const M=membersOf(h.id);
-  $('#visits').innerHTML=(M.length?`<div>👥 家人 ${M.length}/${MAX_MEMBERS}：${M.map(m=>(isOn(m.id)?'🟢':'')+esc(m.nick)+lvTag(m.id)).join('、')}</div>`:'')+(L.length?`<div>🐾 今天來過：${L.slice().reverse().slice(0,5).map(v=>esc(v.nick)+lvTag(v.id)).join('、')}${L.length>5?` 等 ${L.length} 人`:''}</div>`:'');
+  const SH=isShopH(h),M=SH?shopMgrs().map(id=>({id,nick:nickOf(id)})):membersOf(h.id);
+  $('#visits').innerHTML=(M.length?`<div>${SH?'👔 店長':'👥 家人 '+M.length+'/'+MAX_MEMBERS}：${M.map(m=>(isOn(m.id)?'🟢':'')+esc(m.nick)+lvTag(m.id)).join('、')}</div>`:'')+(L.length?`<div>🐾 今天來過：${L.slice().reverse().slice(0,5).map(v=>esc(v.nick)+lvTag(v.id)).join('、')}${L.length>5?` 等 ${L.length} 人`:''}</div>`:'');
   $('#visits').onclick=()=>peopleSheet(h.id);
   const own=petsOf(h.id),gs=guestsOf(h.id).map(g=>pet(g.petId)).filter(p=>p.houseId!==h.id);
   const heads=own.concat(gs).map(p=>{const o=outAt(p.id),away=o&&o.id!==h.id,sl=!away&&sleepState(p);return `<button class="ph1${away?' away':''}" data-pid="${p.id}" title="${esc(p.name)}"><img src="${!away&&petDemon(p)?'assets/demon_head.webp':petHead(p)}" alt="">${away?'<i>🐾</i>':sl?'<i>💤</i>':p.houseId!==h.id?'<i>🏠</i>':''}</button>`}).join('');
@@ -1574,6 +1594,8 @@ function renderFoot2(){
 }
 function renderHome(){
   const h=house(home.id);
+  if(isShopH(h))return renderShopHome(h);
+  $('#feed').textContent='🍖 餵飯';$('#feed').onclick=()=>feedNow();$('#sweep').style.display='';$('#giftbtn').style.display='';
   $('#famtools').innerHTML=isFamily(h.id)?`<button class="act" id="ft1">＋ 毛孩</button><button class="act" id="ft2">⚙️ 家</button>`:(DB.me&&!DB.me.houseId?`<button class="act" id="ft3">🔑 我是家人</button>`:'');
   if($('#ft1'))$('#ft1').onclick=()=>petForm(h.id);
   if($('#ft2'))$('#ft2').onclick=()=>houseSettings(h.id);
@@ -1634,7 +1656,7 @@ function noteForm(){
     closeModal();renderBoard();
     if(isFamily(h.id))toast('便利貼貼好了 📝（貼在自己家不算任務喔）');
     else{const g=DB.game,d=todayTW();if(g.noteDay[0]!==d)g.noteDay=[d,0];
-      if(g.noteDay[1]<3){g.noteDay[1]++;toast('便利貼貼好了 📝');progress('note');earn('note')}else toast('便利貼貼好了 📝（今天的留言任務已經滿了）')}};
+      if(g.noteDay[1]<3){g.noteDay[1]++;toast('便利貼貼好了 📝');earn('note')}else toast('便利貼貼好了 📝（今天的留言任務已經滿了）')}};
   setTimeout(()=>ta.isConnected&&ta.focus(),60);
 }
 $('#addnote').onclick=noteForm;
@@ -1655,7 +1677,7 @@ function renderFloor(){
   (h.poops||[]).forEach(p=>{const el=document.createElement('button');el.className='poop';el.innerHTML='<img src="assets/poop.webp" alt="">';el.setAttribute('aria-label','清便便');
     Object.assign(el.style,hp(p.x,p.y),{zIndex:2600});
     el.onclick=e=>{e.stopPropagation();if(!needMe())return;sfx('sweep');fx('✨',p.x,p.y-40);GONEPOOP[p.id]=Date.now();h.poops=h.poops.filter(x=>x.id!==p.id);renderFloor();const nm=(petsOf(h.id)[0]||{}).name||h.name;
-      toast(`你幫 ${nm} 清了便便 🧹`);progress('poop');earn('poop');if(ONLINE)feedPush(`${DB.me.nick} 幫 ${nm} 清了大便 🧹`);
+      toast(`你幫 ${nm} 清了便便 🧹`);earn('poop');if(ONLINE)feedPush(`${DB.me.nick} 幫 ${nm} 清了大便 🧹`);
       call('cleanPoop',{playerId:DB.me.id,houseId:h.id,poopId:p.id},true).catch(()=>{})};f.appendChild(el)});
   if(home.bowl){const el=document.createElement('div');el.className='bowl';el.innerHTML=`<img src="assets/bowl_${home.bowl.empty?'empty':'full'}.webp" alt="">`;Object.assign(el.style,hp(BOWL.x,BOWL.y),{zIndex:Math.round(BOWL.y)});f.appendChild(el)}
   home.pets.forEach((r,i)=>{const p=pet(r.id);if(!p)return;
@@ -1670,6 +1692,7 @@ function renderFloor(){
     Object.assign(te.style,hp(sp.x-tw/2,sp.y-tw*0.98),{width:(tw/RW*100)+'%',zIndex:Math.round(sp.y)});
     te.onclick=e=>{e.stopPropagation();sleepMenu(r,p)};
     r.tentEl=te;r.tent=sp;f.appendChild(te);r.sleep=undefined;petLook(r);placePet(r)});
+  if(isShopH(h))renderStaff(f,h);
   $('#home').classList.toggle('placing',!!placing);if(placing)drawGrid();else if($('#gcancel'))$('#gcancel').remove();
 }
 // 外觀：餓到縮小、生氣（每幾秒算一次）
@@ -1781,7 +1804,7 @@ function feedNow(only){
   toast(`你餵了 ${names} 🍖${nap.length?'（睡著的幫牠留飯了 💤）':''}${full.length&&!only?'（其他毛孩還飽飽的）':''}${awayMsg?'；'+awayMsg:''}`);
   call('feedPets',{playerId:DB.me.id,houseId:h.id,petIds:fed.map(r=>r.id)},true).catch(e=>toast(e.message));
   earn('feed');if(ONLINE)feedPush(`${DB.me.nick} 餵了 ${names} 🍖`);demonHelp('feed');
-  const g=DB.game;if(!g.feedAt[h.id]||Date.now()-g.feedAt[h.id]>2*HOUR){g.feedAt[h.id]=Date.now();progress('feed')}
+  const g=DB.game;if(!g.feedAt[h.id]||Date.now()-g.feedAt[h.id]>2*HOUR){g.feedAt[h.id]=Date.now()}
 }
 // 睡著的毛孩：帳篷旁放一碗飯，不吵醒
 function napBowl(r){if(!r.tent)return;const el=document.createElement('div');el.className='bowl napb';el.innerHTML='<img src="assets/bowl_full.webp" alt="">';
@@ -2101,7 +2124,7 @@ function recForm(pid,kind){
     if(ONLINE){const o=optAdd(kind,Object.assign({id:'tmp'+uid(),createdAt:Date.now()},rec));if(kind==='weights')feedPush(`${p.name} 量了體重 ⚖️`);
       call('addRecord',Object.assign(cred(),{kind,rec}),true).then(r=>optDone(kind,o,r)).catch(e=>{optFail(kind,o);toast('紀錄沒存成功：'+e.message)})}
     else{try{await call('addRecord',Object.assign(cred(),{kind,rec}))}catch(e){$('#rerr').textContent=e.message;return}}
-    if(kind==='weights'&&!late&&DB.game.weightDay!==T){DB.game.weightDay=T;progress('weight')}
+    if(kind==='weights'&&!late&&DB.game.weightDay!==T){DB.game.weightDay=T}
     if(kind==='weights'&&!late)earn('rec');
     toast('記好了 ✨');idCard(pid)};
 }
@@ -2149,91 +2172,22 @@ const CARDS=[
   {id:'sweetdevil',name:'酷洛米屋',r:'H'},{id:'ufobase',name:'外星人基地',r:'SSR'},{id:'pearl',name:'珍珠貝殼房',r:'SSR'},{id:'princess',name:'公主珠寶房',r:'SSR'},
   {id:'calibeach',name:'加州海灘',r:'R'},{id:'snoopy',name:'史努比房',r:'H'},{id:'stussy',name:'Stussy房',r:'H'},
 ].map(c=>Object.assign(c,{img:`assets/room_card_${c.id}.webp`}));
-const MISSIONS=[
-  {k:'poop',ic:'💩',name:'鏟屎',goal:5,rule:'清任何人家的便便'},
-  {k:'treat',ic:'🍤',name:'餵零食',goal:3,rule:'餵任何毛孩吃零食'},
-  {k:'gift',ic:'🎁',name:'送禮物',goal:1,rule:'送禮物給別人家'},
-  {k:'note',ic:'📝',name:'留言',goal:3,rule:'在別人家貼便利貼（自己家不算）・每天最多算 3 則'},
-  {k:'feed',ic:'🍖',name:'餵飯',goal:3,rule:'同一個家每 2 小時算 1 次'},
-  {k:'weight',ic:'⚖️',name:'量體重',goal:3,rule:'當天登記才算・一天算 1 次'},
-];
 const owned=hid=>new Set((DB.owned[hid]||[]).filter(id=>CARDS.some(c=>c.id===id)));
 function cardArt(c){return `<img src="${c.img}" alt="" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover">`}
 function updTix(){const n=DB.game.tickets;$('#tixn').textContent=n;$('#tixn').style.display=n?'flex':'none'}
-function progress(k){const m=MISSIONS.find(x=>x.k===k),g=DB.game;g.prog[k]=(g.prog[k]||0)+1;
-  if(g.prog[k]>=m.goal){g.prog[k]=0;g.tickets++;setTimeout(()=>toast(`🎟️ ${m.name}任務完成！獲得 1 張抽卡券`),1200)}save();updTix()}
-function missionStatus(k){
-  const g=DB.game,d=todayTW(),now=Date.now();
-  if(k==='poop'){const n=DB.houses.reduce((a,h)=>a+(isFamily(h.id)?0:(h.poops||[]).length),0);return n?`島上現在有 ${n} 坨便便等你清 🧹`:'大家家裡都很乾淨，晚點再來看看'}
-  if(k==='note'){const n=g.noteDay[0]===d?g.noteDay[1]:0;return n>=3?'今天已達上限 ✅ 明天再來':`今天已算 ${n} / 3 則`}
-  if(k==='feed'){const cd=Object.entries(g.feedAt||{}).filter(([h,t])=>now-t<2*HOUR&&house(h));return cd.length?`冷卻中：${cd.map(([h,t])=>`${house(h).name}（還要 ${Math.ceil((2*HOUR-(now-t))/60000)} 分）`).join('、')}`:'現在去任何一家餵飯都會算'}
-  if(k==='weight')return g.weightDay===d?'今天已完成 ✅':'今天還沒量喔';
-  if(k==='treat'){const n=bagList('treat').reduce((a,[,c])=>a+c,0);return n?`背包裡有 ${n} 個零食`:'去 🏪 毛毛商店買零食'}
-  if(k==='gift')return bagList().length?'在朋友家點「🎁 送禮」':'去 🏪 毛毛商店買玩具或零食當禮物';
-}
-function missionsSheet(){
-  if(!DB.me)return onboarding();
-  const h=myHouse(),own=h?owned(h.id):new Set(),g=DB.game;
-  openModal(`<h3>🎟️ 任務與抽卡</h3>
-  <div class="tk"><div><div style="font-size:13px;color:var(--soft)">我的抽卡券</div><div class="n">${g.tickets} 張</div></div><button id="draw" ${g.tickets&&h?'':'disabled'}>開卡包</button></div>
-  <div class="tk coin"><div><div style="font-size:13px;color:var(--soft)">我的金幣</div><div class="n">🪙 ${g.coins||0}</div></div><button id="buy" ${(g.coins||0)>=PACK_PRICE?'':'disabled'}>${PACK_PRICE} 🪙 換 1 張券</button></div>
-  <details class="earn"><summary>怎麼賺金幣？</summary>${Object.values(EARN).map(e=>`<div class="frow"><span>${e.name}</span><span>+${e.v} 🪙・每天最多 ${e.cap} 次</span></div>`).join('')}</details>
-  ${h?'':'<div class="hint" style="text-align:center;margin:-4px 0 10px">有家之後才能開卡包，券會先幫你存著</div>'}
-  <div class="sec" style="margin-top:0"><h4>📋 任務<span>完成就送 1 張券</span></h4><div class="ms">
-  ${MISSIONS.map(m=>`<div class="m"><span class="ic">${m.ic}</span><span>${m.name} ${m.goal} 次</span><span class="num">${g.prog[m.k]||0} / ${m.goal}</span>
-    <div class="bar2"><i style="width:${(g.prog[m.k]||0)/m.goal*100}%"></i></div><small>${m.rule}</small><small class="st">${missionStatus(m.k)}</small></div>`).join('')}</div></div>
-  ${h?`<div class="sec"><h4>🏠 ${esc(h.name)}・房間收藏<span>${CARDS.filter(c=>c.r!=='H'&&own.has(c.id)).length} / ${CARDS.filter(c=>c.r!=='H').length}</span></h4>
-  <div class="coll">${ROOMS.map(([k,n])=>`<div class="mini" style="--rc:#d8c8b4" title="${n}（初始）"><div class="art">${`<img src="${roomImg(k)}" alt="" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover">`}</div><em>初始</em></div>`).join('')}
-  ${CARDS.filter(c=>c.r!=='H'||own.has(c.id)).map(c=>{const o=own.has(c.id);return `<div class="mini ${o?'':'locked'}" style="--rc:${RAR[c.r].color}" title="${o?c.name:'未收集'}"><div class="art">${cardArt(c)}</div>${o?'':'<span>？</span>'}</div>`}).join('')}</div>
-  <div class="hint">外框：<span style="color:${RAR.N.color}">■ 普通</span>　<span style="color:${RAR.R.color}">■ 稀有</span>　<span style="color:${RAR.SSR.color}">■ 超稀有</span>${CARDS.some(c=>c.r==='H'&&own.has(c.id))?`　<span style="color:${RAR.H.color}">■ 隱藏版</span>`:''}・不會抽到重複的・在「⚙️ 家」可以換房間</div></div>`:''}
-  <div class="row2" style="margin-top:14px"><button data-close>關閉</button></div>`);
-  $('#draw').onclick=()=>{closeModal();openPack()};
-  $('#buy').onclick=()=>{if((DB.game.coins||0)<PACK_PRICE)return;DB.game.coins-=PACK_PRICE;DB.game.tickets++;sfx('coin');save();updTix();toast('換到 1 張抽卡券 🎟️');missionsSheet()};
-}
-function openPack(){
-  const h=myHouse();if(!h)return;const own=owned(h.id),left=CARDS.filter(c=>c.r!=='H'&&!own.has(c.id));
-  if(!left.length)return toast('房間全部收集完了！券先幫你存著 🎉');
-  const avail=Object.keys(RAR).filter(r=>left.some(c=>c.r===r));let x=Math.random()*avail.reduce((a,r)=>a+RAR[r].w,0),r=avail[0];
-  for(const k of avail){if((x-=RAR[k].w)<0){r=k;break}}
-  const pool=left.filter(c=>c.r===r),c=pool[Math.floor(Math.random()*pool.length)];
-  const ftxt=`${DB.me.nick} 為 ${h.name} 抽到了 ${c.r==='SSR'?'✨超稀有・':c.r==='R'?'稀有・':''}${c.name}${c.r==='SSR'?'✨':''}`;
-  DB.game.tickets--;own.add(c.id);DB.owned[h.id]=[...own];save();updTix();
-  call('drawCard',Object.assign(cred(),{cardId:c.id,feedText:ftxt}),true).catch(e=>toast('收藏沒存到：'+e.message));
-  const ov=document.createElement('div');ov.className='gacha';ov.innerHTML=`<div class="rays" id="rays"></div><div class="hint2" id="gh">點卡包撕開</div>
-    <div class="stage-area"><div class="pack" id="pk" role="button" aria-label="撕開卡包"><div class="pbody"><img class="plogo" src="assets/logo.webp" alt=""></div><div class="ptop"></div></div>
-      <div class="card" id="cd" style="--rc:${RAR[c.r].color};--glow:${RAR[c.r].glow}"><div class="in"><div class="face back"></div>
-        <div class="face front"><div class="art">${cardArt(c)}</div><div class="cap"><b>${'★'.repeat(c.r==='SSR'?3:c.r==='R'?2:1)} ${RAR[c.r].name}</b><span>${c.name}</span></div></div></div></div></div>
-    <div class="gbtns" id="gb"><button id="guse" class="primary">換上這間</button><button id="gok">收進收藏</button><button id="gmore">再抽一次</button></div>`;
-  document.body.appendChild(ov);const pk=ov.querySelector('#pk'),cd=ov.querySelector('#cd'),gh=ov.querySelector('#gh');let st=0;
-  pk.onclick=()=>{if(st)return;st=1;gh.textContent='';pk.classList.add('shake');setTimeout(()=>{pk.classList.remove('shake');pk.classList.add('torn')},900);setTimeout(()=>{pk.classList.add('gone');cd.classList.add('up');gh.textContent='點卡片翻開';st=2},1500)};
-  cd.onclick=()=>{if(st!==2)return;st=3;gh.textContent='';cd.classList.add('flip');sfx('flip');if(typeof rar!=='undefined'&&rar==='SSR')setTimeout(()=>sfx('ssr'),650);
-    setTimeout(()=>{if(c.r!=='N'){ov.querySelector('#rays').classList.add('on');burst(ov,c.r==='SSR'?28:14)}
-      gh.textContent=c.r==='SSR'?'✨ 超稀有！ ✨':c.r==='R'?'稀有卡！':'抽到新房間';ov.querySelector('#gb').classList.add('on');ov.querySelector('#gmore').style.display=DB.game.tickets?'':'none';
-      if(ONLINE)feedPush(ftxt)},700)};
-  ov.querySelector('#guse').onclick=async()=>{const b=ov.querySelector('#guse');b.disabled=true;b.textContent='換房間中…';
-    const old=h.room;h.room=c.id;ov.remove();toast(`已經換成「${c.name}」🏠`);openHome(h.id);
-    call('updateHouse',Object.assign(cred(),{patch:{room:c.id}}),true).catch(e=>{h.room=old;if(home&&home.id===h.id)openHome(h.id);toast('房間沒換成功：'+e.message)})};
-  ov.querySelector('#gok').onclick=()=>{ov.remove();toast(`已收進「${h.name}」的房間收藏`)};
-  ov.querySelector('#gmore').onclick=()=>{ov.remove();openPack()};
-}
 function burst(ov,n){for(let i=0;i<n;i++){const s=document.createElement('div');s.className='sp';s.textContent=['✨','⭐','💖','🌟'][i%4];
   const a=Math.random()*Math.PI*2,d=120+Math.random()*120;s.style.left='50%';s.style.top='50%';s.style.setProperty('--dx',Math.cos(a)*d+'px');s.style.setProperty('--dy',Math.sin(a)*d+'px');
   s.style.animationDelay=(Math.random()*.3)+'s';ov.appendChild(s);setTimeout(()=>s.remove(),1700)}}
 $('#tix').onclick=missionsSheet;
 
 // ================= 金幣 =================
-const EARN={pat:{v:1,cap:20,name:'摸摸頭'},poop:{v:5,cap:30,name:'鏟屎'},feed:{v:3,cap:10,name:'餵飯'},note:{v:10,cap:3,name:'在別人家留言'},rec:{v:5,cap:10,name:'記錄體重／紀錄項目'}};
-const PACK_PRICE=100;
-function earn(k){const g=DB.game,d=todayTW(),e=EARN[k];if(!e)return 0;if(!g.coinDay||g.coinDay.d!==d)g.coinDay={d};const n=g.coinDay[k]||0;if(n>=e.cap)return 0;
-  g.coinDay[k]=n+1;g.coins=(g.coins||0)+e.v;save();coinPop(e.v);return e.v}
-function coinPop(v){if(flyReward(0,v))return;const el=document.createElement('div');el.className='coinpop';el.textContent=`+${v} 🪙`;document.body.appendChild(el);setTimeout(()=>el.remove(),1500)}
 // ================= 家人 =================
 const membersOf=hid=>(DB.players||[]).filter(p=>p.houseId===hid);
 const MAX_MEMBERS=5;
 // ================= 動態 =================
 const aboutMe=t=>{const h=myHouse();if(!h||!DB.me)return false;if(t.startsWith(DB.me.nick+' '))return false;return t.includes(h.name)||petsOf(h.id).some(p=>t.includes(p.name))};
 // v1.48：島上動態不洗版（小事合併、跑馬燈只放有看頭的事）
-const FEED_MINOR=[[/^(\S+) 幫 (.+) 清了大便/,'poop'],[/^(\S+) 餵了 (.+) 🍖/,'feed'],[/^(\S+) 在 (.+) 餵了飯/,'feed'],[/^(\S+) 請 (.+) 吃了 /,'treat'],[/^(\S+) 在 (.+) 撿到 (\d+) 金幣/,'coin'],[/^(\S+) 在 (.+) 貼了便利貼/,'note'],[/^(\S+) 帶 (.+) 去 (.+) 玩/,'walk'],[/^(\S+) 量了體重/,'weight']];
+const FEED_MINOR=[[/^(\S+) 幫 (.+) 清了大便/,'poop'],[/^(\S+) 餵了 (.+) 🍖/,'feed'],[/^(\S+) 在 (.+) 餵了飯/,'feed'],[/^(\S+) 請 (.+) 吃了 /,'treat'],[/^(\S+) 在 (.+) 撿到 (\d+) 金幣/,'coin'],[/^(\S+) 在 (.+) 貼了便利貼/,'note'],[/^(\S+) 帶 (.+) 去 (.+) 玩/,'walk'],[/^(\S+) 量了體重/,'weight'],[/^💰 (\S+) 把 (.+) 賣給毛二街/,'sell']];
 function feedKind(t){for(const [re,k] of FEED_MINOR){const m=re.exec(t);if(m)return {k,a:m[1],tgt:m[2]||'',amt:k==='coin'?+m[3]||0:0}}return null}
 function feedGroups(){const now=Date.now(),src=DB.feed.filter(f=>now-f.at<24*HOUR),main=new Map(),daily=new Map();
   src.forEach(f=>{const mine=aboutMe(f.t),c=feedKind(f.t);
@@ -2447,7 +2401,6 @@ function shopSheet(tab){
       <button data-buy="${id}" ${coins>=it.price?'':'disabled'}>🪙 ${it.price}</button><small>${bag()[id]?`背包裡有 ${bag()[id]}`:''}</small></div>`).join('')}</div>
       <div class="hint">${shopTab==='treat'?`零食可以去任何人家餵毛孩，每隻毛孩一天最多吃 ${TREAT_MAX} 個；也可以包成禮物送人`:'玩具可以擺在自己家，也可以送給朋友，會放在他們家的地上'}</div>`}
   if(shopTab==='kuji')body=kujiBody(coins);
-  if(shopTab==='ticket')body=`<div class="tk"><div><div style="font-size:13px;color:var(--soft)">抽卡券</div><div class="n">🎟️ ${g.tickets} 張</div></div><button data-ticket ${coins>=PACK_PRICE?'':'disabled'}>🪙 ${PACK_PRICE} 換 1 張</button></div><div class="hint">也可以完成任務拿券，點右上角的 🎟️ 看任務</div>`;
   if(shopTab==='bag'){const L=bagList();body=L.length?`<div class="shopgrid">${L.map(([id,n])=>`<div class="si">${itemIcon(id,'big')}<div class="sn">${ITEMS[id].name}</div><div class="sf">× ${n}</div></div>`).join('')}</div><div class="hint">零食：在別人家點毛孩 →「🍤 零食」。玩具：自己家點「🧸 玩具」擺出來，或在朋友家點「🎁 送禮」</div>`:'<div class="locked">背包是空的，買點東西吧</div>'}
   openModal(`<h3>🏪 毛毛商店</h3><p class="lead">我的金幣：<b class="coinv">🪙 ${coins}</b></p>
     <div class="tabs3">${tabs.map(([k,n])=>`<button data-tab="${k}" class="${k===shopTab?'on':''}">${n}</button>`).join('')}</div>${body}
@@ -2456,7 +2409,6 @@ function shopSheet(tab){
   S.querySelectorAll('[data-tab]').forEach(b=>b.onclick=()=>b.dataset.tab==='acc'?shopCloset():shopSheet(b.dataset.tab));
   S.querySelectorAll('[data-buy]').forEach(b=>b.onclick=()=>{const it=ITEMS[b.dataset.buy];if((g.coins||0)<it.price)return;g.coins-=it.price;sfx('coin');bagAdd(b.dataset.buy,1);dmTick('buy');toast(`買了 ${it.emo} ${it.name}，放進背包了`);const st=S.scrollTop;shopSheet();$('#sheet').scrollTop=st});
   if(shopTab==='kuji')kujiBind(S);
-  const t=S.querySelector('[data-ticket]');if(t)t.onclick=()=>{if((g.coins||0)<PACK_PRICE)return;g.coins-=PACK_PRICE;g.tickets++;sfx('coin');save();updTix();toast('換到 1 張抽卡券 🎟️');shopSheet()};
 }
 // ================= 🎪 毛很多一番賞 =================
 // 🎰 一番賞獎品清單（新增背景時改這裡就好，後端會跟著用）：A 賞至少 1 間、B 至少 2、C 至少 3、D 至少 4
@@ -2516,7 +2468,7 @@ function kujiDraw(ok){
     kb.innerHTML=`<button id="kgive" class="primary">🎁 送人</button><button id="ksell">🪙 賣掉 +${KUJI_SELL}</button><button id="kdrop">放棄</button>`;
     kb.querySelector('#ksell').onclick=()=>{g.coins=(g.coins||0)+KUJI_SELL;save();updHud();toast(`賣掉了，拿回 ${KUJI_SELL} 金幣 🪙`);finish()};
     kb.querySelector('#kdrop').onclick=()=>{if(!armBtn(kb.querySelector('#kdrop'),'確定放棄？'))return;finish()};
-    kb.querySelector('#kgive').onclick=()=>{const L=DB.houses.filter(x=>x.id!==h.id&&!owned(x.id).has(res.room));
+    kb.querySelector('#kgive').onclick=()=>{const L=DB.houses.filter(x=>x.id!==h.id&&!isShopH(x)&&!owned(x.id).has(res.room));
       if(!L.length)return toast('島上每一家都已經有這間了，賣掉吧');
       kb.innerHTML=`<div class="kgive"><p>送給哪一家？（只會列出還沒有這間的家）</p>${L.map(x=>`<button data-to="${x.id}">🏠 ${esc(x.name)}</button>`).join('')}</div><button id="kback">返回</button>`;
       kb.querySelector('#kback').onclick=buttons;
@@ -2595,6 +2547,7 @@ let placing=null;
 const RF_Y1=1240,RF_DEF={y0:770,t:[105,745],b:[20,828],x:[]};
 const RFLOOR={
   basic1:{},basic2:{},basic3:{},
+  shop2:{y0:830,t:[100,840],b:[0,848],x:[[0,800,95,860],[230,800,630,1005]]},
   study:{y0:780,t:[110,720]},
   garden:{y0:760,t:[70,745],b:[0,848]},
   cafe:{y0:790,t:[150,705],b:[0,848],x:[[615,700,848,838]]},
@@ -2613,7 +2566,7 @@ const RFLOOR={
 };
 let GRID=null;
 function roomGrid(room){const d=Object.assign({},RF_DEF,RFLOOR[room]||{});return {y0:d.y0,y1:RF_Y1,t:d.t,b:d.b,x:d.x||[],room}}
-function useRoom(h){GRID=roomGrid(h&&h.room);const G=GRID;
+function useRoom(h){GRID=roomGrid(h&&h.room);const G=GRID;if(isShopH(h)&&!G.x.some(q=>q[0]===230&&q[2]===630))G.x=G.x.concat([[230,800,630,1005]]);
   Object.assign(FLOOR,{x0:Math.max(G.t[0],G.b[0])+45,x1:Math.min(G.t[1],G.b[1])-45,y0:G.y0+35,y1:1200});return G}
 // ---------- 家具網格：橫 7 × 深 5，跟著每間房間的地板伸縮；大家具占 2 格；被擋住的格子不能放 ----------
 const GC=7,GR=5,WIDE={sofa:1,piano:1,slide:1,teepee:1,swing:1,blanket:1};
@@ -2634,14 +2587,14 @@ function drawGrid(){const f=$('#floor');if(!f||!placing||!home)return;const h=ho
 function gFlash(r,c,n){const p=$('#gfl');if(!p)return;p.setAttribute('points',gPoly(r,c,n));p.classList.remove('on');void p.getBoundingClientRect();p.classList.add('on')}
 function startPlacing(P){placing=P;renderFloor();toast(gSpan(P.toy?P.toy.item:P.item)===2?'點格子放下（這個比較大，會占 2 格）':'點格子放下（紅色有東西、灰色不能放）')}
 function toyMenu(t){
-  const h=house(home.id);if(!isFamily(h.id)){const r=home.pets.filter(x=>!x.sleep)[0]&&home.pets.filter(x=>!x.sleep)[Math.floor(Math.random()*home.pets.filter(x=>!x.sleep).length)];if(r){r.tx=t.x+40;r.ty=t.y;r.state='walk';r.goal='toy';if(DB.me&&demonOf(h)){toast(`陪 ${pet(r.id).name} 玩 ${(ITEMS[t.item]||{}).name||'玩具'}`);demonHelp('toy')}}return}
+  const h=house(home.id);if(!canEdit(h.id)){const r=home.pets.filter(x=>!x.sleep)[0]&&home.pets.filter(x=>!x.sleep)[Math.floor(Math.random()*home.pets.filter(x=>!x.sleep).length)];if(r){r.tx=t.x+40;r.ty=t.y;r.state='walk';r.goal='toy';if(DB.me&&demonOf(h)){toast(`陪 ${pet(r.id).name} 玩 ${(ITEMS[t.item]||{}).name||'玩具'}`);demonHelp('toy')}}return}
   openModal(`<h3>${itemIcon(t.item)} ${esc((ITEMS[t.item]||{}).name||'玩具')}</h3>
     <div class="row2"><button id="tmv">↔️ 移動位置</button><button id="tfl">🔁 翻面</button></div>
     <div class="row2"><button id="tbk">🎒 收回背包</button><button data-close>取消</button></div>`);
   $('#tmv').onclick=()=>{closeModal();startPlacing({toy:t})};
-  $('#tfl').onclick=async()=>{t.flip=!t.flip;closeModal();renderFloor();toyPend(h.id).mv[t.id]={x:t.x,y:t.y,flip:t.flip};if(String(t.id).startsWith('tmp'))return;call('moveToy',Object.assign(cred(),{toyId:t.id,x:t.x,y:t.y,flip:t.flip}),true).catch(e=>toast(e.message))};
+  $('#tfl').onclick=async()=>{t.flip=!t.flip;closeModal();renderFloor();toyPend(h.id).mv[t.id]={x:t.x,y:t.y,flip:t.flip};if(String(t.id).startsWith('tmp'))return;call('moveToy',Object.assign(hcred(),{toyId:t.id,x:t.x,y:t.y,flip:t.flip}),true).catch(e=>toast(e.message))};
   $('#tbk').onclick=()=>{h.toys=h.toys.filter(x=>x.id!==t.id);bagAdd(t.item,1);closeModal();renderFloor();toast('收回背包了');toyPend(h.id).rm[t.id]=1;
-    call('removeToy',Object.assign(cred(),{toyId:t.id}),true).catch(e=>{delete toyPend(h.id).rm[t.id];(h.toys=h.toys||[]).push(t);bagAdd(t.item,-1);renderFloor();toast(e.message)})};
+    call('removeToy',Object.assign(hcred(),{toyId:t.id}),true).catch(e=>{delete toyPend(h.id).rm[t.id];(h.toys=h.toys||[]).push(t);bagAdd(t.item,-1);renderFloor();toast(e.message)})};
 }
 function toyPlacer(){
   const h=house(home.id),L=bagList('toy');
@@ -2658,10 +2611,10 @@ $('#home').addEventListener('click',async e=>{
   const blk=gBlocked();if([0,1].slice(0,n).some(i=>blk.has(r+','+(c+i)))){toast('這裡被房間的家具擋住了，換一格吧');gFlash(r,c,n);return}
   const occ=gOcc(h,P.toy);if([0,1].slice(0,n).some(i=>occ.has(r+','+(c+i)))){toast('這格已經有家具了，換一格放吧');gFlash(r,c,n);return}
   ({x,y}=gSpot(r,c,n));placing=null;$('#home').classList.remove('placing');if($('#gcancel'))$('#gcancel').remove();
-  if(P.toy){P.toy.x=Math.round(x);P.toy.y=Math.round(y);renderFloor();toyPend(h.id).mv[P.toy.id]={x:P.toy.x,y:P.toy.y,flip:!!P.toy.flip};if(String(P.toy.id).startsWith('tmp'))return;call('moveToy',Object.assign(cred(),{toyId:P.toy.id,x:P.toy.x,y:P.toy.y,flip:!!P.toy.flip}),true).catch(err=>toast(err.message));return}
+  if(P.toy){P.toy.x=Math.round(x);P.toy.y=Math.round(y);renderFloor();toyPend(h.id).mv[P.toy.id]={x:P.toy.x,y:P.toy.y,flip:!!P.toy.flip};if(String(P.toy.id).startsWith('tmp'))return;call('moveToy',Object.assign(hcred(),{toyId:P.toy.id,x:P.toy.x,y:P.toy.y,flip:!!P.toy.flip}),true).catch(err=>toast(err.message));return}
   const tmp={id:'tmp'+uid(),item:P.item,x:Math.round(x),y:Math.round(y)};bagAdd(P.item,-1);(h.toys=h.toys||[]).push(tmp);renderFloor();toast('擺好了 🧸');
   const tp=toyPend(h.id);tp.add.push(tmp);
-  call('placeToy',Object.assign(cred(),{item:P.item,x:tmp.x,y:tmp.y}),true).then(t=>{const mv=tp.mv[tmp.id],old=tmp.id;Object.assign(tmp,{id:t.id});delete tp.mv[old];if(mv){Object.assign(tmp,mv);tp.mv[t.id]=mv;call('moveToy',Object.assign(cred(),{toyId:t.id,x:mv.x,y:mv.y,flip:!!mv.flip}),true).catch(()=>{})}}).catch(err=>{h.toys=(h.toys||[]).filter(x=>x!==tmp);bagAdd(P.item,1);renderFloor();toast(err.message)});
+  call('placeToy',Object.assign(hcred(),{item:P.item,x:tmp.x,y:tmp.y}),true).then(t=>{const mv=tp.mv[tmp.id],old=tmp.id;Object.assign(tmp,{id:t.id});delete tp.mv[old];if(mv){Object.assign(tmp,mv);tp.mv[t.id]=mv;call('moveToy',Object.assign(hcred(),{toyId:t.id,x:mv.x,y:mv.y,flip:!!mv.flip}),true).catch(()=>{})}}).catch(err=>{h.toys=(h.toys||[]).filter(x=>x!==tmp);bagAdd(P.item,1);renderFloor();toast(err.message)});
 });
 // ---------- 掃把 ----------
 $('#sweep').onclick=async()=>{
@@ -2669,7 +2622,7 @@ $('#sweep').onclick=async()=>{
   const br=document.createElement('div');br.className='broom';br.textContent='🧹';$('#floor').appendChild(br);sfx('sweep');setTimeout(()=>br.remove(),1300);
   ps.forEach(p=>GONEPOOP[p.id]=Date.now());setTimeout(()=>{h.poops=(h.poops||[]).filter(x=>!GONEPOOP[x.id]);renderFloor();ps.forEach(p=>fx('✨',p.x,p.y-40))},700);
   const nm=(petsOf(h.id)[0]||{}).name||h.name,n=ps.length;
-  setTimeout(()=>{ps.forEach(()=>{progress('poop');earn('poop')});toast(`掃乾淨了！清了 ${n} 坨便便 🧹`);if(ONLINE)feedPush(`${DB.me.nick} 幫 ${nm} 清了大便 🧹`)},750);
+  setTimeout(()=>{ps.forEach(()=>earn('poop'));toast(`掃乾淨了！清了 ${n} 坨便便 🧹`);if(ONLINE)feedPush(`${DB.me.nick} 幫 ${nm} 清了大便 🧹`)},750);
   (async()=>{for(const p of ps){try{await call('cleanPoop',{playerId:DB.me.id,houseId:h.id,poopId:p.id},true)}catch(e){}}})();
 };
 
@@ -2678,7 +2631,6 @@ const REW={visit:{x:3,c:2,cap:5,after:{x:0,c:0},n:'串門子'},pat:{x:2,c:1,cap:
   feed:{x:5,c:3,cap:10,after:{x:0,c:0},n:'餵飯'},poop:{x:5,c:2,cap:10,after:{x:0,c:0},n:'鏟屎'},treat:{x:10,c:0,n:'餵零食'},treatFav:{x:15,c:0,n:'餵到最愛的零食'},
   gift:{x:20,c:0,n:'送禮物'},open:{x:5,c:5,n:'拆禮物'},note:{x:10,c:5,cap:3,after:{x:0,c:0},n:'在別人家留言'},rec:{x:5,c:3,cap:10,n:'記錄體重／紀錄項目'},
   walk:{x:10,c:5,cap:3,after:{x:0,c:0},n:'遛遛（帶毛孩去別人家）'},wake:{x:2,c:1,cap:10,after:{x:0,c:0},n:'叫醒／蓋被子'},guest:{x:2,c:1,cap:20,n:'你的毛孩在別人家被照顧'}};
-const XP_LV=100;
 // v1.45：越高級越難升（Lv.1→2 要 100，之後每級多 20）
 const xpNeed=lv=>100+20*(Math.max(1,+lv||1)-1);
 function reward(k,mult){
@@ -2696,7 +2648,6 @@ const COIN_CAP=150;
 function capCoins(c){if(!(c>0))return c||0;const g=DB.game,d=todayTW();if(!g.cc||g.cc.d!==d)g.cc={d,n:0};const ok=Math.max(0,Math.min(c,COIN_CAP-g.cc.n));g.cc.n+=ok;
   if(ok<c&&!g.cc.w){g.cc.w=1;setTimeout(()=>toast(`今天互動賺的金幣到上限 ${COIN_CAP} 了，明天再來～（愛心值照樣加）`),1300)}return ok}
 function earn(k){return reward(k)}
-function progress(){}
 function rewardPop(x,c){if(!x&&!c)return;if(c)sfx('coin');if(flyReward(x,c))return;const el=document.createElement('div');el.className='coinpop';el.textContent=`${x?`+${x} 💗`:''}${c?` +${c} 🪙`:''}`;document.body.appendChild(el);setTimeout(()=>el.remove(),1500)}
 function dailyLogin(){if(!DB.me||(ONLINE&&!myHouse()))return;const g=DB.game,d=todayTW();g.loginDay=d;save();
   if(((g.ci||{}).last)!==d){let tries=0;const t=setInterval(()=>{if(++tries>60)return clearInterval(t);if($('#modal').classList.contains('hidden')&&!picking&&!document.querySelector('.gacha')){clearInterval(t);checkinSheet()}},2500)}}
@@ -2924,14 +2875,17 @@ async function snapshot(){
         if(!r.demon&&im)await drawWear(p,r,im,215*sc,K);
         lbl((r.guest?'🐾 ':'')+(r.demon?'餓魔':'')+p.name+(!r.demon&&popKing(p.id)?' 🏅':''),r.x,r.y+fsN*0.25,fsN,{bg:r.demon?'#3a2a2a':'rgba(255,250,238,.85)',fg:r.demon?'#ffe3c2':'#5a4030',px:7*K,py:0})}})});
     (DB.drops||[]).filter(d=>d.houseId===h.id&&!PICKED.has(d.id)).forEach(d=>ents.push({y:d.y,f:async()=>{const im=await loadImg('assets/money_bag.webp');if(im)drawFit(im,d.x,d.y+6,TB)}}));
+    if(isShopH(h))shopStaffList(h).forEach((st,i)=>{const P=STAFF_POS[i]||STAFF_POS[0];ents.push({y:P.y,f:async()=>{const im=await loadImg(st.img||SHOP_STAFF0[0].img)||await loadImg(SHOP_STAFF0[0].img);if(im){const hh=P.h,ww=hh*im.naturalWidth/im.naturalHeight;x.drawImage(im,P.x-ww/2,P.y-hh,ww,hh)}lbl(st.name,P.x,P.y-P.h-fsN*1.6,fsN,{bg:'rgba(255,250,238,.9)',fg:'#5a3a8a',px:7*K,py:0})}})});
+    if(isShopH(h))ents.push({y:COUNTER.y,f:async()=>{const im=await loadImg('assets/shop2_counter.webp');drawFit(im,COUNTER.x,COUNTER.y,COUNTER.w)}});
     (h.poops||[]).forEach(pp=>ents.push({y:pp.y+1000,f:async()=>{const im=await loadImg('assets/poop.webp');drawFit(im,pp.x,pp.y,44)}}));
     ents.sort((a,b)=>a.y-b.y);for(const e of ents)await e.f();
     if(isNight()){x.fillStyle='rgba(20,25,60,.3)';x.fillRect(0,0,W,H)}
   }else{
     title='毛毛島';const pr=period(),sx=W/1024,sy=H/1536;const lb0=document.querySelector('.label'),kk=W/((lb0&&lb0.parentElement&&lb0.parentElement.clientWidth)||390),fsI=Math.min(13,Math.max(10,(document.documentElement.clientWidth||390)*0.027))*kk;
     const bg=await loadImg(`assets/island_${pr}.webp`);if(bg)x.drawImage(bg,0,0,W,H);
-    const used=new Map(DB.houses.map(hh=>[hh.slot,hh])),items=SLOTS.map((s,i)=>({s,h:used.get(i)})).filter(o=>o.h).concat([{s:[SHOP_POS.x,SHOP_POS.y],shop:true}]).sort((a,b)=>a.s[1]-b.s[1]);
-    for(const o of items){const [hx,hy]=o.s,im=await loadImg(o.shop?`assets/${SHOP_IMG?'shop':'house'+SHOP_POS.style}_${pr}.webp`:`assets/house${o.h.style}_${pr}.webp`);drawFit(im,hx*sx,hy*sy,HOUSE_W*sx);
+    const used=new Map(DB.houses.filter(hh=>!isShopH(hh)).map(hh=>[hh.slot,hh])),items=SLOTS.map((s,i)=>({s,h:used.get(i)})).filter(o=>o.h).concat([{s:[SHOP_POS.x,SHOP_POS.y],shop:true}]).concat(house(SHOP_ID)?[{s:[SHOP2_POS.x,SHOP2_POS.y],shop2:true}]:[]).sort((a,b)=>a.s[1]-b.s[1]);
+    for(const o of items){const [hx,hy]=o.s,im=await loadImg(o.shop2?`assets/shop2_${pr}.webp`:o.shop?`assets/${SHOP_IMG?'shop':'house'+SHOP_POS.style}_${pr}.webp`:`assets/house${o.h.style}_${pr}.webp`);drawFit(im,hx*sx,hy*sy,HOUSE_W*sx);
+      if(o.shop2){lbl('🛍️ 毛二街',hx*sx,(hy+6)*sy,fsI,{bg:'#efe2ff',bd:'#8a62c9',fg:'#5a3a8a',px:9*kk,py:2*kk,bw:1.5*kk});continue}
       {const mine=!o.shop&&isFamily(o.h.id);lbl(o.shop?'🏪 毛毛商店':(mine?'🏠 ':'')+o.h.name,hx*sx,(hy+6)*sy,fsI,o.shop?{bg:'#ffe9a8',bd:'#e0a420',fg:'#7a5200',px:9*kk,py:2*kk,bw:1.5*kk}:mine?{bg:'#fff0e6',bd:cssv('--accent')||'#ff9a6b',fg:'#b4532a',px:9*kk,py:2*kk,bw:1.5*kk}:{bg:'rgba(255,250,238,.93)',bd:cssv('--wood')||'#b98d62',fg:'#6b4b33',px:9*kk,py:2*kk,bw:1.5*kk})}}
   }
   x.restore();
@@ -2954,6 +2908,161 @@ async function takePhoto(){
 }
 
 document.addEventListener('error',e=>{const t=e.target;if(t.tagName==='IMG'&&!t.dataset.fb&&/googleusercontent/.test(t.src)){t.dataset.fb=1;t.src='assets/pet_head_other.webp'}},true);
+// ================= 🛍️ 毛二街（二手店・v1.56） =================
+const COUNTER={x:430,y:1000,w:400},STAFF_POS=[{x:430,y:930,h:300},{x:165,y:1085,h:300},{x:690,y:1095,h:300}];
+const STAFF_SAY=['歡迎光臨毛二街！','今天有新貨喔～','用不到的玩具可以拿來賣','撿便宜要趁早！','這件超划算的啦','收購、賣出都是半價喔'];
+function shopMgrs(){const s=house(SHOP_ID);return s&&Array.isArray(s.mgr)?s.mgr.map(String):[]}
+function isMgr(hid){return !!(DB.me&&isShopH(house(hid))&&shopMgrs().includes(DB.me.id))}
+function canEdit(hid){return isFamily(hid)||isMgr(hid)}
+function hcred(){return home&&isShopH(house(home.id))?{playerId:DB.me&&DB.me.id,houseId:SHOP_ID,pw:''}:cred()}
+function shopStaffList(h){const L=Array.isArray(h&&h.staff)?h.staff.filter(x=>x&&x.name):[];return L.length?L.slice(0,SHOP_STAFF_MAX):SHOP_STAFF0}
+function shopBase(t,id){if(t==='acc')return (ACC[id]||{}).p||0;const it=ITEMS[id];if(!it)return 0;return it.price>0?it.price:LIMIT_BASE}
+const shopPrice=(t,id)=>Math.max(1,Math.round(shopBase(t,id)*SHOP_RATE));
+const shopName=(t,id)=>t==='acc'?((ACC[id]||{}).n||id):((ITEMS[id]||{}).name||id);
+const shopIcon=(t,id)=>t==='acc'?`<span class="ii big"><img src="${accImg(id)}" alt=""></span>`:itemIcon(id,'big');
+const keepScroll=fn=>{const st=$('#sheet').scrollTop;fn();$('#sheet').scrollTop=st};
+// ---------- 店裡的畫面 ----------
+function renderShopHome(h){const mg=isMgr(h.id);
+  $('#famtools').innerHTML=mg?`<button class="act" id="fs1">👔 店員</button><button class="act" id="fs2">⚙️ 店</button><button class="act" id="fs3">🧸 擺設</button>`:'';
+  if(mg){$('#fs1').onclick=()=>shopMgrSheet('staff');$('#fs2').onclick=()=>shopMgrSheet('shop');$('#fs3').onclick=toyPlacer}
+  $('#feed').textContent='🛍️ 買二手';$('#feed').onclick=()=>tradeSheet('buy');
+  $('#giftbtn').textContent='💰 賣東西';$('#giftbtn').onclick=()=>tradeSheet('sell');$('#giftbtn').style.display='';
+  $('#walkbtn').style.display='';$('#walkbtn').onclick=walkForm;$('#sweep').style.display='none';
+  $('#emptyhome').innerHTML='';renderBoard();renderFloor();renderFoot2()}
+let staffEls=[];
+function renderStaff(f,h){staffEls=[];
+  shopStaffList(h).forEach((st,i)=>{const P=STAFF_POS[i]||STAFF_POS[0],el=document.createElement('button');el.className='staff noic';el.setAttribute('aria-label','店員 '+st.name);
+    el.innerHTML=`<img src="${esc(st.img||SHOP_STAFF0[0].img)}" alt="" onerror="this.onerror=null;this.src='${SHOP_STAFF0[0].img}'"><span class="snm">${esc(st.name)}</span>`;
+    Object.assign(el.style,hp(P.x,P.y),{height:(P.h/RH*100)+'%',zIndex:Math.round(P.y)});
+    el.onclick=e=>{e.stopPropagation();if(placing)return;staffTap(i)};f.appendChild(el);staffEls[i]=el});
+  const c=document.createElement('button');c.className='counter noic';c.setAttribute('aria-label','櫃檯');c.innerHTML='<img src="assets/shop2_counter.webp" alt="">';
+  Object.assign(c.style,hp(COUNTER.x,COUNTER.y),{width:(COUNTER.w/RW*100)+'%',zIndex:COUNTER.y});c.onclick=e=>{e.stopPropagation();if(placing)return;staffTap(0)};f.appendChild(c)}
+function staffTap(i){const st=shopStaffList(house(SHOP_ID))[i]||SHOP_STAFF0[0],el=staffEls[i];
+  if(el&&st.img2){const im=el.querySelector('img');im.src=st.img2;clearTimeout(el._t);el._t=setTimeout(()=>{if(im.isConnected)im.src=st.img||SHOP_STAFF0[0].img},2600)}
+  staffSay(i);staffMenu(i)}
+function staffSay(i,text){const el=staffEls[i];if(!el||!el.isConnected)return;const st=shopStaffList(house(SHOP_ID))[i]||{};
+  const own=String(st.about||'').split('\n').map(x=>x.trim()).filter(Boolean),L=own.length&&Math.random()<.6?own:STAFF_SAY,t=text||L[Math.floor(Math.random()*L.length)];
+  el.querySelectorAll('.say').forEach(x=>x.remove());const b=document.createElement('div');b.className='say';b.textContent=t;el.appendChild(b);
+  setTimeout(()=>{b.classList.add('out');setTimeout(()=>b.remove(),400)},4000)}
+function staffMenu(i){document.querySelectorAll('.petmenu').forEach(m=>m.remove());const st=shopStaffList(house(SHOP_ID))[i]||SHOP_STAFF0[0],P=STAFF_POS[i]||STAFF_POS[0];
+  const m=document.createElement('div');m.className='petmenu';Object.assign(m.style,hp(clamp(P.x,150,700),P.y-P.h-60));
+  m.innerHTML=`<div class="pm-h"><b>${esc(st.name)}</b><span class="tr">毛二街店員</span></div><div class="pm-b"><button data-a="buy">🛍️ 買二手</button><button data-a="sell">💰 賣東西</button>${isMgr(SHOP_ID)?'<button data-a="mgr">👔</button>':''}</div>`;
+  m.onclick=e=>{const b=e.target.closest('button');if(!b)return;m.remove();if(b.dataset.a==='mgr')return shopMgrSheet('staff');tradeSheet(b.dataset.a)};
+  $('#floor').appendChild(m);setTimeout(()=>document.addEventListener('click',function c(ev){if(!m.contains(ev.target)){m.remove();document.removeEventListener('click',c)}}),0)}
+setInterval(()=>{if(!home||!isShopH(house(home.id))||$('#home').classList.contains('hidden')||document.hidden||!$('#modal').classList.contains('hidden'))return;
+  if(Math.random()<.35){const n=staffEls.filter(Boolean).length;if(n)staffSay(Math.floor(Math.random()*n))}},8000);
+// ---------- 每天補貨（當天第一個進店的人觸發，後端只收一次） ----------
+let restocking=false;
+async function shopRestockMaybe(){const s=house(SHOP_ID);if(!s||!DB.me||s.rday===todayTW()||restocking)return;if(ONLINE&&!myHouse())return;restocking=true;
+  const pick=f=>{const ids=Object.keys(ITEMS).filter(id=>f(ITEMS[id]));return ids[Math.floor(Math.random()*ids.length)]},A=Object.keys(ACC);
+  const items=[{t:'item',item:pick(it=>it.kind==='toy'&&!it.limited)},{t:'item',item:pick(it=>!it.limited&&!it.bday)},Math.random()<.5?{t:'acc',item:A[Math.floor(Math.random()*A.length)]}:{t:'item',item:pick(it=>it.kind==='treat'&&!it.bday)}];
+  if(Math.random()<.1)items[1]={t:'item',item:pick(it=>it.limited)};
+  try{const r=await call('shopRestock',{playerId:DB.me.id,items},true);if(r&&Array.isArray(r.stock)){s.stock=r.stock;s.rday=todayTW()}}catch(e){}finally{restocking=false}}
+// ---------- 買二手・賣東西 ----------
+let tradeTab='buy',sellSub='bag';
+function tradeSheet(tab,sub){if(!needMe())return;if(tab)tradeTab=tab;if(sub)sellSub=sub;const s=house(SHOP_ID);if(!s)return toast('毛二街還在裝潢中');
+  const g=DB.game,coins=g.coins||0,mh=myHouse(),own=mh?accOwn(mh.id):new Set();let body='';
+  if(tradeTab==='buy'){const L=(Array.isArray(s.stock)?s.stock:[]).filter(x=>x&&(x.t==='acc'?ACC[x.item]:ITEMS[x.item])).slice().sort((a,b)=>(+b.at||0)-(+a.at||0));
+    body=L.length?`<div class="shopgrid">${L.map(x=>{const pr=shopPrice(x.t,x.item),has=x.t==='acc'&&own.has(x.item),lim=x.t==='item'&&ITEMS[x.item].limited;
+      return `<div class="si">${shopIcon(x.t,x.item)}<div class="sn">${esc(shopName(x.t,x.item))}</div><div class="sf"><s>原價 ${shopBase(x.t,x.item)}</s>${lim?' ✨限定':x.t==='acc'?' 👗':''}</div><button data-sb="${x.id}" ${coins>=pr&&!has?'':'disabled'}>${has?'已擁有':'🪙 '+pr}</button><small>${x.src==='p'?(x.by?esc(x.by)+' 寄賣':'島民寄賣'):'店家補貨'}</small></div>`}).join('')}</div>`:'<div class="locked">架上空空的，晚點再來撿便宜</div>';
+    body+=`<div class="hint">二手價都是原價的一半・限定玩具以 🪙${LIMIT_BASE} 當原價・每天店家會補 3 樣新貨</div>`}
+  else if(sellSub==='bag'){const L=bagList();
+    body=L.length?`<div class="shopgrid">${L.map(([id,n])=>`<div class="si">${itemIcon(id,'big')}<div class="sn">${esc(ITEMS[id].name)}</div><div class="sf">× ${n}${ITEMS[id].limited?' ✨限定':''}</div><button data-ss="${id}">賣 🪙 ${shopPrice('item',id)}</button></div>`).join('')}</div>`:'<div class="locked">背包是空的</div>';
+    body+='<div class="hint">按一次會問你確定，再按一次才會賣・擺在家裡的玩具要先「收回背包」才能賣</div>'}
+  else{const L=[...own].filter(id=>ACC[id]);
+    body=!mh?'<div class="locked">有家之後才能賣配件</div>':L.length?`<div class="shopgrid">${L.map(id=>{const on=petsOf(mh.id).filter(p=>Object.values(p.wear||{}).includes(id)).map(p=>p.name);
+      return `<div class="si">${shopIcon('acc',id)}<div class="sn">${esc(ACC[id].n)}</div><div class="sf">${on.length?esc(on.join('、'))+' 戴著':'&nbsp;'}</div><button data-sa="${id}">賣 🪙 ${shopPrice('acc',id)}</button></div>`}).join('')}</div>`:'<div class="locked">衣櫃裡沒有配件</div>';
+    body+='<div class="hint">配件是全家共用的，賣掉後全家的衣櫃都會少這件，毛孩身上戴著的也會脫下來</div>'}
+  openModal(`<h3>🛍️ 毛二街</h3><p class="lead">我的金幣：<b class="coinv">🪙 ${coins}</b>・收購和賣出都是原價的一半</p>
+    <div class="tabs3"><button data-tt="buy" class="${tradeTab==='buy'?'on':''}">🛍️ 買二手</button><button data-tt="sell" class="${tradeTab==='sell'?'on':''}">💰 賣東西</button></div>
+    ${tradeTab==='sell'?`<div class="rtabs"><button data-st="bag" class="${sellSub==='bag'?'on':''}">🎒 背包</button><button data-st="acc" class="${sellSub==='acc'?'on':''}">👗 衣櫃配件</button></div>`:''}
+    ${body}<div class="row2" style="margin-top:12px"><button data-close>關閉</button></div>`);
+  const S=$('#sheet');
+  S.querySelectorAll('[data-tt]').forEach(b=>b.onclick=()=>tradeSheet(b.dataset.tt));
+  S.querySelectorAll('[data-st]').forEach(b=>b.onclick=()=>tradeSheet('sell',b.dataset.st));
+  const pushStock=it=>{if(it&&it.id&&!(s.stock||[]).some(y=>y.id===it.id))(s.stock=s.stock||[]).push(it)};
+  S.querySelectorAll('[data-sb]').forEach(b=>b.onclick=async()=>{const x=(s.stock||[]).find(y=>y.id===b.dataset.sb);if(!x)return;const pr=shopPrice(x.t,x.item),nm=shopName(x.t,x.item);
+    if((g.coins||0)<pr)return toast('金幣不夠喔');if(x.t==='acc'&&!myHouse())return toast('有家之後才能買配件');
+    try{await call('shopBuy',{playerId:DB.me.id,stockId:x.id,name:nm})}catch(e){toast(e.message);if(/買走/.test(e.message)){s.stock=(s.stock||[]).filter(y=>y.id!==x.id);if(ONLINE)sync(true)}return keepScroll(()=>tradeSheet())}
+    s.stock=(s.stock||[]).filter(y=>y.id!==x.id);g.coins=Math.max(0,(g.coins||0)-pr);sfx('coin');
+    if(x.t==='acc'){const hid=myHouse().id,hh=house(hid);hh.acc=[...new Set([...(hh.acc||[]),x.item])];const a=APEND[hid]||(APEND[hid]={ids:[],t:0});a.ids=[...new Set(a.ids.concat([x.item]))];a.t=Date.now()}else bagAdd(x.item,1);
+    save();updTix();dmTick('buy');if(ONLINE)feedPush(`🛍️ ${DB.me.nick} 在毛二街撿到便宜：${nm}`);toast(`撿到便宜！${nm} ${x.t==='acc'?'放進衣櫃了 👗':'放進背包了 🎒'}`);keepScroll(()=>tradeSheet())});
+  S.querySelectorAll('[data-ss]').forEach(b=>b.onclick=async()=>{const id=b.dataset.ss,pr=shopPrice('item',id),nm=ITEMS[id].name;if(!(bag()[id]>0))return;if(!armBtn(b,`確定賣？🪙${pr}`))return;
+    let r;try{r=await call('shopSell',{playerId:DB.me.id,item:id,t:'item',name:nm})}catch(e){return toast(e.message)}
+    bagAdd(id,-1);pushStock(r&&r.it);const rc=b.getBoundingClientRect();grant(0,pr,{x:rc.left+rc.width/2,y:rc.top});if(ONLINE)feedPush(`💰 ${DB.me.nick} 把 ${nm} 賣給毛二街`);toast(`賣掉 ${nm}，拿到 🪙${pr}`);keepScroll(()=>tradeSheet())});
+  S.querySelectorAll('[data-sa]').forEach(b=>b.onclick=async()=>{const id=b.dataset.sa,mh2=myHouse(),pr=shopPrice('acc',id),nm=ACC[id].n;if(!mh2||!isFamily(mh2.id))return toast('正在跟小島同步，等一下再試');if(!armBtn(b,`確定賣？🪙${pr}`))return;
+    let r;try{r=await call('shopSell',Object.assign(cred(),{item:id,t:'acc',name:nm}))}catch(e){return toast(e.message)}
+    const hh=house(mh2.id);hh.acc=(hh.acc||[]).filter(x=>x!==id);if(APEND[mh2.id])APEND[mh2.id].ids=APEND[mh2.id].ids.filter(x=>x!==id);
+    petsOf(mh2.id).forEach(p=>{if(!p.wear)return;let ch=false;for(const k in p.wear)if(p.wear[k]===id){delete p.wear[k];ch=true}if(ch){if(WPEND[p.id])WPEND[p.id].wear=Object.assign({},p.wear);rewearHome(p.id)}});
+    pushStock(r&&r.it);const rc=b.getBoundingClientRect();grant(0,pr,{x:rc.left+rc.width/2,y:rc.top});if(ONLINE)feedPush(`💰 ${DB.me.nick} 把 ${nm} 賣給毛二街`);toast(`賣掉 ${nm}，拿到 🪙${pr}`);keepScroll(()=>tradeSheet())});
+}
+// ---------- 👔 店長：店員・背景・擺設 ----------
+const PROMPT_STAFF=`請參考我附的照片（或照我的描述），畫成 3D 黏土質感的 Q 版人物角色，當作遊戲裡二手商店的店員。
+
+【姿勢】
+- 全身入鏡，從頭到腳都不能被切到
+- 站姿，面向前方，表情親切
+- 頭大身體小的 Q 版比例
+
+【背景（很重要）】
+- 背景必須是純綠色 #00FF00，整片均勻，不要漸層
+- 不要地板、不要陰影、不要任何其他物件
+- 人物身上不要有綠色
+
+【規格】
+- 直式 1:2，人物置中，腳底貼近畫面底部，四周留一點空白
+- 不要任何文字
+
+（想要「打招呼」的第二張圖：請用同一個角色，改成揮手或比讚的姿勢，其他規格一樣）`;
+function shopRoomList(){const mh=myHouse(),o=mh?owned(mh.id):new Set();return [{k:'shop2',n:'毛二街'}].concat(ROOMS.map(([k,n])=>({k,n}))).concat(CARDS.filter(c=>o.has(c.id)).map(c=>({k:c.id,n:c.name})))}
+async function saveStaff(list){const s=house(SHOP_ID);let r;try{r=await call('shopStaff',{playerId:DB.me.id,staff:list})}catch(e){toast(e.message);return false}
+  s.staff=(r&&r.staff)||list;if(home&&home.id===SHOP_ID&&!$('#home').classList.contains('hidden'))renderFloor();return true}
+function shopMgrSheet(tab){const s=house(SHOP_ID);if(!s||!isMgr(SHOP_ID))return toast('只有毛二街店長可以管理');tab=tab||'staff';const L=shopStaffList(s);let body='';
+  if(tab==='staff')body=`<div class="sec" style="margin-top:0"><h4>👔 店員<span>${L.length} / ${SHOP_STAFF_MAX}</span></h4>
+    ${L.map((st,i)=>`<div class="tm"><span class="ic"><img class="stf" src="${esc(st.img||SHOP_STAFF0[0].img)}" alt=""></span><span class="nm2">${esc(st.name)}<small>${['站在櫃檯後面','站在左邊','站在右邊'][i]}</small></span><button data-se="${i}">✏️ 編輯</button>${L.length>1?`<button class="x2" data-sd="${i}">刪除</button>`:''}</div>`).join('')}
+    ${L.length<SHOP_STAFF_MAX?'<div class="row2"><button class="primary" id="sadd">＋ 新增店員</button></div>':''}</div>`;
+  else body=`${fld('smt','店的狀態列',`<input id="smt" maxlength="20" value="${esc(s.motto||'')}" placeholder="例如：二手好物・撿便宜">`)}
+    <div class="field"><div class="flabel">店的背景</div><div class="rooms" id="srm">${shopRoomList().map(r=>`<button type="button" data-v="${r.k}" class="${r.k===(s.room||'shop2')?'on':''}"><img src="${roomImg(r.k)}" alt=""><span>${esc(r.n)}</span></button>`).join('')}</div><div class="hint">你家抽到的房間也可以拿來當店的背景</div></div>
+    <div class="row2"><button class="primary" id="ssave">儲存</button></div><div class="row2"><button id="stoy">🧸 擺玩具到店裡</button></div><div class="hint">店裡的玩具用的是你自己背包裡的，收起來會回到你的背包</div>`;
+  openModal(`<h3>👔 毛二街・店長</h3><div class="tabs3"><button data-mt2="staff" class="${tab==='staff'?'on':''}">👔 店員</button><button data-mt2="shop" class="${tab==='shop'?'on':''}">⚙️ 店</button></div>${body}<div class="row2" style="margin-top:12px"><button data-close>關閉</button></div>`);
+  const S=$('#sheet');S.querySelectorAll('[data-mt2]').forEach(b=>b.onclick=()=>shopMgrSheet(b.dataset.mt2));
+  S.querySelectorAll('[data-se]').forEach(b=>b.onclick=()=>staffForm(+b.dataset.se));
+  if($('#sadd'))$('#sadd').onclick=()=>staffForm(-1);
+  S.querySelectorAll('[data-sd]').forEach(b=>b.onclick=async()=>{if(!armBtn(b,'確定？'))return;const list=L.filter((_,j)=>j!==+b.dataset.sd);if(await saveStaff(list)){toast('店員刪掉了');shopMgrSheet('staff')}});
+  if(tab==='shop'){let room=s.room||'shop2';bindRoom('srm',v=>room=v);
+    $('#stoy').onclick=()=>{closeModal();if(!home||home.id!==SHOP_ID)openHome(SHOP_ID);setTimeout(toyPlacer,home&&home.id===SHOP_ID?0:400)};
+    $('#ssave').onclick=async()=>{const patch={room,motto:$('#smt').value.trim()};try{await call('shopUpdate',{playerId:DB.me.id,patch})}catch(e){return toast(e.message)}
+      Object.assign(s,patch);closeModal();toast('店的設定存好了 ✨');if(home&&home.id===SHOP_ID){setHname(s);$('#roombg').src=roomImg(s.room);openHome(SHOP_ID,true)}}}}
+function staffForm(i){const s=house(SHOP_ID),L=shopStaffList(s).map(x=>Object.assign({},x)),isNew=i<0,st=isNew?{id:uid(),name:'',img:'',img2:'',about:''}:L[i];
+  openModal(`<h3>${isNew?'＋ 新增店員':'✏️ 編輯 '+esc(st.name)}</h3>
+    ${fld('sfn','名字',`<input id="sfn" maxlength="8" value="${esc(st.name)}" placeholder="例如：阿二">`)}
+    ${fld('sfa','會說的話',`<textarea id="sfa" rows="3" maxlength="90" placeholder="一行一句，最多 3 句&#10;例如：今天的貨很新喔">${esc(st.about||'')}</textarea>`,'沒填的話會說預設的招呼語')}
+    <div class="field"><div class="flabel">角色圖</div>
+      <div class="guide"><div class="gstep"><b>1</b><span>複製畫圖指令</span><button type="button" id="sfcopy">📋 複製</button></div>
+        <div class="gstep"><b>2</b><span>貼給 AI，可以附上照片</span><a href="https://chatgpt.com/" target="_blank" rel="noopener">ChatGPT</a><a href="https://gemini.google.com/app" target="_blank" rel="noopener">Gemini</a></div>
+        <div class="gstep"><b>3</b><span>上傳 AI 畫好的綠底圖</span></div>
+        <details><summary>看指令內容</summary><div class="prompt">${esc(PROMPT_STAFF)}</div></details></div>
+      <div class="photo" style="margin-top:8px"><div class="pv check" id="sfp1"><img src="${esc(st.img||SHOP_STAFF0[0].img)}" alt=""></div><div class="info" id="sfi1">站著的圖${st.img?'':'（還沒上傳，先用預設圖）'}<div class="btns"><label>⬆️ 上傳<input type="file" accept="image/*" id="sff1" hidden></label></div></div></div>
+      <div class="photo" style="margin-top:8px"><div class="pv check" id="sfp2">${st.img2?`<img src="${esc(st.img2)}" alt="">`:'👋'}</div><div class="info" id="sfi2">打招呼的圖（選填，點店員時會換成這張）<div class="btns"><label>⬆️ 上傳<input type="file" accept="image/*" id="sff2" hidden></label>${st.img2?'<button id="sfx2">移除</button>':''}</div></div></div>
+      ${!isNew?'<div class="row2"><button id="sfdef">↺ 換回預設的阿二</button></div>':''}</div>
+    <div class="err" id="sferr"></div>
+    <div class="row2 sticky"><button id="sfback">返回</button><button class="primary" id="sfok">${isNew?'加入店員':'儲存'}</button></div>`);
+  $('#sfback').onclick=()=>shopMgrSheet('staff');
+  $('#sfcopy').onclick=async()=>{try{await navigator.clipboard.writeText(PROMPT_STAFF);toast('指令已複製 📋')}catch(e){toast('複製失敗，打開「看指令內容」長按複製')}};
+  const up=k=>async e=>{const f=e.target.files[0];if(!f)return;const info=$('#sfi'+k).firstChild;info.textContent='處理中…';
+    try{const r=await makeBody(f);st['img'+(k===2?'2':'')]=r.url;$('#sfp'+k).innerHTML=`<img src="${r.url}" alt="">`;info.textContent=r.mode==='green'?'✅ 已去掉綠色背景':r.mode==='alpha'?'✅ 透明背景':'⚠️ 這好像不是綠底圖，會帶著一塊方框'}catch(x){info.textContent='這張圖讀不了，換一張試試'}};
+  $('#sff1').onchange=up(1);$('#sff2').onchange=up(2);
+  if($('#sfx2'))$('#sfx2').onclick=()=>{st.img2='';$('#sfp2').innerHTML='👋'};
+  if($('#sfdef'))$('#sfdef').onclick=()=>{st.img=SHOP_STAFF0[0].img;st.img2=SHOP_STAFF0[0].img2;$('#sfp1').innerHTML=`<img src="${st.img}" alt="">`;$('#sfp2').innerHTML=`<img src="${st.img2}" alt="">`;toast('換回預設圖了，按儲存才會生效')};
+  $('#sfok').onclick=async e=>{const name=$('#sfn').value.trim();if(!name)return $('#sferr').textContent='幫店員取個名字';const btn=e.target;btn.disabled=true;
+    try{st.name=name;st.about=$('#sfa').value.split('\n').map(x=>x.trim()).filter(Boolean).slice(0,3).join('\n');
+      if(!st.img)st.img=SHOP_STAFF0[0].img;
+      if(ONLINE)for(const k of ['img','img2'])if(String(st[k]||'').startsWith('data:')){btn.textContent='上傳圖片…';st[k]=(await call('upload',Object.assign(cred(),{dataUrl:st[k]}))).url}
+      const list=isNew?L.concat([st]):L.map((x,j)=>j===i?st:x);
+      if(await saveStaff(list)){toast(isNew?`${name} 來上班了 👔`:'店員存好了');shopMgrSheet('staff')}else{btn.disabled=false;btn.textContent=isNew?'加入店員':'儲存'}}
+    catch(x){$('#sferr').textContent=x.message;btn.disabled=false;btn.textContent=isNew?'加入店員':'儲存'}};
+}
+
 // ================= 頁尾與啟動 =================
 function renderFoot(){
   $('#inote').textContent=ONLINE?'':'試做版：資料只存在這支手機的瀏覽器裡，別人看不到。';
@@ -2982,7 +3091,6 @@ iconize(document.body);
 
 
 // ================= 💰 撿錢 =================
-let pickBusy=false;
 async function pickCoin(d,el){if(!needMe())return;
   PICKED.add(d.id);DB.drops=(DB.drops||[]).filter(x=>x.id!==d.id);renderFloor();
   const known=d.amt!=null,g=DB.game;if(known){g.coins=(g.coins||0)+ +d.amt;save();updTix()}
@@ -3047,7 +3155,6 @@ const updTix0=updTix;updTix=function(){updTix0();updHud()};
 
 // ================= 👑 島主 =================
 function setHname(h){const mh=myHouse();$('#gohome').style.display=mh&&h&&mh.id!==h.id?'':'none';$('#hname').innerHTML=`<b>${esc(h.name)}</b>${h.motto?`<small>${esc(h.motto)}</small>`:''}`}
-function isAdminHouse(h){return !!(DB.adminId&&h&&(DB.players||[]).some(p=>p.id===DB.adminId&&p.houseId===h.id))}
 let logoTaps=0,logoT=0;
 (function(){const lg=document.querySelector('#island .logo');lg.style.setProperty('pointer-events','auto','important');
   let lgT=null;lg.addEventListener('click',()=>{const n=Date.now();logoTaps=n-logoT<800?logoTaps+1:1;logoT=n;clearTimeout(lgT);if(logoTaps>=5){logoTaps=0;adminSheet();return}lgT=setTimeout(()=>{if(logoTaps===1)manualRefresh()},700)});
@@ -3089,11 +3196,15 @@ async function adminSheet(){
     <div class="row2"><select id="alr"></select></div><p class="lead" id="alrh" style="margin:0"></p>
     <div class="row2"><button id="alsend">寄出</button></div></div>
   <div class="sec adm"><h4>🙋 玩家列表<span>${d.players.length} 人・🔔 ${d.players.filter(p=>p.pushSt==='on').length} 人有開通知・全島 🪙${d.players.reduce((a,p)=>a+(+p.coins||0),0).toLocaleString()}</span></h4><p class="lead">照金幣多到少排，點 ⚙️ 可以改金幣、轉移碼<br>🔔 收得到通知・🔕 沒開・📲 還沒加主畫面・❔ 還沒更新到新版</p><div class="plist">${d.players.slice().sort((a,b)=>(+b.coins||0)-(+a.coins||0)).map(p=>`<div class="frow"><span>${pushIc(p)}${esc(p.nick)}<small>${p.house?esc(p.house):'沒有家'}・Lv.${p.lv}・🪙${p.coins}${p.createdAt?'・'+new Date(p.createdAt).toLocaleDateString('zh-TW',{month:'numeric',day:'numeric'})+' 加入':''}</small></span><span>${p.house?'':`<button class="mini danger" data-dpl="${p.id}">刪除</button> `}<button class="mini" data-code="${esc(p.code)}">${esc(p.code)||'—'}</button> <button class="mini" data-apl="${p.id}" aria-label="管理">⚙️</button></span></div>`).join('')}</div><p class="lead">點轉移碼可以複製，傳給換手機的朋友</p></div>
+  <div class="sec adm"><h4>👔 毛二街店長<span>最多 ${SHOP_MGR_MAX} 位</span></h4><p class="lead">店長可以換店的背景、擺玩具、管理店員（最多 ${SHOP_STAFF_MAX} 位）</p>
+    ${[0,1].map(i=>{const cur=(d.shopMgr||shopMgrs())[i]||'';return `<div class="row2"><select id="asm${i}"><option value="">（不指派）</option>${d.players.filter(p=>p.houseId).map(p=>`<option value="${p.id}" ${p.id===cur?'selected':''}>${esc(p.nick)}${p.house?'（'+esc(p.house)+'）':''}</option>`).join('')}</select></div>`}).join('')}
+    <div class="row2"><button id="asmb">儲存店長</button></div></div>
   <div class="sec adm"><h4>🏠 家的管理</h4><div class="row2"><select id="ahh">${hs}</select></div>
     <div class="row2"><input id="ahp" type="password" placeholder="新的家人密碼（4 字以上）"><button id="ahpb">重設密碼</button></div>
     <div class="row2"><button id="ahrb" class="danger">收回成空地</button></div><p class="lead">收回會刪掉這個家的毛孩和紀錄，不能復原</p></div>
   <div class="row2"><button id="aout">登出島主</button><button data-close class="primary">關閉</button></div>`);
   const S=$('#sheet'),ok=m=>{toast(m);sync(true)};
+  $('#asmb').onclick=async()=>{const ids=[...new Set([$('#asm0').value,$('#asm1').value].filter(Boolean))];try{await adminCall('adminShopMgr',{ids});const sh=house(SHOP_ID);if(sh)sh.mgr=ids;ok(ids.length?'店長指派好了 👔':'店長都拿掉了')}catch(e){toast(e.message)}};
   $('#amail').onclick=adminMailSheet;
   call('adminMailList',{adminPw:adminPw(),playerId:DB.me&&DB.me.id},true).then(L=>{if(!Array.isArray(L)||!$('#amail'))return;const un=L.filter(m=>!m.read);if(!un.length)return;
     const bd=document.createElement('span');bd.className='ubadge';bd.textContent=un.length>99?'99+':un.length;$('#amail').appendChild(bd);
@@ -3324,9 +3435,9 @@ function lvOf(id){const p=(DB.players||[]).find(x=>x.id===id);return p&&+p.lv?+p
 function lvTag(id){const n=lvOf(id);return (n?`<b class="lvtag">Lv${n}</b>`:'')+titleTag(id)}
 function coinOf(id){if(DB.me&&id===DB.me.id)return +(DB.game.coins||0);const p=(DB.players||[]).find(x=>x.id===id);return p&&p.coins!=null?+p.coins:null}
 function coinTag(id){const n=coinOf(id);return n==null?'':`<span class="cointag"><img src="assets/icon_coin.webp" alt="金幣">${n.toLocaleString()}</span>`}
-function peopleSheet(hid){const h=house(hid),M=membersOf(hid),L=h.visits&&h.visits.day===todayTW()?(h.visits.list||[]).slice().reverse():[];
+function peopleSheet(hid){const h=house(hid),M=isShopH(h)?shopMgrs().map(id=>({id,nick:nickOf(id)})):membersOf(hid),L=h.visits&&h.visits.day===todayTW()?(h.visits.list||[]).slice().reverse():[];
   openModal(`<h3>🏠 ${esc(h.name)}</h3>
-    <div class="sec"><h4>👥 家人<span>${M.length} / ${MAX_MEMBERS}</span></h4>${M.length?M.map(m=>`<div class="frow"><span>${onDot(m.id)} ${esc(m.nick)} ${lvTag(m.id)||''}${ONLINE&&!isOn(m.id)&&lastOn(m.id)?`<small class="ago">（${lastOn(m.id)}）</small>`:''}</span><span>${isFamily(hid)?coinTag(m.id):''}</span></div>`).join(''):'<div class="locked">還沒有家人</div>'}</div>
+    <div class="sec"><h4>${isShopH(h)?'👔 店長':'👥 家人'}<span>${M.length} / ${isShopH(h)?SHOP_MGR_MAX:MAX_MEMBERS}</span></h4>${M.length?M.map(m=>`<div class="frow"><span>${onDot(m.id)} ${esc(m.nick)} ${lvTag(m.id)||''}${ONLINE&&!isOn(m.id)&&lastOn(m.id)?`<small class="ago">（${lastOn(m.id)}）</small>`:''}</span><span>${isFamily(hid)?coinTag(m.id):''}</span></div>`).join(''):'<div class="locked">還沒有家人</div>'}</div>
     <div class="sec"><h4>🐾 今天來過<span>${L.length} 人</span></h4>${L.length?L.map(v=>`<div class="frow"><span>${onDot(v.id)} ${esc(v.nick)} ${lvTag(v.id)}</span><span class="ago">${v.at?ago(+v.at):''}</span></div>`).join(''):'<div class="locked">今天還沒有人來</div>'}</div>
     <div class="row2"><button data-close>關閉</button></div>`)}
 
@@ -3386,7 +3497,7 @@ function announceLetters(){if(!DB.me)return;let seen=[];try{seen=JSON.parse(loca
     sfx('gift');$('#lgopen').onclick=()=>openLetter(nw[0].id,()=>$('#bell').click())};
   setTimeout(go,1800)}
 // ================= 自動更新：發現新版本就重新載入 =================
-const APP_VER='v1.55';
+const APP_VER='v1.57';
 function checkUpdate(){
   if(!/^https?:/.test(location.protocol)||!API_URL)return;
   if(!$('#modal').classList.contains('hidden'))return; // 正在填表單時不打斷
