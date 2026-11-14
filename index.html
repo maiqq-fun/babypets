@@ -1494,7 +1494,7 @@ function roomPicker(id,cur,hid){const list=roomChoices(hid);return `<div class="
 function bindRoom(id,cb){const g=$('#'+id);g.onclick=e=>{const b=e.target.closest('button');if(!b)return;g.querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===b));cb(b.dataset.v)}}
 // ================= 家裡 =================
 const RW=848,RH=1264,FLOOR={x0:110,x1:750,y0:840,y1:1170};
-const BOARDS={basic1:[432,352,698,536],basic2:[422,335,710,547],basic3:[433,346,700,534],study:[456,286,689,486],garden:[428,255,680,479],cafe:[444,297,681,499],beach:[417,275,698,492],sakura:[435,270,701,507],forest:[432,266,690,492],cloud:[429,265,686,495],xmas:[433,269,689,505],ocean:[428,275,683,496],star:[425,248,690,507],space:[431,280,693,467],dessert:[432,270,762,456],arcade:[432,277,742,462],library:[440,284,742,452],washitsu:[448,280,735,462],circus:[434,302,733,463],cabin:[432,288,738,462],party:[445,281,738,462],pinkroom:[422,236,737,422],sweetdevil:[430,245,705,476],ufobase:[420,262,738,455],street:[426,261,733,455],pearl:[402,248,733,470],surf:[412,250,708,460],nightmkt:[412,280,720,462],redcheck:[422,240,745,435],princess:[426,263,755,457],hiphop:[412,268,764,479],hawaiicat:[430,265,712,460]};
+const BOARDS={basic1:[432,352,698,536],basic2:[422,335,710,547],basic3:[433,346,700,534],study:[456,286,689,486],garden:[428,255,680,479],cafe:[444,297,681,499],beach:[417,275,698,492],sakura:[435,270,701,507],forest:[432,266,690,492],cloud:[429,265,686,495],xmas:[433,269,689,505],ocean:[428,275,683,496],star:[425,248,690,507],space:[431,280,693,467],dessert:[432,270,762,456],arcade:[432,277,742,462],library:[440,284,742,452],washitsu:[448,280,735,462],circus:[434,302,733,463],cabin:[432,288,738,462],party:[445,281,738,462],pinkroom:[422,236,737,422],sweetdevil:[430,245,705,476],ufobase:[420,262,738,455],street:[426,261,733,455],pearl:[402,248,733,470],surf:[412,250,708,460],nightmkt:[412,280,720,462],redcheck:[422,240,745,435],princess:[426,263,755,457],hiphop:[412,268,764,479],hawaiicat:[430,265,712,460],calibeach:[467,181,798,420],snoopy:[481,173,793,412],stussy:[474,195,815,439]};
 const BOWL={x:424,y:1150};
 const hp=(x,y)=>({left:(x/RW*100)+'%',top:(y/RH*100)+'%'});
 let home=null,raf=0,last=0;
@@ -2147,6 +2147,7 @@ const CARDS=[
   {id:'surf',name:'衝浪小屋',r:'N'},{id:'redcheck',name:'夢奇奇屋',r:'H'},
   {id:'pinkroom',name:'粉紅化妝間',r:'R'},{id:'street',name:'街頭塗鴉房',r:'R'},{id:'nightmkt',name:'港口夜市',r:'R'},{id:'hiphop',name:'嘻哈霓虹房',r:'R'},{id:'hawaiicat',name:'KITTY屋',r:'H'},
   {id:'sweetdevil',name:'酷洛米屋',r:'H'},{id:'ufobase',name:'外星人基地',r:'SSR'},{id:'pearl',name:'珍珠貝殼房',r:'SSR'},{id:'princess',name:'公主珠寶房',r:'SSR'},
+  {id:'calibeach',name:'加州海灘',r:'R'},{id:'snoopy',name:'史努比房',r:'H'},{id:'stussy',name:'Stussy房',r:'H'},
 ].map(c=>Object.assign(c,{img:`assets/room_card_${c.id}.webp`}));
 const MISSIONS=[
   {k:'poop',ic:'💩',name:'鏟屎',goal:5,rule:'清任何人家的便便'},
@@ -2460,9 +2461,9 @@ function shopSheet(tab){
 // ================= 🎪 毛很多一番賞 =================
 // 🎰 一番賞獎品清單（新增背景時改這裡就好，後端會跟著用）：A 賞至少 1 間、B 至少 2、C 至少 3、D 至少 4
 const KUJI_POOL={
-  A:['party','princess','redcheck','hawaiicat','sweetdevil'],
+  A:['party','princess','redcheck','hawaiicat','sweetdevil','snoopy','stussy'],
   B:['ocean','star','space','ufobase','pearl'],
-  C:['sakura','forest','cloud','xmas','arcade','washitsu','circus','pinkroom','street','nightmkt','hiphop'],
+  C:['sakura','forest','cloud','xmas','arcade','washitsu','circus','pinkroom','street','nightmkt','hiphop','calibeach'],
   D:['study','garden','cafe','beach','dessert','library','cabin','surf']};
 const KUJI_PRICE=200,KUJI_SELL=100,CARD_PRICE=100;
 const KG={A:{n:'A 賞',img:'assets/badge_a.webp'},B:{n:'B 賞',img:'assets/badge_b.webp'},C:{n:'C 賞',img:'assets/badge_c.webp'},D:{n:'D 賞',img:'assets/badge_d.webp'},L:{n:'最後賞',img:'assets/badge_last.webp'}};
@@ -2608,7 +2609,7 @@ const RFLOOR={
   dessert:{y0:800,t:[60,790]},library:{y0:800,t:[60,790]},cabin:{y0:800,t:[80,800]},
   arcade:{y0:810,t:[60,790]},washitsu:{y0:790,t:[60,790]},circus:{y0:800,t:[60,790]},party:{y0:820,t:[60,760]},
   pinkroom:{y0:760,t:[105,770],b:[0,848]},sweetdevil:{y0:760,t:[100,760],b:[0,848]},ufobase:{y0:760,t:[90,770],b:[0,848]},street:{y0:770,t:[105,780],b:[0,848]},pearl:{y0:760,t:[100,770],b:[0,848]},
-  surf:{y0:750,t:[180,780],b:[0,848]},nightmkt:{y0:750,t:[90,760],b:[0,848]},redcheck:{y0:770,t:[100,770],b:[0,848]},princess:{y0:780,t:[105,775],b:[0,848]},hiphop:{y0:785,t:[110,780],b:[0,848]},hawaiicat:{y0:750,t:[180,760],b:[0,848]}
+  surf:{y0:750,t:[180,780],b:[0,848]},nightmkt:{y0:750,t:[90,760],b:[0,848]},redcheck:{y0:770,t:[100,770],b:[0,848]},princess:{y0:780,t:[105,775],b:[0,848]},hiphop:{y0:785,t:[110,780],b:[0,848]},hawaiicat:{y0:750,t:[180,760],b:[0,848]},calibeach:{y0:775,t:[70,780],b:[0,848],x:[[0,700,185,805]]},snoopy:{y0:775,t:[90,780],b:[0,848],x:[[0,700,135,785]]},stussy:{y0:805,t:[70,780],b:[0,848]}
 };
 let GRID=null;
 function roomGrid(room){const d=Object.assign({},RF_DEF,RFLOOR[room]||{});return {y0:d.y0,y1:RF_Y1,t:d.t,b:d.b,x:d.x||[],room}}
