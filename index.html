@@ -2136,17 +2136,17 @@ $('#me').onclick=()=>{
 };
 
 // ================= 任務・抽卡 =================
-const RAR={N:{name:'普通',color:'#c9a47a',glow:'rgba(255,230,190,.5)',w:70},R:{name:'稀有',color:'#5b9bd5',glow:'rgba(120,190,255,.8)',w:25},SSR:{name:'超稀有',color:'#e8a400',glow:'rgba(255,215,90,1)',w:5}};
+const RAR={N:{name:'普通',color:'#c9a47a',glow:'rgba(255,230,190,.5)',w:70},R:{name:'稀有',color:'#5b9bd5',glow:'rgba(120,190,255,.8)',w:25},SSR:{name:'超稀有',color:'#e8a400',glow:'rgba(255,215,90,1)',w:5},H:{name:'隱藏版',color:'#9b6bd6',glow:'rgba(190,150,255,.9)',w:0}};
 const CARDS=[
   {id:'study',name:'午後書房',r:'N'},{id:'garden',name:'陽光花園房',r:'N'},{id:'cafe',name:'貓咪咖啡廳',r:'N'},{id:'beach',name:'海邊小木屋',r:'N'},
   {id:'sakura',name:'櫻花和室',r:'R'},{id:'forest',name:'蘑菇森林房',r:'R'},{id:'cloud',name:'雲朵房間',r:'R'},{id:'xmas',name:'聖誕小屋',r:'R'},
   {id:'ocean',name:'海底房間',r:'SSR'},{id:'star',name:'星空閣樓',r:'SSR'},{id:'space',name:'太空艙',r:'SSR'},
   {id:'dessert',name:'甜點小舖',r:'N'},{id:'library',name:'貓咪圖書館',r:'N'},{id:'cabin',name:'森林樹屋',r:'N'},
   {id:'arcade',name:'電玩小窩',r:'R'},{id:'washitsu',name:'和風茶室',r:'R'},{id:'circus',name:'馬戲團',r:'R'},
-  {id:'party',name:'生日派對房（限定）',r:'SSR'},
-  {id:'surf',name:'衝浪小屋',r:'N'},{id:'redcheck',name:'紅格子小屋',r:'N'},
-  {id:'pinkroom',name:'粉紅化妝間',r:'R'},{id:'street',name:'街頭塗鴉房',r:'R'},{id:'nightmkt',name:'港口夜市',r:'R'},{id:'hiphop',name:'嘻哈霓虹房',r:'R'},{id:'hawaiicat',name:'夏威夷小貓房',r:'R'},
-  {id:'sweetdevil',name:'小惡魔甜心房',r:'SSR'},{id:'ufobase',name:'外星人基地',r:'SSR'},{id:'pearl',name:'珍珠貝殼房',r:'SSR'},{id:'princess',name:'公主珠寶房',r:'SSR'},
+  {id:'party',name:'生日派對房',r:'H'},
+  {id:'surf',name:'衝浪小屋',r:'N'},{id:'redcheck',name:'夢奇奇屋',r:'H'},
+  {id:'pinkroom',name:'粉紅化妝間',r:'R'},{id:'street',name:'街頭塗鴉房',r:'R'},{id:'nightmkt',name:'港口夜市',r:'R'},{id:'hiphop',name:'嘻哈霓虹房',r:'R'},{id:'hawaiicat',name:'KITTY屋',r:'H'},
+  {id:'sweetdevil',name:'酷洛米屋',r:'H'},{id:'ufobase',name:'外星人基地',r:'SSR'},{id:'pearl',name:'珍珠貝殼房',r:'SSR'},{id:'princess',name:'公主珠寶房',r:'SSR'},
 ].map(c=>Object.assign(c,{img:`assets/room_card_${c.id}.webp`}));
 const MISSIONS=[
   {k:'poop',ic:'💩',name:'鏟屎',goal:5,rule:'清任何人家的便便'},
@@ -2181,16 +2181,16 @@ function missionsSheet(){
   <div class="sec" style="margin-top:0"><h4>📋 任務<span>完成就送 1 張券</span></h4><div class="ms">
   ${MISSIONS.map(m=>`<div class="m"><span class="ic">${m.ic}</span><span>${m.name} ${m.goal} 次</span><span class="num">${g.prog[m.k]||0} / ${m.goal}</span>
     <div class="bar2"><i style="width:${(g.prog[m.k]||0)/m.goal*100}%"></i></div><small>${m.rule}</small><small class="st">${missionStatus(m.k)}</small></div>`).join('')}</div></div>
-  ${h?`<div class="sec"><h4>🏠 ${esc(h.name)}・房間收藏<span>${own.size} / ${CARDS.length}</span></h4>
+  ${h?`<div class="sec"><h4>🏠 ${esc(h.name)}・房間收藏<span>${CARDS.filter(c=>c.r!=='H'&&own.has(c.id)).length} / ${CARDS.filter(c=>c.r!=='H').length}</span></h4>
   <div class="coll">${ROOMS.map(([k,n])=>`<div class="mini" style="--rc:#d8c8b4" title="${n}（初始）"><div class="art">${`<img src="${roomImg(k)}" alt="" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover">`}</div><em>初始</em></div>`).join('')}
-  ${CARDS.map(c=>{const o=own.has(c.id);return `<div class="mini ${o?'':'locked'}" style="--rc:${RAR[c.r].color}" title="${o?c.name:'未收集'}"><div class="art">${cardArt(c)}</div>${o?'':'<span>？</span>'}</div>`}).join('')}</div>
-  <div class="hint">外框：<span style="color:${RAR.N.color}">■ 普通</span>　<span style="color:${RAR.R.color}">■ 稀有</span>　<span style="color:${RAR.SSR.color}">■ 超稀有</span>・不會抽到重複的・在「⚙️ 家」可以換房間</div></div>`:''}
+  ${CARDS.filter(c=>c.r!=='H'||own.has(c.id)).map(c=>{const o=own.has(c.id);return `<div class="mini ${o?'':'locked'}" style="--rc:${RAR[c.r].color}" title="${o?c.name:'未收集'}"><div class="art">${cardArt(c)}</div>${o?'':'<span>？</span>'}</div>`}).join('')}</div>
+  <div class="hint">外框：<span style="color:${RAR.N.color}">■ 普通</span>　<span style="color:${RAR.R.color}">■ 稀有</span>　<span style="color:${RAR.SSR.color}">■ 超稀有</span>${CARDS.some(c=>c.r==='H'&&own.has(c.id))?`　<span style="color:${RAR.H.color}">■ 隱藏版</span>`:''}・不會抽到重複的・在「⚙️ 家」可以換房間</div></div>`:''}
   <div class="row2" style="margin-top:14px"><button data-close>關閉</button></div>`);
   $('#draw').onclick=()=>{closeModal();openPack()};
   $('#buy').onclick=()=>{if((DB.game.coins||0)<PACK_PRICE)return;DB.game.coins-=PACK_PRICE;DB.game.tickets++;sfx('coin');save();updTix();toast('換到 1 張抽卡券 🎟️');missionsSheet()};
 }
 function openPack(){
-  const h=myHouse();if(!h)return;const own=owned(h.id),left=CARDS.filter(c=>!own.has(c.id));
+  const h=myHouse();if(!h)return;const own=owned(h.id),left=CARDS.filter(c=>c.r!=='H'&&!own.has(c.id));
   if(!left.length)return toast('房間全部收集完了！券先幫你存著 🎉');
   const avail=Object.keys(RAR).filter(r=>left.some(c=>c.r===r));let x=Math.random()*avail.reduce((a,r)=>a+RAR[r].w,0),r=avail[0];
   for(const k of avail){if((x-=RAR[k].w)<0){r=k;break}}
@@ -2460,10 +2460,10 @@ function shopSheet(tab){
 // ================= 🎪 毛很多一番賞 =================
 // 🎰 一番賞獎品清單（新增背景時改這裡就好，後端會跟著用）：A 賞至少 1 間、B 至少 2、C 至少 3、D 至少 4
 const KUJI_POOL={
-  A:['party','princess'],
-  B:['ocean','star','space','sweetdevil','ufobase','pearl'],
-  C:['sakura','forest','cloud','xmas','arcade','washitsu','circus','pinkroom','street','nightmkt','hiphop','hawaiicat'],
-  D:['study','garden','cafe','beach','dessert','library','cabin','surf','redcheck']};
+  A:['party','princess','redcheck','hawaiicat','sweetdevil'],
+  B:['ocean','star','space','ufobase','pearl'],
+  C:['sakura','forest','cloud','xmas','arcade','washitsu','circus','pinkroom','street','nightmkt','hiphop'],
+  D:['study','garden','cafe','beach','dessert','library','cabin','surf']};
 const KUJI_PRICE=200,KUJI_SELL=100,CARD_PRICE=100;
 const KG={A:{n:'A 賞',img:'assets/badge_a.webp'},B:{n:'B 賞',img:'assets/badge_b.webp'},C:{n:'C 賞',img:'assets/badge_c.webp'},D:{n:'D 賞',img:'assets/badge_d.webp'},L:{n:'最後賞',img:'assets/badge_last.webp'}};
 const KUJI_IMGS=['assets/kuji_booth.webp','assets/kuji_closed.webp','assets/kuji_open.webp'].concat(Object.values(KG).map(x=>x.img));
@@ -2476,14 +2476,14 @@ function kujiBody(coins){preloadKuji();const k=DB.kuji,h=myHouse();
   if(!k||!Array.isArray(k.items))return top+'<div class="locked">房間一番賞準備中，等一下再來看看</div>';
   const left=k.items.filter(x=>!x.t).length;
   return top+`<div class="kopt hot"><div class="kot"><b>🏠 房間一番賞</b><small>全島共用一箱・第 ${k.no} 箱・剩 <em class="kleft">${left}</em> / ${k.items.length} 張</small></div><button data-kuji ${coins>=KUJI_PRICE&&h?'':'disabled'}>🪙 ${KUJI_PRICE}</button></div>
-  <div class="kboard">${['A','B','C','D'].map(g=>{const L=k.items.filter(x=>x.g===g);return `<div class="krow"><img src="${KG[g].img}" alt="${KG[g].n}"><div class="krooms">${L.map(x=>`<span class="${x.t?'gone':''}">${esc(rName(x.room))}</span>`).join('')}</div><em>${L.filter(x=>!x.t).length}/${L.length}</em></div>`}).join('')}
+  <div class="kboard">${['A','B','C','D'].map(g=>{const L=k.items.filter(x=>x.g===g);return `<div class="krow"><img src="${KG[g].img}" alt="${KG[g].n}"><div class="krooms">${L.map(x=>`<span class="${x.t?'gone':''}">${cardById(x.room).r==='H'?'隱藏版':esc(rName(x.room))}</span>`).join('')}</div><em>${L.filter(x=>!x.t).length}/${L.length}</em></div>`}).join('')}
     <div class="krow"><img src="${KG.L.img}" alt="最後賞"><div class="krooms"><span>抽到最後一張的人，再送 1 次卡牌</span></div></div></div>
   ${(k.log||[]).length?`<div class="sec"><h4>🎊 最近抽到</h4>${k.log.slice().reverse().slice(0,5).map(l=>`<div class="frow"><span>${esc(l.nick)} 抽到 ${KG[l.g]?KG[l.g].n:''}「${esc(rName(l.room))}」${l.last?' 🏁':''}</span><span class="ago">${ago(+l.at)}</span></div>`).join('')}</div>`:''}
   <div class="hint">${h?`抽到已經有的房間，可以送給還沒有的家、賣掉換 ${KUJI_SELL} 金幣，或放棄`:'有家之後才能抽喔'}</div>`}
 function kujiBind(S){
   const c=S.querySelector('[data-card]');if(c)c.onclick=()=>{const h=myHouse(),g=DB.game;if(!h||(g.coins||0)<CARD_PRICE)return;
     const go=()=>{g.coins-=CARD_PRICE;sfx('coin');save();updHud();closeModal();openPack({free:1,ok:1})};
-    if(CARDS.every(x=>owned(h.id).has(x.id)))return packNotice(go);go()};
+    if(CARDS.filter(x=>x.r!=='H').every(x=>owned(h.id).has(x.id)))return packNotice(go);go()};
   const k=S.querySelector('[data-kuji]');if(k)k.onclick=()=>kujiDraw();
 }
 function kujiDraw(ok){
@@ -2775,17 +2775,17 @@ function missionsSheet(){
     <div class="frow"><span>🍤 零食包（隨機 3 個）</span><span>50%</span></div><div class="frow"><span>🧸 玩具</span><span>30%</span></div>
     <div class="frow"><span>🏠 房間（不會重複）</span><span>15%</span></div><div class="frow"><span>✨ 限定玩具（商店不賣）</span><span>5%</span></div>
     <div class="hint">距離保底還有 ${10-(g.pity||0)} 抽</div></div>
-  ${h?`<div class="sec"><h4>🏠 ${esc(h.name)}・房間收藏<span>${own.size} / ${CARDS.length}</span></h4>
+  ${h?`<div class="sec"><h4>🏠 ${esc(h.name)}・房間收藏<span>${CARDS.filter(c=>c.r!=='H'&&own.has(c.id)).length} / ${CARDS.filter(c=>c.r!=='H').length}</span></h4>
   <div class="coll">${ROOMS.map(([k,n])=>`<div class="mini" style="--rc:#d8c8b4" title="${n}（初始）"><div class="art"><img src="${roomImg(k)}" alt="" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover"></div><em>初始</em></div>`).join('')}
-  ${CARDS.map(c=>{const o=own.has(c.id);return `<div class="mini ${o?'':'locked'}" style="--rc:${RAR[c.r].color}" title="${o?c.name:'未收集'}"><div class="art">${cardArt(c)}</div>${o?'':'<span>？</span>'}</div>`}).join('')}</div>
-  <div class="hint">外框：<span style="color:${RAR.N.color}">■ 普通</span>　<span style="color:${RAR.R.color}">■ 稀有</span>　<span style="color:${RAR.SSR.color}">■ 超稀有</span>・在「⚙️ 家」可以換房間</div></div>
+  ${CARDS.filter(c=>c.r!=='H'||own.has(c.id)).map(c=>{const o=own.has(c.id);return `<div class="mini ${o?'':'locked'}" style="--rc:${RAR[c.r].color}" title="${o?c.name:'未收集'}"><div class="art">${cardArt(c)}</div>${o?'':'<span>？</span>'}</div>`}).join('')}</div>
+  <div class="hint">外框：<span style="color:${RAR.N.color}">■ 普通</span>　<span style="color:${RAR.R.color}">■ 稀有</span>　<span style="color:${RAR.SSR.color}">■ 超稀有</span>${CARDS.some(c=>c.r==='H'&&own.has(c.id))?`　<span style="color:${RAR.H.color}">■ 隱藏版</span>`:''}・在「⚙️ 家」可以換房間</div></div>
   <div class="sec"><h4>✨ 限定玩具</h4><div class="shopgrid">${Object.entries(ITEMS).filter(([,i])=>i.limited).map(([id,i])=>`<div class="si ${bag()[id]||(h.toys||[]).some(t=>t.item===id)?'':'locked2'}">${itemIcon(id,'big')}<div class="sn">${i.name}</div></div>`).join('')}</div></div>`:''}
   <div class="row2" style="margin-top:14px"><button data-close>關閉</button></div>`);
   $('#draw').onclick=()=>{closeModal();openPack()};
   $('#toshop').onclick=()=>shopSheet();
 }
 function rollPack(h){
-  const g=DB.game,own=owned(h.id),left=CARDS.filter(c=>!own.has(c.id));g.pity=(g.pity||0)+1;
+  const g=DB.game,own=owned(h.id),left=CARDS.filter(c=>c.r!=='H'&&!own.has(c.id));g.pity=(g.pity||0)+1;
   let type;
   if(g.pity>=10)type=left.length?'room':'limited';
   else{const w={treat:50,toy:30,room:left.length?15:0,limited:5,acc:accLeft(h.id).length?12:0};let x=Math.random()*Object.values(w).reduce((a,b)=>a+b,0);for(const k in w){if((x-=w[k])<0){type=k;break}}}
@@ -2804,7 +2804,7 @@ setTimeout(preloadPack,2500);
 function packNotice(go){openModal(`<div style="text-align:center"><div style="font-size:44px">🎉</div><h3>房間都收集完了！</h3><p class="lead">這次卡包會抽到零食、玩具或配件喔</p></div><div class="row2"><button data-close>先不要</button><button class="primary" id="pkgo">好，開卡包</button></div>`);$('#pkgo').onclick=()=>{closeModal();go()}}
 function openPack(o){o=o||{};
   const h=myHouse();if(!h||(!o.free&&DB.game.tickets<1))return;
-  if(!o.ok&&CARDS.every(c=>owned(h.id).has(c.id)))return packNotice(()=>openPack(Object.assign({},o,{ok:1})));
+  if(!o.ok&&CARDS.filter(c=>c.r!=='H').every(c=>owned(h.id).has(c.id)))return packNotice(()=>openPack(Object.assign({},o,{ok:1})));
   const R=rollPack(h);if(!o.free)DB.game.tickets--;
   let face,cap,rc,glow,ftxt='',rar='N';
   if(R.type==='room'){const c=R.card;rar=c.r;const own=owned(h.id);own.add(c.id);DB.owned[h.id]=[...own];rc=RAR[c.r].color;glow=RAR[c.r].glow;
@@ -2889,6 +2889,19 @@ async function snapshot(){
   const x=cv.getContext('2d');x.fillStyle='#fffaee';x.fillRect(0,0,cv.width,cv.height);
   x.save();x.beginPath();x.roundRect?x.roundRect(PAD,PAD,W,H,24):x.rect(PAD,PAD,W,H);x.clip();x.translate(PAD,PAD);
   const FONT='"Huninn","PingFang TC","Noto Sans TC",sans-serif';
+  // 先把畫面上會用到的字載入（中文網路字體是分段載入的，畫布上的字沒載入就會退回系統字體）
+  try{const txt=[(document.body.innerText||'').replace(/\s+/g,'').slice(0,3000),(DB.pets||[]).map(q=>q.name).join(''),(DB.houses||[]).map(q=>q.name).join(''),(DB.notes||[]).map(q=>q.text).join(''),'0123456789.:　🐾毛很多毛毛島毛毛商店餓魔'].join('');
+    await Promise.race([document.fonts.load('20px "Huninn"',txt),new Promise(r=>setTimeout(r,2500))]);await Promise.race([document.fonts.ready,new Promise(r=>setTimeout(r,1500))])}catch(e){}
+  const cssv=n=>getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+  // 跟遊戲裡一樣的名牌：可有邊框，字級與內距由呼叫端依畫面比例算好
+  const lbl=(t,cx,top,fs,o)=>{x.font=`${fs}px ${FONT}`;const w=x.measureText(t).width+o.px*2,h=fs*1.4+o.py*2;x.fillStyle=o.bg;x.beginPath();x.roundRect?x.roundRect(cx-w/2,top,w,h,h/2):x.rect(cx-w/2,top,w,h);x.fill();if(o.bd){x.strokeStyle=o.bd;x.lineWidth=o.bw||2;x.stroke()}x.fillStyle=o.fg;x.textAlign='center';x.textBaseline='middle';x.fillText(t,cx,top+h/2+fs*0.04)};
+  // 毛孩身上的配件：位置、大小、旋轉、翻轉都照遊戲裡的算法（左右翻轉時一起翻）
+  const drawWear=async(pp,r,im,bw,K)=>{const w=pp.wear||{},bh=bw*im.naturalHeight/im.naturalWidth,items=[];
+    for(const sl of SLOTS3){const id=w[sl];if(!id||!ACC[id])continue;const a=await loadImg(accImg(id));if(a)items.push({a,b:accBox(pp,sl,id)})}
+    if(!items.length)return;x.save();x.translate(r.x,r.y);if(r.facing<0)x.scale(-1,1);x.translate(-bw/2,-bh);
+    items.forEach(({a,b})=>{const aw=b.w/100*bw,ah=aw*a.naturalHeight/a.naturalWidth,rd=Math.PI/180;x.save();x.translate(b.x/100*bw,b.y/100*bh);x.rotate((b.r||0)*rd);
+      x.scale((b.f?-1:1)*Math.max(.25,Math.cos((b.ty||0)*rd)),(b.sy||1)*Math.max(.25,Math.cos((b.tx||0)*rd)));
+      x.shadowColor='rgba(80,50,20,.25)';x.shadowBlur=2*K;x.shadowOffsetY=K;x.drawImage(a,-aw/2,-ah/2,aw,ah);x.restore()});x.restore()};
   const pill=(t,cx,cy,size,bg,bd,fg)=>{x.font=`${size}px ${FONT}`;const w=x.measureText(t).width+size*1.2,h=size*1.6;x.fillStyle=bg;x.strokeStyle=bd;x.lineWidth=2.5;x.beginPath();x.roundRect?x.roundRect(cx-w/2,cy,w,h,h/2):x.rect(cx-w/2,cy,w,h);x.fill();x.stroke();x.fillStyle=fg;x.textAlign='center';x.textBaseline='middle';x.fillText(t,cx,cy+h/2+1)};
   const drawFit=(im,cx,by,w,flip)=>{if(!im)return;const h=w*im.naturalHeight/im.naturalWidth;x.save();x.translate(cx,by);if(flip)x.scale(-1,1);x.drawImage(im,-w/2,-h,w,h);x.restore()};
   let title='';
@@ -2897,24 +2910,28 @@ async function snapshot(){
     const bg=await loadImg(roomImg(h.room));if(bg){const s=Math.max(W/bg.naturalWidth,H/bg.naturalHeight);x.drawImage(bg,(W-bg.naturalWidth*s)/2,(H-bg.naturalHeight*s)/2,bg.naturalWidth*s,bg.naturalHeight*s)}
     const B=BOARDS[h.room]||BOARDS.basic1,ns=DB.notes.filter(n=>n.houseId===h.id).sort((a,c)=>a.createdAt-c.createdAt).slice(-6),bw=(B[2]-B[0]-20)/3,bh=(B[3]-B[1]-20)/2;
     ns.forEach((n,i)=>{const cx=B[0]+10+(i%3)*bw+bw/2,cy=B[1]+10+Math.floor(i/3)*bh+bh/2,s=Math.min(bw,bh)*0.86;x.save();x.translate(cx,cy);x.rotate([-4,3,-2,5,-3,2][i]*Math.PI/180);x.fillStyle=n.color;x.shadowColor='rgba(0,0,0,.2)';x.shadowBlur=4;x.fillRect(-s/2,-s/2,s,s);x.shadowBlur=0;x.fillStyle='#5a4030';x.font=`${Math.round(s/6)}px ${FONT}`;x.textAlign='left';x.textBaseline='top';x.fillText([...n.text].slice(0,6).join(''),-s/2+6,-s/2+6);x.restore()});
-    const ents=[],rw=$('#home').clientWidth||390,TB=Math.min(64,Math.max(40,rw*0.12))*848/rw;
+    const ents=[],rw=$('#home').clientWidth||390,K=W/rw,fsN=Math.min(13,Math.max(10,rw*0.026))*K,TB=Math.min(64,Math.max(40,rw*0.12))*848/rw;
     (h.toys||[]).forEach(t=>{const it=ITEMS[t.item]||{};ents.push({y:it.flat?-1e6:t.y-300,f:async()=>{const im=await loadImg(`assets/item_${t.item}.webp`);if(im)drawFit(im,t.x,t.y+6,TB*(it.sz||1),t.flip);else{x.font=`52px ${FONT}`;x.textAlign='center';x.fillText(it.emo||'',t.x,t.y)}}})});
     (h.gifts||[]).filter(g=>giftVisible(g,h)).forEach(g=>ents.push({y:g.y,f:async()=>{const im=await loadImg(g.admin?'assets/gift_admin.webp':'assets/gift_box.webp');if(im){if(g.admin){x.save();x.shadowColor='rgba(255,210,90,.9)';x.shadowBlur=18}drawFit(im,g.x,g.y+6,TB*(g.admin?1.25:1));if(g.admin)x.restore()}else{x.font=`52px ${FONT}`;x.textAlign='center';x.fillText('🎁',g.x,g.y)}}}));
     home.pets.forEach(r=>{const p=pet(r.id);if(!p)return;
-      if(r.sleep&&r.tent){ents.push({y:r.tent.y,f:async()=>{const sc=petScale(r.tent.y),im=await loadImg(`assets/tent_${(p.card||'#ff9a6b').slice(1)}.webp`)||await loadImg('assets/tent.webp');drawFit(im,r.tent.x,r.tent.y,230*sc);pill(`${p.name}・${r.sleep.label}`,r.tent.x,r.tent.y+8,18,'rgba(255,250,238,.92)','#b98d62','#5a4030')}});return}
+      if(r.sleep&&r.tent){ents.push({y:r.tent.y,f:async()=>{const sc=petScale(r.tent.y),im=await loadImg(`assets/tent_${(p.card||'#ff9a6b').slice(1)}.webp`)||await loadImg('assets/tent.webp');drawFit(im,r.tent.x,r.tent.y,230*sc);lbl(`${p.name}・${r.sleep.label}`,r.tent.x,r.tent.y+fsN*0.3,fsN,{bg:'rgba(255,250,238,.9)',fg:'#5a4030',px:8*K,py:0})}});return}
       ents.push({y:r.y,f:async()=>{const sc=petScale(r.y)*(r.demon?1:(r.hs||1)),im=(r.demon&&await loadImg(r.dsrc||r.di))||await loadImg(petBody(p))||await loadImg(defBody(p.species));
         x.fillStyle='rgba(90,55,25,.2)';x.beginPath();x.ellipse(r.x,r.y,80*sc,14*sc,0,0,Math.PI*2);x.fill();
-        drawFit(im,r.x,r.y,215*sc,r.facing<0);pill((r.guest?'🐾 ':'')+(r.demon?'餓魔':'')+p.name,r.x,r.y+6,18,'rgba(255,250,238,.9)','rgba(185,141,98,.6)','#5a4030')}})});
+        const cl=r.el&&r.el.classList,st=!r.demon&&cl&&cl.contains('starve'),an=!r.demon&&cl&&cl.contains('angry');
+        x.save();if(st||an){x.filter=an?(st?'sepia(.5) saturate(1.7) hue-rotate(-30deg)':'sepia(.5) saturate(2.3) hue-rotate(-30deg) brightness(.97)'):'saturate(.55) brightness(1.06)';x.globalAlpha=st?(an?.85:.82):1}
+        drawFit(im,r.x,r.y,215*sc,r.facing<0);x.restore();
+        if(!r.demon&&im)await drawWear(p,r,im,215*sc,K);
+        lbl((r.guest?'🐾 ':'')+(r.demon?'餓魔':'')+p.name+(!r.demon&&popKing(p.id)?' 🏅':''),r.x,r.y+fsN*0.25,fsN,{bg:r.demon?'#3a2a2a':'rgba(255,250,238,.85)',fg:r.demon?'#ffe3c2':'#5a4030',px:7*K,py:0})}})});
     (DB.drops||[]).filter(d=>d.houseId===h.id&&!PICKED.has(d.id)).forEach(d=>ents.push({y:d.y,f:async()=>{const im=await loadImg('assets/money_bag.webp');if(im)drawFit(im,d.x,d.y+6,TB)}}));
     (h.poops||[]).forEach(pp=>ents.push({y:pp.y+1000,f:async()=>{const im=await loadImg('assets/poop.webp');drawFit(im,pp.x,pp.y,44)}}));
     ents.sort((a,b)=>a.y-b.y);for(const e of ents)await e.f();
     if(isNight()){x.fillStyle='rgba(20,25,60,.3)';x.fillRect(0,0,W,H)}
   }else{
-    title='毛毛島';const pr=period(),sx=W/1024,sy=H/1536;
+    title='毛毛島';const pr=period(),sx=W/1024,sy=H/1536;const lb0=document.querySelector('.label'),kk=W/((lb0&&lb0.parentElement&&lb0.parentElement.clientWidth)||390),fsI=Math.min(13,Math.max(10,(document.documentElement.clientWidth||390)*0.027))*kk;
     const bg=await loadImg(`assets/island_${pr}.webp`);if(bg)x.drawImage(bg,0,0,W,H);
     const used=new Map(DB.houses.map(hh=>[hh.slot,hh])),items=SLOTS.map((s,i)=>({s,h:used.get(i)})).filter(o=>o.h).concat([{s:[SHOP_POS.x,SHOP_POS.y],shop:true}]).sort((a,b)=>a.s[1]-b.s[1]);
     for(const o of items){const [hx,hy]=o.s,im=await loadImg(o.shop?`assets/${SHOP_IMG?'shop':'house'+SHOP_POS.style}_${pr}.webp`:`assets/house${o.h.style}_${pr}.webp`);drawFit(im,hx*sx,hy*sy,HOUSE_W*sx);
-      pill(o.shop?'🏪 毛毛商店':o.h.name,hx*sx,hy*sy+4,15,'rgba(255,250,238,.93)','#b98d62','#6b4b33')}
+      {const mine=!o.shop&&isFamily(o.h.id);lbl(o.shop?'🏪 毛毛商店':(mine?'🏠 ':'')+o.h.name,hx*sx,(hy+6)*sy,fsI,o.shop?{bg:'#ffe9a8',bd:'#e0a420',fg:'#7a5200',px:9*kk,py:2*kk,bw:1.5*kk}:mine?{bg:'#fff0e6',bd:cssv('--accent')||'#ff9a6b',fg:'#b4532a',px:9*kk,py:2*kk,bw:1.5*kk}:{bg:'rgba(255,250,238,.93)',bd:cssv('--wood')||'#b98d62',fg:'#6b4b33',px:9*kk,py:2*kk,bw:1.5*kk})}}
   }
   x.restore();
   // 相框底部
@@ -3085,7 +3102,7 @@ async function adminSheet(){
   $('#anb').onclick=async()=>{const t=$('#an').value.trim();try{await adminCall('adminNotice',{text:t,push:!!($('#anp')&&$('#anp').checked)});DB.notice=t?{t}:null;fi=0;tickerShow();ok(t?'公告更新了 📣':'公告取消了')}catch(e){toast(e.message)}};
   $('#adb').onclick=async()=>{const on=d.dbl!==todayTW();try{await adminCall('adminDouble',{on});DB.dbl=on?todayTW():'';updHud();ok(on?'今天是雙倍日了 ✨':'雙倍日關掉了');adminSheet()}catch(e){toast(e.message)}};
   $('#arb').onclick=async()=>{try{await adminCall('adminRain',{houseId:$('#arh').value,n:+$('#arn').value||1,amt:+$('#ara').value||0});ok('撒好了，等大家去撿 💰');adminSheet()}catch(e){toast(e.message)}};
-  const OWN=d.owned||DB.owned||{},roomOpts=()=>{const own=new Set(OWN[$('#agp').value]||[]),L=CARDS.filter(c=>!c.limitedOnly),A=L.filter(c=>!own.has(c.id));$('#agr').innerHTML=`<option value="">🏠（不送房間）</option>`+A.map(c=>`<option value="${c.id}">${esc(c.name)}</option>`).join('');$('#agrh').textContent=A.length?`這個家已經有 ${L.length-A.length} / ${L.length} 間，清單只列還沒有的`:'這個家所有房間都有了'};
+  const OWN=d.owned||DB.owned||{},roomOpts=()=>{const own=new Set(OWN[$('#agp').value]||[]),L=CARDS.filter(c=>!c.limitedOnly),A=L.filter(c=>!own.has(c.id));$('#agr').innerHTML=`<option value="">🏠（不送房間）</option>`+A.map(c=>`<option value="${c.id}">${esc(c.name)}${c.r==='H'?'（隱藏版）':''}</option>`).join('');$('#agrh').textContent=A.length?`這個家已經有 ${L.length-A.length} / ${L.length} 間，清單只列還沒有的`:'這個家所有房間都有了'};
   const roomOpts0=roomOpts,roomOptsX=()=>{roomOpts0();if($('#agp').value==='__all__')$('#agrh').textContent='全島模式：已經有這間房間的家會自動跳過'};roomOptsX();$('#agp').onchange=roomOptsX;
   $('#agb').onclick=async e=>{const o={houseId:$('#agp').value,coins:+$('#agc').value||0,tickets:+$('#agt').value||0,item:$('#agi').value,n:+$('#agn').value||0,msg:$('#agm').value.trim(),room:$('#agr').value};if(o.room)o.roomName=cardById(o.room).name;
     if(!o.coins&&!o.tickets&&!(o.item&&o.n)&&!o.room)return toast('要送點什麼喔');
@@ -3107,7 +3124,7 @@ async function adminSheet(){
   const letRooms=()=>{const to=$('#alto').value,L=CARDS.filter(c=>!c.limitedOnly);let A,tip;
     if(to==='*'){const any=new Set();Object.values(OWN).forEach(o=>(o||[]).forEach(x=>any.add(x)));A=L.filter(c=>!any.has(c.id));tip=A.length?'寄給全島：只列全島都還沒有的房間':'寄給全島：沒有全島都沒有的房間'}
     else{const hid=to.startsWith('h:')?to.slice(2):((d.players.find(p=>p.id===to)||{}).houseId||'');if(!hid){A=[];tip='這個人還沒有家，不能附房間'}else{const own=new Set(OWN[hid]||[]);A=L.filter(c=>!own.has(c.id));tip=A.length?`他們家已經有 ${L.length-A.length} / ${L.length} 間，清單只列還沒有的`:'他們家所有房間都有了'}}
-    $('#alr').innerHTML=`<option value="">🏠（不附房間）</option>`+A.map(c=>`<option value="${c.id}">${esc(c.name)}</option>`).join('');$('#alrh').textContent=tip};
+    $('#alr').innerHTML=`<option value="">🏠（不附房間）</option>`+A.map(c=>`<option value="${c.id}">${esc(c.name)}${c.r==='H'?'（隱藏版）':''}</option>`).join('');$('#alrh').textContent=tip};
   letRooms();$('#alto').onchange=letRooms;
   $('#alsend').onclick=async()=>{const o={to:$('#alto').value,title:$('#alt').value.trim(),body:$('#alb').value.trim(),coins:+$('#alc').value||0,tickets:+$('#alk').value||0,item:$('#ali').value,n:+$('#aln').value||0,room:$('#alr').value};if(o.room)o.roomName=cardById(o.room).name;
     if(!o.title)return toast('信要有標題喔');try{await adminCall('adminLetter',o);toast(o.to==='*'?'信寄給全部島民了 ✉️':o.to.startsWith('h:')?'信寄給全家了 ✉️':'信寄出了 ✉️');['alt','alb','alc','alk','aln'].forEach(k=>$('#'+k).value='');$('#ali').value='';if(o.room){const hid=o.to==='*'?'':o.to.startsWith('h:')?o.to.slice(2):((d.players.find(p=>p.id===o.to)||{}).houseId||'');if(hid)OWN[hid]=(OWN[hid]||[]).concat(o.room)}letRooms();sync(true)}catch(e){toast(e.message)}};
