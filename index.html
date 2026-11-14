@@ -3081,6 +3081,11 @@ async function snapshot(){
         drawFit(im,r.x,r.y,215*sc,r.facing<0);x.restore();
         if(!r.demon&&im)await drawWear(p,r,im,215*sc,K);
         lbl((r.guest?'🐾 ':'')+(r.demon?'餓魔':'')+p.name+(!r.demon&&popKing(p.id)?' 🏅':''),r.x,r.y+fsN*0.25,fsN,{bg:r.demon?'#3a2a2a':'rgba(255,250,238,.85)',fg:r.demon?'#ffe3c2':'#5a4030',px:7*K,py:0})}})});
+    // 旅客（公園、來家裡晃的）：照畫面上現在的位置畫（走路中也抓得到當下位置）（v1.75）
+    {const fl=$('#floor');(fl?[...fl.querySelectorAll('.gnpc')]:[]).forEach(el=>{const cb=el.offsetParent||fl,fw=cb.clientWidth||1,fh=cb.clientHeight||1,cs=getComputedStyle(el),gx=parseFloat(cs.left)/fw*RW,gy=parseFloat(cs.top)/fh*RH,gh=parseFloat(cs.height)/fh*RH,src=el.querySelector('img')&&el.querySelector('img').getAttribute('src');
+      if(!src||!isFinite(gx)||!isFinite(gy))return;ents.push({y:gy,f:async()=>{const im=await loadImg(src);if(!im)return;const sc=gh/(im.naturalHeight||1);
+        x.fillStyle='rgba(90,55,25,.18)';x.beginPath();x.ellipse(gx,gy,im.naturalWidth*sc*.32,im.naturalWidth*sc*.06,0,0,Math.PI*2);x.fill();
+        x.save();x.shadowColor='rgba(60,35,15,.25)';x.shadowBlur=3*K;x.shadowOffsetY=4*K;drawFit(im,gx,gy,im.naturalWidth*sc,el.classList.contains('flip'));x.restore()}})})}
     (DB.drops||[]).filter(d=>d.houseId===h.id&&!PICKED.has(d.id)).forEach(d=>ents.push({y:d.y,f:async()=>{const im=await loadImg('assets/money_bag.webp');if(im)drawFit(im,d.x,d.y+6,TB)}}));
     if(isShopH(h))shopStaffList(h).forEach((st,i)=>{const P=STAFF_POS[i]||STAFF_POS[0];ents.push({y:P.y,f:async()=>{const im=await loadImg(st.img||SHOP_STAFF0[0].img)||await loadImg(SHOP_STAFF0[0].img);if(im){const hh=P.h,ww=hh*im.naturalWidth/im.naturalHeight;x.drawImage(im,P.x-ww/2,P.y-hh,ww,hh)}lbl(st.name,P.x,P.y-P.h-fsN*1.6,fsN,{bg:'rgba(255,250,238,.9)',fg:'#5a3a8a',px:7*K,py:0})}})});
     if(isShopH(h))ents.push({y:COUNTER.y,f:async()=>{const im=await loadImg('assets/shop2_counter.webp');drawFit(im,COUNTER.x,COUNTER.y,COUNTER.w)}});
@@ -3713,7 +3718,7 @@ function toastOnce(n){try{const k='mhd_amailt',o=+(localStorage.getItem(k)||0);i
 
 // ================= 🌳 毛毛公園＋旅客（v1.70） =================
 // 公園是特別的「家」（id park）：毛孩可以遛去、島主免費布置；沒住民宿的旅客在公園散步、去島民家晃、或出去旅行
-const GIFT_DAY=5,GIFT_P=1,PARK_ID='park',PARK_POS={x:510,y:1252},PARK_SC=1.45,PARK_GUESTS=8;
+const GIFT_DAY=10,GIFT_P=1,PARK_ID='park',PARK_POS={x:510,y:1252},PARK_SC=1.45,PARK_GUESTS=8;
 const isParkH=h=>!!(h&&(h.kind==='park'||h.id===PARK_ID)),isSpecialH=h=>isShopH(h)||isParkH(h);
 GUESTS.push(...[['alpaca','羊駝'],['otter','水獺'],['fox','狐狸'],['sloth','樹懶'],['dog','小狗'],['penguin','企鵝'],['horse','小馬'],['sheep','綿羊'],['monkey','猴子'],['cow','乳牛'],['lion','獅子'],['zebra','斑馬']].map(([k,n])=>({img:`assets/guest_${k}.webp`,n:n+'旅客'})));
 GUESTS.forEach((g,i)=>g.i=i);
@@ -3728,7 +3733,7 @@ function guestPlan(){const k=Math.floor(Date.now()/HOUR),inns=DB.houses.filter(h
   homes.slice(0,Math.min(3,pool.length)).forEach(hid=>{plan.visit[hid]=pool.shift()});
   plan.park=pool;GPLAN=plan;return plan}
 const GUEST_LINES={park:['公園的空氣好好～','今天天氣真好','我在找好住的民宿','這裡的噴水池好漂亮','要不要一起散步？'],visit:['你家好可愛！','借我坐一下下～','這裡的毛孩好有禮貌','我只是路過看看','你家玩具好多喔'],inn:GUEST_SAY};
-// 跟旅客說話：每隻每天第一次會送小禮物（每天最多 5 份）
+// 跟旅客說話：每隻每天第一次會送小禮物（每天最多 10 份，v1.75）
 function guestTalk(g,where,el){if(!needMe())return;const P=guestPlan(),L=GUEST_LINES[where]||GUEST_SAY;let t=L[Math.floor(Math.random()*L.length)];
   if(where!=='inn'&&P.top&&Math.random()<.4)t=`聽說「${P.top.name}」的二樓很舒服！`;sayOn(el,t);sfx('tap');
   const gm=DB.game,d=todayTW();if(!gm.gt||gm.gt.d!==d)gm.gt={d,ids:[]};if(!gm.gt.n)gm.gt.n=0;if(gm.gt.ids.includes(g.i)||gm.gt.n>=GIFT_DAY)return;gm.gt.ids.push(g.i);save();if(Math.random()>GIFT_P)return;gm.gt.n++;
@@ -4198,7 +4203,7 @@ function announceLetters(){if(!DB.me)return;let seen=[];try{seen=JSON.parse(loca
     sfx('gift');$('#lgopen').onclick=()=>openLetter(nw[0].id,()=>$('#bell').click())};
   setTimeout(go,1800)}
 // ================= 自動更新：發現新版本就重新載入 =================
-const APP_VER='v1.74';
+const APP_VER='v1.75';
 function checkUpdate(){
   if(!/^https?:/.test(location.protocol)||!API_URL)return;
   if(!$('#modal').classList.contains('hidden'))return; // 正在填表單時不打斷
