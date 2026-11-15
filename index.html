@@ -590,8 +590,8 @@ html,body,button,.island,.imap,.logo{touch-action:manipulation}
 .lgmore{border:0;background:none;color:var(--accent-d);font-size:13px;padding:6px 0 0}
 .lglist{max-height:60vh;overflow:auto;margin-bottom:10px}
 .letter{border-style:solid;border-width:56px 18px 60px;border-image:url(assets/letter_paper.webp) 100 34 110 34 fill stretch;padding:4px 10px 0;margin:4px 0 12px;color:#5a4030;min-height:220px}
-.lghead{display:flex;gap:10px;align-items:center;margin:0 0 12px;padding-bottom:10px;border-bottom:2px dashed #ecc9a8}.lghead img{width:46px;height:46px;object-fit:contain}
-.lghead b{display:block;font-size:17px}.lghead small{display:block;font-size:11px;color:#a08670}
+.lghead{display:flex;gap:10px;align-items:center;margin:0 0 12px;padding-bottom:10px;border-bottom:2px dashed #ecc9a8}.lghead>img{width:46px;height:46px;object-fit:contain;flex:none}
+.lghead>div>b{display:block;font-size:17px;line-height:1.45}.lghead>div>small{display:block;font-size:11px;color:#a08670}
 .lgbody{font-size:15px;line-height:1.8;white-space:normal;word-break:break-word;min-height:80px}
 .lgatt{margin-top:12px;padding:10px 12px;border:2px dashed #f0c8a8;border-radius:14px;background:rgba(255,250,238,.85);font-size:13px;display:flex;flex-direction:column;gap:8px}
 .lgatt button{border-radius:12px;padding:9px;font:inherit;border:1.5px solid #e6d3bd;background:#fff}.lgatt button.primary{background:var(--accent);color:#fff;border-color:var(--accent)}
@@ -3507,9 +3507,18 @@ async function shopRestockMaybe(){const s=house(SHOP_ID);if(!s||!DB.me||s.rday==
   try{const r=await call('shopRestock',{playerId:DB.me.id,items},true);if(r&&Array.isArray(r.stock)){s.stock=r.stock;s.rday=todayTW()}}catch(e){}finally{restocking=false}}
 // ---------- 買二手・賣東西 ----------
 let tradeTab='buy',sellSub='bag';
+const S2BUY={};   // 剛買、小島還在確認的貨（2 分鐘內不再顯示在架上）
+async function shopBuyBg(x,pr,nm){let err=null;
+  for(let i=0;i<4;i++){try{await call('shopBuy',{playerId:DB.me.id,stockId:x.id,name:nm},true);err=null;break}catch(e){err=e;if(/慢了一步|已經有這件/.test(e.message))break;await new Promise(z=>setTimeout(z,2500+i*2500))}}
+  if(!err){if(ONLINE)feedPush(`🛍️ ${DB.me.nick} 在毛二街撿到便宜：${nm}`);return}
+  if(/太慢|連不上|JSON|Unexpected|fetch|network/i.test(err.message))return;   // 不知道小島有沒有收到：先不收回（跟撿錢一樣）
+  const g=DB.game;g.coins=(g.coins||0)+pr;
+  if(x.t==='acc'){const mh=myHouse(),hh=mh&&house(mh.id);if(hh)hh.acc=(hh.acc||[]).filter(a=>a!==x.item);const a=mh&&APEND[mh.id];if(a)a.ids=a.ids.filter(v=>v!==x.item)}else bagAdd(x.item,-1);
+  save();updTix();toast(/買走/.test(err.message)?`慢了一步，${nm} 被別人買走了，🪙${pr} 退給你`:`${err.message}（🪙${pr} 退給你）`);
+  if($('#sheet')&&/毛二街/.test(($('#sheet h3')||{}).textContent||''))keepScroll(()=>tradeSheet());if(ONLINE)sync(true)}
 function tradeSheet(tab,sub){if(!needMe())return;if(tab)tradeTab=tab;if(sub)sellSub=sub;const s=house(SHOP_ID);if(!s)return toast('毛二街還在裝潢中');
   const g=DB.game,coins=g.coins||0,mh=myHouse(),own=mh?accOwn(mh.id):new Set();let body='';
-  if(tradeTab==='buy'){const L=(Array.isArray(s.stock)?s.stock:[]).filter(x=>x&&(x.t==='acc'?ACC[x.item]:ITEMS[x.item])).slice().sort((a,b)=>(+b.at||0)-(+a.at||0));
+  if(tradeTab==='buy'){const L=(Array.isArray(s.stock)?s.stock:[]).filter(x=>x&&!(S2BUY[x.id]&&Date.now()-S2BUY[x.id]<12e4)&&(x.t==='acc'?ACC[x.item]:ITEMS[x.item])).slice().sort((a,b)=>(+b.at||0)-(+a.at||0));
     body=L.length?`<div class="shopgrid">${L.map(x=>{const pr=shopPrice(x.t,x.item),has=x.t==='acc'&&own.has(x.item),lim=x.t==='item'&&ITEMS[x.item].limited;
       return `<div class="si">${shopIcon(x.t,x.item)}<div class="sn">${esc(shopName(x.t,x.item))}</div><div class="sf"><s>原價 ${shopBase(x.t,x.item)}</s>${lim?' ✨限定':x.t==='acc'?' 👗':''}</div><button data-sb="${x.id}" ${coins>=pr&&!has?'':'disabled'}>${has?'已擁有':'🪙 '+pr}</button><small>${x.src==='p'?(x.by?esc(x.by)+' 寄賣':'島民寄賣'):'店家補貨'}</small></div>`}).join('')}</div>`:'<div class="locked">架上空空的，晚點再來撿便宜</div>';
     body+=`<div class="hint">二手價都是原價的一半・限定玩具以 🪙${LIMIT_BASE} 當原價・每天店家會補 3 樣新貨</div>`}
@@ -3529,12 +3538,12 @@ function tradeSheet(tab,sub){if(!needMe())return;if(tab)tradeTab=tab;if(sub)sell
   S.querySelectorAll('[data-tt]').forEach(b=>b.onclick=()=>tradeSheet(b.dataset.tt));
   S.querySelectorAll('[data-st]').forEach(b=>b.onclick=()=>tradeSheet('sell',b.dataset.st));if(sellSub==='crop')cropBind(S);
   const pushStock=it=>{if(it&&it.id&&!(s.stock||[]).some(y=>y.id===it.id))(s.stock=s.stock||[]).push(it)};
-  S.querySelectorAll('[data-sb]').forEach(b=>b.onclick=async()=>{const x=(s.stock||[]).find(y=>y.id===b.dataset.sb);if(!x)return;const pr=shopPrice(x.t,x.item),nm=shopName(x.t,x.item);
+  S.querySelectorAll('[data-sb]').forEach(b=>b.onclick=()=>{const x=(s.stock||[]).find(y=>y.id===b.dataset.sb);if(!x||S2BUY[x.id])return;const pr=shopPrice(x.t,x.item),nm=shopName(x.t,x.item);
     if((g.coins||0)<pr)return toast('金幣不夠喔');if(x.t==='acc'&&!myHouse())return toast('有家之後才能買配件');
-    try{await call('shopBuy',{playerId:DB.me.id,stockId:x.id,name:nm})}catch(e){toast(e.message);if(/買走/.test(e.message)){s.stock=(s.stock||[]).filter(y=>y.id!==x.id);if(ONLINE)sync(true)}return keepScroll(()=>tradeSheet())}
-    s.stock=(s.stock||[]).filter(y=>y.id!==x.id);g.coins=Math.max(0,(g.coins||0)-pr);sfx('coin');
+    // v1.86：先在畫面上買好（不跳「處理中」），小島在背後確認；被別人先買走才退錢
+    S2BUY[x.id]=Date.now();s.stock=(s.stock||[]).filter(y=>y.id!==x.id);g.coins=Math.max(0,(g.coins||0)-pr);sfx('coin');
     if(x.t==='acc'){const hid=myHouse().id,hh=house(hid);hh.acc=[...new Set([...(hh.acc||[]),x.item])];const a=APEND[hid]||(APEND[hid]={ids:[],t:0});a.ids=[...new Set(a.ids.concat([x.item]))];a.t=Date.now()}else bagAdd(x.item,1);
-    save();updTix();dmTick('buy');if(ONLINE)feedPush(`🛍️ ${DB.me.nick} 在毛二街撿到便宜：${nm}`);toast(`撿到便宜！${nm} ${x.t==='acc'?'放進衣櫃了 👗':'放進背包了 🎒'}`);keepScroll(()=>tradeSheet())});
+    save();updTix();dmTick('buy');toast(`撿到便宜！${nm} ${x.t==='acc'?'放進衣櫃了 👗':'放進背包了 🎒'}`);keepScroll(()=>tradeSheet());shopBuyBg(x,pr,nm)});
   S.querySelectorAll('[data-ss]').forEach(b=>b.onclick=async()=>{const id=b.dataset.ss,pr=shopPrice('item',id),nm=ITEMS[id].name;if(!(bag()[id]>0))return;if(!armBtn(b,`確定賣？🪙${pr}`))return;
     let r;try{r=await call('shopSell',{playerId:DB.me.id,item:id,t:'item',name:nm})}catch(e){return toast(e.message)}
     bagAdd(id,-1);pushStock(r&&r.it);const rc=b.getBoundingClientRect();sfx('coin');grant(0,pr,{x:rc.left+rc.width/2,y:rc.top});if(ONLINE)feedPush(`💰 ${DB.me.nick} 把 ${nm} 賣給毛二街`);toast(`賣掉 ${nm}，拿到 🪙${pr}`);keepScroll(()=>tradeSheet())});
@@ -4241,8 +4250,18 @@ async function adminSheet(){
   if(!DB.me)return toast('先取個暱稱再來');
   if(!adminPw()){openModal(`<h3>👑 島主登入</h3>${fld('apw','島主密碼','<input id="apw" type="password" autocomplete="off">')}<div class="err" id="aerr"></div><div class="row2"><button data-close>取消</button><button class="primary" id="ago">登入</button></div>`);
     $('#ago').onclick=async()=>{try{localStorage.setItem('mhd_admin',$('#apw').value)}catch(e){}try{await adminCall('adminLogin');adminSheet()}catch(e){try{localStorage.removeItem('mhd_admin')}catch(x){}$('#aerr').textContent=e.message}};return}
+  // v1.88：有上次的資料就先秒開，再在背後更新（有變才重畫）
+  if(ADM_D&&ADM_D._by===DB.me.id){adminRender(ADM_D);adminRefresh();return}
   let d;try{d=await adminCall('adminLogin')}catch(e){if(/密碼/.test(e.message)){try{localStorage.removeItem('mhd_admin')}catch(x){}}return toast(e.message)}
-  DB.adminId=DB.me.id;ADM_D=d;
+  d._by=DB.me.id;ADM_D=d;ADM_AT=Date.now();adminRender(d)}
+let ADM_AT=0,ADM_TOK=0;
+const adminOpen=()=>!$('#modal').classList.contains('hidden')&&/島主後台/.test(($('#sheet h3')||{}).textContent||'');
+async function adminRefresh(){const tok=++ADM_TOK;let d;try{d=await call('adminLogin',{adminPw:adminPw(),playerId:DB.me&&DB.me.id},true)}catch(e){return}
+  if(tok!==ADM_TOK)return;d._by=DB.me.id;const same=JSON.stringify(d)===JSON.stringify(ADM_D);ADM_D=d;ADM_AT=Date.now();if(same||!adminOpen())return;
+  const ae=document.activeElement;if(ae&&$('#sheet').contains(ae)&&/INPUT|TEXTAREA|SELECT/.test(ae.tagName)&&ae.value)return;   // 正在打字就不重畫
+  keepScroll(()=>adminRender(d))}
+function adminRender(d){
+  DB.adminId=DB.me.id;
   const hs=d.houses.map(h=>`<option value="${h.id}">${esc(h.name)}</option>`).join(''),its=Object.entries(ITEMS).map(([id,i])=>`<option value="${id}">${i.emo} ${esc(i.name)}</option>`).join('');
   openModal(`<h3>👑 島主後台</h3>
   <div class="row2" style="margin-bottom:8px"><button class="primary mbtn" id="amail"><img class="mic" src="assets/icon_mail.webp" alt="">島民來信</button></div><div class="mlist" id="amprev"></div>
@@ -4299,7 +4318,7 @@ async function adminSheet(){
     if(!o.coins&&!o.tickets&&!(o.item&&o.n)&&!o.room)return toast('要送點什麼喔');
     if(o.houseId==='__all__'){const H=d.houses||[];if(!H.length)return toast('島上還沒有家');const btn=e.target;if(!armBtn(btn,`確定送給全島 ${H.length} 個家？`))return;
       btn.disabled=true;let okN=0,skip=0,fail='';
-      for(let i=0;i<H.length;i++){btn.textContent=`送出中 ${i+1}/${H.length}…`;try{await adminCall('adminGiftHouse',Object.assign({},o,{houseId:H[i].id,all:true}));okN++}catch(x){if(/已經有這間房間/.test(x.message))skip++;else fail=x.message}}
+      btn.textContent='送出中…';try{const r=await adminCall('adminGiftAll',o);okN=r.ok;skip=r.skip;fail=r.fail||''}catch(x){fail=x.message}
       btn.disabled=false;btn.classList.remove('armed');btn.textContent='送出';if(okN&&ONLINE)feedPush('👑 島主送給全島每一家一份禮物，快回家拆！🎁');
       toast(`全島送出了：${okN} 個家收到禮物盒${skip?`，${skip} 個家已有房間而跳過`:''}${fail?`（有失敗：${fail}）`:''} 👑`);
       ['agc','agt','agn','agm'].forEach(k=>$('#'+k).value='');$('#agi').value='';$('#agr').value='';sync(true);return}
@@ -4576,7 +4595,7 @@ function announceLetters(){if(!DB.me)return;let seen=[];try{seen=JSON.parse(loca
     sfx('gift');$('#lgopen').onclick=()=>openLetter(nw[0].id,()=>$('#bell').click())};
   setTimeout(go,1800)}
 // ================= 自動更新：發現新版本就重新載入 =================
-const APP_VER='v1.85';
+const APP_VER='v1.88';
 function checkUpdate(){
   if(!/^https?:/.test(location.protocol)||!API_URL)return;
   if(!$('#modal').classList.contains('hidden'))return; // 正在填表單時不打斷
