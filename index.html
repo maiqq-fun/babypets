@@ -924,12 +924,21 @@ img{-webkit-user-drag:none}
 .walker .say{bottom:calc(100% + 4px)}
 .rentjar b{display:flex;align-items:center;gap:2px}.rentjar .rjc{width:1.3em;height:1.3em}
 .ctitle{max-width:56vw;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+/* v1.60 版面：小島整個往下、上面補海、在線人數移到右邊 */
+#island{--islack:min(5.5dvh,calc(100dvh - min(calc(100vw * 2.02734),100dvh)));--idrop:4.5dvh}
+.imap{top:calc(var(--islack) + var(--idrop))}
+.isea{position:absolute;left:50%;top:0;width:min(100%,calc(100dvh * 1024 / 2076));height:calc(var(--islack) + var(--idrop) + 2px);transform:translateX(-50%) scaleY(-1);background-size:100% auto;background-position:center top;background-repeat:no-repeat;pointer-events:none;transition:background-image 1s}
+#island .camtop{top:calc(122px - var(--idrop))}
+.izreset{top:calc(118px - var(--idrop))}
+.irow2{right:74px;pointer-events:none}.irow2>*{pointer-events:auto}
+.irow2 .onpill{margin-left:auto}
 </style>
 </head>
 <body>
 <!-- ===== 小島 ===== -->
 <div class="stage island" id="island">
   <div class="iback" id="iback"></div>
+  <div class="isea" id="isea"></div>
   <div class="wx" id="wx"></div>
   <div class="imap" id="imap">
   <div class="izoom" id="izoom">
@@ -1487,7 +1496,7 @@ const period=()=>mode==='auto'?autoPeriod():mode;
 const ipct=(x,y)=>({left:(x/1024*100)+'%',top:(y/1536*100)+'%'});
 function renderIsland(){
   const p=period();
-  document.querySelectorAll('#island .bg').forEach(b=>b.classList.toggle('on',b.dataset.p===p));$('#iback').style.backgroundImage=`url(assets/island2_${p}.webp)`;
+  document.querySelectorAll('#island .bg').forEach(b=>b.classList.toggle('on',b.dataset.p===p));$('#iback').style.backgroundImage=`url(assets/island2_${p}.webp)`;$('#isea').style.backgroundImage=`url(assets/island2_${p}.webp)`;
   document.querySelectorAll('#bar button').forEach(b=>b.classList.toggle('on',b.dataset.p===mode));
   const box=$('#things');box.innerHTML='';const used=new Map(DB.houses.filter(h=>!isSpecialH(h)).map(h=>[h.slot,h]));
   SLOTS.map((s,i)=>({s,i})).filter(o=>(o.i!==SHOP_SLOT&&o.i!==CENTER_SLOT)||used.has(o.i)).sort((a,b)=>a.s[1]-b.s[1]).forEach(({s:[x,y],i})=>{
