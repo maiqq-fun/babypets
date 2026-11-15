@@ -932,6 +932,57 @@ img{-webkit-user-drag:none}
 .izreset{top:calc(118px - var(--idrop))}
 .irow2{right:74px;pointer-events:none}.irow2>*{pointer-events:auto}
 .irow2 .onpill{margin-left:auto}
+/* v1.83 新手圖卡 */
+.intro{position:relative;display:flex;flex-direction:column;margin:-6px -4px 0;height:min(640px,calc(100dvh - 120px))}
+.iskip{position:absolute;top:0;right:0;z-index:3;border:2px solid var(--line);background:#fffaf0;color:var(--soft);font:inherit;font-weight:700;font-size:13px;border-radius:999px;padding:5px 12px;cursor:pointer}
+.itrack{flex:1;display:flex;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;min-height:0}.itrack::-webkit-scrollbar{display:none}
+.islide{flex:0 0 100%;scroll-snap-align:center;display:flex;flex-direction:column;align-items:center;padding:34px 10px 6px;text-align:center;overflow-y:auto}
+.iart{position:relative;width:100%;height:42%;min-height:200px;flex:none;display:flex;align-items:center;justify-content:center;margin-bottom:14px}
+.iblob{position:absolute;inset:6% 4%;border-radius:46% 54% 50% 50%/55% 48% 52% 45%;background:#fde9cf}
+.iart img{position:absolute;filter:drop-shadow(0 6px 10px rgba(80,50,20,.18))}
+.islide h2{font-size:22px;font-weight:900;margin:0 0 8px;letter-spacing:.03em}.islide p{font-size:15px;line-height:1.75;color:#7a5a40;margin:0}.islide p b{color:#e5714a}
+.idots{display:flex;gap:7px;justify-content:center;padding:8px 0}.idots i{width:8px;height:8px;border-radius:50%;background:var(--line);transition:.2s}.idots i.on{width:22px;border-radius:5px;background:#f08a5d}
+.ibtn{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;border:2.5px solid var(--line);background:#fffaf0;color:var(--ink);font:inherit;font-weight:900;font-size:16px;border-radius:18px;padding:12px;cursor:pointer;box-shadow:0 3px 0 var(--line)}
+.ibtn.pri{background:#f08a5d;border-color:#e5714a;color:#fff;box-shadow:0 3px 0 #e5714a}.ibtn img{width:34px;height:34px;object-fit:contain;flex:none}.ibtn small{display:block;font-size:11.5px;font-weight:500;opacity:.85}
+.ichoices{display:flex;flex-direction:column;gap:10px;width:100%}.ichoices .ibtn{justify-content:flex-start;text-align:left;padding:10px 14px}
+.intro .amy{position:static;display:flex;flex-direction:row;align-items:flex-end;justify-content:center;gap:6px;margin:6px 0 12px}.intro .amy img{position:static;width:96px;height:auto;flex:none;transform:none;margin:0}
+.intro .amy .obub{position:static;display:block;transform:none;animation:none;background:#fff;border:2px solid var(--line);border-radius:16px 16px 16px 4px;padding:9px 12px;font-size:14px;text-align:left;line-height:1.6;margin-bottom:36px}
+.ilink{background:none;border:0;color:var(--soft);font:inherit;font-size:13px;text-decoration:underline;cursor:pointer;margin-top:12px;padding:4px}
+/* 家人清單 */
+.fmlist{display:flex;flex-direction:column;gap:8px;margin:8px 0 12px}
+.fmlist button{display:flex;align-items:center;justify-content:space-between;gap:8px;border:2px solid var(--line);background:#fff;border-radius:14px;padding:10px 14px;font:inherit;color:var(--ink);text-align:left;cursor:pointer}
+.fmlist b{display:block;font-size:16px}.fmlist small{font-size:12px;color:var(--soft)}.fmlist em{font-style:normal;font-size:12px;font-weight:700;color:#fff;background:#f08a5d;border-radius:999px;padding:3px 9px;flex:none}
+/* iPhone 加入主畫面 */
+.a2hs{text-align:center}.a2st{display:flex;flex-direction:column;gap:8px;text-align:left;margin:10px 0}
+.a2st>div{display:flex;align-items:center;gap:10px;background:#fff;border:2px solid var(--line);border-radius:14px;padding:8px 10px;font-size:14px;line-height:1.45}
+.a2st .n{flex:none;width:24px;height:24px;border-radius:50%;background:#f08a5d;color:#fff;font-weight:900;display:flex;align-items:center;justify-content:center;font-size:13px}
+.a2st .ic{flex:none;width:34px;height:34px;border-radius:9px;background:#f2f2f6;display:flex;align-items:center;justify-content:center;font-size:17px}.a2st .ic.dots{font-weight:900;letter-spacing:-1px}.a2st .ic img{width:28px;height:28px;object-fit:contain}
+.a2st b{color:#e5714a}.a2st small{display:block;font-size:11.5px;color:var(--soft)}
+.a2tip{font-size:13px;color:#7a5a40;background:#fdf0d8;border-radius:12px;padding:9px 10px;line-height:1.65;margin-bottom:10px}.a2pin{display:inline-block;font-size:22px;letter-spacing:.25em;color:#e5714a;margin-left:4px}
+/* v1.83 島主上傳 */
+.upgrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-top:8px}
+.upit{border:2px solid var(--line);background:#fff;border-radius:12px;padding:5px;display:flex;flex-direction:column;align-items:center;gap:2px;font:inherit;cursor:pointer;min-width:0}
+.upit img{width:100%;aspect-ratio:1;object-fit:cover;border-radius:8px;background:#f6efe2}.upit b{font-size:12px;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.upit small{font-size:10.5px;color:var(--soft)}
+.redit{position:relative;width:min(300px,100%);aspect-ratio:848/1264;margin:8px auto;background:#efe4cf;border-radius:10px;overflow:hidden;touch-action:none;user-select:none}
+.redit>img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;pointer-events:none}
+.rebd{position:absolute;border:3px solid #ffcc33;background:rgba(255,204,51,.18);border-radius:6px;cursor:move;touch-action:none}
+.rebd span,.refl span{position:absolute;left:4px;top:2px;font-size:11px;font-weight:700;color:#7a4a00;background:rgba(255,255,255,.85);border-radius:6px;padding:0 4px;pointer-events:none;white-space:nowrap}
+.rebd .rh{position:absolute;right:-9px;bottom:-9px;width:18px;height:18px;border-radius:50%;background:#ffcc33;border:2px solid #fff;touch-action:none}
+.refl{position:absolute;height:0;border-top:3px dashed #3b8de0;cursor:ns-resize;touch-action:none}
+.refl::before{content:'';position:absolute;left:0;right:0;top:-12px;height:24px}
+.refl span{top:6px;color:#174a80}
+.refl .fl,.refl .fr{position:absolute;top:-10px;width:18px;height:18px;border-radius:50%;background:#3b8de0;border:2px solid #fff;touch-action:none}.refl .fl{left:-9px}.refl .fr{right:-9px}
+.stprev{display:flex;gap:6px;justify-content:center;flex-wrap:wrap;margin:6px 0}.stprev img{width:70px;height:70px;object-fit:contain;background:#bfe3c8;border-radius:10px;border:2px solid var(--line)}
+.seg,.tiers{display:flex;gap:6px;flex-wrap:wrap}.seg button,.tiers button{flex:1;min-width:64px;border:2px solid var(--line);background:#fff;border-radius:12px;padding:7px 6px;font:inherit;font-weight:700;font-size:13px;color:var(--ink);display:flex;flex-direction:column;align-items:center;cursor:pointer}
+.seg button.on,.tiers button.on{border-color:#f08a5d;background:#fff3ea}.tiers small{font-size:11px;font-weight:500;color:var(--soft)}
+.chk{display:flex;gap:8px;align-items:flex-start;font-size:13.5px;margin:8px 0;line-height:1.5}.chk input{margin-top:3px}
+/* v1.83 抽卡頁說明 */
+.howto{background:#fff8ea;border:2px solid var(--line);border-radius:14px;padding:10px 12px;margin:0 0 12px;font-size:14px;line-height:1.65;color:#6b4a2b}
+.howto p{margin:3px 0}.howto b{color:#c9662f}
+/* v1.83 二樓的毛孩也穿衣服（身體和衣服包在一起動） */
+.walker .wbody{position:relative;display:block;height:100%;transform-origin:50% 100%;animation:sbreathe 3.4s ease-in-out infinite;filter:drop-shadow(0 4px 3px rgba(60,35,15,.25));pointer-events:none}
+.walker .wbody>img{display:block;height:100%;width:auto}
+.walker.walking .wbody{animation:swalk .55s ease-in-out infinite}
 /* v1.82 星寶按鈕的數字被圓框切掉（.circle 有 overflow:hidden） */
 .sbbtn{overflow:visible}.sbbtn .badge{top:-4px;right:-4px;z-index:3}
 /* v1.81 連線中 */
@@ -1123,7 +1174,11 @@ function keepLists(){const nw=Date.now();for(const id in GONE)if(nw-GONE[id]>5*6
 function optAdd(k,o){o._t=Date.now();(DB[k]=DB[k]||[]).push(o);ADDS[k].push(o);return o}
 function optDone(k,o,r){if(r&&r.id){Object.assign(o,r)}}
 function optFail(k,o){DB[k]=(DB[k]||[]).filter(x=>x!==o);ADDS[k]=ADDS[k].filter(x=>x!==o)}
-function keepPending(){keepToys();keepLists();keepDemon();keepWear();const nw=Date.now();for(const id in GONEPOOP)if(nw-GONEPOOP[id]>5*60e3)delete GONEPOOP[id];DB.houses.forEach(h=>{if(Array.isArray(h.poops))h.poops=h.poops.filter(x=>!GONEPOOP[x.id])});for(const id in GONEGIFT)if(nw-GONEGIFT[id]>5*60e3)delete GONEGIFT[id];DB.houses.forEach(h=>{if(Array.isArray(h.gifts)){h.gifts=h.gifts.filter(x=>!(GONEGIFT[x.id]&&!x.admin));h.gifts.forEach(x=>{if(x.admin&&GONEGIFT[x.id]&&DB.me)x.opened=[...new Set([...(Array.isArray(x.opened)?x.opened:[]),DB.me.id])]})}});const now=Date.now(),T=120000;
+// v1.83：農田剛種、剛澆、剛收的格子先記著，小島還沒確認前同步回來也不會被蓋掉（植物不會突然不見）
+const FARMP={};function farmPend(hid,i,cell){(FARMP[hid]=FARMP[hid]||{})[i]={c:cell?JSON.parse(JSON.stringify(cell)):null,t:Date.now()}}
+function farmDone(hid,i){if(FARMP[hid])delete FARMP[hid][i]}
+function keepFarm(){const nw=Date.now();for(const hid in FARMP){const h=house(hid);if(!h||!h.farm)continue;for(const i in FARMP[hid]){const o=FARMP[hid][i];if(nw-o.t>60000){delete FARMP[hid][i];continue}h.farm.p=h.farm.p||[];h.farm.p[i]=o.c}}}
+function keepPending(){keepToys();keepFarm();keepLists();keepDemon();keepWear();const nw=Date.now();for(const id in GONEPOOP)if(nw-GONEPOOP[id]>5*60e3)delete GONEPOOP[id];DB.houses.forEach(h=>{if(Array.isArray(h.poops))h.poops=h.poops.filter(x=>!GONEPOOP[x.id])});for(const id in GONEGIFT)if(nw-GONEGIFT[id]>5*60e3)delete GONEGIFT[id];DB.houses.forEach(h=>{if(Array.isArray(h.gifts)){h.gifts=h.gifts.filter(x=>!(GONEGIFT[x.id]&&!x.admin));h.gifts.forEach(x=>{if(x.admin&&GONEGIFT[x.id]&&DB.me)x.opened=[...new Set([...(Array.isArray(x.opened)?x.opened:[]),DB.me.id])]})}});const now=Date.now(),T=120000;
   DB.pets.forEach(p=>{const w=PEND.wake[p.id];if(w&&now-w.t<T&&!(+p.wakeUntil>=w.v))p.wakeUntil=w.v;const f=FED[p.id];if(f&&now-f.t<T&&!(+p.lastFed>=f.v)){p.lastFed=f.v;p.meals=f.m;p.mealDay=f.d}});
   for(const pid in PEND.walk){const w=PEND.walk[pid];if(now-w.t>T)continue;DB.houses.forEach(h=>{if(h.id!==w.hid)h.guests=(h.guests||[]).filter(g=>g.petId!==pid)});const h=house(w.hid);if(h&&!(h.guests||[]).some(g=>g.petId===pid))(h.guests=h.guests||[]).push(w.g)}
   for(const pid in PEND.home){const w=PEND.home[pid];if(now-w.t>T)continue;DB.houses.forEach(h=>h.guests=(h.guests||[]).filter(g=>g.petId!==pid))}}
@@ -1143,12 +1198,13 @@ async function sync(quiet){
   try{const d=await api('getState',Object.assign(cred(),{where:curWhere()}));
     Object.assign(DB,{houses:d.houses,pets:d.pets,weights:d.weights,medical:d.medical,expenses:d.expenses,notes:d.notes,feed:d.feed,famOk:d.famOk,players:d.players||[],tlogs:d.tlogs||[]});
     DB.houses.forEach(h=>{if(!Array.isArray(h.poops))h.poops=[]});
-    keepPending();DB.letters=(d.letters||[]).filter(l=>!LGONE[l.id]).map(l=>Object.assign(l,LSTATE[l.id]||{},CLAIMED['l:'+l.id]?{claimed:true}:{}));DB.drops=(d.drops||[]).filter(x=>!PICKED.has(x.id));DB.notice=d.notice&&d.notice.t&&!(+d.notice.until&&Date.now()>+d.notice.until)?d.notice:null;DB.center=d.center||DB.center||null;DB.applies=d.applies||[];DB.rooms=d.rooms||DB.rooms||[];DB.amail=+d.amail||0;setTimeout(updAdminBadge,0);DB.kuji=d.kuji||DB.kuji||null;DB.online=d.online||[];setTimeout(checkAdminGifts,600);DB.rank=d.rank||DB.rank||null;osLogin();pushCheckLater();setTimeout(noticePop,1200);DB.dbl=d.dbl||'';DB.adminId=d.adminId||'';DB.star=d.star||null;if(d.player)DB.starDone=+d.player.starDone||0;
+    keepPending();DB.letters=(d.letters||[]).filter(l=>!LGONE[l.id]).map(l=>Object.assign(l,LSTATE[l.id]||{},CLAIMED['l:'+l.id]?{claimed:true}:{}));DB.drops=(d.drops||[]).filter(x=>!PICKED.has(x.id));DB.notice=d.notice&&d.notice.t&&!(+d.notice.until&&Date.now()>+d.notice.until)?d.notice:null;DB.center=d.center||DB.center||null;DB.applies=d.applies||[];DB.rooms=d.rooms||DB.rooms||[];applyRooms();DB.amail=+d.amail||0;setTimeout(updAdminBadge,0);DB.kuji=d.kuji||DB.kuji||null;DB.online=d.online||[];setTimeout(checkAdminGifts,600);DB.rank=d.rank||DB.rank||null;osLogin();pushCheckLater();setTimeout(noticePop,1200);DB.dbl=d.dbl||'';DB.adminId=d.adminId||'';DB.star=d.star||null;if(d.player)DB.starDone=+d.player.starDone||0;
     setTimeout(announceLetters,0);setTimeout(updGuestBar,0);
-    if(d.player&&DB.me){DB.me.code=d.player.code||DB.me.code;const ml=Array.isArray(d.player.mail)?d.player.mail:[];if(ml.length)claimMail(ml)}
+    if(d.player&&DB.me){DB.me.code=d.player.code||DB.me.code;if(d.player.pin)DB.me.pin=d.player.pin;const ml=Array.isArray(d.player.mail)?d.player.mail:[];if(ml.length)claimMail(ml)}
     DB.owned={};d.houses.forEach(h=>DB.owned[h.id]=Array.isArray(h.owned)?h.owned:[]);
     if(d.player&&DB.me){DB.me.houseId=d.player.houseId||null;if(!DB.gameSynced&&d.player.game&&d.player.game.prog&&!localStorage.getItem(OKEY+'_g')){DB.game=fixGame(d.player.game)}}
     if(d.player&&d.player.inbox&&+d.player.inbox.n>0){const ib=d.player.inbox;let k=0;for(let i=0;i<+ib.n;i++)if(reward('guest'))k++;if(k)toast(`你的毛孩在朋友家被照顧了 ${k} 次 💕`);api('claimInbox',{playerId:DB.me.id}).catch(()=>{})}
+    if(d.catVer!=null&&+d.catVer!==+CAT.ver)loadCatalog(d.catVer);
     DB.gameSynced=true;DB.synced=true;DB.fromCache=false;syncFail=0;setTimeout(dailyLogin,800);try{localStorage.setItem(OKEY+'_g','1')}catch(e){}
     try{localStorage.setItem(OKEY+'_c',JSON.stringify({at:Date.now(),houses:d.houses,pets:d.pets,players:d.players||[],notes:d.notes,feed:d.feed,notice:DB.notice,center:DB.center,rooms:DB.rooms}))}catch(e){}
     const sig=JSON.stringify([d.houses,d.pets,DB.drops,d.online,d.notes,(d.feed||[])[0],DB.letters.length,DB.notice,DB.applies,d.kuji,d.star]);
@@ -1501,12 +1557,138 @@ async function pushSheet(){const kinds=`<div class="sec"><h4>會通知你的事<
   if($('#poff'))$('#poff').onclick=()=>OneSignalDeferred.push(async OS=>{try{localStorage.setItem('mhd_pushoff','1');await OS.User.PushSubscription.optOut()}catch(e){}toast('通知關掉了');pushStatus().then(pushReport);closeModal()});
 }
 // ---------- 👑 島主：玩家金幣、轉移碼 ----------
+// ================= v1.83 👑 島主上傳：背景、房子、商店商品、折扣碼 =================
+let ADM_D=null;
+const ROOM_TYPES=[['N','普通（可抽卡、一番賞）'],['R','稀有（可抽卡、一番賞）'],['SSR','超稀有（可抽卡、一番賞）'],['LTD','限定款（只進一番賞 A 賞）'],['CU','訂製款（不抽，送給某一家）']];
+const ROOM_TN={N:'普通',R:'稀有',SSR:'超稀有',LTD:'限定款',CU:'訂製款'};
+const PRICE_TIERS={treat:[['cheap','🍬 便宜',10,10],['normal','🍪 普通',15,20],['high','🎁 高級',30,50]],toy:[['cheap','🍬 便宜',20,40],['normal','🍪 普通',50,80],['high','🎁 高級',100,140],['lux','💎 豪華',160,200]]};
+const FAV_SPECIES=['貓','狗','兔','倉鼠','鳥','其他'];
+function tierPrice(kind,t){const T=(PRICE_TIERS[kind]||PRICE_TIERS.toy).find(x=>x[0]===t)||PRICE_TIERS[kind][1];const a=T[2],b=T[3];return Math.round((a+Math.random()*(b-a))/5)*5||a}
+function fileImg(file){return new Promise((ok,no)=>{const fr=new FileReader();fr.onerror=no;fr.onload=()=>{const im=new Image();im.onerror=no;im.onload=()=>ok(im);im.src=fr.result};fr.readAsDataURL(file)})}
+// 綠底去背（跟 Claude 幫忙切素材的方法一樣）＋切掉空白
+function chromaCut(im,max){const sc=Math.min(1,(max||1400)/Math.max(im.width,im.height)),c=document.createElement('canvas');c.width=Math.round(im.width*sc);c.height=Math.round(im.height*sc);const x=c.getContext('2d');x.drawImage(im,0,0,c.width,c.height);
+  const D=x.getImageData(0,0,c.width,c.height),a=D.data,c0=[a[0],a[1],a[2]],green=c0[1]-Math.max(c0[0],c0[2])>60;
+  let x0=c.width,y0=c.height,x1=-1,y1=-1;
+  for(let i=0,p=0;i<a.length;i+=4,p++){const r=a[i],g=a[i+1],b=a[i+2];if(green){const d=g-Math.max(r,b),al=Math.max(0,Math.min(1,1-(d-70)/80));a[i+3]=Math.round(a[i+3]*al);if(al<1&&g>Math.max(r,b))a[i+1]=Math.max(r,b)}
+    if(a[i+3]>24){const px=p%c.width,py=(p/c.width)|0;if(px<x0)x0=px;if(px>x1)x1=px;if(py<y0)y0=py;if(py>y1)y1=py}}
+  x.putImageData(D,0,0);if(x1<0)return c;const o=document.createElement('canvas');o.width=x1-x0+1;o.height=y1-y0+1;o.getContext('2d').drawImage(c,x0,y0,o.width,o.height,0,0,o.width,o.height);return o}
+// 放進正方形：房子貼底、商品置中
+function fitSq(src,S,bottom){const c=document.createElement('canvas');c.width=c.height=S;const sc=Math.min(S*.94/src.width,S*.94/src.height),w=src.width*sc,h=src.height*sc;c.getContext('2d').drawImage(src,(S-w)/2,bottom?S-h-6:(S-h)/2,w,h);return c}
+// 清晨／日落／夜晚用調色做（窗戶燈光保留）
+function tintPhase(src,mul,add,glow){const c=document.createElement('canvas');c.width=src.width;c.height=src.height;const x=c.getContext('2d');x.drawImage(src,0,0);const D=x.getImageData(0,0,c.width,c.height),a=D.data;
+  for(let i=0;i<a.length;i+=4){if(!a[i+3])continue;const r=a[i],g=a[i+1],b=a[i+2],l=.299*r+.587*g+.114*b,w=glow?Math.max(0,Math.min(1,(l-185)/50))*Math.max(0,Math.min(1,(r-b-40)/60))*glow:0;
+    a[i]=Math.min(255,(r*mul[0]+add[0])*(1-w)+r*1.08*w);a[i+1]=Math.min(255,(g*mul[1]+add[1])*(1-w)+g*w);a[i+2]=Math.min(255,(b*mul[2]+add[2])*(1-w)+b*.85*w)}
+  x.putImageData(D,0,0);return c}
+function canvasUrl(c,q){let u=c.toDataURL('image/webp',q||.88);if(!/^data:image\/webp/.test(u))u=c.toDataURL('image/png');return u}
+async function upImg(dataUrl){const r=await call('upload',Object.assign(cred(),{dataUrl}),true);return r.url}
+function adminUploadSec(d){
+  const R=(DB.rooms||[]).slice().reverse(),C=CAT||{styles:[],items:[]};
+  const th=(src,lab,sub,attr)=>`<button class="upit" ${attr}><img src="${src}" alt="" loading="lazy"><b>${esc(lab)}</b><small>${sub}</small></button>`;
+  return `<div class="sec adm"><h4>🖼️ 背景（房間）<span>${R.length} 張</span></h4>
+    <p class="lead">建議尺寸 848×1264（直式），會自動裁切。上傳後可以拉框設定軟木板和地板範圍</p>
+    <div class="row2"><button id="aurm">＋ 上傳新背景</button></div>
+    <div class="upgrid">${R.map(r=>th(r.img,r.name,(ROOM_TN[r.r||'CU']||'訂製款')+(r.off?'・已下架':''),`data-urm="${r.id}"`)).join('')||'<p class="lead">還沒有自己上傳的背景</p>'}</div></div>
+  <div class="sec adm"><h4>🏠 房子款式<span>${(C.styles||[]).length} 款</span></h4>
+    <p class="lead">建議尺寸 512×512，綠底會自動去背；只要傳白天的，清晨、日落、夜晚會自動調色</p>
+    <div class="row2"><button id="aust">＋ 上傳新房子</button></div>
+    <div class="upgrid">${(C.styles||[]).map(x=>th((x.img||{}).day,x.name,x.off?'已下架':'上架中',`data-ust="${x.n}"`)).join('')}</div></div>
+  <div class="sec adm"><h4>🛒 商店商品<span>${(C.items||[]).length} 個</span></h4>
+    <p class="lead">建議尺寸 256×256，綠底會自動去背；價格選價位就好，也可以自己打</p>
+    <div class="row2"><button id="auit">＋ 上傳新商品</button></div>
+    <div class="upgrid">${(C.items||[]).map(x=>th(x.img,x.name,`${x.kind==='toy'?'玩具':'零食'}・${x.limited?'限定':'🪙'+x.price}${x.off?'・已下架':''}`,`data-uit="${x.id}"`)).join('')}</div></div>
+  <div class="sec adm"><h4>🎨 訂製款折扣碼</h4><p class="lead">島民申請訂製裝潢時打這組碼就免費，不限次數</p>
+    <div class="row2"><input id="adcode" maxlength="20" value="${esc(d.decoCode||'我毛很多')}"><button id="adcodeb">儲存</button></div></div>`}
+function adminUploadBind(d){
+  $('#aurm').onclick=()=>roomEditor(null);$('#aust').onclick=()=>styleEditor(null);$('#auit').onclick=()=>itemEditor(null);
+  document.querySelectorAll('[data-urm]').forEach(b=>b.onclick=()=>roomEditor((DB.rooms||[]).find(r=>r.id===b.dataset.urm)));
+  document.querySelectorAll('[data-ust]').forEach(b=>b.onclick=()=>styleEditor((CAT.styles||[]).find(x=>String(x.n)===b.dataset.ust)));
+  document.querySelectorAll('[data-uit]').forEach(b=>b.onclick=()=>itemEditor((CAT.items||[]).find(x=>x.id===b.dataset.uit)));
+  $('#adcodeb').onclick=async()=>{try{const r=await adminCall('adminDecoCode',{code:$('#adcode').value.trim()});toast('折扣碼改成「'+r.code+'」了')}catch(e){toast(e.message)}}}
+// ---------- 背景編輯：裁圖、拉軟木板框、拉地板範圍 ----------
+function roomEditor(o){const E=o?JSON.parse(JSON.stringify(o)):{name:'',r:'N',board:[470,240,780,440],floor:{y0:760,t:[120,730]}};let img=o?o.img:'',file=null;
+  E.board=Array.isArray(E.board)?E.board:[470,240,780,440];E.floor=E.floor&&E.floor.t?E.floor:{y0:760,t:[120,730]};
+  const hs=(ADM_D&&ADM_D.houses||[]).map(h=>`<option value="${h.id}" ${E.houseId===h.id?'selected':''}>${esc(h.name)}</option>`).join('');
+  openModal(`<h3>🖼️ ${o?'編輯背景':'上傳新背景'}</h3>
+    ${o?'':`<label class="mimg" style="display:block;text-align:center"><input type="file" accept="image/*" id="refile" hidden><span id="rel">📷 選一張背景圖（848×1264）</span></label>`}
+    <div class="redit" id="redit"><img id="reimg" src="${img||''}" alt="" style="${img?'':'opacity:.2'}"><div class="rebd" id="rebd"><i class="rh"></i><span>軟木板</span></div><div class="refl" id="refl"><i class="fl"></i><i class="fr"></i><span>地板從這裡開始（拉線上下、拉兩端圓點左右）</span></div></div>
+    <p class="lead" style="font-size:12px">拉黃色框對準軟木板（右下角圓點調大小）；藍線是毛孩可以走的地板最上緣</p>
+    ${fld('rename','名字',`<input id="rename" maxlength="12" value="${esc(E.name)}" placeholder="例如：星空露營房">`)}
+    ${fld('retype','類別',`<select id="retype">${ROOM_TYPES.map(([k,n])=>`<option value="${k}" ${E.r===k?'selected':''}>${n}</option>`).join('')}</select>`)}
+    <div id="recu" style="display:${E.r==='CU'?'':'none'}">${fld('rehouse','送給哪一家（可以之後再送）',`<select id="rehouse"><option value="">（先不送）</option>${hs}</select>`)}</div>
+    ${o?`<label class="chk"><input type="checkbox" id="reoff" ${E.off?'checked':''}> 下架（抽卡、一番賞不會再出現；已經有的人保留）</label>`:''}
+    <div class="err" id="reerr"></div><div class="row2 sticky"><button id="reback">← 後台</button><button class="primary" id="resave">${o?'儲存':'上傳'}</button></div>`);
+  $('#reback').onclick=adminSheet;$('#retype').onchange=e=>{$('#recu').style.display=e.target.value==='CU'?'':'none'};
+  const box=$('#redit'),bd=$('#rebd'),fl=$('#refl'),W=848,H=1264;
+  const draw=()=>{const b=E.board;Object.assign(bd.style,{left:b[0]/W*100+'%',top:b[1]/H*100+'%',width:(b[2]-b[0])/W*100+'%',height:(b[3]-b[1])/H*100+'%'});
+    Object.assign(fl.style,{top:E.floor.y0/H*100+'%',left:E.floor.t[0]/W*100+'%',width:(E.floor.t[1]-E.floor.t[0])/W*100+'%'})};draw();
+  const drag=(el,fn)=>{el.onpointerdown=ev=>{ev.preventDefault();ev.stopPropagation();const r=box.getBoundingClientRect(),sx=ev.clientX,sy=ev.clientY,st=JSON.parse(JSON.stringify(E));
+    const mv=e=>{fn((e.clientX-sx)/r.width*W,(e.clientY-sy)/r.height*H,st);draw()},up=()=>{removeEventListener('pointermove',mv);removeEventListener('pointerup',up)};addEventListener('pointermove',mv);addEventListener('pointerup',up)}};
+  const cl=(v,a,b)=>Math.round(Math.max(a,Math.min(b,v)));
+  drag(bd,(dx,dy,st)=>{const w=st.board[2]-st.board[0],h=st.board[3]-st.board[1],x=cl(st.board[0]+dx,0,W-w),y=cl(st.board[1]+dy,0,H-h);E.board=[x,y,x+w,y+h]});
+  drag(bd.querySelector('.rh'),(dx,dy,st)=>{E.board=[st.board[0],st.board[1],cl(st.board[2]+dx,st.board[0]+60,W),cl(st.board[3]+dy,st.board[1]+60,H)]});
+  drag(fl,(dx,dy,st)=>{E.floor.y0=cl(st.floor.y0+dy,300,1150)});
+  drag(fl.querySelector('.fl'),(dx,dy,st)=>{E.floor.t=[cl(st.floor.t[0]+dx,0,st.floor.t[1]-120),st.floor.t[1]]});
+  drag(fl.querySelector('.fr'),(dx,dy,st)=>{E.floor.t=[st.floor.t[0],cl(st.floor.t[1]+dx,st.floor.t[0]+120,W)]});
+  if($('#refile'))$('#refile').onchange=async e=>{const f=e.target.files[0];if(!f)return;$('#rel').textContent='處理中…';try{img=await roomCrop(f);file=1;$('#reimg').src=img;$('#reimg').style.opacity=1;$('#rel').textContent='📷 換一張'}catch(x){$('#rel').textContent='這張圖讀不了，換一張'}};
+  $('#resave').onclick=async ev=>{const b=ev.currentTarget,name=$('#rename').value.trim(),r=$('#retype').value;if(!name)return $('#reerr').textContent='幫背景取個名字';if(!img)return $('#reerr').textContent='先選一張背景圖';
+    b.disabled=true;try{let url=o?o.img:'';if(file){b.textContent='上傳圖片中…';url=await upImg(img)}b.textContent='儲存中…';
+      const res=await adminCall('adminRoomSave',{room:{id:o?o.id:'',name,r,img:url,board:E.board,floor:E.floor,off:$('#reoff')?$('#reoff').checked:false,houseId:r==='CU'?($('#rehouse').value||E.houseId||''):''}});
+      const L=DB.rooms=DB.rooms||[],i=L.findIndex(x=>x.id===res.id);if(i>=0)L[i]=res;else L.push(res);applyRooms();
+      const to=r==='CU'&&$('#rehouse').value;if(to&&to!==(o&&o.houseId)){b.textContent='送給那一家…';try{await adminCall('adminGiftHouse',{houseId:to,room:res.id,roomName:name})}catch(x){toast(x.message)}}
+      toast(o?'背景改好了':'新背景上架了 🖼️'+(to?'，也送給那一家了':''));adminSheet()}catch(x){$('#reerr').textContent=x.message;b.disabled=false;b.textContent=o?'儲存':'上傳'}}}
+// ---------- 房子款式 ----------
+function styleEditor(o){let imgs=null;
+  openModal(`<h3>🏠 ${o?'編輯房子':'上傳新房子'}</h3>
+    ${o?'':`<label class="mimg" style="display:block;text-align:center"><input type="file" accept="image/*" id="stfile" hidden><span id="stl">📷 選一張白天的房子圖（綠底、512×512）</span></label>`}
+    <div class="stprev" id="stprev">${o?['dawn','day','sunset','night'].map(p=>`<img src="${(o.img||{})[p]||''}" alt="">`).join(''):''}</div>
+    ${fld('stname','名字',`<input id="stname" maxlength="12" value="${esc(o?o.name:'')}" placeholder="例如：星空露營屋">`)}
+    ${o?`<label class="chk"><input type="checkbox" id="stoff" ${o.off?'checked':''}> 下架（蓋房子、都更的選單不會出現；已經住的人不受影響）</label>`:''}
+    <div class="err" id="sterr"></div><div class="row2 sticky"><button id="stback">← 後台</button><button class="primary" id="stsave">${o?'儲存':'上架'}</button></div>`);
+  $('#stback').onclick=adminSheet;
+  if($('#stfile'))$('#stfile').onchange=async e=>{const f=e.target.files[0];if(!f)return;$('#stl').textContent='去背、調色中…';
+    try{const sq=fitSq(chromaCut(await fileImg(f),1200),512,true);const P={day:sq,dawn:tintPhase(sq,[1,.93,.96],[10,4,10],0),sunset:tintPhase(sq,[1.02,.82,.68],[12,0,0],.6),night:tintPhase(sq,[.42,.46,.68],[0,0,8],.95)};
+      imgs={};for(const k in P)imgs[k]=canvasUrl(P[k]);$('#stprev').innerHTML=['dawn','day','sunset','night'].map(p=>`<img src="${imgs[p]}" alt="">`).join('');$('#stl').textContent='📷 換一張'}catch(x){$('#stl').textContent='這張圖讀不了，換一張'}};
+  $('#stsave').onclick=async ev=>{const b=ev.currentTarget,name=$('#stname').value.trim();if(!name)return $('#sterr').textContent='幫房子取個名字';if(!o&&!imgs)return $('#sterr').textContent='先選一張房子圖';
+    b.disabled=true;try{let img=null;if(imgs){img={};for(const k of ['day','dawn','sunset','night']){b.textContent=`上傳圖片中…（${Object.keys(img).length+1}/4）`;img[k]=await upImg(imgs[k])}}
+      b.textContent='儲存中…';await adminCall('adminCatSave',{kind:'style',obj:{n:o?o.n:0,name,img,off:$('#stoff')?$('#stoff').checked:false}});
+      await loadCatalog();toast(o?'房子改好了':'新房子上架了 🏠');adminSheet()}catch(x){$('#sterr').textContent=x.message;b.disabled=false;b.textContent=o?'儲存':'上架'}}}
+// ---------- 商店商品 ----------
+function itemEditor(o){let img=null;const I=o?Object.assign({},o):{kind:'treat',price:0,fav:'',limited:''};let tier=o?'custom':'normal';
+  const tiersHTML=k=>(PRICE_TIERS[k]||[]).map(([id,n,a,b])=>`<button type="button" data-t="${id}" class="${tier===id?'on':''}">${n}<small>🪙${a===b?a:a+'～'+b}</small></button>`).join('')+`<button type="button" data-t="custom" class="${tier==='custom'?'on':''}">✏️ 自己打<small>&nbsp;</small></button>`;
+  openModal(`<h3>🛒 ${o?'編輯商品':'上傳新商品'}</h3>
+    ${o?'':`<label class="mimg" style="display:block;text-align:center"><input type="file" accept="image/*" id="itfile" hidden><span id="itl">📷 選一張商品圖（綠底、256×256）</span></label>`}
+    <div class="stprev" id="itprev">${o&&o.img?`<img src="${o.img}" alt="">`:''}</div>
+    ${fld('itname','名字',`<input id="itname" maxlength="12" value="${esc(I.name||'')}" placeholder="例如：草莓布丁">`)}
+    <div class="field"><div class="flabel">種類</div><div class="seg" id="itkind"><button type="button" data-k="treat" class="${I.kind!=='toy'?'on':''}">🍤 零食</button><button type="button" data-k="toy" class="${I.kind==='toy'?'on':''}">🧸 玩具</button></div></div>
+    <div id="itpricebox"><div class="field"><div class="flabel">價位</div><div class="tiers" id="ittier">${tiersHTML(I.kind)}</div></div>
+      <div id="itcustom" style="display:${tier==='custom'?'':'none'}">${fld('itprice','價格',`<input id="itprice" type="number" min="0" max="9999" value="${+I.price||''}">`)}</div></div>
+    <div id="itfavbox" style="display:${I.kind==='toy'?'none':''}"><div class="field"><div class="flabel">誰最愛（可以不選）</div><div class="tiers" id="itfav">${FAV_SPECIES.map(sp=>`<button type="button" data-f="${sp}" class="${FAV_SP(I.fav).includes(sp)?'on':''}">${sp}</button>`).join('')}</div></div></div>
+    <label class="chk" id="itlimbox" style="display:${I.kind==='toy'?'':'none'}"><input type="checkbox" id="itlim" ${I.limited?'checked':''}> 限定玩具（商店不賣，只從卡包、一番賞出現）</label>
+    ${o?`<label class="chk"><input type="checkbox" id="itoff" ${o.off?'checked':''}> 下架（商店不賣了；已經買的人保留）</label>`:''}
+    <div class="err" id="iterr"></div><div class="row2 sticky"><button id="itback">← 後台</button><button class="primary" id="itsave">${o?'儲存':'上架'}</button></div>`);
+  $('#itback').onclick=adminSheet;
+  const bindT=()=>{$('#ittier').onclick=e=>{const b=e.target.closest('button');if(!b)return;tier=b.dataset.t;$('#ittier').querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===b));$('#itcustom').style.display=tier==='custom'?'':'none'}};bindT();
+  $('#itkind').onclick=e=>{const b=e.target.closest('button');if(!b)return;I.kind=b.dataset.k;$('#itkind').querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===b));if(tier!=='custom')tier='normal';$('#ittier').innerHTML=tiersHTML(I.kind);bindT();
+    $('#itfavbox').style.display=I.kind==='toy'?'none':'';$('#itlimbox').style.display=I.kind==='toy'?'':'none'};
+  $('#itfav').onclick=e=>{const b=e.target.closest('button');if(b)b.classList.toggle('on')};
+  if($('#itfile'))$('#itfile').onchange=async e=>{const f=e.target.files[0];if(!f)return;$('#itl').textContent='去背中…';try{img=canvasUrl(fitSq(chromaCut(await fileImg(f),800),256,false));$('#itprev').innerHTML=`<img src="${img}" alt="">`;$('#itl').textContent='📷 換一張'}catch(x){$('#itl').textContent='這張圖讀不了，換一張'}};
+  $('#itsave').onclick=async ev=>{const b=ev.currentTarget,name=$('#itname').value.trim();if(!name)return $('#iterr').textContent='幫商品取個名字';if(!o&&!img)return $('#iterr').textContent='先選一張商品圖';
+    const lim=I.kind==='toy'&&$('#itlim').checked,price=lim?0:tier==='custom'?Math.max(0,Math.round(+$('#itprice').value||0)):tierPrice(I.kind,tier);if(!lim&&!price)return $('#iterr').textContent='價格要大於 0';
+    const fav=[...$('#itfav').querySelectorAll('.on')].map(x=>x.dataset.f).join('、');
+    b.disabled=true;try{let url=null;if(img){b.textContent='上傳圖片中…';url=await upImg(img)}b.textContent='儲存中…';
+      await adminCall('adminCatSave',{kind:'item',obj:{id:o?o.id:'',name,kind:I.kind,price,fav:I.kind==='toy'?'':fav,limited:lim,img:url,off:$('#itoff')?$('#itoff').checked:false}});
+      await loadCatalog();toast(o?'商品改好了':`新商品上架了 🛒${lim?'（限定）':'，價格 🪙'+price}`);adminSheet()}catch(x){$('#iterr').textContent=x.message;b.disabled=false;b.textContent=o?'儲存':'上架'}}}
 function adminPlayerSheet(p){
   openModal(`<h3>👑 ${esc(p.nick)}</h3><p class="lead">${p.house?esc(p.house):'沒有家'}・Lv.${p.lv}<br>${p.pushSt?PUSHLBL[p.pushSt]||'':'❔ 通知：還沒回報（還沒用新版打開過）'}${p.pushAt?`<small>（${ago(+p.pushAt)}回報）</small>`:''}</p>
     <div class="sec adm"><h4>🪙 金幣</h4><p class="lead">現在 ${p.coins}。改了之後，他下次打開 App 就會變成新的數字</p><div class="row2"><input id="apc" type="number" min="0" value="${+p.coins||0}"><button id="apcb">設定</button></div></div>
     <div class="sec adm"><h4>🔑 轉移碼</h4><p class="lead">現在是 <b class="code">${esc(p.code||'—')}</b>，改掉後舊的立刻失效</p><input id="apk" maxlength="12" placeholder="新的轉移碼（6～12 個英文和數字）" autocapitalize="characters"><div class="row2"><button id="apkb">改成這個</button><button id="apkr">🎲 重新產生</button></div></div>
+    <div class="sec adm"><h4>🔢 換機碼</h4><p class="lead">現在是 <b class="code">${esc(p.pin||'—')}</b>（加入現有家庭、點自己名字時要打）</p><div class="row2"><button id="appr">🎲 重新產生</button></div></div>
+    <div class="sec adm"><h4>🔗 合併帳號</h4><p class="lead">同一個人有兩個帳號時，把另一個併進「${esc(p.nick)}」。金幣、抽卡券、等級、背包取多的，另一個帳號會刪掉</p>
+      <div class="row2"><select id="apmg"><option value="">選要併進來的帳號</option>${((ADM_D&&ADM_D.players)||[]).filter(x=>x.id!==p.id).map(x=>`<option value="${x.id}">${esc(x.nick)}（${x.house?esc(x.house):'沒有家'}・Lv${x.lv}）</option>`).join('')}</select><button id="apmgb" class="danger">合併</button></div></div>
     <div class="row2"><button id="apback">← 島主後台</button></div>`);
   $('#apback').onclick=adminSheet;
+  $('#appr').onclick=async e=>{if(!armBtn(e.target,'確定重新產生？'))return;try{const r=await adminCall('adminSetPin',{playerId:p.id});p.pin=r.pin;toast('新的換機碼：'+r.pin);adminPlayerSheet(p)}catch(x){toast(x.message)}};
+  $('#apmgb').onclick=async e=>{const id=$('#apmg').value;if(!id)return toast('先選要併進來的帳號');if(!armBtn(e.target,'確定合併？另一個會刪掉'))return;try{await adminCall('adminMergePlayers',{keepId:p.id,dropId:id});toast('合併好了 🔗');adminSheet()}catch(x){toast(x.message)}};
   $('#apcb').onclick=async()=>{const v=Math.max(0,Math.round(+$('#apc').value||0));try{await adminCall('adminSetCoins',{id:p.id,coins:v});p.coins=v;toast(`${p.nick} 的金幣設定成 ${v} 了`);adminSheet()}catch(e){toast(e.message)}};
   const setc=async code=>{try{const r=await adminCall('adminSetCode',{id:p.id,code});try{await navigator.clipboard.writeText(r.code)}catch(e){}toast('新的轉移碼 '+r.code+' 已複製');adminSheet()}catch(e){toast(e.message)}};
   $('#apkb').onclick=()=>{const v=$('#apk').value.trim().toUpperCase().replace(/^MH-?/,'');if(!v)return toast('先輸入新的轉移碼');setc(v)};
@@ -1538,7 +1720,7 @@ function renderIsland(){
     const h=used.get(i);const el=document.createElement('div');el.className='thing'+(!h&&picking?' pick':'');
     el.setAttribute('role','button');el.tabIndex=0;el.setAttribute('aria-label',h?h.name:'空地，可以蓋房子');
     Object.assign(el.style,ipct(x,y),{width:((h?HOUSE_W:LOT_W)/1024*100)+'%',zIndex:y});
-    el.innerHTML=`<img src="assets/${h?'house'+h.style:'empty_lot'}_${p}.webp" alt="">`;
+    el.innerHTML=`<img src="${h?hsrc(h.style,p):`assets/empty_lot_${p}.webp`}" alt="">`;
     el.onclick=()=>h?openHome(h.id):lotClick(i);
     box.appendChild(el);
     if(h)box.appendChild(signEl(h.name,x,y,isFamily(h.id)?'mine':''));
@@ -1594,7 +1776,57 @@ function lotClick(slot){
 let PENDING_INVITE='';
 const isGuest=()=>{try{return localStorage.getItem('mhd_guest')==='1'}catch(e){return false}};
 function setGuest(on){try{on?localStorage.setItem('mhd_guest','1'):localStorage.removeItem('mhd_guest')}catch(e){}updGuestBar()}
-function onboarding(){
+function onboarding(){if(ONLINE)return introCards('start',(()=>{try{return !!localStorage.getItem('mhd_intro')}catch(e){return false}})());onboardingOld()}
+// ================= v1.83 新手圖卡、加入現有家庭（點自己＋換機碼）、iPhone 加入主畫面 =================
+const INTRO_SL=[
+  {art:`<img src="assets/island2_day.webp" alt="" style="width:66%;height:92%;object-fit:cover;object-position:center 30%;border-radius:26px;top:0"><img src="assets/logo.webp" alt="" style="width:56%;bottom:-2%">`,h:'歡迎來到毛很多島！',p:'這是一座大家一起養毛孩的小島。<br>每一間房子都住著<b>真的島民和他們的毛孩</b>，<br>你也可以在這裡有一個家。'},
+  {art:`<img src="assets/pet_body_cat.webp" alt="" style="width:46%;left:6%;bottom:6%"><img src="assets/pet_body_dog.webp" alt="" style="width:50%;right:4%;bottom:4%"><img src="assets/icon_water.webp" alt="" style="width:18%;top:4%;left:42%">`,h:'照顧自己的毛孩',p:'把家裡的毛孩搬上島！<br><b>餵飯、摸摸、清便便</b>，牠會越來越開心；<br>體重、看醫生、花了多少錢也能記下來。'},
+  {art:`<img src="assets/pet_body_rabbit.webp" alt="" style="width:44%;left:8%;bottom:6%"><img src="assets/icon_moneyburst.webp" alt="" style="width:38%;right:6%;top:6%"><img src="assets/icon_mail.webp" alt="" style="width:24%;right:14%;bottom:8%">`,h:'去別人家串門子',p:'到朋友家看毛孩、貼便利貼、送零食。<br>島上常常會<b>掉錢袋</b>，看到就點一下，<br>撿到的金幣都是你的！'},
+  {art:`<img src="assets/room_card_spacecat.webp" alt="" style="width:38%;left:12%;top:4%;border-radius:14px;transform:rotate(-6deg)"><img src="assets/card_back_gold.webp" alt="" style="width:34%;right:12%;top:12%;transform:rotate(7deg)"><img src="assets/kuji_icon.webp" alt="" style="width:30%;bottom:0;left:35%">`,h:'收集房間、佈置你的家',p:'用抽卡券、<b>一番賞</b>抽到漂亮的房間，<br>在毛毛商店買零食、玩具和衣服，<br>把家打扮成你喜歡的樣子。'},
+  {art:`<img src="assets/pack.webp" alt="" style="width:40%;left:8%;top:6%;transform:rotate(-6deg)"><img src="assets/icon_rank.webp" alt="" style="width:34%;right:10%;top:4%"><img src="assets/icon_expand.webp" alt="" style="width:36%;left:34%;bottom:0">`,h:'還有好多可以玩',p:'每天<b>解任務</b>拿抽卡券和金幣、<br>蓋民宿、種菜賣錢、拚排行榜……<br>島上還會不定期舉辦活動，<br>有什麼想要的，也可以寫信給島主許願！'}];
+function introCards(mode,startLast){const start=mode==='start';try{localStorage.setItem('mhd_intro','1')}catch(e){}
+  const last=start?`<div class="islide"><div class="amy"><img src="assets/center_npc_wave.webp" alt=""><div class="obub">準備好了嗎？<br>你想怎麼開始呢～</div></div>
+      <div class="ichoices"><button class="ibtn pri" id="ojoin"><img src="assets/icon_mail.webp" alt=""><span>加入現有家庭<small>家人已經在島上了：選家、打家庭密碼</small></span></button>
+        <button class="ibtn" id="obuild"><img src="assets/icon_deco.webp" alt=""><span>蓋一棟房子<small>打島主給的邀請碼，自己設家庭密碼</small></span></button>
+        <button class="ibtn" id="oguest"><img src="assets/guest_cat.webp" alt=""><span>我是遊客（先逛逛）<small>先看看大家的毛孩，之後再決定</small></span></button></div>
+      <button class="ilink" id="orec">換手機了？用轉移碼找回帳號</button></div>`:'';
+  openModal(`<div class="intro"><button class="iskip" id="iskip">略過</button><div class="itrack" id="itrack">${INTRO_SL.map(x=>`<div class="islide"><div class="iart"><div class="iblob"></div>${x.art}</div><h2>${x.h}</h2><p>${x.p}</p></div>`).join('')}${last}</div>
+    <div class="idots" id="idots"></div><button class="ibtn pri" id="inext">下一頁</button></div>`,true);
+  const T=$('#itrack'),N=T.children.length,cur=()=>Math.round(T.scrollLeft/T.clientWidth),D=$('#idots');D.innerHTML='<i></i>'.repeat(N);
+  const upd=()=>{const i=cur(),end=i===N-1;[...D.children].forEach((d,k)=>d.classList.toggle('on',k===i));$('#inext').textContent=end?(start?'':'知道了！'):i===N-2&&start?'開始吧！':'下一頁';$('#inext').style.display=end&&start?'none':'';$('#iskip').style.visibility=end?'hidden':'visible'};
+  T.addEventListener('scroll',()=>requestAnimationFrame(upd));upd();
+  $('#inext').onclick=()=>{if(cur()===N-1)return closeModal();T.scrollTo({left:(cur()+1)*T.clientWidth,behavior:'smooth'})};
+  $('#iskip').onclick=()=>{if(!start)return closeModal();T.scrollTo({left:(N-1)*T.clientWidth,behavior:'smooth'})};
+  if(startLast)setTimeout(()=>{T.scrollLeft=(N-1)*T.clientWidth;upd()},30);
+  if(start){$('#ojoin').onclick=()=>joinFlow();$('#obuild').onclick=inviteStep;$('#orec').onclick=recoverSheet;
+    $('#oguest').onclick=()=>{setGuest(true);closeModal();renderIsland();toast('參觀中，想加入隨時點上面的「🔒 參觀中」')}}}
+// 加入現有家庭：打對家庭密碼 → 列出家人 → 點自己＋換機碼，或「我是新的家人」
+function famPick(h,pw,list){
+  const recent=m=>m.on&&Date.now()-m.on<864e5;
+  openModal(`<h3>🏠 「${esc(h.name)}」的家人</h3><p class="lead">哪一個是你？點自己的名字，用換機碼接回原本的帳號</p>
+    <div class="fmlist">${list.length?list.map(m=>`<button data-m="${m.id}"><span><b>${esc(m.nick)}</b><small>Lv${m.lv}・${m.on?ago(m.on):'很久沒上線'}</small></span>${recent(m)?'<em>是你嗎？</em>':''}</button>`).join(''):'<p class="lead">這家還沒有其他家人</p>'}</div>
+    ${list.length<MAX_MEMBERS?'<div class="row2"><button id="fmnew">＋ 我是新的家人</button></div>':'<p class="lead">這家已經滿 '+MAX_MEMBERS+' 個家人了</p>'}<div class="row2"><button id="fmback">返回</button></div>`,true);
+  $('#fmback').onclick=()=>joinFlow(h.id);
+  $('#sheet').querySelectorAll('[data-m]').forEach(b=>b.onclick=()=>pinStep(h,pw,list.find(m=>m.id===b.dataset.m),list));
+  let warned=false;
+  if($('#fmnew'))$('#fmnew').onclick=()=>nameStep(async()=>{try{await call('joinHouse',{playerId:DB.me.id,houseId:h.id,pw})}catch(e){toast(e.message);return}
+      DB.me.houseId=h.id;DB.me.pw=pw;DB.famOk=true;save();toast(`歡迎回家！你現在是「${h.name}」的家人`);await sync(true);updGuestBar();openHome(h.id)},()=>famPick(h,pw,list),
+    n=>{const same=list.find(m=>m.nick===n);
+      if(same){$('#nerr').innerHTML=`這家已經有「${esc(n)}」了，<button class="ilink" id="nsame">我就是 ${esc(n)}</button>`;$('#nsame').onclick=()=>pinStep(h,pw,same,list);return false}
+      if(list.length&&!warned){warned=true;$('#nerr').innerHTML=`你確定不是 ${list.map(m=>'「'+esc(m.nick)+'」').join('、')} 嗎？<br>如果你剛剛是在網頁玩，請按「返回」點自己的名字。<br>確定是新的家人，就再按一次「下一步」`;return false}
+      return true})}
+function pinStep(h,pw,m,list){
+  openModal(`<h3>🔢 你是「${esc(m.nick)}」嗎？</h3><p class="lead">輸入 ${esc(m.nick)} 的 4 位數換機碼<br><small>在舊手機（或網頁版）的「😊 我的設定」可以看到；忘記的話請島主幫忙</small></p>
+    ${fld('pin','換機碼','<input id="pin" inputmode="numeric" maxlength="4" pattern="[0-9]*" autocomplete="off" placeholder="例如：3821" style="font-size:22px;letter-spacing:.3em;text-align:center">')}
+    <div class="err" id="pinerr"></div><div class="row2"><button id="pinb">返回</button><button class="primary" id="pinok">接回帳號</button></div>`,true);
+  $('#pinb').onclick=()=>famPick(h,pw,list);setTimeout(()=>$('#pin')?.focus(),60);
+  $('#pin').onkeydown=e=>{if(e.key==='Enter')$('#pinok').click()};
+  $('#pinok').onclick=async e=>{const v=$('#pin').value.trim();if(!/^\d{4}$/.test(v))return $('#pinerr').textContent='換機碼是 4 個數字';const b=e.currentTarget;b.disabled=true;
+    let r;try{r=await call('claimMember',{houseId:h.id,pw,targetId:m.id,pin:v})}catch(x){$('#pinerr').textContent=x.message;b.disabled=false;return}
+    const p=r.player;DB.me={id:p.id,nick:p.nick,houseId:p.houseId||null,pw:r.pw||pw,code:p.code,pin:p.pin};
+    if(p.game&&typeof p.game==='object')DB.game=fixGame(Object.assign({},p.game));
+    DB.gameSynced=true;setGuest(false);try{localStorage.setItem(OKEY+'_g','1')}catch(x){}save();closeModal();updTix();toast(`歡迎回來，${p.nick}！🎉`);await sync(true);renderIsland();if(p.houseId)openHome(p.houseId)}}
+function onboardingOld(){
   openModal(`<div class="deco"><img src="assets/logo_deco.webp" alt=""><span>歡迎來到毛很多</span></div><p class="lead">${ONLINE?'這是一座私人小島，有島主的邀請碼或家人密碼才能加入':'你想怎麼開始？'}</p>
     <div class="big3">
       <button id="o1"><span class="e">🏠</span><span>${ONLINE?'我有邀請碼，要蓋房子':'蓋我自己的家'}<small>在島上選一塊空地，替你的毛孩建檔</small></span></button>
@@ -1609,20 +1841,20 @@ function onboarding(){
 }
 function inviteStep(){
   if(!ONLINE)return nameStep(()=>{picking=true;renderIsland();toast('點一塊「＋」空地')});
-  openModal(`<h3>🏠 輸入邀請碼</h3><p class="lead">跟島主拿到的邀請碼，一組只能用一次</p>
-    ${fld('ivc','邀請碼',`<input id="ivc" placeholder="例如：MAO-4821" autocapitalize="characters" autocomplete="off" value="${esc(PENDING_INVITE)}">`)}
+  openModal(`<h3>🏠 蓋一棟房子</h3><p class="lead">輸入島主給你的邀請碼（一組只能用一次）</p>
+    ${fld('ivc','島主給的邀請碼',`<input id="ivc" placeholder="例如：MAO-4821" autocapitalize="characters" autocomplete="off" value="${esc(PENDING_INVITE)}">`)}
     <div class="err" id="iverr"></div><div class="row2"><button id="ivb">返回</button><button class="primary" id="ivok">下一步</button></div>`,true);
   $('#ivb').onclick=onboarding;
   $('#ivok').onclick=async()=>{const c=$('#ivc').value.trim();if(!c){$('#iverr').textContent='請輸入邀請碼';return}
     try{await call('checkInvite',{invite:c})}catch(e){$('#iverr').textContent=e.message;return}
     PENDING_INVITE=c;nameStep(()=>{picking=true;renderIsland();toast('點一塊「＋」空地，蓋你的家')})};
 }
-function nameStep(next,back){
+function nameStep(next,back,check){
   openModal(`<div class="deco"><img src="assets/logo_deco.webp" alt=""><span>取一個暱稱</span></div><p class="lead">大家在動態和便利貼上會看到這個名字</p>
     ${fld('nick','你的暱稱',`<input id="nick" maxlength="12" placeholder="例如：小麥" value="${esc(DB.me?.nick||'')}">`)}
     <div class="err" id="nerr"></div><div class="row2"><button id="nback">返回</button><button class="primary" id="nnext">下一步</button></div>`,true);
   $('#nback').onclick=back||onboarding;
-  $('#nnext').onclick=async()=>{const n=$('#nick').value.trim();if(!n){$('#nerr').textContent='請先輸入暱稱';return}
+  $('#nnext').onclick=async()=>{const n=$('#nick').value.trim();if(!n){$('#nerr').textContent='請先輸入暱稱';return}if(check&&!check(n))return;
     const me={id:DB.me?.id||(uid()+uid()),nick:n,houseId:DB.me?.houseId||null,pw:DB.me?.pw||''};
     try{await call('savePlayer',{player:{id:me.id,nick:n,game:DB.game}})}catch(e){$('#nerr').textContent=e.message;return}
     DB.me=me;save();setGuest(false);closeModal();next()};
@@ -1634,14 +1866,15 @@ function updGuestBar(){let g=$('#guestbar');if(!g){g=document.createElement('but
 function joinFlow(hid){
   const fresh=!DB.me;const mine=myHouse();if(mine){toast(`你已經是「${mine.name}」的家人，要先退出才能加入別的家`);return}
   const list=DB.houses.filter(h=>!isSpecialH(h)).sort((a,b)=>a.name.localeCompare(b.name,'zh-Hant'));
-  openModal(`<h3>🔑 加入家人的家</h3><p class="lead">選一個家，輸入家人告訴你的密碼</p>
+  openModal(`<h3>🔑 加入現有家庭</h3><p class="lead">選你家，輸入家人告訴你的家庭密碼</p>
     ${fld('jh','哪一個家？',`<select id="jh">${list.map(h=>`<option value="${h.id}" ${h.id===hid?'selected':''}>${esc(h.name)}（${membersOf(h.id).length}/${MAX_MEMBERS}）</option>`).join('')}</select>`)}
-    ${fld('jp','家人密碼',`<input id="jp" type="password" autocomplete="off">`,'試做版的示範家庭，密碼都是 1234')}
+    ${fld('jp','家庭密碼',`<input id="jp" type="password" autocomplete="off">`,ONLINE?'不知道的話問一下家人':'試做版的示範家庭，密碼都是 1234')}
     <div class="err" id="jerr"></div>
     <div class="row2"><button ${fresh?'id="jback"':'data-close'}>${fresh?'返回':'取消'}</button><button class="primary" id="jok">${fresh?'下一步':'加入'}</button></div>`,fresh);
   if($('#jback'))$('#jback').onclick=onboarding;
   $('#jok').onclick=async()=>{const h=house($('#jh').value),pw=hashPw($('#jp').value);
-    if(fresh&&ONLINE){try{await call('checkJoin',{houseId:h.id,pw})}catch(e){$('#jerr').textContent=e.message;return}
+    if(fresh&&ONLINE){let L;try{L=await call('famMembers',{houseId:h.id,pw})}catch(e){$('#jerr').textContent=e.message;return}
+      return famPick(h,pw,L);
       return nameStep(async()=>{try{await call('joinHouse',{playerId:DB.me.id,houseId:h.id,pw})}catch(e){toast(e.message);return}
         DB.me.houseId=h.id;DB.me.pw=pw;DB.famOk=true;save();toast(`歡迎回家！你現在是「${h.name}」的家人`);await sync(true);updGuestBar();openHome(h.id)},()=>joinFlow(h.id))}
     if(fresh)return nameStep(()=>joinFlow(h.id));
@@ -1657,7 +1890,7 @@ function buildFlow(slot){
   const steps=n=>`<div class="steps">${[1,2,3].map(i=>`<i class="${i<=n?'on':''}"></i>`).join('')}</div>`;
   function s1(){
     openModal(`<h3>🏠 選一款房子</h3>${steps(1)}<p class="lead">每款房子島上只有一間，被選走就沒了</p>
-      <div class="styles" id="sty">${Object.keys(STYLE_NAMES).map(n=>`<button data-s="${n}" ${taken.has(+n)?'disabled':''} class="${+n===B.style?'on':''}" aria-label="${STYLE_NAMES[n]}${taken.has(+n)?'（已有人住）':''}"><img src="assets/house${n}_day.webp" alt=""></button>`).join('')}</div>
+      <div class="styles" id="sty">${Object.keys(STYLE_NAMES).filter(n=>!STYLE_OFF.has(+n)).map(n=>`<button data-s="${n}" ${taken.has(+n)?'disabled':''} class="${+n===B.style?'on':''}" aria-label="${STYLE_NAMES[n]}${taken.has(+n)?'（已有人住）':''}"><img src="${hsrc(n,'day')}" alt=""></button>`).join('')}</div>
       <div class="hint" id="stn" style="text-align:center;margin:8px 0 14px">${B.style?STYLE_NAMES[B.style]:'點一間喜歡的'}</div>
       <div class="row2 sticky"><button data-close>取消</button><button class="primary" id="b1" ${B.style?'':'disabled'}>下一步</button></div>`);
     $('#sty').onclick=e=>{const b=e.target.closest('button');if(!b||b.disabled)return;B.style=+b.dataset.s;$('#sty').querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===b));$('#stn').textContent=STYLE_NAMES[B.style];$('#b1').disabled=false};
@@ -1678,14 +1911,13 @@ function buildFlow(slot){
     setTimeout(()=>$('#bn')?.focus(),60);
   }
   function s3(){
-    openModal(`<h3>🔑 設定家人密碼</h3>${steps(3)}<p class="lead">一起照顧毛孩的家人輸入這組密碼，就能一起編輯資料、看醫療和支出紀錄</p>
+    openModal(`<h3>🔑 設定家庭密碼</h3>${steps(3)}<p class="lead">一起照顧毛孩的家人輸入這組密碼，就能一起編輯資料、看醫療和支出紀錄</p>
       ${ONLINE?fld('pinv','島主給的邀請碼',`<input id="pinv" placeholder="例如：MAO-4821" autocapitalize="characters" autocomplete="off" value="${esc(B.invite||PENDING_INVITE||'')}">`,'這是私人小島，要有邀請碼才能蓋房子'):''}
-      ${fld('p1','家人密碼',`<input id="p1" type="password" minlength="4" autocomplete="new-password">`,'至少 4 個字，只告訴家人就好')}
-      ${fld('p2','再輸入一次',`<input id="p2" type="password" autocomplete="new-password">`)}
+      ${fld('p1','家庭密碼',`<input id="p1" minlength="4" autocomplete="off" autocapitalize="none" value="${esc(B.pw1||(B.pw1='mao'+String(1000+Math.floor(Math.random()*9000))))}">`,'已經幫你想好一組了，也可以改成好記的（至少 4 個字）。家人加入時要打這組，先截圖存起來')}
       <div class="err" id="perr"></div>
       <div class="row2"><button id="pb">上一步</button><button class="primary" id="b3">蓋好了！</button></div>`);
     $('#pb').onclick=s2;
-    $('#b3').onclick=async()=>{const a=$('#p1').value,b=$('#p2').value,inv=$('#pinv')?$('#pinv').value.trim():'';B.invite=inv;
+    $('#b3').onclick=async()=>{const a=$('#p1').value.trim(),b=a,inv=$('#pinv')?$('#pinv').value.trim():'';B.invite=inv;
       if(ONLINE&&!inv){$('#perr').textContent='請輸入島主給的邀請碼';return}
       if(a.length<4){$('#perr').textContent='密碼至少 4 個字';return}
       if(a!==b){$('#perr').textContent='兩次輸入的密碼不一樣';return}
@@ -1698,7 +1930,7 @@ function buildFlow(slot){
   s1();
 }
 
-function roomChoices(hid){const o=hid?owned(hid):new Set();return ROOMS.map(([k,n])=>({k,n,tag:'初始'})).concat(CARDS.filter(c=>o.has(c.id)).map(c=>({k:c.id,n:c.name,tag:RAR[c.r].name}))).concat((DB.rooms||[]).filter(r=>o.has(r.id)).map(r=>({k:r.id,n:r.name,tag:'訂製',cu:1})))}
+function roomChoices(hid){const o=hid?owned(hid):new Set();return ROOMS.map(([k,n])=>({k,n,tag:'初始'})).concat(CARDS.filter(c=>o.has(c.id)).map(c=>({k:c.id,n:c.name,tag:RAR[c.r].name}))).concat((DB.rooms||[]).filter(r=>(r.r||'CU')==='CU'&&o.has(r.id)).map(r=>({k:r.id,n:r.name,tag:'訂製款',cu:1})))}
 function roomPicker(id,cur,hid){const list=roomChoices(hid);return `<div class="rooms" id="${id}">${list.map(r=>`<button type="button" data-v="${r.k}" class="${r.k===cur?'on':''}${r.cu?' cu':''}"><img src="${roomImg(r.k)}" alt="">${r.cu?'<i class="cub"><img src="assets/icon_custom.webp" alt=""></i>':''}<span>${esc(r.n)}</span></button>`).join('')}</div><div class="hint">${hid?'抽卡抽到的房間也會出現在這裡':'抽卡可以解鎖更多房間'}</div>`}
 function bindRoom(id,cb){const g=$('#'+id);g.onclick=e=>{const b=e.target.closest('button');if(!b)return;g.querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===b));cb(b.dataset.v)}}
 // ================= 家裡 =================
@@ -1709,8 +1941,8 @@ const hp=(x,y)=>({left:(x/RW*100)+'%',top:(y/RH*100)+'%'});
 let home=null,raf=0,last=0;
 function spawnPoops(h){
   const n=petsOf(h.id).length;if(!n){h.poopAt=Date.now();return}
-  const every=4*HOUR,k=Math.floor((Date.now()-(h.poopAt||Date.now()))/every)*n;
-  for(let i=0;i<k&&h.poops.length<4;i++)h.poops.push({id:uid(),x:FLOOR.x0+60+Math.random()*(FLOOR.x1-FLOOR.x0-120),y:FLOOR.y0+60+Math.random()*(FLOOR.y1-FLOOR.y0-60)});
+  const every=3*HOUR,k=Math.floor((Date.now()-(h.poopAt||Date.now()))/every)*n;
+  for(let i=0;i<k&&h.poops.length<5;i++)h.poops.push({id:uid(),x:FLOOR.x0+60+Math.random()*(FLOOR.x1-FLOOR.x0-120),y:FLOOR.y0+60+Math.random()*(FLOOR.y1-FLOOR.y0-60)});
   if(k)h.poopAt=Date.now();save();
 }
 // ---------- 毛孩狀態 ----------
@@ -1880,7 +2112,7 @@ function renderFloor(){
     const dd=demonOf(h),bar=dm&&!isFamily(h.id)&&dd?`<span class="dbar"><i style="width:${Math.min(100,(+dd.prog||0)/DEMON_GOAL*100)}%"></i><b>解救 ${+dd.prog||0}/${DEMON_GOAL}</b></span>`:'';
     el.innerHTML=`<div class="body"><img src="${dm?r.di:petBody(p)}" alt=""><div class="shadow"></div>${dm?'':wearHTML(p)}</div><span class="nm">${r.guest?'🐾 ':''}${dm?'餓魔':''}${esc(p.name)}${!dm&&popKing(p.id)?'<span class="crownk">🏅</span>':''}</span>${bar}`;if(dm)el.classList.add('demon');
     const im=el.querySelector('img');r.ar=r.ar||1;im.onload=()=>{r.ar=im.naturalHeight/im.naturalWidth;placePet(r)};im.onerror=()=>{if(!im.dataset.fb&&!r.demon){im.dataset.fb=1;im.src=defBody(p.species)}};
-    el.onclick=e=>{e.stopPropagation();petMenu(r,p)};r.el=el;f.appendChild(el);
+    el.onclick=e=>{e.stopPropagation();if(!r.demon||isFamily(home.id))doPat(r,p);petMenu(r,p)};r.el=el;f.appendChild(el);   // v1.83：點毛孩就直接摸摸，連點一直摸
     const sp=tentSpot(p,i),tw=230*petScale(sp.y),te=document.createElement('div');te.className='tent';
     te.innerHTML=`<img src="assets/tent_${(p.card||'#ff9a6b').slice(1)}.webp" alt="" onerror="this.src='assets/tent.webp'"><span class="zz">${[0,1,2].map(()=>`<i><img src="assets/fx_z.webp" alt="" onerror="this.replaceWith('Z')"></i>`).join('')}</span><span class="flag"><img src="${petHead(p)}" alt=""></span><span class="nm" id="tl_${r.id}"></span>`;
     Object.assign(te.style,hp(sp.x-tw/2,sp.y-tw*0.98),{width:(tw/RW*100)+'%',zIndex:Math.round(sp.y)});
@@ -1958,23 +2190,27 @@ function tick(now){
 const FXIMG={'💕':'heart','❤️':'heart','💖':'heart','✨':'star','🎉':'firework','🍖？':'question','🎵':'notes','💤':'z'};
 function fx(ch,x,y){const el=document.createElement('div');el.className='fx';if(FXIMG[ch])el.innerHTML=`<img src="assets/fx_${FXIMG[ch]}.webp" alt="" onerror="this.replaceWith('${ch}')">`;else el.textContent=ch;Object.assign(el.style,hp(x,y));$('#floor').appendChild(el);setTimeout(()=>el.remove(),1400)}
 function bar(v,c){return `<span class="sbar"><i style="width:${v}%;background:${c}"></i></span>`}
+// v1.83：摸摸（點毛孩、選單都用這個）：毛孩會開心跳；告訴小島最多 30 秒一次、提示字 4 秒一次
+const PATT={};
+function doPat(r,p){if(!needMe()||r.sleep)return;
+  if(p.trait==='高冷'&&Math.random()<0.3){startAnim(r,'dodge');toast(`${p.name} 閃開了 😼 高冷`);return}
+  r.state='happy';r.until=performance.now()+1600;startAnim(r,'jump');fx('💕',r.x,r.y-180*petScale(r.y));sfx('pat');sfxPet(p);if(Math.random()<0.5)petSay(r,'pat');if(p.trait==='黏人')setTimeout(()=>fx('💖',r.x+30,r.y-200*petScale(r.y)),300);
+  const now=Date.now(),t=PATT[p.id]||(PATT[p.id]={s:0,m:0});earn('pat');demonHelp('pat');
+  if(now-t.m>4000){t.m=now;toast(`${p.name} 被摸得好開心`)}
+  if(now-t.s>30000){t.s=now;p.pats=(Array.isArray(p.pats)?p.pats:[]).filter(x=>now-x<3*HOUR).concat(now).slice(-6);call('pat',{playerId:DB.me.id,petId:p.id},true).catch(()=>{})}}
 function petMenu(r,p){
   document.querySelectorAll('.petmenu').forEach(m=>m.remove());
   const h=house(home.id),f=fullness(p),md=mood(p,h);
   const m=document.createElement('div');m.className='petmenu';Object.assign(m.style,hp(clamp(r.x,150,700),r.y-215*(r.ar||1)*petScale(r.y)-10));
   m.innerHTML=`<div class="pm-h"><b>${r.demon?'餓魔':''}${esc(p.name)}</b>${p.trait?`<span class="tr">${esc(p.trait)}</span>`:''}</div>
     ${r.demon&&!isFamily(h.id)?(()=>{const d=demonOf(h)||{};return `<div class="pm-s">😈 ${bar(Math.min(100,(+d.prog||0)/DEMON_GOAL*100),'#ff6f91')} ${+d.prog||0}/${DEMON_GOAL}</div><div class="pm-s" style="font-size:11px;color:var(--soft)">摸頭+1・餵飯+3・零食+2・玩具+2</div>`})():`<div class="pm-s">🍖 ${bar(f,'#ff9a6b')}</div><div class="pm-s">💛 ${bar(md,'#f4c542')}</div>`}
-    <div class="pm-b"><button data-a="pat">🤚 摸頭</button>${r.guest?'':`<button data-a="feed">🍚 ${r.demon&&!isFamily(h.id)?'餵餓魔':'餵牠'}</button>`}<button data-a="treat">🍤 零食</button>${!r.guest&&!r.demon&&isFamily(p.houseId)?'<button data-a="closet">👗</button>':''}<button data-a="id">🪪</button></div>`;
+    <div class="pm-b">${r.demon&&!isFamily(h.id)?'<button data-a="pat">🤚 摸頭</button><button data-a="feed">🍚 餵餓魔</button>':''}<button data-a="treat">🍤 零食</button>${!r.guest&&!r.demon&&isFamily(p.houseId)?'<button data-a="closet">👗</button>':''}<button data-a="id">🪪</button></div>`;
   m.onclick=e=>{const b=e.target.closest('button');if(!b)return;m.remove();
     if(b.dataset.a==='id')return idCard(p.id);
     if(b.dataset.a==='closet')return closetSheet(p.id);
     if(b.dataset.a==='treat')return treatPicker(r,p);
     if(b.dataset.a==='feed')return feedNow(r);
-    if(!needMe())return;
-    if(p.trait==='高冷'&&Math.random()<0.3){startAnim(r,'dodge');toast(`${p.name} 閃開了 😼 高冷`);return}
-    r.state='happy';r.until=performance.now()+1600;fx('💕',r.x,r.y-180*petScale(r.y));sfx('pat');sfxPet(p);if(Math.random()<0.6)petSay(r,'pat');if(p.trait==='黏人')setTimeout(()=>fx('💖',r.x+30,r.y-200*petScale(r.y)),300);
-    p.pats=(Array.isArray(p.pats)?p.pats:[]).filter(t=>Date.now()-t<3*HOUR).concat(Date.now()).slice(-6);
-    toast(`${p.name} 被摸得好開心`);earn('pat');call('pat',{playerId:DB.me.id,petId:p.id},true).catch(()=>{});demonHelp('pat')};
+    doPat(r,p)};
   $('#floor').appendChild(m);setTimeout(()=>document.addEventListener('click',function c(ev){if(!m.contains(ev.target)){m.remove();document.removeEventListener('click',c)}}),0);
 }
 $('#feed').onclick=()=>feedNow();
@@ -1994,11 +2230,12 @@ function feedNow(only){
   const h=house(home.id);if(!isFamily(h.id)&&demonShown(h))return feedDemon(h);
   const cand=only?[only]:home.pets.filter(r=>!r.guest),full=[],eat=[],nap=[];
   cand.forEach(r=>{const p=pet(r.id);if(!p)return;if(canEat(p))full.push(p.name);else if(r.sleep)nap.push(r);else eat.push(r)});
-  const away=only?[]:petsOf(h.id).filter(p=>{const o=outAt(p.id);return o&&o.id!==h.id&&fullness(p)<80});
+  // v1.83：自己家的毛孩在外面玩也可以直接餵（飯留在家裡），不會再「說肚子餓卻不能餵」
+  const away=only?[]:petsOf(h.id).filter(p=>{const o=outAt(p.id);return o&&o.id!==h.id&&fullness(p)<80}),remote=isFamily(h.id)?away.splice(0):[];
   const gh=only?[]:home.pets.filter(r=>r.guest&&pet(r.id)&&fullness(pet(r.id))<80).map(r=>pet(r.id).name);
   const awayMsg=[away.length?`${away.map(p=>p.name).join('、')} 在外面玩，叫牠回家才能吃`:'',gh.length?`${gh.join('、')} 是來玩的，要回自己家才能吃喔`:''].filter(Boolean).join('；');
   if(eat.length&&home.bowl){if(!nap.length)return toast('碗裡還有飯喔，等牠們吃完');eat.length=0}
-  if(!eat.length&&!nap.length){if(!full.length)return toast(awayMsg||'現在沒有毛孩要吃飯');
+  if(!eat.length&&!nap.length&&!remote.length){if(!full.length)return toast(awayMsg||'現在沒有毛孩要吃飯');
     return toast((only?`${full[0]} 還飽飽的，晚點再餵`:full.length===cand.length?'大家都吃飽飽了～':`${full.join('、')} 還飽飽的`)+(awayMsg?'；'+awayMsg:''))}
   const now=Date.now(),day=todayTW(),fed=eat.concat(nap);
   if(eat.length){home.bowl={empty:false};renderFloor();
@@ -2006,9 +2243,10 @@ function feedNow(only){
     setTimeout(()=>{if(home&&home.bowl){home.bowl.empty=true;renderFloor()}},4200);
     setTimeout(()=>{if(home){home.bowl=null;renderFloor()}},7000)}
   nap.forEach(r=>napBowl(r));
+  remote.forEach(p=>fed.push({id:p.id,remote:1}));
   fed.forEach(r=>{const p=pet(r.id);p.lastFed=now;p.meals=(p.mealDay===day?(+p.meals||0):0)+1;p.mealDay=day;FED[p.id]={t:Date.now(),v:now,m:p.meals,d:day}});
   const names=fed.map(r=>pet(r.id).name).join('、');
-  toast(`你餵了 ${names} 🍖${nap.length?'（睡著的幫牠留飯了 💤）':''}${full.length&&!only?'（其他毛孩還飽飽的）':''}${awayMsg?'；'+awayMsg:''}`);
+  toast(`你餵了 ${names} 🍖${remote.length?`（${remote.map(p=>p.name).join('、')} 在外面玩，飯幫牠留在家裡了）`:''}${nap.length?'（睡著的幫牠留飯了 💤）':''}${full.length&&!only?'（其他毛孩還飽飽的）':''}${awayMsg?'；'+awayMsg:''}`);
   call('feedPets',{playerId:DB.me.id,houseId:h.id,petIds:fed.map(r=>r.id)},true).catch(e=>toast(e.message));
   earn('feed');if(ONLINE)feedPush(`${DB.me.nick} 餵了 ${names} 🍖`);demonHelp('feed');
   const g=DB.game;g.feedAt=g.feedAt||{};if(!g.feedAt[h.id]||Date.now()-g.feedAt[h.id]>2*HOUR){g.feedAt[h.id]=Date.now()}
@@ -2353,6 +2591,7 @@ $('#me').onclick=()=>{
     <p class="lead" style="font-size:11px;opacity:.6;margin:8px 0 0">App 版本 ${typeof APP_VER!=='undefined'?APP_VER:''}</p>
     <div class="row2" style="margin-top:8px"><button id="mci">${((DB.game.ci||{}).last)===todayTW()?'📅 簽到 ✅':'📅 每日簽到'}</button><button id="mdm">📋 今日任務</button></div>
     ${ONLINE?`<div class="codebox"><div><small>我的轉移碼（換手機時用，截圖存起來）</small><b>${esc(DB.me.code||'同步後就會出現')}</b></div><span class="cbtns"><button id="mcode">複製</button> <button id="mcodee">✏️ 改</button></span></div>`:''}
+    ${ONLINE?`<div class="codebox"><div><small>我的換機碼（加入現有家庭→點自己名字時要打）</small><b>${esc(DB.me.pin||'同步後就會出現')}</b></div></div>`:''}
     ${ONLINE?'<div class="row2" style="margin-top:8px"><button id="mrec">🔑 用轉移碼登入其他帳號</button></div>':''}
     ${adminPw()?'<div class="row2" style="margin-top:10px"><button id="madmin">👑 島主後台'+(DB.amail?' <b class="mbadge">📮 '+DB.amail+'</b>':'')+'</button></div>':''}
     <div class="row2" style="margin-top:10px"><button data-close>關閉</button></div>`);
@@ -2368,7 +2607,7 @@ $('#me').onclick=()=>{
 };
 
 // ================= 任務・抽卡 =================
-const RAR={N:{name:'普通',color:'#c9a47a',glow:'rgba(255,230,190,.5)',w:70},R:{name:'稀有',color:'#5b9bd5',glow:'rgba(120,190,255,.8)',w:25},SSR:{name:'超稀有',color:'#e8a400',glow:'rgba(255,215,90,1)',w:5},H:{name:'隱藏版',color:'#9b6bd6',glow:'rgba(190,150,255,.9)',w:0},C:{name:'訂製',color:'#e0a020',glow:'rgba(255,210,90,.9)',w:0}};
+const RAR={N:{name:'普通',color:'#c9a47a',glow:'rgba(255,230,190,.5)',w:70},R:{name:'稀有',color:'#5b9bd5',glow:'rgba(120,190,255,.8)',w:25},SSR:{name:'超稀有',color:'#e8a400',glow:'rgba(255,215,90,1)',w:5},H:{name:'限定款',color:'#9b6bd6',glow:'rgba(190,150,255,.9)',w:0},C:{name:'訂製款',color:'#e0a020',glow:'rgba(255,210,90,.9)',w:0}};
 const CARDS=[
   {id:'study',name:'午後書房',r:'N'},{id:'garden',name:'陽光花園房',r:'N'},{id:'cafe',name:'貓咪咖啡廳',r:'N'},{id:'beach',name:'海邊小木屋',r:'N'},
   {id:'sakura',name:'櫻花和室',r:'R'},{id:'forest',name:'蘑菇森林房',r:'R'},{id:'cloud',name:'雲朵房間',r:'R'},{id:'xmas',name:'聖誕小屋',r:'R'},
@@ -2423,10 +2662,13 @@ function tickerShow(){
   const list=v.length?v:feedGroups().daily.slice(0,1);
   if(!list.length&&!(DB.notice&&DB.notice.t)){el.style.display='none';return}el.style.display='';
   const unread=DB.feed.filter(f=>f.at>seen&&!(DB.me&&f.t.startsWith(DB.me.nick+' '))).length;
-  const NT=DB.notice&&DB.notice.t&&(+DB.notice.until||!DB.notice.at||Date.now()-DB.notice.at<24*HOUR)?{t:'👑 島主公告：'+DB.notice.t,n:1,mine:false,nt:1}:null,L2=[];list.forEach((x,i)=>{if(NT&&i%5===0)L2.push(NT);L2.push(x)});if(!L2.length&&NT)L2.push(NT);const f=L2[fi%L2.length];el.style.opacity=0;
+  // v1.83：島主公告在跑馬燈只跑一次（每則公告每台手機一次），之後看通知列
+  let tks=0;try{tks=+(localStorage.getItem('mhd_tknt')||0)}catch(e){}
+  const NT=DB.notice&&DB.notice.t&&+DB.notice.at!==tks&&(+DB.notice.until||!DB.notice.at||Date.now()-DB.notice.at<24*HOUR)?{t:'👑 島主公告：'+DB.notice.t,n:1,mine:false,nt:1}:null,L2=[];if(NT)L2.push(NT);list.forEach(x=>L2.push(x));const f=NT||L2[fi%Math.max(1,L2.length)];if(!f){el.style.display='none';return}el.style.opacity=0;
+  if(f.nt)try{localStorage.setItem('mhd_tknt',String(+DB.notice.at||1))}catch(e){}
   setTimeout(()=>{el.classList.toggle('gold',!!f.nt);el.innerHTML=`${unread?`<b class="unread">${unread>99?'99+':unread}</b>`:'📣'} ${esc(feedText(f))}`;el.style.opacity=1},L2.length>1?300:0);
 }
-setInterval(()=>{if(feedView().length+(DB.notice&&DB.notice.t?1:0)>1){fi++;tickerShow()}},4000);
+setInterval(()=>{if(feedView().length>1||(DB.notice&&DB.notice.t)){fi++;tickerShow()}},4000);
 // 新的島主公告：打開 App 跳一次卡片
 function noticePop(){const n=DB.notice;if(!n||!n.t||!n.at)return;let seen=0;try{seen=+(localStorage.getItem('mhd_noticeseen')||0)}catch(e){}if(+n.at<=seen)return;
   let tries=0;const t=setInterval(()=>{if(++tries>40)return clearInterval(t);try{if(+(localStorage.getItem('mhd_noticeseen')||0)>=+n.at)return clearInterval(t)}catch(e){}if(!$('#modal').classList.contains('hidden')||picking||document.querySelector('.gacha'))return;clearInterval(t);
@@ -2447,7 +2689,7 @@ $('#ticker').onclick=()=>{
 function notices(){
   const h=myHouse(),out=[];if(!h)return out;const now=Date.now();
   if(demonOf(h))out.push({ic:'😱',t:`你不在的時候，${petsOf(h.id).map(p=>p.name).join('、')} 變成餓魔了！快回家摸摸牠`,go:'home'});
-  petsOf(h.id).forEach(p=>{if(!demonOf(h)&&isHungry(p)){const o=outAt(p.id);out.push({ic:'🍖',t:o&&o.id!==h.id?`${p.name} 在「${o.name}」玩到肚子餓了，叫牠回家吃飯`:`${p.name} 肚子餓了，快去餵牠`,go:'home'})}
+  petsOf(h.id).forEach(p=>{if(!demonOf(h)&&isHungry(p)){const o=outAt(p.id);out.push({ic:'🍖',t:`${p.name} 肚子餓了，快去餵牠`,go:'home'})}
     if(p.birthday){const b=p.birthday.slice(5),days=[0,1,2,3,4,5,6,7].find(k=>twDay(now+k*86400e3).slice(5)===b);if(days!==undefined)out.push({ic:'🎂',t:days?`${p.name} 再 ${days} 天生日`:`今天是 ${p.name} 的生日！`,go:'home'})}});
   const UG=myGiftsUnopened(),ua=UG.filter(g=>g.admin).length,ub=UG.length-ua;if(ua)out.push({ic:'👑',t:`島主送了 ${ua} 份禮物到你家，快回家拆！`,go:'home'});if(ub)out.push({ic:'🎁',t:`家裡有 ${ub} 份禮物還沒拆`,go:'home'});
   const pp=(h.poops||[]).length;if(pp)out.push({ic:'💩',t:`家裡有 ${pp} 坨便便等人清`,go:'home'});
@@ -2539,14 +2781,20 @@ let installEvt=null;window.addEventListener('beforeinstallprompt',e=>{e.preventD
 if(ONLINE&&inLine&&!/openExternalBrowser=1/.test(location.search)){try{const u=new URL(location.href);u.searchParams.set('openExternalBrowser','1');location.replace(u.toString())}catch(e){}}
 const inviteUrl=()=>{try{const u=new URL(location.href);u.search='';u.hash='';u.searchParams.set('openExternalBrowser','1');return u.toString()}catch(e){return location.href}};
 const SHARE_SVG='<svg width="18" height="20" viewBox="0 0 18 20" style="vertical-align:-3px"><path d="M9 1v12M5 5l4-4 4 4" fill="none" stroke="#2d7ff9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M5 8H3v11h12V8h-2" fill="none" stroke="#2d7ff9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
-function hgDue(){if(isStandalone())return false;let s={};try{s=JSON.parse(localStorage.getItem('mhd_hg')||'{}')}catch(e){}return !((+s.n||0)>=3||(s.n&&Date.now()-(+s.at||0)<3*864e5))}
+let hgShown=false;
+function hgDue(){if(isStandalone()||hgShown)return false;if(isIOS&&!inApp)return true;let s={};try{s=JSON.parse(localStorage.getItem('mhd_hg')||'{}')}catch(e){}return !((+s.n||0)>=3||(s.n&&Date.now()-(+s.at||0)<3*864e5))}
 function hgThen(then){if(hgDue())homeGuide(true,then);else then()}
 function homeGuide(auto,then){
-  if(auto&&isStandalone())return then&&then();
+  if(auto&&isStandalone())return then&&then();if(auto)hgShown=true;
   const lead=`<p class="lead hglead"><b>把毛很多加入主畫面，遊戲版面更完整</b><br>像 App 一樣一鍵打開，還能收到毛孩的通知 🐾</p>`;
   let ic='📲',ttl='加到主畫面',body;
   if(inApp){ic='🧭';ttl='先換到瀏覽器打開';body=`<p class="lead hglead"><b>在 LINE／IG 裡沒辦法加到主畫面</b><br>換到瀏覽器打開，遊戲版面更完整，資料也比較不會不見</p><ol class="steps2"><li>點右上或右下角的「⋯」</li><li>選「用預設瀏覽器開啟」或「在 Safari 中開啟」</li><li>打開後會再教你加到主畫面</li></ol><div class="row2"><button id="hgcopy">🔗 複製網址，自己貼到 Safari</button></div>`}
-  else if(isIOS)body=lead+`<ol class="steps2"><li>點 Safari 下方（或右上）的分享按鈕 ${SHARE_SVG}</li><li>往下滑，點「<b>加入主畫面</b>」</li><li>右上角按「<b>加入</b>」，主畫面就會出現毛很多 🐾</li></ol>`;
+  else if(isIOS){const pin=DB.me&&DB.me.pin;body=lead+`<div class="a2st"><div><span class="n">1</span><span class="ic dots">•••</span><span>點右下角的<b>「•••」</b><small>如果下面是一整排按鈕，就直接點中間的分享 ${SHARE_SVG}</small></span></div>
+      <div><span class="n">2</span><span class="ic">${SHARE_SVG}</span><span>點<b>「分享」</b></span></div>
+      <div><span class="n">3</span><span class="ic">⊞</span><span>往下滑，點<b>「加入主畫面」</b></span></div>
+      <div><span class="n">4</span><span class="ic" style="font-size:12px;color:#2f7cf6;font-weight:900">加入</span><span>右上角按<b>「加入」</b></span></div>
+      <div><span class="n">5</span><span class="ic"><img src="assets/logo.webp" alt=""></span><span>回到主畫面，<b>點毛很多的圖示</b>打開</span></div></div>
+      ${DB.me&&DB.me.houseId?`<div class="a2tip">💡 從主畫面打開後選<b>「加入現有家庭」</b>→ 打家庭密碼 → 點自己的名字，再打這組<b>換機碼</b>就會接回你的帳號：<b class="a2pin">${pin?esc(pin):'－'}</b>${pin?'':'<br><small>（換機碼同步後會出現在「😊 我的設定」）</small>'}</div>`:''}`}
   else if(installEvt){ttl='把毛很多裝到手機';body=lead+`<p class="lead" style="font-size:12px">按一下就好，不用去商店下載</p><div class="row2"><button class="primary" id="doinstall">📲 安裝到手機</button></div>`}
   else body=lead+`<ol class="steps2"><li>點瀏覽器右上角的「⋮」</li><li>選「<b>加到主畫面</b>」或「安裝應用程式」</li></ol>`;
   openModal(`<div style="text-align:center"><div class="giftopen">${ic}</div><h3>${ttl}</h3></div>${isStandalone()?'<p class="lead">你已經是從主畫面打開的了 ✅</p>':body}
@@ -2595,7 +2843,19 @@ Object.assign(ITEMS,{
   t_snake:{name:'皇冠小蛇',emo:'🐍',kind:'toy',price:60,sz:1.1,an:'tumble'},t_trike:{name:'三角龍玩偶',emo:'🦕',kind:'toy',price:70,sz:1.15},t_axolotl:{name:'六角恐龍玩偶',emo:'🦎',kind:'toy',price:60,sz:1.1,fxk:'heart'},
   t_shark:{name:'鯊魚玩偶',emo:'🦈',kind:'toy',price:60,sz:1.15},t_penguin:{name:'冒險企鵝',emo:'🐧',kind:'toy',price:70,sz:1.1,an:'tumble'},t_duck:{name:'飛行員小鴨',emo:'🦆',kind:'toy',price:70,sz:1.1,an:'tumble'},
   t_astro:{name:'太空貓',emo:'👩‍🚀',kind:'toy',price:0,limited:true,sz:1.2,an:'wob'},t_ufo:{name:'外星人飛碟',emo:'🛸',kind:'toy',price:0,limited:true,sz:1.3,an:'wob'}});
-function itemIcon(id,cls){const it=ITEMS[id]||{emo:'❓'};return `<span class="ii ${cls||''}"><img src="assets/item_${id}.webp" alt="" onerror="this.remove()"><b>${it.emo}</b></span>`}
+// ================= v1.83 島主上傳的房子款式、商店商品（catalog） =================
+// 小島只送版本號（catVer），版本變了才下載一次，存在手機
+let CAT={ver:0,styles:[],items:[]};try{const c=JSON.parse(localStorage.getItem(OKEY+'_cat')||'null');if(c&&Array.isArray(c.styles))CAT=c}catch(e){}
+const STYLE_IMG={},STYLE_OFF=new Set();
+function hsrc(n,p){const c=STYLE_IMG[n];return c?(c[p]||c.day):`assets/house${n}_${p}.webp`}
+const FAV_SP=v=>String(v||'').split(/[、,，\s]+/).filter(Boolean);
+function applyCatalog(){
+  (CAT.styles||[]).forEach(x=>{STYLE_NAMES[x.n]=x.name;STYLE_IMG[x.n]=x.img||{};if(x.off)STYLE_OFF.add(+x.n);else STYLE_OFF.delete(+x.n)});
+  (CAT.items||[]).forEach(x=>{ITEMS[x.id]=Object.assign(ITEMS[x.id]||{},{name:x.name,emo:'',kind:x.kind==='toy'?'toy':'treat',price:+x.price||0,fav:x.fav?FAV_SP(x.fav):undefined,limited:!!x.limited,img:x.img,off:!!x.off,custom:1})})}
+applyCatalog();
+let catLoading=false;
+async function loadCatalog(ver){if(catLoading||!ONLINE)return;catLoading=true;try{const c=await api('getCatalog',{});CAT={ver:+c.ver||+ver||0,styles:c.styles||[],items:c.items||[]};try{localStorage.setItem(OKEY+'_cat',JSON.stringify(CAT))}catch(e){}applyCatalog();rerender()}catch(e){}finally{catLoading=false}}
+function itemIcon(id,cls){const it=ITEMS[id]||{emo:'❓'};return `<span class="ii ${cls||''}"><img src="${it.img||`assets/item_${id}.webp`}" alt="" onerror="this.remove()"><b>${it.emo||''}</b></span>`}
 const bag=()=>DB.game.bag||(DB.game.bag={});
 function bagAdd(id,n){const b=bag();b[id]=(b[id]||0)+n;if(b[id]<=0)delete b[id];save()}
 const bagList=kind=>Object.entries(bag()).filter(([id,n])=>n>0&&ITEMS[id]&&(!kind||ITEMS[id].kind===kind));
@@ -2608,7 +2868,7 @@ function shopSheet(tab){
   if(shopTab==='ticket')shopTab='kuji';const tabs=[['treat','🍤','零食'],['toy','🧸','玩具'],['kuji','<img class="tabic" src="assets/kuji_icon.webp" alt="">','一番賞'],['acc','👗','服飾'],['seed','🌱','種子'],['bag','🎒','背包']];
   let body='';
   if(shopTab==='treat'||shopTab==='toy'||shopTab==='seed'){
-    const list=Object.entries(ITEMS).filter(([id,it])=>it.kind===shopTab&&!it.limited&&(!it.bday||bd));
+    const list=Object.entries(ITEMS).filter(([id,it])=>it.kind===shopTab&&!it.limited&&!it.off&&(!it.bday||bd));
     body=`<div class="shopgrid">${list.map(([id,it])=>`<div class="si">${itemIcon(id,'big')}<div class="sn">${it.name}</div>
       ${it.fav&&it.fav.length?`<div class="sf">${it.fav.join('、')}最愛</div>`:it.bday?'<div class="sf">今天有毛孩生日限定</div>':'<div class="sf">&nbsp;</div>'}
       <button data-buy="${id}" ${coins>=it.price?'':'disabled'}>🪙 ${it.price}</button><small>${bag()[id]?`背包裡有 ${bag()[id]}`:''}</small></div>`).join('')}</div>
@@ -2625,6 +2885,12 @@ function shopSheet(tab){
 }
 // ================= 🎪 毛很多一番賞 =================
 // 🎰 一番賞獎品清單（新增背景時改這裡就好，後端會跟著用）：A 賞至少 1 間、B 至少 2、C 至少 3、D 至少 4
+// v1.83：島主上傳的背景（DB.rooms）：N／R／SSR 跟一般房間一樣（可抽卡、進一番賞）；LTD 限定款＝H（只進一番賞 A 賞）；CU 訂製款＝C（只給那一家）
+const KUJI_TIER={LTD:'A',SSR:'B',R:'C',N:'D'};
+function applyRooms(){(DB.rooms||[]).forEach(r=>{const t=r.r||'CU';if(Array.isArray(r.board))BOARDS[r.id]=r.board;if(r.floor&&r.floor.t)RFLOOR[r.id]=Object.assign({b:[0,848]},r.floor);
+  Object.keys(KUJI_POOL).forEach(k=>{const i=KUJI_POOL[k].indexOf(r.id);if(i>=0)KUJI_POOL[k].splice(i,1)});
+  if(t==='CU')return;let c=CARDS.find(x=>x.id===r.id);if(!c){c={id:r.id};CARDS.push(c)}Object.assign(c,{name:r.name,r:t==='LTD'?'H':t,img:r.img,off:!!r.off,custom:1});
+  if(!r.off&&KUJI_TIER[t])KUJI_POOL[KUJI_TIER[t]].push(r.id)})}
 const KUJI_POOL={
   A:['party','princess','redcheck','hawaiicat','sweetdevil','snoopy','stussy'],
   B:['ocean','star','space','ufobase','pearl','spacecat','crystalstar'],
@@ -2738,7 +3004,7 @@ async function openGift(gid){
     if(+g.coins){G.coins=(G.coins||0)+ +g.coins;got.push(`${g.coins} 金幣`)}if(+g.tickets){G.tickets=(G.tickets||0)+ +g.tickets;got.push(`${g.tickets} 張抽卡券`)}
     if(g.item&&ITEMS[g.item]&&+g.n){bagAdd(g.item,+g.n);got.push(`${ITEMS[g.item].name} ×${g.n}`)}
     if(g.room){const own=new Set(DB.owned[h.id]||[]);if(!own.has(g.room)){own.add(g.room);DB.owned[h.id]=[...own];got.push(`🏠 新房間「${rName(g.room)}」`)}else got.push(`🏠 房間「${rName(g.room)}」已經收進家裡了`)}save();updTix();
-    fx('🎉',g.x,g.y-60);renderFloor();sfx('gift');sayAny('gift');if(ONLINE)feedPush(`🎁 ${DB.me.nick} 幫 ${h.name} 拆開了島主的禮物！`);
+    fx('🎉',g.x,g.y-60);renderFloor();sfx('gift');sayAny('gift');if(ONLINE&&g.all)feedPush(`🎁 ${DB.me.nick} 幫 ${h.name} 拆開了島主的禮物！`);
     openModal(`<div style="text-align:center"><div class="giftopen"><span class="ii huge"><img src="assets/gift_admin.webp" alt="" onerror="this.remove()"><b>🎁</b></span></div><h3>👑 島主送的禮物！</h3>${g.msg?`<p class="lead">「${esc(g.msg)}」</p>`:''}<p class="lead">${got.join('、')||'一份心意'}</p><p class="lead" style="font-size:12px">${g.room?'房間可以到「⚙️ 家」裡換上。':''}道具已經放進你的背包。這份禮物一個家只有一份，被你搶先拆到了！</p></div><div class="row2"><button data-close>謝謝島主 🎉</button></div>`);return}
   // 一般禮物：先在畫面上拆開，雲端在背景處理
   const it=ITEMS[g.item]||{name:'神秘禮物',emo:'🎁',kind:'treat'},asToy=it.kind==='toy'&&(h.toys||[]).length<TOY_MAX;
@@ -2815,7 +3081,7 @@ function toyMenu(t){
 function toyPlacer(){
   const h=house(home.id),L=bagList('toy');
   if((h.toys||[]).length>=TOY_MAX)return toast(`地上最多放 ${TOY_MAX} 個玩具，先收一些起來吧`);
-  if(isSpecialH(h)){const S=Object.entries(ITEMS).filter(([id,it])=>it.kind==='toy'&&!it.limited&&!it.bday);
+  if(isSpecialH(h)){const S=Object.entries(ITEMS).filter(([id,it])=>it.kind==='toy'&&!it.limited&&!it.off&&!it.bday);
     openModal(`<h3>🧸 布置毛二街</h3><p class="lead">店裡的擺設免費，毛毛商店的玩具都可以用；收起來就會消失，不會進背包</p><div class="shopgrid">${S.map(([id,it])=>`<button class="si pick" data-p="${id}">${itemIcon(id,'big')}<div class="sn">${it.name}</div><div class="sf">免費</div></button>`).join('')}</div>
       <div class="row2" style="margin-top:12px"><button data-close>取消</button></div>`);
     $('#sheet').querySelectorAll('[data-p]').forEach(b=>b.onclick=()=>{closeModal();startPlacing({item:b.dataset.p,free:1})});return}
@@ -2848,7 +3114,7 @@ $('#sweep').onclick=async()=>{
 
 // ================= 愛心值・金幣（統一獎勵） =================
 const REW={visit:{x:3,c:2,cap:5,after:{x:0,c:0},n:'串門子'},pat:{x:2,c:1,cap:20,after:{x:0,c:0},n:'摸摸頭'},
-  feed:{x:5,c:3,cap:10,after:{x:0,c:0},n:'餵飯'},poop:{x:5,c:2,cap:10,after:{x:0,c:0},n:'鏟屎'},treat:{x:10,c:0,n:'餵零食'},treatFav:{x:15,c:0,n:'餵到最愛的零食'},
+  feed:{x:5,c:3,cap:10,after:{x:0,c:0},n:'餵飯'},poop:{x:5,c:2,cap:10,after:{x:0,c:0},n:'鏟屎'},treat:{x:15,c:5,n:'餵零食'},treatFav:{x:25,c:10,n:'餵到最愛的零食'},npc:{x:5,c:0,capH:6,n:'跟旅客聊天'},
   gift:{x:20,c:0,n:'送禮物'},open:{x:5,c:5,n:'拆禮物'},note:{x:10,c:5,cap:3,after:{x:0,c:0},n:'在別人家留言'},rec:{x:5,c:3,cap:10,n:'記錄體重／紀錄項目'},
   walk:{x:10,c:5,cap:3,after:{x:0,c:0},n:'遛遛（帶毛孩去別人家）'},wake:{x:2,c:1,cap:10,after:{x:0,c:0},n:'叫醒／蓋被子'},guest:{x:2,c:1,cap:20,n:'你的毛孩在別人家被照顧'}};
 // v1.45：越高級越難升（Lv.1→2 要 100，之後每級多 20）
@@ -2856,16 +3122,20 @@ const xpNeed=lv=>100+20*(Math.max(1,+lv||1)-1);
 function reward(k,mult){
   const e=REW[k];if(!e)return false;const g=DB.game,d=todayTW();
   dmTick(k);
-  if(!g.rd||g.rd.d!==d)g.rd={d};const n=g.rd[k]||0;let bx=e.x,bc=e.c;if(e.cap&&n>=e.cap){if(!e.after)return false;bx=e.after.x;bc=e.after.c}g.rd[k]=n+1;
+  // v1.83：次數上限改成每 8 小時重算（跟金幣上限一樣）；capH＝每小時上限
+  const w=coinWin();if(!g.rd||g.rd.d!==w)g.rd={d:w};const n=g.rd[k]||0;let bx=e.x,bc=e.c;if(e.cap&&n>=e.cap){if(!e.after)return false;bx=e.after.x;bc=e.after.c}
+  if(e.capH){const hk=w+':'+taipeiHour();if(!g.rh||g.rh.h!==hk)g.rh={h:hk};if((g.rh[k]||0)>=e.capH)return false;g.rh[k]=(g.rh[k]||0)+1}g.rd[k]=n+1;
   const dm=DB.dbl===todayTW()?2:1,x=bx*(mult||1)*dm,c=capCoins(bc*(mult||1)*dm);if(!x&&!c)return true;g.xp=(g.xp||0)+x;g.coins=(g.coins||0)+c;g.lv=g.lv||1;let up=0;
-  while(g.xp>=xpNeed(g.lv)){g.xp-=xpNeed(g.lv);g.lv++;g.tickets++;up++}
+  while(g.xp>=xpNeed(g.lv)){g.xp-=xpNeed(g.lv);g.lv++;g.tickets++;g.coins=(g.coins||0)+LV_BONUS;up++}
   save();updTix();rewardPop(x,c);
-  if(up)setTimeout(()=>{toast(`🎉 升到 Lv.${g.lv}！送你 ${up} 張抽卡券 🎟️`);sfx('levelup')},900);
+  if(up)setTimeout(()=>{toast(`🎉 升到 Lv.${g.lv}！送你 ${up} 張抽卡券 🎟️＋🪙${up*LV_BONUS}`);sfx('levelup')},900);
   return true;
 }
 // 每天互動＋任務賺的金幣上限（簽到、撿錢、島主禮物不算）
-const COIN_CAP=150;
-function capCoins(c){if(!(c>0))return c||0;const g=DB.game,d=todayTW();if(!g.cc||g.cc.d!==d)g.cc={d,n:0};const ok=Math.max(0,Math.min(c,COIN_CAP-g.cc.n));g.cc.n+=ok;
+const COIN_CAP=150,LV_BONUS=200;
+// v1.83：金幣上限每 8 小時重算一次（台北時間 0～8、8～16、16～24 點三段），畫面上不顯示
+const coinWin=()=>todayTW()+'#'+Math.floor(taipeiHour()/8);
+function capCoins(c){if(!(c>0))return c||0;const g=DB.game,d=todayTW();if(!g.cc||g.cc.d!==coinWin())g.cc={d:coinWin(),n:0};const ok=Math.max(0,Math.min(c,COIN_CAP-g.cc.n));g.cc.n+=ok;
   if(ok<c&&!g.cc.w){g.cc.w=1;setTimeout(()=>toast(`今天互動賺的金幣到上限 ${COIN_CAP} 了，明天再來～（愛心值照樣加）`),1300)}return ok}
 function earn(k){return reward(k)}
 function rewardPop(x,c){if(!x&&!c)return;if(c)sfx('coin');if(flyReward(x,c))return;const el=document.createElement('div');el.className='coinpop';el.textContent=`${x?`+${x} 💗`:''}${c?` +${c} 🪙`:''}`;document.body.appendChild(el);setTimeout(()=>el.remove(),1500)}
@@ -2973,32 +3243,35 @@ function missionsSheet(){
   const h=myHouse(),own=h?owned(h.id):new Set(),g=DB.game,xp=g.xp||0,lv=g.lv||1;
   openModal(`<h3>🎟️ 抽卡與等級</h3>
   ${dmHTML()}
-  <div class="lvbox"><div class="lvt"><b>Lv.${lv}</b><span>${xp} / ${xpNeed(lv)} 💗</span></div><div class="xpbar"><i style="width:${Math.min(100,xp/xpNeed(lv)*100)}%"></i></div><small>任何互動都會加愛心值，集滿就升一級、送 1 張抽卡券；等級越高，需要的愛心值越多。摸頭、鏟屎這些互動每天有上限，到了就不再加</small></div>
+  <div class="lvbox"><div class="lvt"><b>Lv.${lv}</b><span>${xp} / ${xpNeed(lv)} 💗</span></div><div class="xpbar"><i style="width:${Math.min(100,xp/xpNeed(lv)*100)}%"></i></div></div>
   <div class="tk"><div><div style="font-size:13px;color:var(--soft)">我的抽卡券</div><div class="n">${g.tickets} 張</div></div><button id="draw" ${g.tickets&&h?'':'disabled'}>開卡包</button></div>
   ${h?'':'<div class="hint" style="text-align:center;margin:-4px 0 10px">有家之後才能開卡包，券會先幫你存著</div>'}
   <div class="tk coin"><div><div style="font-size:13px;color:var(--soft)">我的金幣</div><div class="n">🪙 ${g.coins||0}</div></div><button id="toshop">🏪 去商店</button></div>
-  <details class="earn" open><summary>做什麼可以拿獎勵？</summary><div class="frow"><span>每日簽到</span><span>見簽到卡・連續 7 天送抽卡券</span></div><div class="frow"><span>🪙 每日金幣上限</span><span>互動＋任務一天最多 ${COIN_CAP}<small class="aft">簽到、撿錢不算（今天已賺 ${(g.cc&&g.cc.d===todayTW()?g.cc.n:0)}）</small></span></div>${Object.values(REW).map(e=>`<div class="frow"><span>${e.n}</span><span>${e.x?`+${e.x} 💗`:''}${e.c?` +${e.c} 🪙`:''}${e.cap?`・前 ${e.cap} 次`:''}${e.cap&&e.after&&(e.after.x||e.after.c)?`<small class="aft">之後 ${e.after.x?`+${e.after.x} 💗`:''}${e.after.c?` +${e.after.c} 🪙`:''}</small>`:e.cap?'<small class="aft">之後沒有</small>':''}</span></div>`).join('')}</details>
-  <div class="sec"><h4>🎴 卡包裡有什麼<span>保底：每 10 抽至少 1 間新房間</span></h4>
+  <div class="howto"><p>💗 <b>怎麼升級</b>：在島上做任何事都會加愛心，集滿就升一級，送 1 張抽卡券＋🪙${LV_BONUS}</p>
+    <p>🪙 <b>怎麼賺錢</b>：照顧毛孩、去別人家串門子、跟旅客聊天、做每日任務都會給金幣；路上的錢袋要快點撿！等級到了還可以蓋民宿、種菜賺更多</p>
+    <p>🎴 <b>卡包裡有</b>：零食、玩具、房間、限定玩具</p></div>
+  <details class="earn"><summary>看詳細獎勵</summary><div class="frow"><span>每日簽到</span><span>見簽到卡・連續 7 天送抽卡券</span></div>${Object.values(REW).map(e=>`<div class="frow"><span>${e.n}</span><span>${e.x?`+${e.x} 💗`:''}${e.c?` +${e.c} 🪙`:''}${e.cap?`・前 ${e.cap} 次`:''}${e.cap&&e.after&&(e.after.x||e.after.c)?`<small class="aft">之後 ${e.after.x?`+${e.after.x} 💗`:''}${e.after.c?` +${e.after.c} 🪙`:''}</small>`:e.cap?'<small class="aft">之後沒有</small>':''}</span></div>`).join('')}</details>
+  <div class="sec"><h4>🎴 卡包裡有什麼</h4>
     <div class="frow"><span>🍤 零食包（隨機 3 個）</span><span>50%</span></div><div class="frow"><span>🧸 玩具</span><span>30%</span></div>
     <div class="frow"><span>🏠 房間（不會重複）</span><span>15%</span></div><div class="frow"><span>✨ 限定玩具（商店不賣）</span><span>5%</span></div>
-    <div class="hint">距離保底還有 ${10-(g.pity||0)} 抽</div></div>
-  ${h?`<div class="sec"><h4>🏠 ${esc(h.name)}・房間收藏<span>${CARDS.filter(c=>c.r!=='H'&&own.has(c.id)).length} / ${CARDS.filter(c=>c.r!=='H').length}</span></h4>
+    </div>
+  ${h?`<div class="sec"><h4>🏠 ${esc(h.name)}・房間收藏<span>${CARDS.filter(c=>c.r!=='H'&&own.has(c.id)).length} / ${CARDS.filter(c=>c.r!=='H'&&!c.off).length}</span></h4>
   <div class="coll">${ROOMS.map(([k,n])=>`<div class="mini" style="--rc:#d8c8b4" title="${n}（初始）"><div class="art"><img src="${roomImg(k)}" alt="" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover"></div><em>初始</em></div>`).join('')}
-  ${CARDS.filter(c=>c.r!=='H'||own.has(c.id)).map(c=>{const o=own.has(c.id);return `<div class="mini ${o?'':'locked'}" style="--rc:${RAR[c.r].color}" title="${o?c.name:'未收集'}"><div class="art">${cardArt(c)}</div>${o?'':'<span>？</span>'}</div>`}).join('')}</div>
-  <div class="hint">外框：<span style="color:${RAR.N.color}">■ 普通</span>　<span style="color:${RAR.R.color}">■ 稀有</span>　<span style="color:${RAR.SSR.color}">■ 超稀有</span>${CARDS.some(c=>c.r==='H'&&own.has(c.id))?`　<span style="color:${RAR.H.color}">■ 隱藏版</span>`:''}・在「⚙️ 家」可以換房間</div></div>
-  <div class="sec"><h4>✨ 限定玩具</h4><div class="shopgrid">${Object.entries(ITEMS).filter(([,i])=>i.limited).map(([id,i])=>`<div class="si ${bag()[id]||(h.toys||[]).some(t=>t.item===id)?'':'locked2'}">${itemIcon(id,'big')}<div class="sn">${i.name}</div></div>`).join('')}</div></div>`:''}
+  ${CARDS.filter(c=>(c.r!=='H'&&!c.off)||own.has(c.id)).map(c=>{const o=own.has(c.id);return `<div class="mini ${o?'':'locked'}" style="--rc:${RAR[c.r].color}" title="${o?c.name:'未收集'}"><div class="art">${cardArt(c)}</div>${o?'':'<span>？</span>'}</div>`}).join('')}</div>
+  <div class="hint">外框：<span style="color:${RAR.N.color}">■ 普通</span>　<span style="color:${RAR.R.color}">■ 稀有</span>　<span style="color:${RAR.SSR.color}">■ 超稀有</span>${CARDS.some(c=>c.r==='H'&&own.has(c.id))?`　<span style="color:${RAR.H.color}">■ 限定款</span>`:''}・在「⚙️ 家」可以換房間</div></div>
+  <div class="sec"><h4>✨ 限定玩具</h4><div class="shopgrid">${Object.entries(ITEMS).filter(([,i])=>i.limited).map(([id,i])=>`<div class="si ${bag()[id]||(h.toys||[]).some(t=>t.item===id)||(h.toys2||[]).some(t=>t.item===id)?'':'locked2'}">${itemIcon(id,'big')}<div class="sn">${i.name}</div></div>`).join('')}</div></div>`:''}
   <div class="row2" style="margin-top:14px"><button data-close>關閉</button></div>`);
   $('#draw').onclick=()=>{closeModal();openPack()};
   $('#toshop').onclick=()=>shopSheet();
 }
 function rollPack(h){
-  const g=DB.game,own=owned(h.id),left=CARDS.filter(c=>c.r!=='H'&&!own.has(c.id));g.pity=(g.pity||0)+1;
+  const g=DB.game,own=owned(h.id),left=CARDS.filter(c=>c.r!=='H'&&!c.off&&!own.has(c.id));g.pity=(g.pity||0)+1;
   let type;
   if(g.pity>=10)type=left.length?'room':'limited';
   else{const w={treat:50,toy:30,room:left.length?15:0,limited:5,acc:accLeft(h.id).length?12:0};let x=Math.random()*Object.values(w).reduce((a,b)=>a+b,0);for(const k in w){if((x-=w[k])<0){type=k;break}}}
   if(type==='room'){g.pity=0;const avail=Object.keys(RAR).filter(r=>left.some(c=>c.r===r));let x=Math.random()*avail.reduce((a,r)=>a+RAR[r].w,0),r=avail[0];for(const k of avail){if((x-=RAR[k].w)<0){r=k;break}}
     const pool=left.filter(c=>c.r===r);return {type,card:pool[Math.floor(Math.random()*pool.length)]}}
-  const pick=f=>{const ids=Object.keys(ITEMS).filter(id=>f(ITEMS[id]));return ids[Math.floor(Math.random()*ids.length)]};
+  const pick=f=>{const ids=Object.keys(ITEMS).filter(id=>f(ITEMS[id])&&!ITEMS[id].off);return ids[Math.floor(Math.random()*ids.length)]};
   if(type==='acc'){const L=accLeft(h.id);return {type,acc:L[Math.floor(Math.random()*L.length)]}}
   if(type==='treat')return {type,items:[0,1,2].map(()=>pick(i=>i.kind==='treat'&&!i.bday))};
   if(type==='toy')return {type,items:[pick(i=>i.kind==='toy'&&!i.limited)]};
@@ -3118,7 +3391,7 @@ async function snapshot(){
     const B=BOARDS[h.room]||BOARDS.basic1,ns=DB.notes.filter(n=>n.houseId===h.id).sort((a,c)=>a.createdAt-c.createdAt).slice(-6),bw=(B[2]-B[0]-20)/3,bh=(B[3]-B[1]-20)/2;
     ns.forEach((n,i)=>{const cx=B[0]+10+(i%3)*bw+bw/2,cy=B[1]+10+Math.floor(i/3)*bh+bh/2,s=Math.min(bw,bh)*0.86;x.save();x.translate(cx,cy);x.rotate([-4,3,-2,5,-3,2][i]*Math.PI/180);x.fillStyle=n.color;x.shadowColor='rgba(0,0,0,.2)';x.shadowBlur=4;x.fillRect(-s/2,-s/2,s,s);x.shadowBlur=0;x.fillStyle='#5a4030';x.font=`${Math.round(s/6)}px ${FONT}`;x.textAlign='left';x.textBaseline='top';x.fillText([...n.text].slice(0,6).join(''),-s/2+6,-s/2+6);x.restore()});
     const ents=[],rw=$('#home').clientWidth||390,K=W/rw,fsN=Math.min(13,Math.max(10,rw*0.026))*K,TB=Math.min(64,Math.max(40,rw*0.12))*848/rw;
-    (h.toys||[]).forEach(t=>{const it=ITEMS[t.item]||{};ents.push({y:it.flat?-1e6:t.y-300,f:async()=>{const im=await loadImg(`assets/item_${t.item}.webp`);if(im)drawFit(im,t.x,t.y+6,TB*(it.sz||1),t.flip);else{x.font=`52px ${FONT}`;x.textAlign='center';x.fillText(it.emo||'',t.x,t.y)}}})});
+    (h.toys||[]).forEach(t=>{const it=ITEMS[t.item]||{};ents.push({y:it.flat?-1e6:t.y-300,f:async()=>{const im=await loadImg((ITEMS[t.item]&&ITEMS[t.item].img)||`assets/item_${t.item}.webp`);if(im)drawFit(im,t.x,t.y+6,TB*(it.sz||1),t.flip);else{x.font=`52px ${FONT}`;x.textAlign='center';x.fillText(it.emo||'',t.x,t.y)}}})});
     (h.gifts||[]).filter(g=>giftVisible(g,h)).forEach(g=>ents.push({y:g.y,f:async()=>{const im=await loadImg(g.admin?'assets/gift_admin.webp':'assets/gift_box.webp');if(im){if(g.admin){x.save();x.shadowColor='rgba(255,210,90,.9)';x.shadowBlur=18}drawFit(im,g.x,g.y+6,TB*(g.admin?1.25:1));if(g.admin)x.restore()}else{x.font=`52px ${FONT}`;x.textAlign='center';x.fillText('🎁',g.x,g.y)}}}));
     home.pets.forEach(r=>{const p=pet(r.id);if(!p)return;
       if(r.sleep&&r.tent){ents.push({y:r.tent.y,f:async()=>{const sc=petScale(r.tent.y),im=await loadImg(`assets/tent_${(p.card||'#ff9a6b').slice(1)}.webp`)||await loadImg('assets/tent.webp');drawFit(im,r.tent.x,r.tent.y,230*sc);lbl(`${p.name}・${r.sleep.label}`,r.tent.x,r.tent.y+fsN*0.3,fsN,{bg:'rgba(255,250,238,.9)',fg:'#5a4030',px:8*K,py:0})}});return}
@@ -3144,7 +3417,7 @@ async function snapshot(){
     title='毛毛島';const pr=period(),sx=W/1024,sy=H/1536;const lb0=document.querySelector('.label'),kk=W/((lb0&&lb0.parentElement&&lb0.parentElement.clientWidth)||390),fsI=Math.min(13,Math.max(10,(document.documentElement.clientWidth||390)*0.027))*kk;
     const bg=await loadImg(`assets/island2_${pr}.webp`);if(bg)x.drawImage(bg,0,bg.naturalHeight*0.12524,bg.naturalWidth,bg.naturalHeight*0.73988,0,0,W,H);const signImg=await loadImg('assets/sign.webp');
     const used=new Map(DB.houses.filter(hh=>!isSpecialH(hh)).map(hh=>[hh.slot,hh])),items=SLOTS.map((s,i)=>({s,h:used.get(i)})).filter(o=>o.h).concat([{s:[SHOP_POS.x,SHOP_POS.y],shop:true}]).concat(house(SHOP_ID)?[{s:[SHOP2_POS.x,SHOP2_POS.y],shop2:true}]:[]).concat([{s:[centerPos().x,centerPos().y],ctr:true},{s:[PARK_POS.x,PARK_POS.y],park:true}]).sort((a,b)=>a.s[1]-b.s[1]);
-    for(const o of items){const [hx,hy]=o.s,im=await loadImg(o.park?`assets/park_${pr}.webp`:o.ctr?`assets/center_${pr}.webp`:o.shop2?`assets/shop2_${pr}.webp`:o.shop?`assets/${SHOP_IMG?'shop':'house'+SHOP_POS.style}_${pr}.webp`:`assets/house${o.h.style}_${pr}.webp`);drawFit(im,hx*sx,hy*sy,HOUSE_W*(o.park?PARK_SC:o.shop||o.shop2||o.ctr?SHOP_SC:1)*sx);
+    for(const o of items){const [hx,hy]=o.s,im=await loadImg(o.park?`assets/park_${pr}.webp`:o.ctr?`assets/center_${pr}.webp`:o.shop2?`assets/shop2_${pr}.webp`:o.shop?`assets/${SHOP_IMG?'shop':'house'+SHOP_POS.style}_${pr}.webp`:hsrc(o.h.style,pr));drawFit(im,hx*sx,hy*sy,HOUSE_W*(o.park?PARK_SC:o.shop||o.shop2||o.ctr?SHOP_SC:1)*sx);
       {const nm=o.park?'毛毛公園':o.ctr?'島民中心':o.shop2?'毛二街':o.shop?'毛毛商店':o.h.name,mine=!o.shop&&!o.shop2&&!o.ctr&&!o.park&&isFamily(o.h.id),sw=SIGN_W*sx,sh2=signImg?sw*signImg.naturalHeight/signImg.naturalWidth:sw*.64,top=(hy-SIGN_UP)*sy;
         if(signImg){x.save();if(mine){x.shadowColor='rgba(255,140,80,.95)';x.shadowBlur=10}x.drawImage(signImg,hx*sx-sw/2,top,sw,sh2);x.restore()}
         const fs=W*signFs(nm)/100;x.font=`bold ${fs}px ${FONT}`;x.fillStyle=o.ctr||o.park?'#3f6b2a':o.shop2?'#5a3a8a':o.shop?'#7a4a00':mine?'#b4401a':'#6b3f1d';x.textAlign='center';x.textBaseline='middle';
@@ -3225,7 +3498,7 @@ setInterval(()=>{if(!home||!isShopH(house(home.id))||$('#home').classList.contai
 // ---------- 每天補貨（當天第一個進店的人觸發，後端只收一次） ----------
 let restocking=false;
 async function shopRestockMaybe(){const s=house(SHOP_ID);if(!s||!DB.me||s.rday===todayTW()||restocking)return;if(ONLINE&&!myHouse())return;restocking=true;
-  const pick=f=>{const ids=Object.keys(ITEMS).filter(id=>f(ITEMS[id]));return ids[Math.floor(Math.random()*ids.length)]},A=Object.keys(ACC);
+  const pick=f=>{const ids=Object.keys(ITEMS).filter(id=>f(ITEMS[id])&&!ITEMS[id].off);return ids[Math.floor(Math.random()*ids.length)]},A=Object.keys(ACC);
   const items=[{t:'item',item:pick(it=>it.kind==='toy'&&!it.limited)},{t:'item',item:pick(it=>!it.limited&&!it.bday)},Math.random()<.5?{t:'acc',item:A[Math.floor(Math.random()*A.length)]}:{t:'item',item:pick(it=>it.kind==='treat'&&!it.bday)}];
   if(Math.random()<.1)items[1]={t:'item',item:pick(it=>it.limited)};
   try{const r=await call('shopRestock',{playerId:DB.me.id,items},true);if(r&&Array.isArray(r.stock)){s.stock=r.stock;s.rday=todayTW()}}catch(e){}finally{restocking=false}}
@@ -3484,9 +3757,10 @@ function centerMenu(s){openModal(`<div class="mqd"><img src="${esc(s.img2||s.img
     <button id="cm2"><img class="mic" src="assets/icon_renew.webp" alt=""><span><b>申請都更・外牆整修</b><small>換房子的外觀（Lv${RENEW_LV}・🪙${RENEW_COST}・一個月一次）</small></span></button>
     <button id="cm3"><img class="mic" src="assets/icon_expand.webp" alt=""><span><b>申請擴建</b><small>二樓民宿、農田（Lv${EXP_LV}・🪙${EXP_COST}）</small></span></button>
     <button id="cm5"><img class="mic" src="assets/icon_deco.webp" alt=""><span><b>訂製裝潢</b><small>照你的描述做一間專屬房間（🪙500・一個月一次）</small></span></button>
+    <button id="cm6"><span class="mic">📖</span><span><b>新手說明</b><small>這座島可以玩什麼？</small></span></button>
     <button id="cm4"><span class="mic">📌</span><span><b>看公告</b><small>${DB.notice&&DB.notice.t?'島主有新公告喔':'目前沒有公告'}</small></span></button></div>
   <div class="row2"><button data-close>掰掰</button></div>`);
-  $('#cm1').onclick=()=>mailAdminSheet();$('#cm2').onclick=centerRenew;$('#cm3').onclick=centerExpand;$('#cm5').onclick=decoForm;$('#cm4').onclick=()=>{closeModal();$('#cboard')&&$('#cboard').click()}}
+  $('#cm1').onclick=()=>mailAdminSheet();$('#cm2').onclick=centerRenew;$('#cm3').onclick=centerExpand;$('#cm5').onclick=decoForm;$('#cm6').onclick=()=>introCards('help');$('#cm4').onclick=()=>{closeModal();$('#cboard')&&$('#cboard').click()}}
 function centerLocked(k){openModal(`<div style="text-align:center"><img src="assets/icon_${k==='擴建'?'expand':'renew'}.webp" alt="" style="width:90px"><h3>🔒 ${k}還在準備中</h3><p class="lead">${k==='擴建'?'之後可以加蓋二樓（Lv15 以上、🪙1000、島主審核）':'之後可以換房子的外觀（Lv7 以上、🪙300、島主審核）'}<br>敬請期待！</p></div><div class="row2"><button data-close class="primary">好</button></div>`)}
 // 工讀生在島民中心走來走去（跟毛二街店員一樣）
 setInterval(()=>{if(!$('#centerv')||document.hidden)return;cEls.forEach((el,i)=>{if(!el||!el.isConnected||el._busy||Math.random()<.45)return;const P=CSTAFF_POS[i]||CSTAFF_POS[0],cx=el._x==null?P.x:el._x,cy=el._y==null?P.y:el._y;let tx,ty;
@@ -3554,7 +3828,7 @@ function sceneOpen(id,title,sub,bg,back){let v=$('#'+id);if(v)v.remove();v=docum
 const stageXY=(st,e)=>{const r=st.getBoundingClientRect();return {x:(e.clientX-r.left)/r.width*RW,y:(e.clientY-r.top)/r.height*RH}};
 function scenePop(st,txt,x,y){const el=document.createElement('div');el.className='spop';el.innerHTML=txt;Object.assign(el.style,hp(x,y));st.appendChild(el);setTimeout(()=>el.remove(),1600)}
 // 會走來走去的角色（毛孩、旅客）
-function walker(st,img,x,y,h,name,onTap){const el=document.createElement('button');el.className='staff walker noic';el.innerHTML=`<img src="${img}" alt="">${name?`<span class="snm">${esc(name)}</span>`:''}`;
+function walker(st,img,x,y,h,name,onTap,wear){const el=document.createElement('button');el.className='staff walker noic';el.innerHTML=`${wear!=null?`<span class="wbody"><img src="${img}" alt="">${wear}</span>`:`<img src="${img}" alt="">`}${name?`<span class="snm">${esc(name)}</span>`:''}`;
   Object.assign(el.style,hp(x,y),{height:(h/RH*100)+'%',zIndex:Math.round(y)});el._x=x;el._y=y;el.onclick=e=>{e.stopPropagation();onTap&&onTap(el)};st.appendChild(el);return el}
 function walkTick(st){st.querySelectorAll('.walker').forEach(el=>{if(el._busy||Math.random()<.5)return;const tx=FLOOR.x0+40+Math.random()*(FLOOR.x1-FLOOR.x0-80),ty=FLOOR.y0+30+Math.random()*(FLOOR.y1-FLOOR.y0-40);
   const d=Math.hypot(tx-el._x,ty-el._y);if(d<40)return;const dur=d/100;el._busy=1;el.classList.toggle('flip',tx<el._x);el.classList.add('walking');el.style.transition=`left ${dur}s linear,top ${dur}s linear`;
@@ -3589,7 +3863,7 @@ function renderF2(){const v=$('#f2v');if(!v||!F2)return;const h=house(F2.hid),st
   const f2w=(el,key)=>{el.classList.add('gnpc');el._key=key;el._rest=Date.now()+300+Math.random()*2500;return el};
   (guestPlan().inn[h.id]||[]).forEach((g,i)=>{const key='f2:'+h.id+':'+g.i,P0=GPOS[key]||(GPOS[key]={x:200+i*220,y:1000+(i%2)*80});f2w(walker(st,g.img,P0.x,P0.y,250,'',el=>guestTalk(g,'inn',el)),key)});
   if(F2.placing)f2Grid(st,h);
-  petsOf(h.id).filter(up2).forEach((p,i)=>{const key='f2p:'+h.id+':'+(p.id||p.name),P0=GPOS[key]||(GPOS[key]={x:300+i*160,y:1080});f2w(walker(st,petBody(p),P0.x,P0.y,200,p.name,el=>{sayOn(el,['二樓好好玩！','這裡是我的秘密基地','旅客好多喔～',`${p.name} 在二樓玩～`][Math.floor(Math.random()*4)]);if(DB.me&&Math.random()<.5)earn('pat')}),key)});
+  petsOf(h.id).filter(up2).forEach((p,i)=>{const key='f2p:'+h.id+':'+(p.id||p.name),P0=GPOS[key]||(GPOS[key]={x:300+i*160,y:1080});f2w(walker(st,petBody(p),P0.x,P0.y,200,p.name,el=>{sayOn(el,['二樓好好玩！','這裡是我的秘密基地','旅客好多喔～',`${p.name} 在二樓玩～`][Math.floor(Math.random()*4)]);if(DB.me&&Math.random()<.5)earn('pat')},wearHTML(p)),key)});
   if(!gn&&!(h.toys2||[]).length){const tip=document.createElement('div');tip.className='f2hint';tip.textContent=fam?'二樓空空的，擺些玩具家具，旅客就會來住了':'二樓還在布置中';st.appendChild(tip)}
   const j=document.createElement('button');j.className='rentjar noic';j.id='rentjar';st.appendChild(j);j.onclick=e=>{e.stopPropagation();fam?collectRent():innInfo()};updRent();
   if(F2.placing){v.querySelector('.cbtns').innerHTML='<button class="act" id="f2x">✕ 取消擺放</button>';$('#f2x').onclick=()=>{F2.placing=null;renderF2()};return}
@@ -3665,23 +3939,23 @@ async function plotTap(i){if(!needMe())return;const h=house(FM.hid),f=farmOf(h),
   if(!c){if(!fam)return toast('這格還沒種東西');return seedPick(i)}
   if(now>=ripeAt(c)){if(!fam)return toast('成熟了！等主人來收成');
     // v1.82：先在畫面上收成（不用等小島），小島回來再補錢袋；失敗就放回去
-    const old=c,P=PLOTS[i],st=$('#farmv .cstage');f.p[i]=null;bagAdd(CROP[old.c].item,1);sfx('gift');renderFarm();scenePop(st,`${itemIcon(CROP[old.c].item)} +1`,P[0],P[1]-200);
-    try{const r=await call('farmHarvest',Object.assign(cred(),{houseId:h.id,i}),true);
+    const old=c,P=PLOTS[i],st=$('#farmv .cstage');f.p[i]=null;farmPend(h.id,i,null);bagAdd(CROP[old.c].item,1);sfx('gift');renderFarm();scenePop(st,`${itemIcon(CROP[old.c].item)} +1`,P[0],P[1]-200);
+    try{const r=await call('farmHarvest',Object.assign(cred(),{houseId:h.id,i}),true);farmDone(h.id,i);
       if(r.bag){grant(0,r.bag);setTimeout(()=>{scenePop(st,`<img src="assets/icon_moneyburst.webp" alt="" style="width:60px"> +${r.bag}`,P[0],P[1]-280);toast(`💰 金蘋果樹上還掛著一個錢袋：${r.bag} 金幣！`)},300)}
-      else toast(`收成了 ${CROP[old.c].n}！放進背包了`)}catch(e){if(!/空的/.test(e.message)){f.p[i]=old;bagAdd(CROP[old.c].item,-1);renderFarm()}toast(e.message)}return}
+      else toast(`收成了 ${CROP[old.c].n}！放進背包了`)}catch(e){farmDone(h.id,i);if(!/空的/.test(e.message)){farmOf(house(h.id)).p[i]=old;bagAdd(CROP[old.c].item,-1);renderFarm()}toast(e.message)}return}
   const wn=(c.w||[]).length;if(wn>=FARM_WMAX)return toast(`這格已經澆滿 3 次了，還要 ${fmLeft(ripeAt(c)-now)}`);
   if(now-lastW(c)<HOUR)return toast(`剛剛才澆過，${fmLeft(HOUR-(now-lastW(c)))}後可以再澆`);
   // v1.82：先在畫面上澆水，小島在背後確認；失敗才退回
-  const old=JSON.parse(JSON.stringify(c)),P=PLOTS[i];c.w=(c.w||[]).concat({t:now,by:DB.me.id});sfx('sweep');renderFarm();scenePop($('#farmv .cstage'),'<img src="assets/icon_water.webp" alt="" style="width:56px"> 快 1 小時！',P[0],P[1]-200);
-  try{const r=await call('farmWater',{playerId:DB.me.id,houseId:h.id,i},true);if(farmOf(h).p[i])farmOf(h).p[i]=r;if(!fam)earn('water');renderFarm();
-    if(!fam&&ONLINE)feedPush(`${DB.me.nick} 幫「${h.name}」的田澆水 💧`)}catch(e){f.p[i]=old;renderFarm();toast(e.message)}}
+  const old=JSON.parse(JSON.stringify(c)),P=PLOTS[i];c.w=(c.w||[]).concat({t:now,by:DB.me.id});farmPend(h.id,i,c);sfx('sweep');renderFarm();scenePop($('#farmv .cstage'),'<img src="assets/icon_water.webp" alt="" style="width:56px"> 快 1 小時！',P[0],P[1]-200);
+  try{const r=await call('farmWater',{playerId:DB.me.id,houseId:h.id,i},true);farmDone(h.id,i);farmOf(house(h.id)).p[i]=r;if(!fam)earn('water');renderFarm();
+    if(!fam&&ONLINE)feedPush(`${DB.me.nick} 幫「${h.name}」的田澆水 💧`)}catch(e){farmDone(h.id,i);farmOf(house(h.id)).p[i]=old;renderFarm();toast(e.message)}}
 function seedPick(i){const g=DB.game;
   openModal(`<h3>🌱 要種什麼？</h3><div class="shopgrid">${Object.entries(CROP).map(([k,c])=>{const s=ITEMS[c.seed],n=bag()[c.seed]||0;return `<div class="si">${itemIcon(c.seed,'big')}<div class="sn">${c.n}</div><div class="sf">賣 🪙${ITEMS[c.item].price}${k==='apple'?'・可能有錢袋':''}</div>
     ${n?`<button data-pl="${k}">種下（有 ${n}）</button>`:`<button data-pb="${k}" ${(g.coins||0)>=s.price?'':'disabled'}>🪙${s.price} 買來種</button>`}</div>`}).join('')}</div>
     <div class="hint">8 小時成熟，澆水可以更快</div><div class="row2"><button data-close>取消</button></div>`);
   // v1.82：先種下去（畫面馬上看到），小島在背後確認；失敗才把種子還你
-  const plant=async k=>{const h=house(FM.hid),f=farmOf(h);if(f.p[i])return;f.p[i]={c:k,at:Date.now(),w:[]};bagAdd(CROP[k].seed,-1);closeModal();sfx('pat');renderFarm();toast(`種下${CROP[k].n}了 🌱`);
-    try{const r=await call('farmPlant',Object.assign(cred(),{houseId:h.id,i,c:k}),true);f.p[i]=r;renderFarm()}catch(e){if(!/已經種/.test(e.message)){f.p[i]=null;bagAdd(CROP[k].seed,1);renderFarm()}toast(e.message)}};
+  const plant=async k=>{const h=house(FM.hid),f=farmOf(h);if(f.p[i])return;f.p[i]={c:k,at:Date.now(),w:[]};farmPend(h.id,i,f.p[i]);bagAdd(CROP[k].seed,-1);closeModal();sfx('pat');renderFarm();toast(`種下${CROP[k].n}了 🌱`);
+    try{const r=await call('farmPlant',Object.assign(cred(),{houseId:h.id,i,c:k}),true);farmDone(h.id,i);farmOf(house(h.id)).p[i]=r;renderFarm()}catch(e){farmDone(h.id,i);if(!/已經種/.test(e.message)){farmOf(house(h.id)).p[i]=null;bagAdd(CROP[k].seed,1);renderFarm()}toast(e.message)}};
   $('#sheet').querySelectorAll('[data-pl]').forEach(b=>b.onclick=()=>plant(b.dataset.pl));
   $('#sheet').querySelectorAll('[data-pb]').forEach(b=>b.onclick=()=>{const s=ITEMS[CROP[b.dataset.pb].seed];if((g.coins||0)<s.price)return;g.coins-=s.price;sfx('coin');bagAdd(CROP[b.dataset.pb].seed,1);updTix&&updTix();plant(b.dataset.pb)})}
 // 毛二街：作物全價賣掉，或換零食（零食打 8 折，剩下的零頭換成金幣）
@@ -3689,7 +3963,7 @@ function cropSellBody(){const L=bagList('crop');return (L.length?`<div class="sh
   +'<div class="hint">作物照全價收購・換零食時零食打 8 折，剩下的零頭換成金幣</div>'}
 function cropBind(S){S.querySelectorAll('[data-cs]').forEach(b=>b.onclick=()=>{const id=b.dataset.cs,it=ITEMS[id];if(!(bag()[id]>0))return;bagAdd(id,-1);grant(0,it.price);sfx('coin');toast(`賣掉 ${it.name}，拿到 ${it.price} 金幣`);tradeSheet('sell','crop')});
   S.querySelectorAll('[data-cx]').forEach(b=>b.onclick=()=>cropSwap(b.dataset.cx))}
-function cropSwap(id){const it=ITEMS[id],T=Object.entries(ITEMS).filter(([k,x])=>x.kind==='treat'&&!x.bday&&!x.limited&&x.price>0);
+function cropSwap(id){const it=ITEMS[id],T=Object.entries(ITEMS).filter(([k,x])=>x.kind==='treat'&&!x.bday&&!x.limited&&!x.off&&x.price>0);
   openModal(`<h3>🍪 用 ${esc(it.name)} 換零食</h3><p class="lead">一個${esc(it.name)}值 🪙${it.price}，零食打 8 折</p><div class="shopgrid">${T.map(([k,x])=>{const p=Math.max(1,Math.round(x.price*.8)),n=Math.floor(it.price/p),r=it.price-n*p;
     return `<button class="si pick" data-tw="${k}">${itemIcon(k,'big')}<div class="sn">${esc(x.name)}</div><div class="sf">換 ${n} 個${r?`＋🪙${r}`:''}</div></button>`}).join('')}</div><div class="row2"><button id="cxb">← 回去</button></div>`);
   $('#cxb').onclick=()=>tradeSheet('sell','crop');
@@ -3724,25 +3998,25 @@ function myApplies(){const L=(DB.applies||[]).filter(a=>myHouse()&&a.houseId===m
 function centerRenew(){const h=myHouse();if(!h)return toast('要有家才能申請都更');const g=DB.game,lv=g.lv||1,A=DB.applies||[];
   const mine=A.find(x=>x.houseId===h.id&&x.st==='wait'),last=+h.renewAt||0,lock=!mine&&last&&Date.now()-last<RENEW_DAYS*864e5;
   const head=`<h3 class="mh3"><img class="mic" src="assets/icon_renew.webp" alt="" style="width:34px;height:34px">都更・外牆整修</h3>`;
-  if(mine)return openModal(`${head}<div class="locked">${mine.kind==='renew'?`你家的都更申請在等島主看<br><img src="assets/house${+mine.style}_day.webp" alt="" style="width:90px;margin-top:6px"><br>${esc(STYLE_NAMES[mine.style]||'')}`:`你家已經有一張「${EXPN[mine.kind]||mine.kind}」申請在等島主看<br>處理完才能再申請`}</div><div class="row2"><button id="rnmy">📋 我的申請</button><button data-close>好</button></div>`),$('#rnmy').onclick=myApplies;
+  if(mine)return openModal(`${head}<div class="locked">${mine.kind==='renew'?`你家的都更申請在等島主看<br><img src="${hsrc(+mine.style,'day')}" alt="" style="width:90px;margin-top:6px"><br>${esc(STYLE_NAMES[mine.style]||'')}`:`你家已經有一張「${EXPN[mine.kind]||mine.kind}」申請在等島主看<br>處理完才能再申請`}</div><div class="row2"><button id="rnmy">📋 我的申請</button><button data-close>好</button></div>`),$('#rnmy').onclick=myApplies;
   if(lock)return openModal(`${head}<div class="locked">你家這個月已經都更過了<br>${Math.ceil((last+RENEW_DAYS*864e5-Date.now())/864e5)} 天後可以再申請</div><div class="row2"><button data-close>好</button></div>`);
   const taken=new Set(DB.houses.filter(x=>x.id!==h.id).map(x=>+x.style).concat(A.filter(x=>x.kind==='renew'&&x.st==='wait').map(x=>+x.style)));let pick=0;
   openModal(`${head}<p class="lead">Lv.${RENEW_LV} 以上・🪙${RENEW_COST}・一個月一次・島主審核（沒通過會全額退錢）<br>你現在 Lv.${lv}・🪙${g.coins||0}</p>
-    <div class="rnprev"><img src="assets/house${+h.style}_day.webp" alt=""><span>➜</span><img id="rnto" src="assets/house${+h.style}_day.webp" alt="" style="opacity:.25"><small id="rnn">點一款新外觀</small></div>
-    <div class="styles" id="rnsty">${Object.keys(STYLE_NAMES).filter(n=>+n!==+h.style).map(n=>`<button data-s="${n}" ${taken.has(+n)?'disabled':''} aria-label="${STYLE_NAMES[n]}${taken.has(+n)?'（已有人住）':''}"><img src="assets/house${n}_day.webp" alt="" loading="lazy"></button>`).join('')}</div>
+    <div class="rnprev"><img src="${hsrc(+h.style,'day')}" alt=""><span>➜</span><img id="rnto" src="${hsrc(+h.style,'day')}" alt="" style="opacity:.25"><small id="rnn">點一款新外觀</small></div>
+    <div class="styles" id="rnsty">${Object.keys(STYLE_NAMES).filter(n=>+n!==+h.style&&!STYLE_OFF.has(+n)).map(n=>`<button data-s="${n}" ${taken.has(+n)?'disabled':''} aria-label="${STYLE_NAMES[n]}${taken.has(+n)?'（已有人住）':''}"><img src="${hsrc(n,'day')}" alt="" loading="lazy"></button>`).join('')}</div>
     ${fld('rnnote','想跟島主說的話（選填）','<input id="rnnote" maxlength="60" placeholder="例如：想住進櫻花屋！">')}<div class="err" id="rnerr"></div>
     <div class="row2 sticky"><button data-close>取消</button><button class="primary" id="rnok" disabled>送出申請（🪙${RENEW_COST}）</button></div>`);
   $('#rnsty').onclick=e=>{const b=e.target.closest('button');if(!b||b.disabled)return;pick=+b.dataset.s;$('#rnsty').querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===b));
-    const to=$('#rnto');to.src=`assets/house${pick}_day.webp`;to.style.opacity=1;$('#rnn').textContent=STYLE_NAMES[pick];$('#rnok').disabled=false};
+    const to=$('#rnto');to.src=`${hsrc(pick,'day')}`;to.style.opacity=1;$('#rnn').textContent=STYLE_NAMES[pick];$('#rnok').disabled=false};
   $('#rnok').onclick=async e=>{const btn=e.currentTarget;if(!pick)return;if((g.lv||1)<RENEW_LV)return $('#rnerr').textContent=`要 Lv.${RENEW_LV} 以上才能申請，再加油一下！`;if((g.coins||0)<RENEW_COST)return $('#rnerr').textContent=`金幣不夠，要 🪙${RENEW_COST}`;
     btn.disabled=true;
     try{const a=await call('applyExpand',Object.assign(cred(),{houseId:h.id,kind:'renew',style:pick,note:$('#rnnote').value.trim(),lv:g.lv||1}));g.coins=(g.coins||0)-RENEW_COST;save();updHud&&updHud();updTix&&updTix();sfx('coin');(DB.applies=DB.applies||[]).unshift(a);h.renewAt=Date.now();
-      openModal(`<div style="text-align:center"><img src="assets/house${pick}_day.webp" alt="" style="width:110px"><h3>都更申請送出了！</h3><p class="lead">島主核准之後，你家就會換成「${esc(STYLE_NAMES[pick]||'')}」<br>結果會寄信通知你 🐾</p></div><div class="row2"><button data-close class="primary">好</button></div>`)}
+      openModal(`<div style="text-align:center"><img src="${hsrc(pick,'day')}" alt="" style="width:110px"><h3>都更申請送出了！</h3><p class="lead">島主核准之後，你家就會換成「${esc(STYLE_NAMES[pick]||'')}」<br>結果會寄信通知你 🐾</p></div><div class="row2"><button data-close class="primary">好</button></div>`)}
     catch(x){$('#rnerr').textContent=x.message;btn.disabled=false}}}
 // ---------- 👑 島主：審核擴建・都更 ----------
 function adminApplySec(d){const L=(d.applies||[]),W=L.filter(a=>a.st==='wait');
   return `<div class="sec adm"><h4><img class="mic" src="assets/icon_expand.webp" alt="">擴建・都更申請<span>${W.length} 張等你看</span></h4>
-    ${W.map(a=>`<div class="apbox"><b>${esc(a.house)}・${EXPN[a.kind]||a.kind}</b><small>${esc(a.nick)}・${ago(+a.at)}・已付 🪙${a.cost||EXP_COST}</small>${a.kind==='renew'?`<div class="rnprev"><img src="assets/house${+a.from||1}_day.webp" alt=""><span>➜</span><img src="assets/house${+a.style}_day.webp" alt=""><small>${esc(STYLE_NAMES[a.style]||'')}${DB.houses.some(x=>x.id!==a.houseId&&+x.style===+a.style)?'<br>⚠️ 這款已經被別家蓋走了，只能駁回':''}</small></div>`:''}${a.note?`<p>「${esc(a.note)}」</p>`:''}
+    ${W.map(a=>`<div class="apbox"><b>${esc(a.house)}・${EXPN[a.kind]||a.kind}</b><small>${esc(a.nick)}・${ago(+a.at)}・已付 🪙${a.cost||EXP_COST}</small>${a.kind==='renew'?`<div class="rnprev"><img src="${hsrc(+a.from||1,'day')}" alt=""><span>➜</span><img src="${hsrc(+a.style,'day')}" alt=""><small>${esc(STYLE_NAMES[a.style]||'')}${DB.houses.some(x=>x.id!==a.houseId&&+x.style===+a.style)?'<br>⚠️ 這款已經被別家蓋走了，只能駁回':''}</small></div>`:''}${a.note?`<p>「${esc(a.note)}」</p>`:''}
       <input data-apr="${a.id}" maxlength="100" placeholder="回覆（選填）"><div class="row2"><button data-apn="${a.id}"><img class="mic" src="assets/icon_no.webp" alt="">駁回（退錢）</button><button class="primary" data-apy="${a.id}"><img class="mic" src="assets/icon_ok.webp" alt="">核准</button></div></div>`).join('')||'<div class="locked">目前沒有申請</div>'}
     ${L.filter(a=>a.st!=='wait').slice(0,5).map(a=>`<div class="frow"><span>${esc(a.house)}・${EXPN[a.kind]||a.kind}<small>${esc(a.nick)}</small></span><span>${a.st==='ok'?'✅':'❌'}</span></div>`).join('')}</div>`}
 function adminApplyBind(){const go=async(id,ok,b)=>{if(!armBtn(b,ok?'確定核准？':'確定駁回？'))return;const inp=document.querySelector(`[data-apr="${id}"]`);
@@ -3756,18 +4030,24 @@ MAILN.deco='訂製裝潢';MAILT.deco='🎨 訂製裝潢';
 const customRoom=id=>(typeof DB!=='undefined'&&Array.isArray(DB.rooms)?DB.rooms:[]).find(r=>r.id===id);
 function decoForm(){const h=myHouse();if(!h)return toast('要有家才能申請訂製裝潢');if(!ONLINE)return toast('試做版沒有訂製裝潢');const g=DB.game,last=+h.decoAt||0,wait=last&&Date.now()-last<DECO_DAYS*864e5;let img='';
   openModal(`<h3 class="mh3"><img class="mic" src="assets/icon_deco.webp" alt="" style="width:36px;height:36px">訂製裝潢</h3>
-    ${wait?`<div class="locked">你家這個月已經申請過了<br>${Math.ceil((last+DECO_DAYS*864e5-Date.now())/864e5)} 天後可以再申請</div><div class="row2"><button data-close>好</button></div>`:`
+    ${wait?`<div class="locked" style="margin-bottom:10px">你家這個月已經申請過了，${Math.ceil((last+DECO_DAYS*864e5-Date.now())/864e5)} 天後可以再申請<br><small>有折扣碼的話，現在還是可以免費申請喔</small></div>`:''}${`
     <p class="lead"><b>你希望打造什麼樣的房間呢？</b><br>描述得越仔細越好！畢竟裝潢一個月只能換一次<br><small>（例如：風格／主色系／主題／氣氛⋯）</small></p>
     <textarea id="dtx" rows="7" maxlength="400" style="display:block;width:100%;box-sizing:border-box;min-height:170px;font-size:16px" placeholder="例如：想要粉紅色和奶油色的星空房間，有一扇大圓窗看得到月亮，牆上掛小燈串，氣氛溫暖安靜，像睡前的感覺"></textarea><div class="mcnt"><span id="dcn">0</span> / 400</div>
     <div class="row2"><label class="mimg"><input type="file" accept="image/*" id="dfile" hidden><span id="dimgl">📷 附一張參考圖（可以不附）</span></label></div><div id="dprev"></div>
-    <p class="lead" style="font-size:12px">一次 🪙${DECO_COST}・一個家一個月一次・做好的房間只屬於你家<br>申請完畢後請留意信箱 💌（如果做不出來，會全額退款）</p><div class="err" id="derr"></div>
-    <div class="row2"><button data-close>取消</button><button class="primary" id="dsend" ${(g.coins||0)>=DECO_COST?'':'disabled'}>${(g.coins||0)>=DECO_COST?`送出（🪙${DECO_COST}）`:'金幣不夠'}</button></div>`}`);
-  if(wait)return;const tx=$('#dtx');tx.oninput=()=>$('#dcn').textContent=tx.value.length;
+    ${fld('dcode','折扣碼（有的話）','<input id="dcode" maxlength="20" autocomplete="off" placeholder="打對就免費許願">')}
+    <p class="lead" style="font-size:12px">一次 🪙${DECO_COST}・一個家一個月一次（用折扣碼不限）・做好的房間只屬於你家<br>申請完畢後請留意信箱 💌（如果做不出來，會全額退款）</p><div class="err" id="derr"></div>
+    <div class="row2"><button data-close>取消</button><button class="primary" id="dsend">${wait?'用折扣碼送出':`送出（🪙${DECO_COST}）`}</button></div>`}`);
+  const tx=$('#dtx');$('#dcode').oninput=e=>{if(!wait)$('#dsend').textContent=e.target.value.trim()?'用折扣碼送出':`送出（🪙${DECO_COST}）`};tx.oninput=()=>$('#dcn').textContent=tx.value.length;
   $('#dfile').onchange=async e=>{const f=e.target.files[0];if(!f)return;try{img=await shrinkImg(f);$('#dprev').innerHTML=`<img class="mshot" src="${img}" alt="">`;$('#dimgl').textContent='📷 換一張'}catch(x){$('#derr').textContent='這張圖讀不進來，換一張試試'}};
-  $('#dsend').onclick=async e=>{const v=tx.value.trim();if(v.length<5)return $('#derr').textContent='多描述一點你想要的房間吧';const b=e.currentTarget;b.disabled=true;b.textContent='送出中…';
-    try{await call('decoApply',Object.assign(cred(),{text:v,img}));g.coins=(g.coins||0)-DECO_COST;save();updTix&&updTix();h.decoAt=Date.now();sfx('coin');
+  $('#dsend').onclick=async e=>{const v=tx.value.trim();if(v.length<5)return $('#derr').textContent='多描述一點你想要的房間吧';const hasCode=!!$('#dcode').value.trim();
+    if(wait&&!hasCode)return $('#derr').textContent='這個月已經申請過了，要用折扣碼才能再申請';if(!hasCode&&(g.coins||0)<DECO_COST)return $('#derr').textContent=`金幣不夠，要 🪙${DECO_COST}（有折扣碼可以免費）`;const b=e.currentTarget;b.disabled=true;b.textContent='送出中…';$('#derr').textContent='小島處理訂製比較慢，請等一下，不要關掉喔 🙏';
+    const code=($('#dcode')&&$('#dcode').value.trim())||'';let r;
+    try{try{r=await call('decoApply',Object.assign(cred(),{text:v,img,code}),true)}
+      catch(x){if(!/太慢|連不上|忙/.test(x.message))throw x;   // v1.83：逾時不一定是失敗 → 先同步看看是不是已經送出了
+        await sync(true);const hh=house(h.id);if(!(hh&&+hh.decoAt&&Date.now()-hh.decoAt<10*60000))throw x;r={free:hh.decoFree?1:0}}
+      const cost=r&&r.free?0:DECO_COST;g.coins=(g.coins||0)-cost;save();updTix&&updTix();if(cost)h.decoAt=Date.now();sfx('coin');
       openModal(`<div style="text-align:center"><img src="assets/icon_deco.webp" alt="" style="width:96px"><h3>申請送出了！</h3><p class="lead">島主會照你的描述幫你裝潢<br>完成後會寄信給你，請留意信箱 💌</p></div><div class="row2"><button data-close class="primary">好</button></div>`)}
-    catch(x){$('#derr').textContent=x.message;b.disabled=false;b.textContent=`送出（🪙${DECO_COST}）`}}}
+    catch(x){$('#derr').textContent=x.message;b.disabled=false;b.textContent=$('#dcode').value.trim()?'用折扣碼送出':`送出（🪙${DECO_COST}）`}}}
 // ---------- 👑 島主：處理訂製申請 ----------
 const decoPrompt=t=>`請幫我畫一張遊戲的房間背景圖：3D 黏土風、可愛粉嫩、柔和打光的室內房間，正面視角，直式 2:3。上半部是牆面和窗戶等裝飾（右上方的牆留一塊可以貼便利貼的軟木板），下半部是寬敞、空曠、平整的地板（之後要放家具和毛孩，地板上不要有東西）。畫面裡不要有人物、動物，也不要有任何文字。\n\n房間主人的需求：「${t}」`;
 function adminDecoOne(m){const st=m.st||'wait',done=st==='done',no=st==='no';let img='';
@@ -3818,10 +4098,10 @@ function guestPlan(){const k=Math.floor(Date.now()/HOUR),inns=DB.houses.filter(h
   plan.park=pool;GPLAN=plan;return plan}
 const GUEST_LINES={park:['公園的空氣好好～','今天天氣真好','我在找好住的民宿','這裡的噴水池好漂亮','要不要一起散步？'],visit:['你家好可愛！','借我坐一下下～','這裡的毛孩好有禮貌','我只是路過看看','你家玩具好多喔'],inn:GUEST_SAY};
 // 跟旅客說話：每隻每天第一次會送小禮物（每天最多 10 份，v1.75）
-function guestTalk(g,where,el){if(!needMe())return;const P=guestPlan(),L=GUEST_LINES[where]||GUEST_SAY;let t=L[Math.floor(Math.random()*L.length)];
+function guestTalk(g,where,el){if(!needMe())return;earn('npc');const P=guestPlan(),L=GUEST_LINES[where]||GUEST_SAY;let t=L[Math.floor(Math.random()*L.length)];
   if(where!=='inn'&&P.top&&Math.random()<.4)t=`聽說「${P.top.name}」的二樓很舒服！`;sayOn(el,t);sfx('tap');
   const gm=DB.game,d=todayTW();if(!gm.gt||gm.gt.d!==d)gm.gt={d,ids:[]};if(!gm.gt.n)gm.gt.n=0;if(gm.gt.ids.includes(g.i)||gm.gt.n>=GIFT_DAY)return;gm.gt.ids.push(g.i);save();if(Math.random()>GIFT_P)return;gm.gt.n++;
-  const r=Math.random(),T=Object.entries(ITEMS).filter(([k,x])=>x.kind==='treat'&&!x.bday&&!x.limited&&x.price>0),Y=Object.entries(ITEMS).filter(([k,x])=>x.kind==='toy'&&!x.limited&&x.price>0&&x.price<=60);
+  const r=Math.random(),T=Object.entries(ITEMS).filter(([k,x])=>x.kind==='treat'&&!x.bday&&!x.limited&&!x.off&&x.price>0),Y=Object.entries(ITEMS).filter(([k,x])=>x.kind==='toy'&&!x.limited&&!x.off&&x.price>0&&x.price<=60);
   if(r<.7){const [id,x]=T[Math.floor(Math.random()*T.length)];bagAdd(id,1);setTimeout(()=>{sfx('gift');toast(`${g.n}送你一個「${x.name}」！放進背包了 🎁`)},600)}
   else{const [id,x]=Y[Math.floor(Math.random()*Y.length)];bagAdd(id,1);setTimeout(()=>{sfx('gift');toast(`${g.n}送你一個玩具「${x.name}」！放進背包了 🎁`)},600)}}
 // 在房間地板上放旅客（公園：好幾隻；一般家：來晃的那 1 隻）
@@ -3856,6 +4136,7 @@ function renderFoot(){
 }
 renderIsland();renderFoot();tickerShow();setInterval(()=>{if(mode==='auto'&&!$('#island').classList.contains('hidden'))renderIsland()},60000);
 if(ONLINE){
+  try{applyRooms()}catch(e){}
   if(DB.fromCache)renderIsland();else busy(true);if(!DB.fromCache)conBar(true);
   sync(!!DB.fromCache).finally(()=>{busy(false);updGuestBar();if(DB.synced&&!DB.me&&!isGuest())hgThen(onboarding)});
   setInterval(()=>{if(document.visibilityState==='visible'&&$('#modal').classList.contains('hidden'))sync(true)},45000);
@@ -3957,10 +4238,11 @@ async function adminSheet(){
   if(!adminPw()){openModal(`<h3>👑 島主登入</h3>${fld('apw','島主密碼','<input id="apw" type="password" autocomplete="off">')}<div class="err" id="aerr"></div><div class="row2"><button data-close>取消</button><button class="primary" id="ago">登入</button></div>`);
     $('#ago').onclick=async()=>{try{localStorage.setItem('mhd_admin',$('#apw').value)}catch(e){}try{await adminCall('adminLogin');adminSheet()}catch(e){try{localStorage.removeItem('mhd_admin')}catch(x){}$('#aerr').textContent=e.message}};return}
   let d;try{d=await adminCall('adminLogin')}catch(e){if(/密碼/.test(e.message)){try{localStorage.removeItem('mhd_admin')}catch(x){}}return toast(e.message)}
-  DB.adminId=DB.me.id;
+  DB.adminId=DB.me.id;ADM_D=d;
   const hs=d.houses.map(h=>`<option value="${h.id}">${esc(h.name)}</option>`).join(''),its=Object.entries(ITEMS).map(([id,i])=>`<option value="${id}">${i.emo} ${esc(i.name)}</option>`).join('');
   openModal(`<h3>👑 島主後台</h3>
   <div class="row2" style="margin-bottom:8px"><button class="primary mbtn" id="amail"><img class="mic" src="assets/icon_mail.webp" alt="">島民來信</button></div><div class="mlist" id="amprev"></div>
+  ${adminApplySec(d)}
   <div class="sec adm"><h4>🔑 邀請碼<span>${(d.invites||[]).filter(x=>!x.usedBy&&!x.void).length} 組可用</span></h4><p class="lead">每組只能用一次，給要蓋房子的朋友</p>
     <div class="row2"><input id="ainn" maxlength="20" placeholder="備註（例如：給小明）"><button id="ainb">產生 1 組</button></div>
     <div class="invl">${(d.invites||[]).slice(0,30).map(x=>`<div class="frow"><span><b class="code">${esc(x.code)}</b><small>${x.usedBy?`已被 ${esc(x.usedNick||'')} 使用`:x.void?'已作廢':'未使用'}${x.note?'・'+esc(x.note):''}</small></span>${!x.usedBy&&!x.void?`<span><button class="mini" data-icp="${esc(x.code)}">複製</button> <button class="mini" data-ivd="${esc(x.code)}">作廢</button></span>`:''}</div>`).join('')||'<div class="locked">還沒有邀請碼</div>'}</div></div>
@@ -3975,7 +4257,6 @@ async function adminSheet(){
     <div class="row2"><select id="agi"><option value="">（不送道具）</option>${its}</select><input id="agn" type="number" min="0" placeholder="數量" style="max-width:80px"></div>
     <div class="row2"><select id="agr"></select></div><p class="lead" id="agrh" style="margin:0"></p>
     <input id="agm" maxlength="40" placeholder="想說的話（可以不填）"><div class="row2"><button id="agb">送出</button></div></div>
-  ${adminGiftStatus()}
   <div class="sec adm"><h4>✉️ 寫信</h4><div class="row2"><select id="alto"><option value="*">📣 全部島民</option><optgroup label="🏠 寄給整個家（家人每人一封）">${DB.houses.filter(h=>d.players.some(p=>p.houseId===h.id)).map(h=>`<option value="h:${h.id}">🏠 ${esc(h.name)}（全家）</option>`).join('')}</optgroup><optgroup label="👤 寄給一個人">${d.players.map(p=>`<option value="${p.id}">${esc(p.nick)}${p.house?'（'+esc(p.house)+'）':''}</option>`).join('')}</optgroup></select></div>
     <input id="alt" maxlength="30" placeholder="標題（例如：週末活動開始囉）"><textarea id="alb" rows="4" maxlength="500" placeholder="想說的話"></textarea>
     <p class="lead" style="margin:6px 0 0">附上禮物（可以不填，收件人要按「領取」）</p>
@@ -3983,8 +4264,6 @@ async function adminSheet(){
     <div class="row2"><select id="ali"><option value="">（不附道具）</option>${its}</select><input id="aln" type="number" min="0" placeholder="數量" style="max-width:80px"></div>
     <div class="row2"><select id="alr"></select></div><p class="lead" id="alrh" style="margin:0"></p>
     <div class="row2"><button id="alsend">寄出</button></div></div>
-  <div class="sec adm"><h4>🙋 玩家列表<span>${d.players.length} 人・🔔 ${d.players.filter(p=>p.pushSt==='on').length} 人有開通知・全島 🪙${d.players.reduce((a,p)=>a+(+p.coins||0),0).toLocaleString()}</span></h4><p class="lead">照金幣多到少排，點 ⚙️ 可以改金幣、轉移碼<br>🔔 收得到通知・🔕 沒開・📲 還沒加主畫面・❔ 還沒更新到新版</p><div class="plist">${d.players.slice().sort((a,b)=>(+b.coins||0)-(+a.coins||0)).map(p=>`<div class="frow"><span>${pushIc(p)}${esc(p.nick)}<small>${p.house?esc(p.house):'沒有家'}・Lv.${p.lv}・🪙${p.coins}${p.createdAt?'・'+new Date(p.createdAt).toLocaleDateString('zh-TW',{month:'numeric',day:'numeric'})+' 加入':''}</small></span><span>${p.house?'':`<button class="mini danger" data-dpl="${p.id}">刪除</button> `}<button class="mini" data-code="${esc(p.code)}">${esc(p.code)||'—'}</button> <button class="mini" data-apl="${p.id}" aria-label="管理">⚙️</button></span></div>`).join('')}</div><p class="lead">點轉移碼可以複製，傳給換手機的朋友</p></div>
-  ${adminApplySec(d)}
   ${adminCenterSec()}
   ${adminStarSec(d)}
   <div class="sec adm"><h4>👔 毛二街店長<span>最多 ${SHOP_MGR_MAX} 位</span></h4><p class="lead">店長可以換店的背景、擺玩具、管理店員（最多 ${SHOP_STAFF_MAX} 位）</p>
@@ -3993,9 +4272,12 @@ async function adminSheet(){
   <div class="sec adm"><h4>🏠 家的管理</h4><div class="row2"><select id="ahh">${hs}</select></div>
     <div class="row2"><input id="ahp" type="password" placeholder="新的家人密碼（4 字以上）"><button id="ahpb">重設密碼</button></div>
     <div class="row2"><button id="ahrb" class="danger">收回成空地</button></div><p class="lead">收回會刪掉這個家的毛孩和紀錄，不能復原</p></div>
+  ${adminUploadSec(d)}
+  <div class="sec adm"><h4>🙋 玩家列表<span>${d.players.length} 人・🔔 ${d.players.filter(p=>p.pushSt==='on').length} 人有開通知・全島 🪙${d.players.reduce((a,p)=>a+(+p.coins||0),0).toLocaleString()}</span></h4><p class="lead">照金幣多到少排，點 ⚙️ 可以改金幣、轉移碼<br>🔔 收得到通知・🔕 沒開・📲 還沒加主畫面・❔ 還沒更新到新版</p><div class="plist">${d.players.slice().sort((a,b)=>(+b.coins||0)-(+a.coins||0)).map(p=>`<div class="frow"><span>${pushIc(p)}${esc(p.nick)}<small>${p.house?esc(p.house):'沒有家'}・Lv.${p.lv}・🪙${p.coins}${p.createdAt?'・'+new Date(p.createdAt).toLocaleDateString('zh-TW',{month:'numeric',day:'numeric'})+' 加入':''}</small></span><span>${p.house?'':`<button class="mini danger" data-dpl="${p.id}">刪除</button> `}<button class="mini" data-code="${esc(p.code)}">${esc(p.code)||'—'}</button> <button class="mini" data-apl="${p.id}" aria-label="管理">⚙️</button></span></div>`).join('')}</div><p class="lead">點轉移碼可以複製，傳給換手機的朋友</p></div>
+  ${adminGiftStatus()}
   <div class="row2"><button id="aout">登出島主</button><button data-close class="primary">關閉</button></div>`);
   const S=$('#sheet'),ok=m=>{toast(m);sync(true)};
-  adminStarBind();adminCenterBind();adminApplyBind();
+  adminStarBind();adminCenterBind();adminApplyBind();adminUploadBind(d);
   $('#asmb').onclick=async()=>{const ids=[...new Set([$('#asm0').value,$('#asm1').value].filter(Boolean))];try{await adminCall('adminShopMgr',{ids});const sh=house(SHOP_ID);if(sh)sh.mgr=ids;ok(ids.length?'店長指派好了 👔':'店長都拿掉了')}catch(e){toast(e.message)}};
   $('#amail').onclick=adminMailSheet;
   call('adminMailList',{adminPw:adminPw(),playerId:DB.me&&DB.me.id},true).then(L=>{if(!Array.isArray(L)||!$('#amail'))return;const un=L.filter(m=>!m.read);if(!un.length)return;
@@ -4013,8 +4295,8 @@ async function adminSheet(){
     if(!o.coins&&!o.tickets&&!(o.item&&o.n)&&!o.room)return toast('要送點什麼喔');
     if(o.houseId==='__all__'){const H=d.houses||[];if(!H.length)return toast('島上還沒有家');const btn=e.target;if(!armBtn(btn,`確定送給全島 ${H.length} 個家？`))return;
       btn.disabled=true;let okN=0,skip=0,fail='';
-      for(let i=0;i<H.length;i++){btn.textContent=`送出中 ${i+1}/${H.length}…`;try{await adminCall('adminGiftHouse',Object.assign({},o,{houseId:H[i].id}));okN++}catch(x){if(/已經有這間房間/.test(x.message))skip++;else fail=x.message}}
-      btn.disabled=false;btn.classList.remove('armed');btn.textContent='送出';
+      for(let i=0;i<H.length;i++){btn.textContent=`送出中 ${i+1}/${H.length}…`;try{await adminCall('adminGiftHouse',Object.assign({},o,{houseId:H[i].id,all:true}));okN++}catch(x){if(/已經有這間房間/.test(x.message))skip++;else fail=x.message}}
+      btn.disabled=false;btn.classList.remove('armed');btn.textContent='送出';if(okN&&ONLINE)feedPush('👑 島主送給全島每一家一份禮物，快回家拆！🎁');
       toast(`全島送出了：${okN} 個家收到禮物盒${skip?`，${skip} 個家已有房間而跳過`:''}${fail?`（有失敗：${fail}）`:''} 👑`);
       ['agc','agt','agn','agm'].forEach(k=>$('#'+k).value='');$('#agi').value='';$('#agr').value='';sync(true);return}
     try{await adminCall('adminGiftHouse',o);toast('送出了，禮物盒已經放在他們家 👑');['agc','agt','agn','agm'].forEach(k=>$('#'+k).value='');$('#agi').value='';$('#agr').value='';sync(true)}catch(e){toast(e.message)}};
@@ -4082,7 +4364,7 @@ function situation(r,p){const h=house(home.id),hr=+new Date(Date.now()+8*3600e3)
   if(r.guest)c.push('away','away');
   else if(DB.me&&!isFamily(h.id))c.push('visitor','visitor');
   if(r.demon)return 'demon';
-  if(isHungry(p)){const k=r.guest?'ghungry':'hungry';c.push(k,k,k)}
+  if(isHungry(p)&&!r.guest&&!home.bowl)c.push('hungry','hungry','hungry');
   if((h.poops||[]).length)c.push('poop');
   if((h.toys||[]).length)c.push('toy');
   if(DB.dbl===todayTW())c.push('dbl');
@@ -4145,9 +4427,9 @@ drawWx();loadWx();setInterval(loadWx,30*60e3);
   addEventListener('resize',()=>apply())})();
 
 // ================= 獎勵共用 =================
-function grant(x,c,from){const g=DB.game;g.xp=(g.xp||0)+x;g.coins=(g.coins||0)+c;g.lv=g.lv||1;let up=0;while(g.xp>=xpNeed(g.lv)){g.xp-=xpNeed(g.lv);g.lv++;g.tickets++;up++}
-  save();updTix();if(x||c){if(c)sfx('coin');flyReward(x,c,from)}if(up)setTimeout(()=>{toast(`🎉 升到 Lv.${g.lv}！送你 ${up} 張抽卡券 🎟️`);sfx('levelup')},900)}
-function randItems(kind,n){const L=Object.entries(ITEMS).filter(([,i])=>i.kind===kind&&!i.limited&&!i.bday).map(([id])=>id);const out=[];for(let i=0;i<n;i++)out.push(L[Math.floor(Math.random()*L.length)]);return out}
+function grant(x,c,from){const g=DB.game;g.xp=(g.xp||0)+x;g.coins=(g.coins||0)+c;g.lv=g.lv||1;let up=0;while(g.xp>=xpNeed(g.lv)){g.xp-=xpNeed(g.lv);g.lv++;g.tickets++;g.coins=(g.coins||0)+LV_BONUS;up++}
+  save();updTix();if(x||c){if(c)sfx('coin');flyReward(x,c,from)}if(up)setTimeout(()=>{toast(`🎉 升到 Lv.${g.lv}！送你 ${up} 張抽卡券 🎟️＋🪙${up*LV_BONUS}`);sfx('levelup')},900)}
+function randItems(kind,n){const L=Object.entries(ITEMS).filter(([,i])=>i.kind===kind&&!i.limited&&!i.off&&!i.bday).map(([id])=>id);const out=[];for(let i=0;i<n;i++)out.push(L[Math.floor(Math.random()*L.length)]);return out}
 
 // ================= 📅 每日簽到（中斷就從第 1 天重來） =================
 const CI=[{t:'10 金幣',c:10},{t:'15 金幣',c:15},{t:'零食包',treats:2},{t:'20 金幣',c:20},{t:'30 經驗',x:30},{t:'30 金幣',c:30},{t:'抽卡券＋玩具',tk:1,toy:1}];
@@ -4290,7 +4572,7 @@ function announceLetters(){if(!DB.me)return;let seen=[];try{seen=JSON.parse(loca
     sfx('gift');$('#lgopen').onclick=()=>openLetter(nw[0].id,()=>$('#bell').click())};
   setTimeout(go,1800)}
 // ================= 自動更新：發現新版本就重新載入 =================
-const APP_VER='v1.82';
+const APP_VER='v1.83';
 function checkUpdate(){
   if(!/^https?:/.test(location.protocol)||!API_URL)return;
   if(!$('#modal').classList.contains('hidden'))return; // 正在填表單時不打斷
