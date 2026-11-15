@@ -128,6 +128,8 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
 .rooms{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
 .rooms button{min-width:0;border:2px solid var(--line);background:#fff;border-radius:12px;padding:4px;display:flex;flex-direction:column;gap:3px;font-size:12px;color:var(--soft)}
 .rooms button img{width:100%;aspect-ratio:3/4;object-fit:cover;border-radius:8px}
+.rooms button{position:relative}.rooms button.f2lock{filter:grayscale(1) brightness(.55);cursor:not-allowed}.rooms button small{display:block;font-size:10.5px}
+.rooms .f2tag{position:absolute;left:6px;top:6px;font-style:normal;font-size:10.5px;font-weight:900;color:#fff;background:#7a5ad8;border-radius:999px;padding:1px 7px;filter:none}
 .rooms button.on{border-color:var(--accent);box-shadow:0 0 0 2px var(--accent);color:var(--ink)}
 .steps{display:flex;justify-content:center;gap:6px;margin:6px 0 12px}
 .steps i{width:22px;height:5px;border-radius:3px;background:var(--line)}
@@ -1587,7 +1589,7 @@ function adminUploadSec(d){
   return `<div class="sec adm"><h4>🖼️ 背景（房間）<span>${R.length} 張</span></h4>
     <p class="lead">建議尺寸 848×1264（直式），會自動裁切。上傳後可以拉框設定軟木板和地板範圍</p>
     <div class="row2"><button id="aurm">＋ 上傳新背景</button></div>
-    <div class="upgrid">${R.map(r=>th(r.img,r.name,(ROOM_TN[r.r||'CU']||'訂製款')+(r.off?'・已下架':''),`data-urm="${r.id}"`)).join('')||'<p class="lead">還沒有自己上傳的背景</p>'}</div></div>
+    <div class="upgrid">${R.map(r=>th(r.img,r.name,(ROOM_TN[r.r||'CU']||'訂製款')+(r.f2?'・2F':'')+(r.off?'・已下架':''),`data-urm="${r.id}"`)).join('')||'<p class="lead">還沒有自己上傳的背景</p>'}</div></div>
   <div class="sec adm"><h4>🏠 房子款式<span>${(C.styles||[]).length} 款</span></h4>
     <p class="lead">建議尺寸 512×512，綠底會自動去背；只要傳白天的，清晨、日落、夜晚會自動調色</p>
     <div class="row2"><button id="aust">＋ 上傳新房子</button></div>
@@ -1607,17 +1609,18 @@ function adminUploadBind(d){
 // ---------- 背景編輯：裁圖、拉軟木板框、拉地板範圍 ----------
 function roomEditor(o){const E=o?JSON.parse(JSON.stringify(o)):{name:'',r:'N',board:[470,240,780,440],floor:{y0:760,t:[120,730]}};let img=o?o.img:'',file=null;
   E.board=Array.isArray(E.board)?E.board:[470,240,780,440];E.floor=E.floor&&E.floor.t?E.floor:{y0:760,t:[120,730]};
-  const hs=(ADM_D&&ADM_D.houses||[]).map(h=>`<option value="${h.id}" ${E.houseId===h.id?'selected':''}>${esc(h.name)}</option>`).join('');
+  const hs=(ADM_D&&ADM_D.houses||[]).map(h=>{const f=hasF2(house(h.id)||h);return `<option value="${h.id}" data-f2="${f?1:''}" ${E.houseId===h.id?'selected':''}>${esc(h.name)}${f?'':'（沒有二樓）'}</option>`}).join('');
   openModal(`<h3>🖼️ ${o?'編輯背景':'上傳新背景'}</h3>
     ${o?'':`<label class="mimg" style="display:block;text-align:center"><input type="file" accept="image/*" id="refile" hidden><span id="rel">📷 選一張背景圖（848×1264）</span></label>`}
     <div class="redit" id="redit"><img id="reimg" src="${img||''}" alt="" style="${img?'':'opacity:.2'}"><div class="rebd" id="rebd"><i class="rh"></i><span>軟木板</span></div><div class="refl" id="refl"><i class="fl"></i><i class="fr"></i><span>地板從這裡開始（拉線上下、拉兩端圓點左右）</span></div></div>
     <p class="lead" style="font-size:12px">拉黃色框對準軟木板（右下角圓點調大小）；藍線是毛孩可以走的地板最上緣</p>
     ${fld('rename','名字',`<input id="rename" maxlength="12" value="${esc(E.name)}" placeholder="例如：星空露營房">`)}
     ${fld('retype','類別',`<select id="retype">${ROOM_TYPES.map(([k,n])=>`<option value="${k}" ${E.r===k?'selected':''}>${n}</option>`).join('')}</select>`)}
-    <div id="recu" style="display:${E.r==='CU'?'':'none'}">${fld('rehouse','送給哪一家（可以之後再送）',`<select id="rehouse"><option value="">（先不送）</option>${hs}</select>`)}</div>
+    <div id="recu" style="display:${E.r==='CU'?'':'none'}"><label class="chk"><input type="checkbox" id="ref2" ${E.f2?'checked':''}> 二樓專用（只能放二樓，只能送給有二樓的家）</label>${fld('rehouse','送給哪一家（可以之後再送）',`<select id="rehouse"><option value="">（先不送）</option>${hs}</select>`)}</div>
     ${o?`<label class="chk"><input type="checkbox" id="reoff" ${E.off?'checked':''}> 下架（抽卡、一番賞不會再出現；已經有的人保留）</label>`:''}
     <div class="err" id="reerr"></div><div class="row2 sticky"><button id="reback">← 後台</button><button class="primary" id="resave">${o?'儲存':'上傳'}</button></div>`);
   $('#reback').onclick=adminSheet;$('#retype').onchange=e=>{$('#recu').style.display=e.target.value==='CU'?'':'none'};
+  const f2Opts=()=>{const on=$('#ref2').checked;[...$('#rehouse').options].forEach(o=>{if(o.value)o.disabled=on&&!o.dataset.f2});if(on&&$('#rehouse').selectedOptions[0]&&$('#rehouse').selectedOptions[0].disabled)$('#rehouse').value=''};$('#ref2').onchange=f2Opts;f2Opts();
   const box=$('#redit'),bd=$('#rebd'),fl=$('#refl'),W=848,H=1264;
   const draw=()=>{const b=E.board;Object.assign(bd.style,{left:b[0]/W*100+'%',top:b[1]/H*100+'%',width:(b[2]-b[0])/W*100+'%',height:(b[3]-b[1])/H*100+'%'});
     Object.assign(fl.style,{top:E.floor.y0/H*100+'%',left:E.floor.t[0]/W*100+'%',width:(E.floor.t[1]-E.floor.t[0])/W*100+'%'})};draw();
@@ -1632,7 +1635,7 @@ function roomEditor(o){const E=o?JSON.parse(JSON.stringify(o)):{name:'',r:'N',bo
   if($('#refile'))$('#refile').onchange=async e=>{const f=e.target.files[0];if(!f)return;$('#rel').textContent='處理中…';try{img=await roomCrop(f);file=1;$('#reimg').src=img;$('#reimg').style.opacity=1;$('#rel').textContent='📷 換一張'}catch(x){$('#rel').textContent='這張圖讀不了，換一張'}};
   $('#resave').onclick=async ev=>{const b=ev.currentTarget,name=$('#rename').value.trim(),r=$('#retype').value;if(!name)return $('#reerr').textContent='幫背景取個名字';if(!img)return $('#reerr').textContent='先選一張背景圖';
     b.disabled=true;try{let url=o?o.img:'';if(file){b.textContent='上傳圖片中…';url=await upImg(img)}b.textContent='儲存中…';
-      const res=await adminCall('adminRoomSave',{room:{id:o?o.id:'',name,r,img:url,board:E.board,floor:E.floor,off:$('#reoff')?$('#reoff').checked:false,houseId:r==='CU'?($('#rehouse').value||E.houseId||''):''}});
+      const res=await adminCall('adminRoomSave',{room:{id:o?o.id:'',name,r,img:url,board:E.board,floor:E.floor,off:$('#reoff')?$('#reoff').checked:false,f2:r==='CU'&&$('#ref2').checked,houseId:r==='CU'?($('#rehouse').value||E.houseId||''):''}});
       const L=DB.rooms=DB.rooms||[],i=L.findIndex(x=>x.id===res.id);if(i>=0)L[i]=res;else L.push(res);applyRooms();
       const to=r==='CU'&&$('#rehouse').value;if(to&&to!==(o&&o.houseId)){b.textContent='送給那一家…';try{await adminCall('adminGiftHouse',{houseId:to,room:res.id,roomName:name})}catch(x){toast(x.message)}}
       toast(o?'背景改好了':'新背景上架了 🖼️'+(to?'，也送給那一家了':''));adminSheet()}catch(x){$('#reerr').textContent=x.message;b.disabled=false;b.textContent=o?'儲存':'上傳'}}}
@@ -1930,9 +1933,9 @@ function buildFlow(slot){
   s1();
 }
 
-function roomChoices(hid){const o=hid?owned(hid):new Set();return ROOMS.map(([k,n])=>({k,n,tag:'初始'})).concat(CARDS.filter(c=>o.has(c.id)).map(c=>({k:c.id,n:c.name,tag:RAR[c.r].name}))).concat((DB.rooms||[]).filter(r=>(r.r||'CU')==='CU'&&o.has(r.id)).map(r=>({k:r.id,n:r.name,tag:'訂製款',cu:1})))}
-function roomPicker(id,cur,hid){const list=roomChoices(hid);return `<div class="rooms" id="${id}">${list.map(r=>`<button type="button" data-v="${r.k}" class="${r.k===cur?'on':''}${r.cu?' cu':''}"><img src="${roomImg(r.k)}" alt="">${r.cu?'<i class="cub"><img src="assets/icon_custom.webp" alt=""></i>':''}<span>${esc(r.n)}</span></button>`).join('')}</div><div class="hint">${hid?'抽卡抽到的房間也會出現在這裡':'抽卡可以解鎖更多房間'}</div>`}
-function bindRoom(id,cb){const g=$('#'+id);g.onclick=e=>{const b=e.target.closest('button');if(!b)return;g.querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===b));cb(b.dataset.v)}}
+function roomChoices(hid){const o=hid?owned(hid):new Set();return ROOMS.map(([k,n])=>({k,n,tag:'初始'})).concat(CARDS.filter(c=>o.has(c.id)).map(c=>({k:c.id,n:c.name,tag:RAR[c.r].name}))).concat((DB.rooms||[]).filter(r=>(r.r||'CU')==='CU'&&o.has(r.id)).map(r=>({k:r.id,n:r.name,tag:'訂製款',cu:1,f2:!!r.f2})))}
+function roomPicker(id,cur,hid,fl){const list=roomChoices(hid);return `<div class="rooms" id="${id}">${list.map(r=>{const lock=r.f2&&fl!==2;return `<button type="button" data-v="${r.k}" ${lock?'disabled':''} class="${r.k===cur?'on':''}${r.cu?' cu':''}${lock?' f2lock':''}"><img src="${roomImg(r.k)}" alt="">${r.cu?'<i class="cub"><img src="assets/icon_custom.webp" alt=""></i>':''}${r.f2?'<em class="f2tag">2F專用</em>':''}<span>${esc(r.n)}${lock?'<small>（2F專用）</small>':''}</span></button>`}).join('')}</div><div class="hint">${hid?'抽卡抽到的房間也會出現在這裡':'抽卡可以解鎖更多房間'}</div>`}
+function bindRoom(id,cb){const g=$('#'+id);g.onclick=e=>{const b=e.target.closest('button');if(!b||b.disabled)return;g.querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===b));cb(b.dataset.v)}}
 // ================= 家裡 =================
 const RW=848,RH=1264,FLOOR={x0:110,x1:750,y0:840,y1:1170};
 const BOARDS={shop2:[420,232,822,445],starhouse:[452,240,836,482],basic1:[432,352,698,536],basic2:[422,335,710,547],basic3:[433,346,700,534],study:[456,286,689,486],garden:[428,255,680,479],cafe:[444,297,681,499],beach:[417,275,698,492],sakura:[435,270,701,507],forest:[432,266,690,492],cloud:[429,265,686,495],xmas:[433,269,689,505],ocean:[428,275,683,496],star:[425,248,690,507],space:[431,280,693,467],dessert:[432,270,762,456],arcade:[432,277,742,462],library:[440,284,742,452],washitsu:[448,280,735,462],circus:[434,302,733,463],cabin:[432,288,738,462],party:[445,281,738,462],pinkroom:[422,236,737,422],sweetdevil:[430,245,705,476],ufobase:[420,262,738,455],street:[426,261,733,455],pearl:[402,248,733,470],surf:[412,250,708,460],nightmkt:[412,280,720,462],redcheck:[422,240,745,435],princess:[426,263,755,457],hiphop:[412,268,764,479],hawaiicat:[430,265,712,460],calibeach:[467,181,798,420],snoopy:[481,173,793,412],stussy:[474,195,815,439],spacecat:[448,245,760,446],crystalstar:[480,242,742,402],magicattic:[527,226,812,409],clouddream:[528,207,826,405],catbakery:[481,251,813,450],monsterroom:[472,236,774,444],starcircus:[443,253,757,436],mushroomstudy:[416,267,748,465],sunnypet:[440,295,708,450],cattreehouse:[445,262,740,448]};
@@ -3854,7 +3857,6 @@ function f2Wander(st){const FL=f2Floor();st.querySelectorAll('.gnpc').forEach(el
   setTimeout(()=>{el._busy=0;el._rest=Date.now()+1500+Math.random()*3500;el.classList.remove('walking');el.style.zIndex=Math.round(ty)},dur*1000)})}
 function renderF2(){const v=$('#f2v');if(!v||!F2)return;const h=house(F2.hid),st=v.querySelector('.cstage'),fam=isFamily(h.id);
   st.querySelector('.cbg').src=roomImg(h.room2||'basic1');st.querySelectorAll('.toy,.walker,.rentjar,.f2hint,.ggrid,.f2board').forEach(x=>x.remove());st.classList.toggle('placing',!!F2.placing);
-  {const B=BOARDS[h.room2||'basic1']||BOARDS.basic1,bd=document.createElement('div');bd.className='f2board';Object.assign(bd.style,{left:B[0]/RW*100+'%',top:B[1]/RH*100+'%',width:(B[2]-B[0])/RW*100+'%',height:(B[3]-B[1])/RH*100+'%'});bd.innerHTML='<span class="mmcard"><i class="pin"></i>MAIMINE<small>🐾</small></span>';st.appendChild(bd)}
   (h.toys2||[]).forEach(t=>{const it=ITEMS[t.item]||{},el=document.createElement('button');el.className='toy'+(t.flip?' flip':'')+(it.an?' an-'+it.an:'')+(it.flat?' flat':'');el.innerHTML=itemIcon(t.item,'toyi');
     if(it.sz)el.style.setProperty('--sz',it.sz);Object.assign(el.style,hp(t.x,t.y),{zIndex:it.flat?1:Math.round(t.y)-300});
     el.onclick=e=>{e.stopPropagation();if(F2.placing)return toast('這裡有東西了，換個地方');if(fam)f2ToyMenu(t);else{el.classList.remove('bump');void el.offsetWidth;el.classList.add('bump')}};st.appendChild(el)});
@@ -3878,7 +3880,7 @@ function innInfo(){const h=house(F2.hid),c=comfortOf(h);openModal(`<div style="t
 async function collectRent(){const h=house(F2.hid);if(!isFamily(h.id))return innInfo();const est=rentNow(h);if(est<=0)return toast(comfortOf(h)?'存錢筒還是空的，晚點再來收':'二樓還沒有玩具，旅客不會來住喔');
   try{const r=await call('innCollect',Object.assign(cred(),{houseId:h.id}));if(!r.coins)return toast('存錢筒還是空的');h.inn={at:Date.now(),last:r.coins};
     const j=$('#rentjar'),b=j?j.getBoundingClientRect():null;grant(0,r.coins,b?{x:b.left+b.width/2,y:b.top}:null);sfx('coin');toast(`💰 收到 ${r.coins} 金幣租金！`);updRent()}catch(e){toast(e.message)}}
-function f2Bg(){const h=house(F2.hid);openModal(`<h3>🎨 二樓的背景</h3><p class="lead">從你家收集到的房間裡選一個</p><div class="field">${roomPicker('f2rm',h.room2||'basic1',h.id)}</div><div class="row2"><button data-close>取消</button><button class="primary" id="f2rok">換上</button></div>`);
+function f2Bg(){const h=house(F2.hid);openModal(`<h3>🎨 二樓的背景</h3><p class="lead">從你家收集到的房間裡選一個</p><div class="field">${roomPicker('f2rm',h.room2||'basic1',h.id,2)}</div><div class="row2"><button data-close>取消</button><button class="primary" id="f2rok">換上</button></div>`);
   let room=h.room2||'basic1';bindRoom('f2rm',v=>room=v);
   $('#f2rok').onclick=async()=>{try{await call('updateHouse',Object.assign(cred(),{patch:{room2:room}}));h.room2=room;closeModal();renderF2();toast('換好了 🎨')}catch(e){toast(e.message)}}}
 function f2Placer(){const h=house(F2.hid),L=bagList('toy');if((h.toys2||[]).length>=TOY_MAX)return toast(`二樓最多放 ${TOY_MAX} 個玩具`);
@@ -4031,18 +4033,20 @@ const customRoom=id=>(typeof DB!=='undefined'&&Array.isArray(DB.rooms)?DB.rooms:
 function decoForm(){const h=myHouse();if(!h)return toast('要有家才能申請訂製裝潢');if(!ONLINE)return toast('試做版沒有訂製裝潢');const g=DB.game,last=+h.decoAt||0,wait=last&&Date.now()-last<DECO_DAYS*864e5;let img='';
   openModal(`<h3 class="mh3"><img class="mic" src="assets/icon_deco.webp" alt="" style="width:36px;height:36px">訂製裝潢</h3>
     ${wait?`<div class="locked" style="margin-bottom:10px">你家這個月已經申請過了，${Math.ceil((last+DECO_DAYS*864e5-Date.now())/864e5)} 天後可以再申請<br><small>有折扣碼的話，現在還是可以免費申請喔</small></div>`:''}${`
+    ${hasF2(h)?`<div class="field"><div class="flabel">要放在哪一層？</div><div class="seg" id="dfl"><button type="button" data-f="1" class="on">🏠 一樓</button><button type="button" data-f="2">🛏️ 二樓民宿</button></div><div class="hint">選二樓的話，做好的房間只能放在二樓</div></div>`:''}
     <p class="lead"><b>你希望打造什麼樣的房間呢？</b><br>描述得越仔細越好！畢竟裝潢一個月只能換一次<br><small>（例如：風格／主色系／主題／氣氛⋯）</small></p>
     <textarea id="dtx" rows="7" maxlength="400" style="display:block;width:100%;box-sizing:border-box;min-height:170px;font-size:16px" placeholder="例如：想要粉紅色和奶油色的星空房間，有一扇大圓窗看得到月亮，牆上掛小燈串，氣氛溫暖安靜，像睡前的感覺"></textarea><div class="mcnt"><span id="dcn">0</span> / 400</div>
     <div class="row2"><label class="mimg"><input type="file" accept="image/*" id="dfile" hidden><span id="dimgl">📷 附一張參考圖（可以不附）</span></label></div><div id="dprev"></div>
     ${fld('dcode','折扣碼（有的話）','<input id="dcode" maxlength="20" autocomplete="off" placeholder="打對就免費許願">')}
     <p class="lead" style="font-size:12px">一次 🪙${DECO_COST}・一個家一個月一次（用折扣碼不限）・做好的房間只屬於你家<br>申請完畢後請留意信箱 💌（如果做不出來，會全額退款）</p><div class="err" id="derr"></div>
     <div class="row2"><button data-close>取消</button><button class="primary" id="dsend">${wait?'用折扣碼送出':`送出（🪙${DECO_COST}）`}</button></div>`}`);
+  let dfl=1;if($('#dfl'))$('#dfl').onclick=e=>{const b=e.target.closest('button');if(!b)return;dfl=+b.dataset.f;$('#dfl').querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===b))};
   const tx=$('#dtx');$('#dcode').oninput=e=>{if(!wait)$('#dsend').textContent=e.target.value.trim()?'用折扣碼送出':`送出（🪙${DECO_COST}）`};tx.oninput=()=>$('#dcn').textContent=tx.value.length;
   $('#dfile').onchange=async e=>{const f=e.target.files[0];if(!f)return;try{img=await shrinkImg(f);$('#dprev').innerHTML=`<img class="mshot" src="${img}" alt="">`;$('#dimgl').textContent='📷 換一張'}catch(x){$('#derr').textContent='這張圖讀不進來，換一張試試'}};
   $('#dsend').onclick=async e=>{const v=tx.value.trim();if(v.length<5)return $('#derr').textContent='多描述一點你想要的房間吧';const hasCode=!!$('#dcode').value.trim();
     if(wait&&!hasCode)return $('#derr').textContent='這個月已經申請過了，要用折扣碼才能再申請';if(!hasCode&&(g.coins||0)<DECO_COST)return $('#derr').textContent=`金幣不夠，要 🪙${DECO_COST}（有折扣碼可以免費）`;const b=e.currentTarget;b.disabled=true;b.textContent='送出中…';$('#derr').textContent='小島處理訂製比較慢，請等一下，不要關掉喔 🙏';
     const code=($('#dcode')&&$('#dcode').value.trim())||'';let r;
-    try{try{r=await call('decoApply',Object.assign(cred(),{text:v,img,code}),true)}
+    try{try{r=await call('decoApply',Object.assign(cred(),{text:v,img,code,f2:dfl===2}),true)}
       catch(x){if(!/太慢|連不上|忙/.test(x.message))throw x;   // v1.83：逾時不一定是失敗 → 先同步看看是不是已經送出了
         await sync(true);const hh=house(h.id);if(!(hh&&+hh.decoAt&&Date.now()-hh.decoAt<10*60000))throw x;r={free:hh.decoFree?1:0}}
       const cost=r&&r.free?0:DECO_COST;g.coins=(g.coins||0)-cost;save();updTix&&updTix();if(cost)h.decoAt=Date.now();sfx('coin');
@@ -4051,7 +4055,7 @@ function decoForm(){const h=myHouse();if(!h)return toast('要有家才能申請�
 // ---------- 👑 島主：處理訂製申請 ----------
 const decoPrompt=t=>`請幫我畫一張遊戲的房間背景圖：3D 黏土風、可愛粉嫩、柔和打光的室內房間，正面視角，直式 2:3。上半部是牆面和窗戶等裝飾（右上方的牆留一塊可以貼便利貼的軟木板），下半部是寬敞、空曠、平整的地板（之後要放家具和毛孩，地板上不要有東西）。畫面裡不要有人物、動物，也不要有任何文字。\n\n房間主人的需求：「${t}」`;
 function adminDecoOne(m){const st=m.st||'wait',done=st==='done',no=st==='no';let img='';
-  openModal(`<h3 class="mh3"><img class="mic" src="assets/icon_deco.webp" alt="" style="width:34px;height:34px">訂製裝潢</h3><p class="lead">${esc(m.nick)}${m.house?'・'+esc(m.house):''}・${ago(m.at)}・已付 🪙${m.cost||DECO_COST}<br>${done?'<img class="mic" src="assets/icon_ok.webp" alt="">已經完成、寄出了':no?'<img class="mic" src="assets/icon_no.webp" alt="">已經退回、退款了':'⏳ 等你處理'}</p>
+  openModal(`<h3 class="mh3"><img class="mic" src="assets/icon_deco.webp" alt="" style="width:34px;height:34px">訂製裝潢</h3><p class="lead">${esc(m.nick)}${m.house?'・'+esc(m.house):''}・${ago(m.at)}・${m.free?'折扣碼（免費）':'已付 🪙'+(m.cost||DECO_COST)}${m.f2?'<br><b>🛏️ 二樓用</b>（做好會是二樓專用）':''}<br>${done?'<img class="mic" src="assets/icon_ok.webp" alt="">已經完成、寄出了':no?'<img class="mic" src="assets/icon_no.webp" alt="">已經退回、退款了':'⏳ 等你處理'}</p>
     <div class="mbody">${esc(m.text)}</div>${m.img?`<img class="mshot" src="${m.img}" alt="參考圖">`:''}
     <div class="sec adm"><h4>🪄 生圖指令<span>貼給 AI 就好</span></h4><div class="prompt" id="dpr">${esc(decoPrompt(m.text))}</div><div class="row2"><button id="dcp">📋 複製指令</button></div></div>
     ${!done&&!no?`<div class="sec adm"><h4><img class="mic" src="assets/icon_custom.webp" alt="">上傳做好的房間</h4>
@@ -4067,7 +4071,7 @@ function adminDecoOne(m){const st=m.st||'wait',done=st==='done',no=st==='no';let
   $('#drf').onchange=async e=>{const f=e.target.files[0];if(!f)return;$('#dri').firstChild.textContent='處理中…';try{img=await roomCrop(f);$('#drp').innerHTML=`<img src="${img}" alt="" style="width:100%;height:100%;object-fit:cover">`;$('#dri').firstChild.textContent='✅ 裁好了（848×1264）'}catch(x){$('#dri').firstChild.textContent='這張圖讀不了，換一張'}};
   $('#drok').onclick=async e=>{const name=$('#drn').value.trim();if(!name)return $('#drerr').textContent='幫房間取個名字';if(!img)return $('#drerr').textContent='先選房間的圖';const b=e.currentTarget;b.disabled=true;
     try{b.textContent='上傳圖片中…';const up=await call('upload',Object.assign(cred(),{dataUrl:img}),true);b.textContent='寄信中…';
-      const r=await adminCall('adminDecoFinish',{id:m.id,name,img:up.url,reply:$('#drr').value.trim()});(DB.rooms=DB.rooms||[]).push({id:r.roomId,name,img:up.url,houseId:m.houseId});m.st='done';toast('完成了！已經寄信給他 🎨');adminDecoOne(m)}
+      const r=await adminCall('adminDecoFinish',{id:m.id,name,img:up.url,reply:$('#drr').value.trim()});(DB.rooms=DB.rooms||[]).push({id:r.roomId,name,img:up.url,houseId:m.houseId,r:'CU',f2:m.f2?1:''});m.st='done';toast('完成了！已經寄信給他 🎨');adminDecoOne(m)}
     catch(x){$('#drerr').textContent=x.message;b.disabled=false;b.innerHTML='<img class="mic" src="assets/icon_ok.webp" alt="">完成並寄給他'}};
   $('#drno').onclick=async e=>{if(!armBtn(e.currentTarget,'確定退回並退款？'))return;try{await adminCall('adminDecoRefund',{id:m.id,reply:$('#drr').value.trim()});m.st='no';toast('退回了，已經寄信退款');adminDecoOne(m)}catch(x){$('#drerr').textContent=x.message}}}
 // 房間圖：裁成 848×1264、壓成 jpg（上傳雲端用）
@@ -4572,7 +4576,7 @@ function announceLetters(){if(!DB.me)return;let seen=[];try{seen=JSON.parse(loca
     sfx('gift');$('#lgopen').onclick=()=>openLetter(nw[0].id,()=>$('#bell').click())};
   setTimeout(go,1800)}
 // ================= 自動更新：發現新版本就重新載入 =================
-const APP_VER='v1.83';
+const APP_VER='v1.85';
 function checkUpdate(){
   if(!/^https?:/.test(location.protocol)||!API_URL)return;
   if(!$('#modal').classList.contains('hidden'))return; // 正在填表單時不打斷
