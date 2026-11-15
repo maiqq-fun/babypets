@@ -1194,7 +1194,7 @@ const LOCAL={
   recoverPlayer(){throw new Error('試做版不能用轉移碼')},claimMail(){return true},
   adminLogin(){return {players:(DB.players||[]).map(p=>({id:p.id,nick:p.nick,code:'MH-DEMO00',house:(house(p.houseId)||{}).name||'',houseId:p.houseId||'',lv:1,coins:0,tickets:0})),houses:DB.houses.filter(h=>!isSpecialH(h)).map(h=>({id:h.id,name:h.name})),shopMgr:(house(SHOP_ID)||{}).mgr||[],drops:(DB.drops||[]).length,notice:DB.notice,dbl:DB.dbl}},
   adminNotice({text,days}){const at=Date.now();DB.notice=text?{t:text,at,until:+days?at+days*864e5:0}:null;return true},
-  applyExpand({houseId,kind,note,lv,style}){const h=house(houseId),rn=kind==='renew';if(+lv<(rn?7:15))throw new Error(`要 Lv.${rn?7:15} 以上才能申請${rn?'都更':'擴建'}`);if((DB.applies||[]).some(a=>a.houseId===houseId&&a.st==='wait'))throw new Error('你家已經有一張申請在等島主看了');
+  applyExpand({houseId,kind,note,lv,style}){const h=house(houseId),rn=kind==='renew';if(+lv<7)throw new Error(`要 Lv.7 以上才能申請${rn?'都更':'擴建'}`);if((DB.applies||[]).some(a=>a.houseId===houseId&&a.st==='wait'))throw new Error('你家已經有一張申請在等島主看了');
     if(rn&&DB.houses.some(x=>x.id!==h.id&&+x.style===+style))throw new Error('這款房子島上已經有人用了，換一款吧');
     const a={id:uid(),kind,houseId,house:h.name,playerId:DB.me.id,nick:DB.me.nick,note:note||'',cost:rn?300:1000,at:Date.now(),st:'wait',reply:''};if(rn){a.style=+style;a.from=+h.style;h.renewAt=Date.now()}return a},
   adminApplyDecide({id,ok,reply}){const a=(DB.applies||[]).find(x=>x.id===id);if(!a||a.st!=='wait')throw new Error('這張申請已經處理過了');const h=house(a.houseId);a.st=ok?'ok':'no';a.reply=reply||'';
@@ -3320,7 +3320,7 @@ function staffForm(i){const s=house(SHOP_ID),L=shopStaffList(s).map(x=>Object.as
 
 // ================= ⭐ 星寶活動：毛球的星寶（v1.64） =================
 // 島主在後台按「開始」後兩週；每個人各自算：星寶一天 4 個時段出現、每人每天最多找到 3 次（不告訴玩家）、集滿 10 次去找毛球
-const NXT='<img class="mic" src="assets/icon_next.webp" alt="">下一句',STAR_GOAL=10,STAR_DAY_MAX=3,STAR_WIN_H=1.5,STAR_SEGS=[[7,11],[12,16],[18,22],[22.5,27]],MQ_EVERY=30*60000,STAR_ROOM='starhouse',STAR_COINS=500;
+const NXT='<img class="mic" src="assets/icon_next.webp" alt="">下一句',STAR_GOAL=10,STAR_DAY_MAX=3,STAR_WIN_H=2,STAR_SEGS=[[7,10],[10,13],[13,16],[16,19],[19,22],[22,27]],MQ_EVERY=30*60000,STAR_ROOM='starhouse',STAR_COINS=500;
 function starEv(){const s=DB.star;if(!s||!+s.start)return null;const end=+s.end||(+s.start+14*864e5),now=Date.now();return {start:+s.start,end,on:now>=+s.start&&now<end}}
 function starG(){const g=DB.game;if(!g.star||typeof g.star!=='object')g.star={n:0,day:'',dn:0,got:[],met:false,done:false};if(!Array.isArray(g.star.got))g.star.got=[];return g.star}
 const starDone=()=>!!(starG().done||DB.starDone);
@@ -3335,6 +3335,18 @@ const starCan=()=>{const E=starEv();return !!(E&&E.on&&DB.me&&myHouse()&&!starDo
 function starSpot(){if(!starCan())return null;const s=starToday(),now=Date.now();if(s.n>=STAR_GOAL||s.dn>=STAR_DAY_MAX)return null;
   const w=starWin(now);if(!w||s.got.includes(w.id))return null;const L=starHouses();if(!L.length)return null;const k=DB.me.id+w.id;
   return {w,hid:L[Math.floor(hash01(k)*L.length)],x:Math.round(FLOOR.x0+60+hash01(k+'x')*(FLOOR.x1-FLOOR.x0-120)),y:Math.round(FLOOR.y0+50+hash01(k+'y')*(FLOOR.y1-FLOOR.y0-90))}}
+// 🔍 毛球的提示（v1.79）：星寶不在 → 直接說不在；在 → 每按一次更清楚：方向 → 旁邊是誰 → 直接說哪一家
+const starHintLv={};
+function starPos(h){if(!h)return null;if(h.slot>=0&&SLOTS[h.slot])return {x:SLOTS[h.slot][0],y:SLOTS[h.slot][1]};return null}
+function starHint(s){const sp=starSpot(),back='<div class="row2"><button id="mqb">← 回去</button><button data-close class="primary">好</button></div>';
+  if(!sp){mqSay('mq_worry',esc(s.dn>=STAR_DAY_MAX?'星寶今天玩累了，現在不在島上……明天再來找吧！':'星寶現在好像不在島上，晚點再來找吧！'),back);$('#mqb').onclick=mqTalk;return}
+  const h=house(sp.hid),p=starPos(h),lv=starHintLv[sp.w.id]=Math.min(3,(starHintLv[sp.w.id]||0)+1);let t;
+  if(lv===1||!p&&lv===2){if(p){const lr=p.x<400?'左':p.x>650?'右':'',ud=p.y<520?'上':p.y>900?'下':'';t=`我覺得星寶躲在小島的${lr||ud?(lr+(ud?(lr?ud+'方':ud+'面'):'邊')):'正中間'}那一帶……`}else t='星寶躲在某一家裡，再讓我想想……'}
+  else if(lv===2){const L=DB.houses.filter(x=>x.id!==h.id&&!isParkH(x)).map(x=>({n:x.name,p:starPos(x)})).filter(x=>x.p).concat([{n:'毛毛商店',p:SHOP_POS},{n:'毛毛公園',p:PARK_POS}]);
+    const d=o=>Math.hypot(o.p.x-p.x,o.p.y-p.y),near=L.sort((a,b)=>d(a)-d(b))[0];t=near?`我看到了！星寶躲的那一家，就在「${near.n}」旁邊！`:'她就在附近，再找找看！'}
+  else t=`就是「${h.name}」！星寶就躲在那裡，快去！`;
+  mqSay('mq_search',esc(t),lv<3?'<div class="row2"><button id="mqb">← 回去</button><button id="mqh2" class="primary">🔍 再多一點提示</button></div>':back);
+  $('#mqb').onclick=mqTalk;if($('#mqh2'))$('#mqh2').onclick=()=>starHint(s)}
 // 毛球每 30 分鐘換一家（每人看到的不一樣）
 function mqSpot(){if(!starCan())return null;const L=starHouses();if(!L.length)return null;const sl=Math.floor(Date.now()/MQ_EVERY),k=DB.me.id+'mq'+sl;let i=Math.floor(hash01(k)*L.length);
   const sp=starSpot();if(sp&&L[i]===sp.hid&&L.length>1)i=(i+1)%L.length;return {hid:L[i],x:Math.round(FLOOR.x1-90-hash01(k+'x')*120),y:Math.round(FLOOR.y0+40+hash01(k+'y')*60)}}
@@ -3364,17 +3376,14 @@ function mqTalk(){if(!needMe())return;const s=starToday(),E=starEv();if(!E)retur
   if(s.n>=STAR_GOAL)return reunion();
   if(!s.met)return mqSeq([['mq_lost','嗚嗚……你、你是誰？'],['mq_lost','我是毛球，是個探險家……可是我把最重要的朋友「星寶」弄丟了。'],['mq_lost','她是一顆縫補過的星星，頭上有粉紅色蝴蝶結。她很怕生，一緊張就會躲起來……'],
       ['mq_worry','她好像躲進島上大家的家裡了。你可以幫我找找看嗎？'],['mq_worry','找到她的時候，她會在地上發呆，輕輕點她一下就好。'],['mq_worry','等你找到 10 次，再來找我好不好？我也會在島上到處找……']],'交給我！',()=>{s.met=true;save();toast('⭐ 去大家家裡找星寶吧！')});
-  const n=s.n,left=E.end-Date.now();let img='mq_worry',t;
+  const n=s.n,left=E.end-Date.now();let img='mq_worry',t,t0='';
   if(s.dn>=STAR_DAY_MAX)t='星寶今天好像玩累了，跑去睡覺了……明天再一起找吧！';
-  else if(!starWin(Date.now()))t=['星寶現在躲起來睡覺了……晚點再來找找看吧！','噓……星寶好像在睡午覺，現在怎麼找都找不到，晚點再來吧','星寶現在不知道躲到哪裡睡著了，等她醒來再一起找！'][Math.floor(Math.random()*3)];
-  else if(s.got.includes(starWin(Date.now()).id))t='你剛剛找到星寶的時候，她又一溜煙跑去躲起來了……晚點再來找找看！';
-  else if(left<2*864e5&&Math.random()<.5)t='我們差不多要離開這座島了……如果還沒找齊，要加油喔！';
-  else if(n>=5&&Math.random()<.6){img='mq_happy';t=[`已經 ${n} 次了！我感覺星寶就快回來了！`,'你好厲害！再一下下就好了！'][Math.floor(Math.random()*2)]}
-  else t=['你找到我了！星寶有沒有消息？','我剛剛好像聽到星寶在笑……可是轉頭又不見了。','星寶最喜歡軟軟的東西，可能會躲在有玩具的家？','她晚上也會出來喔，有時候半夜特別活潑。',`你已經幫我找到 ${n} 次了，謝謝你……`][Math.floor(Math.random()*5)];
+  else if(!starWin(Date.now()))t=['星寶現在不在島上喔……晚點再來找找看吧！','星寶現在不在島上，不知道跑去哪裡睡覺了……晚點再來吧！','我找遍了，星寶現在不在島上……我們晚點再一起找！'][Math.floor(Math.random()*3)];
+  else if(s.got.includes(starWin(Date.now()).id))t='你剛剛找到星寶之後，她又一溜煙跑走了，現在不在島上……晚點再來找吧！';
+  else t0=['星寶現在在島上！她躲在某一家裡，快去找找看！','我剛剛好像看到星寶跑過去了！她現在就在島上！'][Math.floor(Math.random()*2)];
+  if(t0){t=t0;if(left<2*864e5)t+='我們差不多要離開這座島了，要加油喔！';else if(n>=5){img='mq_happy';t+=`你已經找到 ${n} 次了，就快了！`}}
   mqSay(img,esc(t),`<div class="row2"><button id="mqh">🔍 給我一點提示</button><button id="mqp">🎒 看看進度</button></div><div class="row2"><button data-close>掰掰</button></div>`);
-  $('#mqh').onclick=()=>{const sp=starSpot(),L=starHouses();let H=[...['星寶不喜歡一直待在同一個地方，過一陣子再去同一家看看也不錯。','她不是一直都在外面，有時候會躲起來睡覺，晚點再來找找看。','有好多人跑來跑去的家，她會比較害羞……']];
-    if(sp&&L.length){const g=Math.random()<.5?sp.hid:L[Math.floor(Math.random()*L.length)];H.push(`我覺得她現在特別愛去「${(house(g)||{}).name||'某一家'}」附近？（只是猜的）`)}
-    mqSay('mq_search',esc(H[Math.floor(Math.random()*H.length)]),'<div class="row2"><button id="mqb">← 回去</button><button data-close class="primary">好</button></div>');$('#mqb').onclick=mqTalk};
+  $('#mqh').onclick=()=>starHint(s);
   $('#mqp').onclick=()=>{mqSay('mq_bag',`你已經找到 <b>${n} / ${STAR_GOAL}</b> 次！${n<STAR_GOAL?`還差 ${STAR_GOAL-n} 次就好了！`:''}${sbIcons(n)}<small class="mqleft">活動還剩 ${starLeft()}</small>`,'<div class="row2"><button id="mqb">← 回去</button><button data-close class="primary">好</button></div>');$('#mqb').onclick=mqTalk}}
 function starLeft(){const E=starEv();if(!E)return '';const m=Math.max(0,Math.floor((E.end-Date.now())/60000)),d=Math.floor(m/1440),h=Math.floor(m%1440/60);return d?`${d} 天 ${h} 小時`:h?`${h} 小時 ${m%60} 分`:`${m%60} 分鐘`}
 // ---------- 重逢動畫 ----------
@@ -3456,7 +3465,7 @@ function centerTap(i){const s=centerStaff()[i]||CENTER_STAFF0[0],el=cEls[i];sfx&
 function centerMenu(s){openModal(`<div class="mqd"><img src="${esc(s.img2||s.img||CENTER_STAFF0[0].img2)}" alt="" style="width:120px"><div class="mqbub">我是 ${esc(s.name)}，有什麼可以幫你的嗎？</div></div>
   <div class="cmenu"><button id="cm1">${mic('mail',30)}<span><b>寫信給島主</b><small>回報問題、建議、許願</small></span></button>
     <button id="cm2"><img class="mic" src="assets/icon_renew.webp" alt=""><span><b>申請都更・外牆整修</b><small>換房子的外觀（Lv${RENEW_LV}・🪙${RENEW_COST}・一個月一次）</small></span></button>
-    <button id="cm3"><img class="mic" src="assets/icon_expand.webp" alt=""><span><b>申請擴建</b><small>二樓民宿、農田（Lv15・🪙1000）</small></span></button>
+    <button id="cm3"><img class="mic" src="assets/icon_expand.webp" alt=""><span><b>申請擴建</b><small>二樓民宿、農田（Lv${EXP_LV}・🪙${EXP_COST}）</small></span></button>
     <button id="cm5"><img class="mic" src="assets/icon_deco.webp" alt=""><span><b>訂製裝潢</b><small>照你的描述做一間專屬房間（🪙500・一個月一次）</small></span></button>
     <button id="cm4"><span class="mic">📌</span><span><b>看公告</b><small>${DB.notice&&DB.notice.t?'島主有新公告喔':'目前沒有公告'}</small></span></button></div>
   <div class="row2"><button data-close>掰掰</button></div>`);
@@ -3504,8 +3513,8 @@ function cStaffForm(i){const L=centerStaff().map(x=>Object.assign({},x)),isNew=i
 setInterval(()=>{const n=DB.notice;if(n&&+n.until&&Date.now()>+n.until){DB.notice=null;try{tickerShow();updBell()}catch(e){}}},60000);
 
 // ================= 📐 擴建：二樓民宿＋農田（v1.67） =================
-// 在島民中心申請（Lv15 以上、各 🪙1000、島主審核，駁回會寄信退錢）
-const EXP_COST=1000,EXP_LV=15,INN_CAP_H=24,FARM_N0=4,FARM_MAX=6,FARM_GROW_H=8,FARM_WMAX=3,PLOT_COST=500;
+// 在島民中心申請（Lv7 以上、各 🪙1000、島主審核，駁回會寄信退錢）
+const EXP_COST=1000,EXP_LV=7,INN_CAP_H=24,FARM_N0=4,FARM_MAX=6,FARM_GROW_H=8,FARM_WMAX=3,PLOT_COST=500;
 const EXPN={floor2:'二樓民宿',farm:'農田',renew:'都更・外牆整修'};
 const RENEW_COST=300,RENEW_LV=7,RENEW_DAYS=30;
 const CROP={tomato:{n:'小番茄',seed:'seed_tomato',item:'c_tomato'},pumpkin:{n:'南瓜',seed:'seed_pumpkin',item:'c_pumpkin'},apple:{n:'金蘋果',seed:'seed_apple',item:'c_apple'}};
@@ -4256,7 +4265,7 @@ function announceLetters(){if(!DB.me)return;let seen=[];try{seen=JSON.parse(loca
     sfx('gift');$('#lgopen').onclick=()=>openLetter(nw[0].id,()=>$('#bell').click())};
   setTimeout(go,1800)}
 // ================= 自動更新：發現新版本就重新載入 =================
-const APP_VER='v1.77';
+const APP_VER='v1.79';
 function checkUpdate(){
   if(!/^https?:/.test(location.protocol)||!API_URL)return;
   if(!$('#modal').classList.contains('hidden'))return; // 正在填表單時不打斷
