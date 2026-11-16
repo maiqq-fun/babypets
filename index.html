@@ -185,6 +185,7 @@ details summary{font-size:13px;color:var(--accent-d);cursor:pointer}
 @keyframes cp{0%{opacity:0;transform:translateY(8px)}15%{opacity:1;transform:none}80%{opacity:1}100%{opacity:0;transform:translateY(-14px)}}
 .tk.coin{background:#fffaf0}.tk.coin button{background:#f0b429;box-shadow:0 3px 0 #c98f12}
 details.earn{margin:-4px 0 12px}details.earn .frow{font-size:13px}
+.jobcard{background:#fff8e6;border:2px dashed #e0b96a;border-radius:14px;padding:12px 14px;margin:10px 0;line-height:1.75;font-size:14px}.jobcard.rush{background:#ffece4;border-color:#ff8a65}.jobcard b{display:block;font-size:16px;margin-bottom:4px}.jobcard .row2{margin-top:8px}.jobmeta{color:#a07a3a;font-size:12.5px}.jdot{display:inline-block;min-width:18px;height:18px;line-height:18px;border-radius:9px;background:#ff6b6b;color:#fff;font-size:11px;font-style:normal;text-align:center;margin-left:4px;padding:0 4px}
 .frow{display:flex;justify-content:space-between;gap:10px;padding:9px 2px;border-bottom:1px dashed var(--line);font-size:14px;line-height:1.4}
 .frow .ago{color:#a08670;font-size:12px;white-space:nowrap}
 .frow.mine{background:#fff6e0;border-radius:8px;padding:9px 8px}
@@ -1200,7 +1201,7 @@ async function sync(quiet){
   try{const d=await api('getState',Object.assign(cred(),{where:curWhere()}));
     Object.assign(DB,{houses:d.houses,pets:d.pets,weights:d.weights,medical:d.medical,expenses:d.expenses,notes:d.notes,feed:d.feed,famOk:d.famOk,players:d.players||[],tlogs:d.tlogs||[]});
     DB.houses.forEach(h=>{if(!Array.isArray(h.poops))h.poops=[]});
-    keepPending();DB.letters=(d.letters||[]).filter(l=>!LGONE[l.id]).map(l=>Object.assign(l,LSTATE[l.id]||{},CLAIMED['l:'+l.id]?{claimed:true}:{}));DB.drops=(d.drops||[]).filter(x=>!PICKED.has(x.id));DB.notice=d.notice&&d.notice.t&&!(+d.notice.until&&Date.now()>+d.notice.until)?d.notice:null;DB.center=d.center||DB.center||null;DB.applies=d.applies||[];DB.rooms=d.rooms||DB.rooms||[];applyRooms();DB.amail=+d.amail||0;setTimeout(updAdminBadge,0);DB.kuji=d.kuji||DB.kuji||null;DB.online=d.online||[];setTimeout(checkAdminGifts,600);DB.rank=d.rank||DB.rank||null;osLogin();pushCheckLater();setTimeout(noticePop,1200);DB.dbl=d.dbl||'';DB.adminId=d.adminId||'';DB.star=d.star||null;if(d.player)DB.starDone=+d.player.starDone||0;
+    keepPending();DB.letters=(d.letters||[]).filter(l=>!LGONE[l.id]).map(l=>Object.assign(l,LSTATE[l.id]||{},CLAIMED['l:'+l.id]?{claimed:true}:{}));DB.drops=(d.drops||[]).filter(x=>!PICKED.has(x.id));DB.notice=d.notice&&d.notice.t&&!(+d.notice.until&&Date.now()>+d.notice.until)?d.notice:null;DB.center=d.center||DB.center||null;DB.applies=d.applies||[];DB.rooms=d.rooms||DB.rooms||[];applyRooms();DB.amail=+d.amail||0;setTimeout(updAdminBadge,0);DB.kuji=d.kuji||DB.kuji||null;DB.online=d.online||[];setTimeout(checkAdminGifts,600);DB.rank=d.rank||DB.rank||null;osLogin();pushCheckLater();setTimeout(noticePop,1200);DB.dbl=d.dbl||'';DB.adminId=d.adminId||'';DB.star=d.star||null;DB.jobs=d.jobs||null;setTimeout(jobPayCheck,1500);if(d.player)DB.starDone=+d.player.starDone||0;
     setTimeout(announceLetters,0);setTimeout(updGuestBar,0);
     if(d.player&&DB.me){DB.me.code=d.player.code||DB.me.code;if(d.player.pin)DB.me.pin=d.player.pin;const ml=Array.isArray(d.player.mail)?d.player.mail:[];if(ml.length)claimMail(ml)}
     DB.owned={};d.houses.forEach(h=>DB.owned[h.id]=Array.isArray(h.owned)?h.owned:[]);
@@ -1209,7 +1210,7 @@ async function sync(quiet){
     if(d.catVer!=null&&+d.catVer!==+CAT.ver)loadCatalog(d.catVer);
     DB.gameSynced=true;DB.synced=true;DB.fromCache=false;syncFail=0;setTimeout(dailyLogin,800);try{localStorage.setItem(OKEY+'_g','1')}catch(e){}
     try{localStorage.setItem(OKEY+'_c',JSON.stringify({at:Date.now(),houses:d.houses,pets:d.pets,players:d.players||[],notes:d.notes,feed:d.feed,notice:DB.notice,center:DB.center,rooms:DB.rooms}))}catch(e){}
-    const sig=JSON.stringify([d.houses,d.pets,DB.drops,d.online,d.notes,(d.feed||[])[0],DB.letters.length,DB.notice,DB.applies,d.kuji,d.star]);
+    const sig=JSON.stringify([d.houses,d.pets,DB.drops,d.online,d.notes,(d.feed||[])[0],DB.letters.length,DB.notice,DB.applies,d.kuji,d.star,d.jobs,Math.floor(Date.now()/600000)]);
     save();if(sig!==lastSig){lastSig=sig;rerender()}else{tickerShow();updBell()}
   }catch(e){if(!quiet&&DB.synced)toast('連不上小島：'+e.message);
     if(!DB.synced&&++syncFail<=8){conBar(true);setTimeout(()=>sync(true),3000+syncFail*1500)}else if(!DB.synced){conBar(false);toast('連不上小島，網路好了會自動再試 🙏')}}
@@ -1741,11 +1742,13 @@ function renderIsland(){
   {const sp=SHOP2_POS,sh=house(SHOP_ID),el=document.createElement('div');el.className='thing';el.setAttribute('role','button');el.tabIndex=0;el.setAttribute('aria-label','毛二街');
     Object.assign(el.style,ipct(sp.x,sp.y),{width:(HOUSE_W*SHOP_SC/1024*100)+'%',zIndex:sp.y});el.innerHTML=`<img src="assets/shop2_${p}.webp" alt="" onerror="this.src='assets/shop2_day.webp'">`;el.onclick=()=>sh?openHome(SHOP_ID):toast('毛二街還在裝潢中，等島主更新後端 🛠️');box.appendChild(el);
     box.appendChild(signEl('毛二街',sp.x,sp.y,'shop2'));
-    if(sh&&guestsOf(SHOP_ID).length){const gb=document.createElement('div');gb.className='bubble';gb.textContent='🐾';Object.assign(gb.style,ipct(sp.x-40,sp.y-150),{zIndex:2001});box.appendChild(gb)}}
+    if(sh&&(guestsOf(SHOP_ID).length||workersAt(SHOP_ID).length)){const gb=document.createElement('div');gb.className='bubble';gb.textContent='🐾';Object.assign(gb.style,ipct(sp.x-40,sp.y-150),{zIndex:2001});box.appendChild(gb)}
+    if(sh&&jobOpen('shop').length){const jb=document.createElement('div');jb.className='bubble';jb.textContent='📋';Object.assign(jb.style,ipct(sp.x+40,sp.y-150),{zIndex:2001});box.appendChild(jb)}}
   {const sp=PARK_POS,pk=house(PARK_ID),el=document.createElement('div');el.className='thing';el.setAttribute('role','button');el.tabIndex=0;el.setAttribute('aria-label','毛毛公園');
     Object.assign(el.style,ipct(sp.x,sp.y),{width:(HOUSE_W*PARK_SC/1024*100)+'%',zIndex:sp.y});el.innerHTML=`<img src="assets/park_${p}.webp" alt="" onerror="this.src='assets/park_day.webp'">`;el.onclick=()=>pk?openHome(PARK_ID):toast('公園還在整理中，等島主更新後端 🌳');box.appendChild(el);
     box.appendChild(signEl('毛毛公園',sp.x,sp.y,'center'));
-    if(pk&&guestsOf(PARK_ID).length){const gb=document.createElement('div');gb.className='bubble';gb.textContent='🐾';Object.assign(gb.style,ipct(sp.x-50,sp.y-170),{zIndex:2001});box.appendChild(gb)}}
+    if(pk&&(guestsOf(PARK_ID).length||workersAt(PARK_ID).length)){const gb=document.createElement('div');gb.className='bubble';gb.textContent='🐾';Object.assign(gb.style,ipct(sp.x-50,sp.y-170),{zIndex:2001});box.appendChild(gb)}
+    if(pk&&jobOpen('park').length){const jb=document.createElement('div');jb.className='bubble';jb.textContent='📋';Object.assign(jb.style,ipct(sp.x+50,sp.y-170),{zIndex:2001});box.appendChild(jb)}}
   {const sp=centerPos(),el=document.createElement('div');el.className='thing';el.setAttribute('role','button');el.tabIndex=0;el.setAttribute('aria-label','島民中心');
     Object.assign(el.style,ipct(sp.x,sp.y),{width:(HOUSE_W*SHOP_SC/1024*100)+'%',zIndex:sp.y});el.innerHTML=`<img src="assets/center_${p}.webp" alt="" onerror="this.src='assets/center_day.webp'">`;el.onclick=openCenter;box.appendChild(el);
     box.appendChild(signEl('島民中心',sp.x,sp.y,'center'));
@@ -1971,7 +1974,7 @@ function sleepState(p,now){
   return null;
 }
 const isNight=()=>{const m=twMin(Date.now());return m>=23*60||m<6*60};
-const guestHere=(pid,now)=>DB.houses.some(h=>(h.guests||[]).some(g=>g.petId===pid&&+g.until>(now||Date.now())));
+const guestHere=(pid,now)=>DB.houses.some(h=>(h.guests||[]).some(g=>g.petId===pid&&+g.until>(now||Date.now())))||!!jobNow(pid,now);
 function canEat(p){return fullness(p)>=80?'full':''}
 // ---------- 肚子餓・餓魔（v1.36） ----------
 function hungerH(p,now){return p.lastFed?((now||Date.now())-p.lastFed)/HOUR:5.4}
@@ -1991,7 +1994,7 @@ function openHome(hid,keep){
   $('#island').classList.add('hidden');$('#home').classList.remove('hidden');
   setHname(h);useRoom(h);$('#roombg').src=roomImg(h.room);$('#hback').style.backgroundImage=`url(${roomImg(h.room)})`;if(!ONLINE)spawnPoops(h);
   const prev=home&&home.id===hid?home.pets:[];
-  const plist=petsOf(hid).filter(p=>(!outAt(p.id)||outAt(p.id).id===hid)&&!up2(p)).concat(guestsOf(hid).map(g=>pet(g.petId)).filter(p=>p.houseId!==hid));
+  const plist=petsOf(hid).filter(p=>(!outAt(p.id)||outAt(p.id).id===hid)&&!up2(p)).concat(guestsOf(hid).map(g=>pet(g.petId)).filter(p=>p.houseId!==hid&&!jobNow(p.id))).concat(workersAt(hid).map(w=>pet(w.petId)).filter(p=>p&&p.houseId!==hid));
   home={id:hid,pets:plist.map((p,i)=>{const o=prev.find(q=>q.id===p.id);
     return Object.assign(o?Object.assign(o,{el:null,tentEl:null}):{id:p.id,x:220+(i%3)*200,y:900+(i%2)*120,tx:0,ty:0,state:'idle',until:performance.now()+500+i*600,facing:1,hop:0,anim:null,welcome:!keep},{guest:p.houseId!==hid})}),bowl:null};
   if(!keep&&home.pets.length){home.pets.forEach((r,i)=>{r.tx=300+i*120;r.ty=1110;r.state='walk';r.goal='welcome'})}
@@ -2010,9 +2013,9 @@ function renderFoot2(){
   const SH=isShopH(h),M=SH?shopMgrs().map(id=>({id,nick:nickOf(id)})):membersOf(h.id);
   $('#visits').innerHTML=(M.length?`<div>${SH?'👔 店長':'👥 家人 '+M.length+'/'+MAX_MEMBERS}：${M.map(m=>(isOn(m.id)?'🟢':'')+esc(m.nick)+lvTag(m.id)).join('、')}</div>`:'')+(L.length?`<div>🐾 今天來過：${L.slice().reverse().slice(0,5).map(v=>esc(v.nick)+lvTag(v.id)).join('、')}${L.length>5?` 等 ${L.length} 人`:''}</div>`:'');
   $('#visits').onclick=()=>peopleSheet(h.id);
-  const own=petsOf(h.id),gs=guestsOf(h.id).map(g=>pet(g.petId)).filter(p=>p.houseId!==h.id);
-  const heads=own.concat(gs).map(p=>{const o=outAt(p.id),away=o&&o.id!==h.id,sl=!away&&sleepState(p);return `<button class="ph1${away?' away':''}" data-pid="${p.id}" title="${esc(p.name)}"><img src="${!away&&petDemon(p)?'assets/demon_head.webp':petHead(p)}" alt="">${away?'<i>🐾</i>':sl?'<i>💤</i>':p.houseId!==h.id?'<i>🏠</i>':''}</button>`}).join('');
-  $('#petheads').innerHTML=heads;$('#petheads').querySelectorAll('[data-pid]').forEach(b=>b.onclick=()=>{const pid=b.dataset.pid,pp=pet(pid),o=outAt(pid);if(o&&o.id!==h.id){if(pp.houseId===h.id&&isFamily(h.id))return recallSheet(pp,o);toast(`${pp.name} 出門去 ${o.name} 玩了 🐾`)}idCard(pid)});
+  const own=petsOf(h.id),gs=guestsOf(h.id).map(g=>pet(g.petId)).filter(p=>p.houseId!==h.id&&!jobNow(p.id)).concat(workersAt(h.id).map(w=>pet(w.petId)).filter(p=>p&&p.houseId!==h.id));
+  const heads=own.concat(gs).map(p=>{const o=outAt(p.id),away=o&&o.id!==h.id,sl=!away&&sleepState(p);return `<button class="ph1${away?' away':''}" data-pid="${p.id}" title="${esc(p.name)}"><img src="${!away&&petDemon(p)?'assets/demon_head.webp':petHead(p)}" alt="">${away?(jobNow(p.id)?'<i>💼</i>':'<i>🐾</i>'):sl?'<i>💤</i>':p.houseId!==h.id?'<i>🏠</i>':''}</button>`}).join('');
+  $('#petheads').innerHTML=heads;$('#petheads').querySelectorAll('[data-pid]').forEach(b=>b.onclick=()=>{const pid=b.dataset.pid,pp=pet(pid),o=outAt(pid),jw=jobNow(pid);if(jw&&o&&o.id!==h.id)return toast(`${pp.name} 在${JOB_PLACE[jw.place]}打工中 💼 ${JOB_SLOTS[jw.slot][1]}:00 下班`);if(o&&o.id!==h.id){if(pp.houseId===h.id&&isFamily(h.id))return recallSheet(pp,o);toast(`${pp.name} 出門去 ${o.name} 玩了 🐾`)}idCard(pid)});
   const dm=!SH&&!isFamily(h.id)&&demonOf(h);
   if(dm&&+dm.until>Date.now()){const mins=Math.ceil((+dm.until-Date.now())/60000);$('#visits').insertAdjacentHTML('beforeend',`<div>😇 餓魔被救回來了，${mins>=60?Math.floor(mins/60)+' 小時 '+(mins%60)+' 分':mins+' 分鐘'}後又會變回餓魔（主人回家才會真的好）</div>`)}
   $('#visits').style.display=M.length||L.length||(dm&&+dm.until>Date.now())?'':'none';
@@ -2123,6 +2126,7 @@ function renderFloor(){
     r.tentEl=te;r.tent=sp;f.appendChild(te);r.sleep=undefined;petLook(r);placePet(r)});
   if(isShopH(h)){renderStaff(f,h);lastStarSig=starSig()}else if(isParkH(h)){lastStarSig=starSig()}else renderStar(f,h);
   if(!isShopH(h))renderGuestsOnFloor(f,h);
+  if(isShopH(h)||isParkH(h))renderJobSubs(f,h);
   $('#home').classList.toggle('placing',!!placing);if(placing)drawGrid();else if($('#gcancel'))$('#gcancel').remove();
 }
 // 外觀：餓到縮小、生氣（每幾秒算一次）
@@ -2197,7 +2201,7 @@ function bar(v,c){return `<span class="sbar"><i style="width:${v}%;background:${
 const PATT={};
 function doPat(r,p){if(!needMe()||r.sleep)return;
   if(p.trait==='高冷'&&Math.random()<0.3){startAnim(r,'dodge');toast(`${p.name} 閃開了 😼 高冷`);return}
-  r.state='happy';r.until=performance.now()+1600;startAnim(r,'jump');fx('💕',r.x,r.y-180*petScale(r.y));sfx('pat');sfxPet(p);if(Math.random()<0.5)petSay(r,'pat');if(p.trait==='黏人')setTimeout(()=>fx('💖',r.x+30,r.y-200*petScale(r.y)),300);
+  r.state='happy';r.until=performance.now()+1600;startAnim(r,'jump');fx('💕',r.x,r.y-180*petScale(r.y));sfx('pat');sfxPet(p);if(jobNow(p.id))petSay(r,null,jobSay(p));else if(Math.random()<0.5)petSay(r,'pat');if(p.trait==='黏人')setTimeout(()=>fx('💖',r.x+30,r.y-200*petScale(r.y)),300);
   const now=Date.now(),t=PATT[p.id]||(PATT[p.id]={s:0,m:0});earn('pat');demonHelp('pat');
   if(now-t.m>4000){t.m=now;toast(`${p.name} 被摸得好開心`)}
   if(now-t.s>30000){t.s=now;p.pats=(Array.isArray(p.pats)?p.pats:[]).filter(x=>now-x<3*HOUR).concat(now).slice(-6);call('pat',{playerId:DB.me.id,petId:p.id},true).catch(()=>{})}}
@@ -3341,7 +3345,7 @@ function sleepMenu(r,p){
 // ================= 遛遛 =================
 const WALK_MIN=30,GUEST_MAX=3;
 function guestsOf(hid){const h=house(hid),now=Date.now();return ((h&&h.guests)||[]).filter(g=>+g.until>now&&pet(g.petId))}
-function outAt(pid){const now=Date.now();return DB.houses.find(h=>(h.guests||[]).some(g=>g.petId===pid&&+g.until>now))}
+function outAt(pid){const now=Date.now(),jw=typeof jobNow==='function'&&jobNow(pid,now);if(jw){const jh=house(JOB_HID[jw.place]);if(jh)return jh}return DB.houses.find(h=>(h.guests||[]).some(g=>g.petId===pid&&+g.until>now))}
 function walkForm(){
   if(!needMe())return;const mine=myHouse(),h=house(home.id);
   if(!mine)return toast('要先有自己的家和毛孩，才能帶毛孩出門喔');
@@ -3349,11 +3353,11 @@ function walkForm(){
   if(guestsOf(h.id).length>=(isParkH(h)?PARK_GUESTS:GUEST_MAX)&&!guestsOf(h.id).some(g=>ps.some(p=>p.id===g.petId)))return toast(`這個家已經有 ${GUEST_MAX} 位客人了，晚點再來`);
   const here=guestsOf(h.id).filter(g=>ps.some(p=>p.id===g.petId));
   openModal(`<h3>🐾 帶毛孩去「${esc(h.name)}」玩</h3><p class="lead">會在這裡玩 ${WALK_MIN} 分鐘，大家進來都看得到牠</p>
-    <div class="shopgrid">${ps.map(p=>{const o=outAt(p.id);return `<button class="si pick" data-w="${p.id}" ${o&&o.id!==h.id?'':''}><span class="ii big"><img src="${petHead(p)}" alt="" style="border-radius:50%"></span><div class="sn">${esc(p.name)}</div><div class="sf">${o?(o.id===h.id?'正在這裡玩':'在 '+esc(o.name)+' 玩'):sleepState(p)?'在睡覺（會叫醒）':'在家'}</div></button>`}).join('')}</div>
+    <div class="shopgrid">${ps.map(p=>{const o=outAt(p.id);return `<button class="si pick" data-w="${p.id}" ${o&&o.id!==h.id?'':''}><span class="ii big"><img src="${petHead(p)}" alt="" style="border-radius:50%"></span><div class="sn">${esc(p.name)}</div><div class="sf">${jobNow(p.id)?'打工中 💼':o?(o.id===h.id?'正在這裡玩':'在 '+esc(o.name)+' 玩'):sleepState(p)?'在睡覺（會叫醒）':'在家'}</div></button>`}).join('')}</div>
     ${here.length?`<div class="row2"><button id="wback">🏠 把 ${here.map(g=>esc(pet(g.petId).name)).join('、')} 帶回家</button></div>`:''}
     <div class="row2" style="margin-top:10px"><button data-close>取消</button></div>`);
   if($('#wback'))$('#wback').onclick=()=>{for(const g of here){PEND.home[g.petId]={t:Date.now()};delete PEND.walk[g.petId];call('walkHome',{playerId:DB.me.id,petId:g.petId},true).catch(()=>{})}h.guests=(h.guests||[]).filter(g=>!here.includes(g));closeModal();openHome(h.id,true);toast('帶回家了 🏠')};
-  $('#sheet').querySelectorAll('[data-w]').forEach(b=>b.onclick=async()=>{const p=pet(b.dataset.w);
+  $('#sheet').querySelectorAll('[data-w]').forEach(b=>b.onclick=async()=>{const p=pet(b.dataset.w);if(jobNow(p.id))return toast(`${p.name} 正在打工，下班才能帶出門喔 💼`);
     let g;if(ONLINE){g={petId:p.id,ownerId:DB.me.id,ownerNick:DB.me.nick,until:Date.now()+WALK_MIN*60000};const gg=g;
       call('walkPet',{playerId:DB.me.id,houseId:h.id,petId:p.id},true).then(r=>{if(r)Object.assign(gg,r)}).catch(e=>{h.guests=(h.guests||[]).filter(x=>x!==gg);delete PEND.walk[p.id];if(home&&home.id===h.id)openHome(h.id,true);toast('遛遛沒成功：'+e.message)})}
     else{try{g=await call('walkPet',{playerId:DB.me.id,houseId:h.id,petId:p.id})}catch(e){toast(e.message);return}}
@@ -3464,6 +3468,7 @@ const keepScroll=fn=>{const st=$('#sheet').scrollTop;fn();$('#sheet').scrollTop=
 function renderShopHome(h){const mg=isMgr(h.id);
   $('#famtools').innerHTML=mg?`<button class="act" id="fs1">👔 店員</button><button class="act" id="fs2">⚙️ 店</button><button class="act" id="fs3">🧸 擺設</button>`:'';
   if(mg){$('#fs1').onclick=()=>shopMgrSheet('staff');$('#fs2').onclick=()=>shopMgrSheet('shop');$('#fs3').onclick=toyPlacer}
+  jobBtn('shop');
   $('#feed').textContent='🛍️ 買二手';$('#feed').onclick=()=>tradeSheet('buy');
   $('#giftbtn').textContent='💰 賣東西';$('#giftbtn').onclick=()=>tradeSheet('sell');$('#giftbtn').style.display='';
   $('#walkbtn').style.display='';$('#walkbtn').onclick=walkForm;$('#sweep').style.display='none';
@@ -4098,6 +4103,8 @@ function toastOnce(n){try{const k='mhd_amailt',o=+(localStorage.getItem(k)||0);i
 const GIFT_DAY=10,GIFT_P=1,PARK_ID='park',PARK_POS={x:510,y:1252},PARK_SC=1.45,PARK_GUESTS=8;
 const isParkH=h=>!!(h&&(h.kind==='park'||h.id===PARK_ID)),isSpecialH=h=>isShopH(h)||isParkH(h);
 GUESTS.push(...[['alpaca','羊駝'],['otter','水獺'],['fox','狐狸'],['sloth','樹懶'],['dog','小狗'],['penguin','企鵝'],['horse','小馬'],['sheep','綿羊'],['monkey','猴子'],['cow','乳牛'],['lion','獅子'],['zebra','斑馬']].map(([k,n])=>({img:`assets/guest_${k}.webp`,n:n+'旅客'})));
+// v1.89 新島民 9 位（黏土魚人）
+GUESTS.push(...[['captain','菸斗船長'],['hoops','二十三號'],['chef','鬍子主廚'],['leopard','豹紋阿姨'],['bubble','泡泡糖少年'],['grandpa','魚骨爺爺'],['punk','龐克刺刺'],['icecream','冰淇淋小妹'],['diver','咕嚕潛水員']].map(([k,n])=>({img:`assets/guest_${k}.webp`,n})));
 GUESTS.forEach((g,i)=>g.i=i);
 // 每小時重新分配一次（大家看到的一樣）：舒適度高的民宿先挑 → 0～2 隻去旅行 → 最多 3 隻去島民家晃 → 其他在公園
 let GPLAN=null;
@@ -4135,10 +4142,100 @@ function guestWander(f){f.querySelectorAll('.gnpc').forEach(el=>{if(el._busy||Da
 setInterval(()=>{const f=$('#floor');if(!f||!home||$('#home').classList.contains('hidden')||document.hidden)return;if(f.querySelector('.gnpc'))guestWander(f)},900);
 // ---------- 公園的畫面（用家的畫面，按鈕不一樣） ----------
 function renderParkHome(h){const ad=!!adminPw();
-  $('#famtools').innerHTML=ad?'<button class="act" id="fp1">🧸 布置</button>':'';if($('#fp1'))$('#fp1').onclick=toyPlacer;
+  $('#famtools').innerHTML=ad?'<button class="act" id="fp1">🧸 布置</button>':'';if($('#fp1'))$('#fp1').onclick=toyPlacer;jobBtn('park');
   $('#feed').style.display='none';$('#sweep').style.display='none';$('#giftbtn').style.display='none';
   $('#walkbtn').style.display='';$('#walkbtn').onclick=walkForm;$('#board').style.display='none';$('#addnote').style.display='none';$('#notebook').style.display='none';
   $('#emptyhome').innerHTML='';renderFloor();renderFoot2()}
+
+// ================= 💼 毛孩打工（v1.90） =================
+// 毛二街「賣萌」、毛毛公園「撿垃圾」：徵才單隨機時間貼在公布欄（1～2 小時就撕掉）→ 投履歷 → 隔天早上 4 點抽籤、寄信公布
+// 臨時工讀 1 班、短期工讀 3～7 天（每天同一時段）；急徵先搶先贏。時間到毛孩自己去上班，下班回家把薪水交給家人
+const JOB_SLOTS=[[8,12],[13,17],[18,22]],JOB_SLOT_NAME=['早班','午班','晚班'],JOB_SEATS=3,JOB_PAY=60,JOB_BONUS=100;
+const JOB_PLACE={shop:'毛二街',park:'毛毛公園'},JOB_WORK={shop:'賣萌',park:'撿垃圾'},JOB_HID={shop:SHOP_ID,park:PARK_ID};
+const JOB_TXT={shop:['徵！會賣萌的毛孩，會翻肚優先','毛二街徵店貓店狗！只要可愛就好','誠徵招財毛孩，會對客人眨眼加分','店長說最近客人變少了，徵可愛店員','徵：會坐在櫃檯上發呆的毛孩','徵賣萌專員，供餐（小魚乾）'],
+  park:['垃圾多到海鷗都在抱怨，急徵撿垃圾小幫手','公園徵環保小尖兵！','徵：鼻子靈、會把瓶子叼回來的毛孩','落葉掃不完啦！徵撿垃圾毛孩','公園管理員腰痛，徵代班小幫手','旅客亂丟垃圾，徵巡邏毛孩']};
+const JOB_SAY={shop:{貪吃:['（偷看架上的零食）','這個……可以吃一口嗎？','店長沒在看吧？'],愛睡:['好睏……上班好累','（站著打瞌睡）','還有幾分鐘下班……'],活潑:['歡迎光臨～！','要不要買點什麼？','今天有特價喔！'],高冷:['……結帳嗎','（愛理不理）','要買就快點'],黏人:['你要走了嗎？再陪我一下','客人～摸摸我','不要走嘛～'],'':['歡迎光臨～','我在上班喔！','要買什麼呢？']},
+  park:{貪吃:['這個垃圾聞起來好香……','有人掉了餅乾！','（偷偷舔了一下）'],愛睡:['撿完這個就休息……','（躺在落葉堆裡）','好想睡午覺'],活潑:['我撿到三個瓶子了！','垃圾別跑！','公園變乾淨了～'],高冷:['……不要亂丟垃圾','（瞪著亂丟垃圾的旅客）','哼，又是寶特瓶'],黏人:['你也來幫忙撿嘛～','陪我一起巡邏好不好','你看我撿得好不好？'],'':['我在撿垃圾喔！','公園要乾乾淨淨','不要亂丟垃圾喔']}};
+const JOB_RES={o:'認真上班，乖乖領薪水',g:'表現很好，被加薪了！之後每班 +🪙20',p:'客人太喜歡牠了，收到一份禮物 🎁',l:'遲到了……扣 🪙15',s:'翹班了！這班沒有薪水 😑',f:'偷吃餅乾被開除了 🍪 2 天不能投履歷'};
+const dsAdd=(ds,k)=>new Date(Date.parse(ds+'T00:00:00Z')+k*864e5).toISOString().slice(0,10);
+const dsDiff=(a,b)=>Math.round((Date.parse(a+'T00:00:00Z')-Date.parse(b+'T00:00:00Z'))/864e5);
+const shiftAt=(ds,slot,end)=>Date.parse(ds+'T00:00:00Z')-8*HOUR+JOB_SLOTS[slot][end?1:0]*HOUR;
+const jobsD=()=>DB.jobs&&Array.isArray(DB.jobs.posts)?DB.jobs:{posts:[],roster:[]};
+const jobPlaceOf=hid=>hid===SHOP_ID?'shop':hid===PARK_ID?'park':'';
+const slotTxt=s=>`${JOB_SLOT_NAME[s]} ${JOB_SLOTS[s][0]}:00～${JOB_SLOTS[s][1]}:00`;
+const mdTxt=ds=>ds.slice(5).replace('-','/').replace(/^0/,'');
+function jobWhenTxt(o){return o.days>1?`${mdTxt(o.start||o.from)} 起連續 ${o.days} 天，每天${slotTxt(o.slot)}`:`${(o.start||o.from)===todayTW()?'今天':mdTxt(o.start||o.from)} ${slotTxt(o.slot)}`}
+// 現在正在上班（翹班的那天不算）
+function jobNow(pid,now){now=now||Date.now();const d=todayTW();
+  return (jobsD().roster||[]).find(c=>c.petId===pid&&dsDiff(d,c.from)>=0&&dsDiff(d,c.from)<c.len&&now>=shiftAt(d,c.slot)&&now<shiftAt(d,c.slot,true)&&(c.res||'')[dsDiff(d,c.from)]!=='s')||null}
+function workersAt(hid,now){const pl=jobPlaceOf(hid);if(!pl)return [];now=now||Date.now();
+  return (jobsD().roster||[]).filter(c=>c.place===pl&&jobNow(c.petId,now)===c&&pet(c.petId)).map(c=>({petId:c.petId,until:shiftAt(todayTW(),c.slot,true),job:c}))}
+// 還沒做完的工作（今天或之後還有班）
+function jobAhead(pid,now){now=now||Date.now();const d=todayTW();
+  return (jobsD().roster||[]).find(c=>{if(c.petId!==pid)return false;const last=dsAdd(c.from,c.len-1),k=dsDiff(last,d);return k>0||(k===0&&now<shiftAt(d,c.slot,true))})||null}
+function jobBan(pid){let u=0;(jobsD().roster||[]).forEach(c=>{const i=(c.res||'').indexOf('f');if(c.petId!==pid||i<0)return;const t=shiftAt(dsAdd(c.from,i),c.slot,true)+2*864e5;if(t>u)u=t});return u}
+const jobPending=pid=>(jobsD().posts||[]).find(p=>(p.apps||[]).some(a=>a.petId===pid))||null;
+const jobOpen=(place,now)=>{now=now||Date.now();return (jobsD().posts||[]).filter(p=>p.place===place&&now>=p.open&&now<p.close)};
+function petJobStatus(p){const now=Date.now(),w=jobNow(p.id,now);if(w)return {t:`在${JOB_PLACE[w.place]}打工中 💼`};
+  const a=jobAhead(p.id,now);if(a)return {t:`已經有工作（${jobWhenTxt(a)}）`};
+  const b=jobBan(p.id);if(b>now)return {t:`剛被開除，在家反省中（還要 ${Math.ceil((b-now)/HOUR)} 小時）`};
+  const q=jobPending(p.id);if(q)return {t:`已投${JOB_PLACE[q.place]}的履歷，等結果`,post:q};
+  return {ok:1,t:'可以應徵'}}
+function jobSay(p){const w=jobNow(p.id),S=JOB_SAY[w?w.place:'shop'],L=S[p.trait]||S[''];return L[Math.floor(Math.random()*L.length)]}
+// 📋 公布欄
+function jobBoard(place){if(!ONLINE)return toast('連線版才有打工喔');const now=Date.now(),O=jobOpen(place,now),mine=myHouse(),ps=mine?petsOf(mine.id):[];
+  const card=p=>{const left=Math.max(1,Math.ceil((p.close-now)/60000)),L=JOB_TXT[place],t=L[p.t%L.length],mineApp=(p.apps||[]).filter(a=>ps.some(q=>q.id===a.petId));
+    return `<div class="jobcard${p.rush?' rush':''}"><b>${p.rush?'⚡ 急徵！':'📋 '}${esc(t)}</b>
+      <div>💼 工作：${JOB_WORK[place]}　${p.days>1?`📆 短期工讀 ${p.days} 天`:'⏱️ 臨時工讀'}</div>
+      <div>📅 ${jobWhenTxt(p)}</div>
+      <div>👥 名額 ${p.n} 位・${p.rush?'先搶先贏，馬上錄取':'明天早上抽籤、寄信公布'}</div>
+      <div>🪙 每班 ${JOB_PAY}${p.days>1?`・做滿 ${p.days} 天加發 ${JOB_BONUS}`:''}</div>
+      <div class="jobmeta">${p.rush?'':`已有 ${(p.apps||[]).length} 隻應徵・`}還剩 ${left>=60?Math.floor(left/60)+' 小時 '+(left%60)+' 分':left+' 分鐘'}就撕掉${mineApp.length?`<br>✅ ${mineApp.map(a=>esc((pet(a.petId)||{}).name||'')).join('、')} 已經投了`:''}</div>
+      ${mine&&isFamily(mine.id)&&ps.length?`<div class="row2"><button class="primary" data-ja="${p.id}">✉️ 投履歷</button></div>`:''}</div>`};
+  const sl=JOB_SLOTS.findIndex((x,i)=>now>=shiftAt(todayTW(),i)&&now<shiftAt(todayTW(),i,true)),W=workersAt(JOB_HID[place],now);
+  const today=JOB_SLOTS.map((x,i)=>{const L=(jobsD().roster||[]).filter(c=>c.place===place&&c.slot===i&&dsDiff(todayTW(),c.from)>=0&&dsDiff(todayTW(),c.from)<c.len);
+    return `<div class="frow"><span>${i===sl?'▶️ ':''}${slotTxt(i)}<small>${L.length?L.map(c=>esc((pet(c.petId)||{}).name||'?')+((c.res||'')[dsDiff(todayTW(),c.from)]==='s'?'（翹班）':'')).join('、'):''}${L.length<JOB_SEATS?`${L.length?'・':''}🐟 代班 ×${JOB_SEATS-L.length}`:''}</small></span></div>`}).join('');
+  const st=ps.map(p=>{const s=petJobStatus(p);return `<div class="frow"><span><img src="${petHead(p)}" alt="" style="width:28px;height:28px;border-radius:50%;vertical-align:middle;margin-right:6px">${esc(p.name)}<small>${esc(s.t)}</small></span>${s.post&&isFamily(mine.id)?`<button class="mini" data-jc="${s.post.id}" data-jp="${p.id}">收回</button>`:''}</div>`}).join('');
+  openModal(`<h3>📋 ${JOB_PLACE[place]} 徵才公布欄</h3><p class="lead">徵才單會在隨機的時間貼出來，1～2 小時就撕掉，常常來看看！</p>
+    ${O.length?O.map(card).join(''):`<div class="locked">目前沒有徵才單<br><small>${W.length?'大家都在認真上班中':'下次經過再看看'}</small></div>`}
+    <h4 style="margin:14px 0 4px">🗓️ 今天的班表</h4><div class="plist">${today}</div>
+    ${ps.length?`<h4 style="margin:14px 0 4px">🐾 我家的毛孩</h4><div class="plist">${st}</div>`:''}
+    <div class="row2" style="margin-top:12px"><button data-close>關閉</button></div>`);
+  $('#sheet').querySelectorAll('[data-ja]').forEach(b=>b.onclick=()=>jobApplyForm(b.dataset.ja,place));
+  $('#sheet').querySelectorAll('[data-jc]').forEach(b=>b.onclick=async e=>{if(!armBtn(e.target,'確定收回？'))return;const P=(jobsD().posts||[]).find(x=>x.id===b.dataset.jc);
+    try{await call('jobCancel',Object.assign(cred(),{postId:b.dataset.jc,petId:b.dataset.jp}));if(P)P.apps=(P.apps||[]).filter(a=>a.petId!==b.dataset.jp);toast('履歷收回來了');jobBoard(place)}catch(err){toast(err.message)}})}
+function jobApplyForm(postId,place){const P=(jobsD().posts||[]).find(x=>x.id===postId),mine=myHouse();if(!P||!mine)return;const ps=petsOf(mine.id);let pick=null;
+  openModal(`<h3>✉️ 投履歷：${JOB_PLACE[place]}${JOB_WORK[place]}</h3><p class="lead">${esc(jobWhenTxt(P))}</p>
+    <div class="shopgrid">${ps.map(p=>{const s=petJobStatus(p),here=(P.apps||[]).some(a=>a.petId===p.id);return `<button class="si pick" data-jpk="${p.id}" ${s.ok&&!here?'':'disabled'}><span class="ii big"><img src="${petHead(p)}" alt="" style="border-radius:50%"></span><div class="sn">${esc(p.name)}</div><div class="sf">${here?'已經投了':esc(s.t)}</div></button>`}).join('')}</div>
+    <div class="field"><label for="jmsg">一句自我介紹（選填，20 字內）</label><input id="jmsg" maxlength="20" placeholder="例：我很會翻肚！"></div>
+    <div class="row2"><button data-close>取消</button><button class="primary" id="jsend" disabled>送出履歷</button></div>`);
+  $('#sheet').querySelectorAll('[data-jpk]').forEach(b=>b.onclick=()=>{pick=b.dataset.jpk;$('#sheet').querySelectorAll('[data-jpk]').forEach(x=>x.classList.toggle('on',x===b));$('#jsend').disabled=false});
+  $('#jsend').onclick=async()=>{if(!pick)return;const p=pet(pick),msg=$('#jmsg').value.trim().slice(0,20);
+    try{const r=await call('jobApply',Object.assign(cred(),{postId,petId:pick,msg}));
+      (P.apps=P.apps||[]).push({petId:pick,houseId:mine.id,msg});closeModal();sfx('gift');
+      if(r&&r.hired){toast(`⚡ 搶到了！${p.name} ${r.when} 上班`);sync(true)}else toast(`${p.name} 的履歷送出了！明天早上公布結果 ✉️`)}
+    catch(e){toast(e.message);if(/慢了一步|撕掉/.test(e.message))sync(true)}}}
+// 💰 下班領薪水：同一個家的家人誰先打開誰領（存進他的金幣）
+let jobPayAt=0;
+function jobPayCheck(){const mine=myHouse();if(!ONLINE||!mine||!isFamily(mine.id)||Date.now()-jobPayAt<60000)return;if(!$('#modal').classList.contains('hidden')){clearTimeout(jobPayCheck.t);jobPayCheck.t=setTimeout(jobPayCheck,6000);return}const now=Date.now();
+  const due=(jobsD().roster||[]).some(c=>c.houseId===mine.id&&c.paid<c.len&&now>=shiftAt(dsAdd(c.from,c.paid),c.slot,true));if(!due)return;jobPayAt=now;
+  call('jobPay',cred(),true).then(r=>{const L=(r&&r.list)||[];if(!L.length)return;const g=DB.game;let sum=0;const gifts=[];
+    L.forEach(x=>{sum+=+x.coins||0;if(x.gift){const T=Object.entries(ITEMS).filter(([k,y])=>y.kind==='treat'&&!y.bday&&!y.limited&&!y.off&&y.price>0);if(T.length){const [id,y]=T[Math.floor(Math.random()*T.length)];bagAdd(id,1);gifts.push(y.name)}}
+      const c=(jobsD().roster||[]).find(c=>c.petId===x.petId&&c.place===x.place&&c.slot===x.slot);if(c)c.paid=Math.max(c.paid,dsDiff(x.day,c.from)+1)});
+    g.coins=(g.coins||0)+sum;save();updHud();sfx(sum?'coin':'tap');
+    openModal(`<div style="text-align:center"><div class="giftopen">💼</div><h3>毛孩打工回來了！</h3></div>
+      <div class="plist">${L.map(x=>{const p=pet(x.petId)||{name:'毛孩'};return `<div class="frow"><span>${p.head||p.id?`<img src="${petHead(p)}" alt="" style="width:28px;height:28px;border-radius:50%;vertical-align:middle;margin-right:6px">`:''}${esc(p.name)}・${mdTxt(x.day)} ${JOB_PLACE[x.place]}${JOB_SLOT_NAME[x.slot]}<small>${x.code==='g'&&x.days<=1?'表現很好，店長多給了 🪙20':JOB_RES[x.code]||JOB_RES.o}${x.bonus?`<br>🎉 ${x.days} 天全勤！加發 🪙${x.bonus}`:''}</small></span><b>🪙${x.coins}</b></div>`}).join('')}</div>
+      <p class="lead" style="text-align:center">一共 🪙${sum}${gifts.length?`，還有 ${gifts.join('、')} 🎁（放進背包了）`:''}</p>
+      <div class="row2"><button data-close>辛苦了 🐾</button></div>`)}).catch(()=>{jobPayAt=0})}
+// 店、公園右上的「📋 徵才」按鈕
+function jobBtn(place){if(!ONLINE)return;const n=jobOpen(place).length;$('#famtools').insertAdjacentHTML('beforeend',`<button class="act" id="fjob">📋 徵才${n?`<i class="jdot">${n}</i>`:''}</button>`);$('#fjob').onclick=()=>jobBoard(place)}
+// 沒人上班的位子由旅客代班（在店裡、公園走來走去）
+function renderJobSubs(f,h){const pl=jobPlaceOf(h.id),now=Date.now(),d=todayTW();if(!pl||!ONLINE)return;const sl=JOB_SLOTS.findIndex((x,i)=>now>=shiftAt(d,i)&&now<shiftAt(d,i,true));if(sl<0)return;
+  const n=Math.max(0,JOB_SEATS-workersAt(h.id,now).length);if(!n)return;
+  const pool=GUESTS.slice().sort((a,b)=>hash01(d+pl+sl+'s'+a.i)-hash01(d+pl+sl+'s'+b.i)).slice(0,n);
+  pool.forEach((g,k)=>{const x=FLOOR.x0+80+hash01(d+pl+k+'x')*(FLOOR.x1-FLOOR.x0-160),y=FLOOR.y0+40+hash01(d+pl+k+'y')*(FLOOR.y1-FLOOR.y0-80);
+    const el=walker(f,g.img,x,y,pl==='park'?180:200,'代班',e=>{sayOn(e,['我是來代班的～','今天人手不夠，我來幫忙！','正職的毛孩呢？','代班也要認真！'][Math.floor(Math.random()*4)]);sfx('tap')});
+    el.classList.add('gnpc');el._key='sub:'+h.id+':'+k;el._rest=Date.now()+500+Math.random()*2500})}
 
 // ================= 頁尾與啟動 =================
 function renderFoot(){
@@ -4595,7 +4692,7 @@ function announceLetters(){if(!DB.me)return;let seen=[];try{seen=JSON.parse(loca
     sfx('gift');$('#lgopen').onclick=()=>openLetter(nw[0].id,()=>$('#bell').click())};
   setTimeout(go,1800)}
 // ================= 自動更新：發現新版本就重新載入 =================
-const APP_VER='v1.88';
+const APP_VER='v1.90';
 function checkUpdate(){
   if(!/^https?:/.test(location.protocol)||!API_URL)return;
   if(!$('#modal').classList.contains('hidden'))return; // 正在填表單時不打斷
