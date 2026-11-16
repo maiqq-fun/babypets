@@ -176,6 +176,8 @@ details summary{font-size:13px;color:var(--accent-d);cursor:pointer}
 .pm-b{display:flex;gap:6px}
 .nb{display:block;width:100%;text-align:left;border:0;border-radius:6px;padding:12px;margin-bottom:8px;font-size:15px;line-height:1.5;box-shadow:0 2px 3px rgba(0,0,0,.12);color:#5a4030}
 .nb small{display:block;font-size:12px;opacity:.7;margin-top:4px}
+.note.fold span{text-align:center;opacity:.75}.note.fold{filter:saturate(.7)}.nb.fold{opacity:.8}
+.nreplies{margin:12px 0 6px;display:flex;flex-direction:column;gap:6px}.nrep{background:#fff8ee;border-radius:12px;padding:8px 12px;font-size:14px;line-height:1.5;color:#5a4030}.nrep b{margin-right:8px;color:#a06a40}.nrep small{display:block;font-size:11px;opacity:.65}.nrep.none{text-align:center;opacity:.6}.nrep .mini{padding:1px 8px;font-size:11px;margin-left:6px;vertical-align:middle}.nrbox{display:flex;gap:8px;margin:6px 0 10px}.nrbox input{flex:1;min-width:0}.nrbox button{flex:none;padding:8px 14px}
 .m small.st{color:var(--accent-d)}
 .mini em{position:absolute;left:3px;bottom:3px;font-style:normal;font-size:10px;background:rgba(255,255,255,.9);border-radius:6px;padding:0 4px;color:#7a6050}
 .gbtns{flex-wrap:wrap;justify-content:center}
@@ -1181,7 +1183,7 @@ function optFail(k,o){DB[k]=(DB[k]||[]).filter(x=>x!==o);ADDS[k]=ADDS[k].filter(
 const FARMP={};function farmPend(hid,i,cell){(FARMP[hid]=FARMP[hid]||{})[i]={c:cell?JSON.parse(JSON.stringify(cell)):null,t:Date.now()}}
 function farmDone(hid,i){if(FARMP[hid])delete FARMP[hid][i]}
 function keepFarm(){const nw=Date.now();for(const hid in FARMP){const h=house(hid);if(!h||!h.farm)continue;for(const i in FARMP[hid]){const o=FARMP[hid][i];if(nw-o.t>60000){delete FARMP[hid][i];continue}h.farm.p=h.farm.p||[];h.farm.p[i]=o.c}}}
-function keepPending(){keepToys();keepFarm();keepLists();keepDemon();keepWear();const nw=Date.now();for(const id in GONEPOOP)if(nw-GONEPOOP[id]>5*60e3)delete GONEPOOP[id];DB.houses.forEach(h=>{if(Array.isArray(h.poops))h.poops=h.poops.filter(x=>!GONEPOOP[x.id])});for(const id in GONEGIFT)if(nw-GONEGIFT[id]>5*60e3)delete GONEGIFT[id];DB.houses.forEach(h=>{if(Array.isArray(h.gifts)){h.gifts=h.gifts.filter(x=>!(GONEGIFT[x.id]&&!x.admin));h.gifts.forEach(x=>{if(x.admin&&GONEGIFT[x.id]&&DB.me)x.opened=[...new Set([...(Array.isArray(x.opened)?x.opened:[]),DB.me.id])]})}});const now=Date.now(),T=120000;
+function keepPending(){keepToys();keepFarm();keepLists();keepReplies();keepDemon();keepWear();const nw=Date.now();for(const id in GONEPOOP)if(nw-GONEPOOP[id]>5*60e3)delete GONEPOOP[id];DB.houses.forEach(h=>{if(Array.isArray(h.poops))h.poops=h.poops.filter(x=>!GONEPOOP[x.id])});for(const id in GONEGIFT)if(nw-GONEGIFT[id]>5*60e3)delete GONEGIFT[id];DB.houses.forEach(h=>{if(Array.isArray(h.gifts)){h.gifts=h.gifts.filter(x=>!(GONEGIFT[x.id]&&!x.admin));h.gifts.forEach(x=>{if(x.admin&&GONEGIFT[x.id]&&DB.me)x.opened=[...new Set([...(Array.isArray(x.opened)?x.opened:[]),DB.me.id])]})}});const now=Date.now(),T=120000;
   DB.pets.forEach(p=>{const w=PEND.wake[p.id];if(w&&now-w.t<T&&!(+p.wakeUntil>=w.v))p.wakeUntil=w.v;const f=FED[p.id];if(f&&now-f.t<T&&!(+p.lastFed>=f.v)){p.lastFed=f.v;p.meals=f.m;p.mealDay=f.d}});
   for(const pid in PEND.walk){const w=PEND.walk[pid];if(now-w.t>T)continue;DB.houses.forEach(h=>{if(h.id!==w.hid)h.guests=(h.guests||[]).filter(g=>g.petId!==pid)});const h=house(w.hid);if(h&&!(h.guests||[]).some(g=>g.petId===pid))(h.guests=h.guests||[]).push(w.g)}
   for(const pid in PEND.home){const w=PEND.home[pid];if(now-w.t>T)continue;DB.houses.forEach(h=>h.guests=(h.guests||[]).filter(g=>g.petId!==pid))}}
@@ -1249,8 +1251,10 @@ const LOCAL={
   deletePet({petId}){DB.pets=DB.pets.filter(x=>x.id!==petId);['weights','medical','expenses'].forEach(k=>DB[k]=DB[k].filter(x=>x.petId!==petId));return true},
   addRecord({kind,rec}){const r=Object.assign({},rec,{id:uid(),createdAt:Date.now()});DB[kind].push(r);if(kind==='weights')feedPush(`${pet(rec.petId).name} 量了體重 ⚖️`);return r},
   deleteRecord({kind,id}){DB[kind]=DB[kind].filter(x=>x.id!==id);return true},
-  addNote({note}){const n={id:uid(),houseId:note.houseId,by:DB.me.nick,byId:DB.me.id,text:note.text,color:note.color,createdAt:Date.now()};DB.notes.push(n);feedPush(`${DB.me.nick} 在 ${house(note.houseId).name} 貼了便利貼 📝`);return n},
+  addNote({note}){const n={id:uid(),houseId:note.houseId,by:DB.me.nick,byId:DB.me.id,text:note.text,color:note.color,createdAt:Date.now(),secret:note.secret?1:''};DB.notes.push(n);feedPush(`${DB.me.nick} 在 ${house(note.houseId).name} 貼了便利貼 📝`);return n},
   deleteNote({id}){DB.notes=DB.notes.filter(x=>x.id!==id);return true},
+  replyNote({id,text}){const n=DB.notes.find(x=>x.id===id);if(!n)throw new Error('這張便利貼已經被撕掉了');n.replies=(n.replies||[]).concat({id:uid(),by:DB.me.nick,byId:DB.me.id,text,at:Date.now()});return {replies:n.replies}},
+  deleteReply({id,replyId}){const n=DB.notes.find(x=>x.id===id);if(n)n.replies=(n.replies||[]).filter(r=>r.id!==replyId);return {replies:n?n.replies:[]}},
   cleanPoop({houseId}){const h=house(houseId),nm=(petsOf(houseId)[0]||{}).name||h.name;feedPush(`${DB.me.nick} 幫 ${nm} 清了大便 🧹`);return {gone:false}},
   drawCard({houseId,cardId,feedText}){const o=new Set(DB.owned[houseId]||[]);o.add(cardId);DB.owned[houseId]=[...o];if(feedText)feedPush(feedText);return {owned:DB.owned[houseId]}},
   upload({dataUrl}){return {url:dataUrl}},
@@ -2048,8 +2052,9 @@ function renderBoard(){
   const h=house(home.id),B=BOARDS[h.room]||BOARDS.basic1,ins=10;
   const b=$('#board');Object.assign(b.style,hp(B[0]+ins,B[1]+ins),{width:((B[2]-B[0]-2*ins)/RW*100)+'%',height:((B[3]-B[1]-2*ins)/RH*100)+'%'});
   const all=DB.notes.filter(n=>n.houseId===home.id).sort((a,c)=>a.createdAt-c.createdAt),list=all.slice(-6);
-  b.innerHTML=list.map((n,i)=>`<button class="note" data-id="${n.id}" style="background:${n.color};transform:rotate(${[-4,3,-2,5,-3,2][i%6]}deg)">
-    <span>${esc([...n.text].slice(0,12).join(''))}${[...n.text].length>12?'…':''}</span><small>— ${esc(n.by)}</small></button>`).join('')
+  b.innerHTML=list.map((n,i)=>{const rc=(n.replies||[]).length;return n.hidden?`<button class="note fold" data-id="${n.id}" style="background:${n.color};transform:rotate(${[-4,3,-2,5,-3,2][i%6]}deg)"><span>🔒<br>秘密便條</span><small>— ${esc(n.by)}</small></button>`
+    :`<button class="note" data-id="${n.id}" style="background:${n.color};transform:rotate(${[-4,3,-2,5,-3,2][i%6]}deg)">
+    <span>${n.secret?'🔒':''}${esc([...n.text].slice(0,12).join(''))}${[...n.text].length>12?'…':''}</span><small>${rc?`💬${rc} `:''}— ${esc(n.by)}</small></button>`}).join('')
     +(list.length?'':`<button class="note empty" id="boardadd" aria-label="貼便利貼">＋</button>`);
   b.querySelectorAll('.note[data-id]').forEach(el=>el.onclick=()=>noteView(el.dataset.id));
   if($('#boardadd'))$('#boardadd').onclick=noteForm;
@@ -2058,20 +2063,34 @@ function renderBoard(){
 function noteBook(){if(isParkH(house(home.id)))return;
   const all=DB.notes.filter(n=>n.houseId===home.id).sort((a,c)=>c.createdAt-a.createdAt);
   openModal(`<h3>📒 ${esc(house(home.id).name)} 的留言簿</h3><p class="lead">共 ${all.length} 張便利貼，軟木板上只貼最新的 6 張</p>
-    ${all.length?all.map(n=>`<button class="nb" data-id="${n.id}" style="background:${n.color}"><span>${esc(n.text)}</span><small>— ${esc(n.by)}・${ago(n.createdAt)}</small></button>`).join(''):'<div class="locked">還沒有人留言</div>'}
+    ${all.length?all.map(n=>{const rc=(n.replies||[]).length;return `<button class="nb${n.hidden?' fold':''}" data-id="${n.id}" style="background:${n.color}"><span>${n.hidden?'🔒 秘密便條（只有這家的家人看得到）':(n.secret?'🔒 ':'')+esc(n.text)}</span><small>— ${esc(n.by)}・${ago(n.createdAt)}${rc&&!n.hidden?`・💬 ${rc} 則回覆`:''}</small></button>`}).join(''):'<div class="locked">還沒有人留言</div>'}
     <div class="row2 sticky"><button data-close>關閉</button><button class="primary" id="nbadd">📝 貼便利貼</button></div>`);
   $('#sheet').querySelectorAll('.nb').forEach(el=>el.onclick=()=>noteView(el.dataset.id,true));
   $('#nbadd').onclick=noteForm;
 }
 function noteView(id,fromBook){
-  const n=DB.notes.find(x=>x.id===id);const canTear=isFamily(n.houseId)||(DB.me&&n.byId===DB.me.id);
-  openModal(`<h3>📝 ${esc(n.by)} 的便利貼</h3><p class="lead">${ago(n.createdAt)}</p><div style="background:${n.color};padding:18px;border-radius:6px;font-size:18px;line-height:1.6;box-shadow:0 2px 4px rgba(0,0,0,.15);white-space:pre-wrap;user-select:text">${esc(n.text)}</div>
+  const n=DB.notes.find(x=>x.id===id);if(!n)return;const canTear=isFamily(n.houseId)||(DB.me&&n.byId===DB.me.id),h=house(n.houseId)||{name:''};
+  if(n.hidden){openModal(`<div style="text-align:center"><div class="giftopen">🔒</div><h3>${esc(n.by)} 的秘密便條</h3><p class="lead">這張便條摺起來了，只有「${esc(h.name)}」的家人和 ${esc(n.by)} 看得到</p></div>
+    <div class="row2">${fromBook?'<button id="nbback">← 留言簿</button>':''}<button data-close>關閉</button></div>`);if($('#nbback'))$('#nbback').onclick=noteBook;return}
+  const R=n.replies||[],me=DB.me&&DB.me.id;
+  openModal(`<h3>${n.secret?'🔒':'📝'} ${esc(n.by)} 的${n.secret?'秘密便條':'便利貼'}</h3><p class="lead">${ago(n.createdAt)}${n.secret?`・只有「${esc(h.name)}」的家人和 ${esc(n.by)} 看得到`:''}</p><div style="background:${n.color};padding:18px;border-radius:6px;font-size:18px;line-height:1.6;box-shadow:0 2px 4px rgba(0,0,0,.15);white-space:pre-wrap;user-select:text">${esc(n.text)}</div>
+    <div class="nreplies">${R.length?R.map(r=>`<div class="nrep"><b>${esc(r.by)}</b>${esc(r.text)}<small>${ago(r.at)}${!String(r.id).startsWith('tmp')&&(isFamily(n.houseId)||r.byId===me)?` <button class="mini" data-dr="${r.id}">刪除</button>`:''}</small></div>`).join(''):'<div class="nrep none">還沒有人回覆</div>'}</div>
+    ${DB.me&&!String(n.id).startsWith('tmp')?`<div class="nrbox"><input id="nrin" maxlength="40" placeholder="回覆 ${esc(n.by)}…（40 字內）"><button class="primary" id="nrsend">回覆</button></div>`:''}
     ${canTear?'<button class="btn-d" id="tear">撕掉這張</button>':''}<div class="row2">${fromBook?'<button id="nbback">← 留言簿</button>':''}<button data-close>關閉</button></div>`);
   if($('#nbback'))$('#nbback').onclick=noteBook;
+  if($('#nrsend'))$('#nrsend').onclick=async()=>{if(!needMe())return;const t=$('#nrin').value.trim();if(!t)return toast('先寫點什麼再回覆喔');
+    const tmp={id:'tmp'+uid(),by:DB.me.nick,byId:DB.me.id,text:t,at:Date.now()};n.replies=(n.replies||[]).concat(tmp);REPLYP[n.id]={list:n.replies,t:Date.now()};noteView(id,fromBook);renderBoard();sfx('tap');
+    try{const r=await call('replyNote',Object.assign(cred(),{id:n.id,text:t}),true);n.replies=r.replies||n.replies;REPLYP[n.id]={list:n.replies,t:Date.now()};toast('回覆好了 💬')}
+    catch(e){n.replies=(n.replies||[]).filter(x=>x!==tmp);delete REPLYP[n.id];toast('回覆沒成功：'+e.message)}
+    if(!$('#modal').classList.contains('hidden')&&$('#nrin'))noteView(id,fromBook);renderBoard()};
+  $('#sheet').querySelectorAll('[data-dr]').forEach(b=>b.onclick=async e=>{if(!armBtn(e.target,'確定刪除？'))return;
+    try{const r=await call('deleteReply',Object.assign(cred(),{id:n.id,replyId:b.dataset.dr}),true);n.replies=r.replies||[];REPLYP[n.id]={list:n.replies,t:Date.now()};noteView(id,fromBook);renderBoard()}catch(err){toast(err.message)}});
   if($('#tear'))$('#tear').onclick=async e=>{if(!armBtn(e.target,'確定要撕掉嗎？再按一次'))return;
     const bak=n;GONE[id]=Date.now();DB.notes=DB.notes.filter(x=>x.id!==id);renderBoard();toast('撕掉了');if(fromBook)noteBook();else closeModal();
     call('deleteNote',{id,playerId:DB.me.id,pw:isFamily(n.houseId)?DB.me.pw:''},true).catch(err=>{delete GONE[id];DB.notes.push(bak);renderBoard();toast('沒撕成功：'+err.message)})};
 }
+// 剛回覆的先記著，同步回來的舊資料不會把它蓋掉
+const REPLYP={};function keepReplies(){const nw=Date.now();for(const id in REPLYP){const o=REPLYP[id];if(nw-o.t>120000){delete REPLYP[id];continue}const n=(DB.notes||[]).find(x=>x.id===id);if(n&&!n.hidden)n.replies=o.list}}
 function needMe(){if(!DB.me){onboarding();return false}if(ONLINE&&!myHouse()){privateNote();return false}return true}
 function privateNote(){openModal(`<div style="text-align:center"><div class="giftopen">🔒</div><h3>這是私人小島</h3><p class="lead">要島主邀請才能加入，加入之後就可以摸毛孩、留言、送禮囉</p></div>
   <div class="row2"><button data-close>先逛逛</button><button class="primary" id="pvj">我有邀請碼／家人密碼</button></div>`);$('#pvj').onclick=()=>{closeModal();onboarding()}}
@@ -2080,14 +2099,15 @@ function noteForm(){
   openModal(`<h3>📝 在「${esc(h.name)}」貼便利貼</h3>
     ${fld('nt','想說的話（40 字以內）',`<textarea id="nt" maxlength="40" placeholder="例如：今天也好可愛！"></textarea>`)}<div class="count" id="ntc">0 / 40</div>
     <div class="flabel">便利貼顏色</div><div class="swatches" id="ncol">${NOTE_COLORS.map((c,i)=>`<button style="background:${c}" data-c="${c}" class="${i?'':'on'}" aria-label="顏色 ${i+1}"></button>`).join('')}</div>
+    ${!isFamily(h.id)&&!isShopH(h)?'<label class="chk"><input type="checkbox" id="nsec"> 🔒 秘密便條（只有這家的家人和你看得到，其他人只看到摺起來的便條）</label>':''}
     <div class="err" id="nerr"></div>
     <div class="row2"><button data-close>取消</button><button class="primary" id="nsave">貼上去</button></div>`);
   const ta=$('#nt');ta.oninput=()=>{$('#ntc').textContent=[...ta.value].length+' / 40';$('#nerr').textContent=''};
   $('#ncol').onclick=e=>{const b=e.target.closest('button');if(!b)return;color=b.dataset.c;$('#ncol').querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===b))};
-  $('#nsave').onclick=async()=>{const t=ta.value.trim();if(!t){$('#nerr').textContent='先寫點什麼再貼喔';return}
-    let n;if(ONLINE){n=optAdd('notes',{id:'tmp'+uid(),houseId:h.id,by:DB.me.nick,byId:DB.me.id,text:t,color,createdAt:Date.now()});feedPush(`${DB.me.nick} 在 ${h.name} 貼了便利貼 📝`);const nn=n;
-      call('addNote',{playerId:DB.me.id,note:{houseId:h.id,text:t,color}},true).then(r=>optDone('notes',nn,r)).catch(e=>{optFail('notes',nn);renderBoard();toast('便利貼沒貼成功：'+e.message)})}
-    else{try{n=await call('addNote',{playerId:DB.me.id,note:{houseId:h.id,text:t,color}})}catch(e){$('#nerr').textContent=e.message;return}}
+  $('#nsave').onclick=async()=>{const t=ta.value.trim();if(!t){$('#nerr').textContent='先寫點什麼再貼喔';return}const sec=$('#nsec')&&$('#nsec').checked?1:'';
+    let n;if(ONLINE){n=optAdd('notes',{id:'tmp'+uid(),houseId:h.id,by:DB.me.nick,byId:DB.me.id,text:t,color,createdAt:Date.now(),secret:sec});feedPush(`${DB.me.nick} 在 ${h.name} 貼了${sec?'一張秘密便條 🔒':'便利貼 📝'}`);const nn=n;
+      call('addNote',{playerId:DB.me.id,note:{houseId:h.id,text:t,color,secret:sec}},true).then(r=>optDone('notes',nn,r)).catch(e=>{optFail('notes',nn);renderBoard();toast('便利貼沒貼成功：'+e.message)})}
+    else{try{n=await call('addNote',{playerId:DB.me.id,note:{houseId:h.id,text:t,color,secret:sec}})}catch(e){$('#nerr').textContent=e.message;return}}
     closeModal();renderBoard();
     if(isFamily(h.id))toast('便利貼貼好了 📝（貼在自己家不算任務喔）');
     else{const g=DB.game,d=todayTW();if(g.noteDay[0]!==d)g.noteDay=[d,0];
@@ -4695,7 +4715,7 @@ function announceLetters(){if(!DB.me)return;let seen=[];try{seen=JSON.parse(loca
     sfx('gift');$('#lgopen').onclick=()=>openLetter(nw[0].id,()=>$('#bell').click())};
   setTimeout(go,1800)}
 // ================= 自動更新：發現新版本就重新載入 =================
-const APP_VER='v1.91';
+const APP_VER='v1.92';
 function checkUpdate(){
   if(!/^https?:/.test(location.protocol)||!API_URL)return;
   if(!$('#modal').classList.contains('hidden'))return; // 正在填表單時不打斷
