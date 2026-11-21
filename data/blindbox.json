@@ -439,6 +439,53 @@
      "h"
     ]
    ]
+  },
+  {
+   "id": 10,
+   "name": "CHIHUAHUA CHAOS 吉娃娃暴走團",
+   "odds": "h2",
+   "figs": [
+    [
+     "ALOHA",
+     "n"
+    ],
+    [
+     "MONDAY",
+     "n"
+    ],
+    [
+     "SPA DAY",
+     "n"
+    ],
+    [
+     "QUACK",
+     "r"
+    ],
+    [
+     "PUNK",
+     "sr"
+    ],
+    [
+     "CHOMP",
+     "r"
+    ],
+    [
+     "HOWDY",
+     "n"
+    ],
+    [
+     "CLOWNY",
+     "h"
+    ],
+    [
+     "DINO PUP",
+     "n"
+    ],
+    [
+     "SPACE PUP",
+     "h"
+    ]
+   ]
   }
  ]
 }
