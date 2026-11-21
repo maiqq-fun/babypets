@@ -486,6 +486,100 @@
      "h"
     ]
    ]
+  },
+  {
+   "id": 11,
+   "name": "SLEEPY BOYS 厭世男孩",
+   "odds": "h2",
+   "figs": [
+    [
+     "SKATE",
+     "n"
+    ],
+    [
+     "BUBBLE",
+     "n"
+    ],
+    [
+     "INK",
+     "n"
+    ],
+    [
+     "MONSTER",
+     "r"
+    ],
+    [
+     "NO.23",
+     "n"
+    ],
+    [
+     "LEO",
+     "sr"
+    ],
+    [
+     "BONES",
+     "n"
+    ],
+    [
+     "FLUFF",
+     "h"
+    ],
+    [
+     "BEATS",
+     "r"
+    ],
+    [
+     "JUICE",
+     "h"
+    ]
+   ]
+  },
+  {
+   "id": 12,
+   "name": "SLEEPY GIRLS 厭世女孩",
+   "odds": "h2",
+   "figs": [
+    [
+     "SUNNY",
+     "n"
+    ],
+    [
+     "NOISE",
+     "n"
+    ],
+    [
+     "LOLLI",
+     "r"
+    ],
+    [
+     "LEOPARD",
+     "n"
+    ],
+    [
+     "KITTEN",
+     "n"
+    ],
+    [
+     "POP",
+     "r"
+    ],
+    [
+     "ANGEL",
+     "h"
+    ],
+    [
+     "BOW",
+     "sr"
+    ],
+    [
+     "FLUFFY",
+     "n"
+    ],
+    [
+     "CAMO",
+     "h"
+    ]
+   ]
   }
  ]
 }
