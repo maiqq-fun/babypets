@@ -298,6 +298,53 @@
      "h"
     ]
    ]
+  },
+  {
+   "id": 8,
+   "name": "PIGGY CLUB 胖胖豬俱樂部",
+   "odds": "h2",
+   "figs": [
+    [
+     "BUBBLE",
+     "n"
+    ],
+    [
+     "KITTY",
+     "n"
+    ],
+    [
+     "FROGGY",
+     "n"
+    ],
+    [
+     "CHEF P",
+     "n"
+    ],
+    [
+     "COSMO",
+     "r"
+    ],
+    [
+     "STRAWBY",
+     "n"
+    ],
+    [
+     "SHARKY",
+     "r"
+    ],
+    [
+     "HIP-HOP",
+     "h"
+    ],
+    [
+     "SWEETIE",
+     "sr"
+    ],
+    [
+     "MAGIC",
+     "h"
+    ]
+   ]
   }
  ]
 }
