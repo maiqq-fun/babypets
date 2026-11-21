@@ -392,6 +392,53 @@
      "h"
     ]
    ]
+  },
+  {
+   "id": 9,
+   "name": "SUNNY TOWN 陽光小鎮",
+   "odds": "h2",
+   "figs": [
+    [
+     "ZAP",
+     "n"
+    ],
+    [
+     "BUBBLES",
+     "n"
+    ],
+    [
+     "DINER DOT",
+     "n"
+    ],
+    [
+     "DOC",
+     "sr"
+    ],
+    [
+     "CHILL",
+     "n"
+    ],
+    [
+     "ARTSY",
+     "r"
+    ],
+    [
+     "STARRY",
+     "h"
+    ],
+    [
+     "SCOUT",
+     "n"
+    ],
+    [
+     "NEKO GAMER",
+     "r"
+    ],
+    [
+     "ROCKY",
+     "h"
+    ]
+   ]
   }
  ]
 }
