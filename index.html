@@ -1119,6 +1119,20 @@ img{-webkit-user-drag:none}
 .xmrain{position:fixed;top:-60px;width:38px;z-index:99996;pointer-events:none;animation:xmfall linear forwards}
 @keyframes xmfall{to{transform:translateY(115vh) rotate(260deg)}}
 .xmend .who{height:min(200px,24vh)}
+
+/* ===== 🔄 公仔交換 ===== */
+.xcrow{display:flex;align-items:center;gap:8px;border:2px solid var(--wood);border-radius:16px;background:#fffaf0;padding:8px 10px;margin:8px 0}
+.xcfig{flex:1;min-width:0;text-align:center;font-size:12px;line-height:1.3}
+.xcfig img{width:64px;height:64px;object-fit:contain;display:block;margin:0 auto 2px}
+.xcarr{font-size:20px;flex:none}
+.xcmeta{font-size:12px;color:var(--soft);text-align:center;margin-top:2px}
+.xcbtns{display:flex;gap:6px;margin-top:6px}.xcbtns button{flex:1;padding:7px 4px;font-size:13px}
+.xcgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:8px 0}
+.xcgrid button{border:2px solid var(--wood);border-radius:12px;background:#fffaf0;padding:4px;font-size:11px;line-height:1.25;position:relative}
+.xcgrid button img{width:100%;aspect-ratio:1;object-fit:contain;display:block}
+.xcgrid button i{position:absolute;top:2px;right:4px;font-style:normal;font-size:10px;color:var(--soft)}
+.xcpl{display:flex;flex-direction:column;gap:6px;margin:8px 0}.xcpl button{text-align:left;padding:9px 12px;border:2px solid var(--wood);border-radius:14px;background:#fffaf0;font-size:14px}
+.bdot{display:inline-flex;min-width:18px;height:18px;border-radius:9px;background:#ff6b6b;color:#fff;font-size:11px;align-items:center;justify-content:center;padding:0 5px;margin-left:4px;vertical-align:1px}
 </style>
 </head>
 <body>
@@ -1314,7 +1328,7 @@ async function sync(quiet){
   try{const d=await api('getState',Object.assign(cred(),{where:curWhere()}));
     Object.assign(DB,{houses:d.houses,pets:d.pets,weights:d.weights,medical:d.medical,expenses:d.expenses,notes:d.notes,feed:d.feed,famOk:d.famOk,players:d.players||[],tlogs:d.tlogs||[]});
     DB.houses.forEach(h=>{if(!Array.isArray(h.poops))h.poops=[]});
-    keepPending();DB.letters=(d.letters||[]).filter(l=>!LGONE[l.id]).map(l=>Object.assign(l,LSTATE[l.id]||{},CLAIMED['l:'+l.id]?{claimed:true}:{}));DB.drops=(d.drops||[]).filter(x=>!PICKED.has(x.id));DB.notice=d.notice&&d.notice.t&&!(+d.notice.until&&Date.now()>+d.notice.until)?d.notice:null;DB.center=d.center||DB.center||null;DB.applies=d.applies||[];DB.rooms=d.rooms||DB.rooms||[];if(Array.isArray(d.bbx)){DB.bbx=d.bbx;bbRegister()}applyRooms();DB.amail=+d.amail||0;setTimeout(updAdminBadge,0);DB.kuji=d.kuji||DB.kuji||null;DB.online=d.online||[];setTimeout(checkAdminGifts,600);DB.rank=d.rank||DB.rank||null;osLogin();pushCheckLater();setTimeout(noticePop,1200);DB.dbl=d.dbl||'';DB.adminId=d.adminId||'';DB.star=d.star||null;DB.xmas=d.xmas||null;if(typeof bgmSync==='function')setTimeout(bgmSync,0);DB.jobs=d.jobs||null;setTimeout(jobPayCheck,1500);if(d.player)DB.starDone=+d.player.starDone||0;DB.xmasDone=+d.player.xmasDone||0;
+    keepPending();DB.letters=(d.letters||[]).filter(l=>!LGONE[l.id]).map(l=>Object.assign(l,LSTATE[l.id]||{},CLAIMED['l:'+l.id]?{claimed:true}:{}));DB.drops=(d.drops||[]).filter(x=>!PICKED.has(x.id));DB.notice=d.notice&&d.notice.t&&!(+d.notice.until&&Date.now()>+d.notice.until)?d.notice:null;DB.center=d.center||DB.center||null;DB.applies=d.applies||[];DB.rooms=d.rooms||DB.rooms||[];if(Array.isArray(d.bbx)){DB.bbx=d.bbx;bbRegister()}applyRooms();DB.amail=+d.amail||0;setTimeout(updAdminBadge,0);DB.kuji=d.kuji||DB.kuji||null;DB.online=d.online||[];setTimeout(checkAdminGifts,600);DB.rank=d.rank||DB.rank||null;osLogin();pushCheckLater();setTimeout(noticePop,1200);DB.dbl=d.dbl||'';DB.adminId=d.adminId||'';DB.star=d.star||null;DB.xmas=d.xmas||null;DB.trades=Array.isArray(d.trades)?d.trades:(DB.trades||[]);if(typeof xcSync==='function')setTimeout(xcSync,0);if(typeof bgmSync==='function')setTimeout(bgmSync,0);DB.jobs=d.jobs||null;setTimeout(jobPayCheck,1500);if(d.player)DB.starDone=+d.player.starDone||0;DB.xmasDone=+d.player.xmasDone||0;
     setTimeout(announceLetters,0);setTimeout(updGuestBar,0);
     if(d.player&&DB.me){DB.me.code=d.player.code||DB.me.code;if(d.player.pin)DB.me.pin=d.player.pin;const ml=Array.isArray(d.player.mail)?d.player.mail:[];if(ml.length)claimMail(ml)}
     DB.owned={};d.houses.forEach(h=>DB.owned[h.id]=Array.isArray(h.owned)?h.owned:[]);
@@ -3662,7 +3676,7 @@ const keepScroll=fn=>{const st=$('#sheet').scrollTop;fn();$('#sheet').scrollTop=
 function renderShopHome(h){const mg=isMgr(h.id);
   $('#famtools').innerHTML=mg?`<button class="act" id="fs1">👔 店員</button><button class="act" id="fs2">⚙️ 店</button><button class="act" id="fs3">🧸 擺設</button>`:'';
   if(mg){$('#fs1').onclick=()=>shopMgrSheet('staff');$('#fs2').onclick=()=>shopMgrSheet('shop');$('#fs3').onclick=toyPlacer}
-  $('#famtools').insertAdjacentHTML('afterbegin','<button class="act" id="fsbb">🎁 盲盒</button><button class="act" id="fsdc">🛋️ 裝潢</button>');$('#fsbb').onclick=bbShop;$('#fsdc').onclick=()=>decoShop();
+  $('#famtools').insertAdjacentHTML('afterbegin','<button class="act" id="fsbb">🎁 盲盒</button><button class="act" id="fsdc">🛋️ 裝潢</button><button class="act" id="fsxc">🔄 交換</button>');$('#fsbb').onclick=bbShop;$('#fsdc').onclick=()=>decoShop();$('#fsxc').onclick=()=>xcSheet();xcSync();
   jobBtn('shop');
   $('#feed').textContent='🛍️ 買二手';$('#feed').onclick=()=>tradeSheet('buy');
   $('#giftbtn').textContent='💰 賣東西';$('#giftbtn').onclick=()=>tradeSheet('sell');$('#giftbtn').style.display='';
@@ -4260,7 +4274,7 @@ function showClose(p,sel){const h=house(SHV.hid),s=showNorm(h.show),cid=s.pos[p]
     <div class="row2">${fam?'<button id="shswap">🔁 換櫃子</button>':''}<button data-close class="primary">關閉</button></div>`);
   if($('#shswap'))$('#shswap').onclick=()=>showCabPick(p);
   $('#sheet').querySelectorAll('.shs').forEach(b=>b.onclick=()=>{const i=+b.dataset.i,it=showNorm(house(SHV.hid).show).it[p][i];
-    if(!fam){if(it)toast(`${(ITEMS[it]||{}).emo||''}${(ITEMS[it]||{}).name||'玩具'}`);return}
+    if(!fam){if(it){if(XC_RE.test(it))xcFromShow(SHV.hid,it);else toast(`${(ITEMS[it]||{}).emo||''}${(ITEMS[it]||{}).name||'玩具'}`)}return}
     it?showItemMenu(p,i,it):showToyPick(p,i)})}
 function showToyPick(p,i){const L=bagList('fig').concat(bagList('toy'));
   if(!L.length)return openModal(`<div style="text-align:center"><h3>背包裡沒有玩具</h3><p class="lead">去毛二街抽盲盒、去商店買玩具，或把家裡地上的玩具收回背包，就能擺進展示櫃了</p></div><div class="row2"><button id="shbk">← 回去</button></div>`),$('#shbk').onclick=()=>showClose(p,i);
@@ -4437,6 +4451,78 @@ function adminXmasSec(d){const S=d.xmas||DB.xmas,on=S&&+S.start&&Date.now()<+S.e
     <div class="row2"><button id="axm1" class="primary">${on?'重新開始':'現在開始'}</button>${on?'<button id="axm0" class="danger">提早結束</button>':''}</div></div>`}
 function adminXmasBind(){const go=async(on,b)=>{if(!armBtn(b,on?'確定開始？':'確定結束？'))return;try{const r=await adminCall('adminXmas',{on:on?1:0});DB.xmas=r;updXmBtn();toast(on?'🎄 聖誕活動開始了！':'聖誕活動結束了');adminSheet()}catch(e){toast(e.message)}};
   if($('#axm1'))$('#axm1').onclick=e=>go(1,e.currentTarget);if($('#axm0'))$('#axm0').onclick=e=>go(0,e.currentTarget)}
+
+// ================= 🔄 公仔交換（v2.06）=================
+// 提出時自己那隻先交給後端保管（背包扣掉）；對方答應才互換；婉拒／取消／3 天沒回，下次同步自動退回
+const XC_RE=/^bb\d+_\d{2}$/,XC_MAX=3,XC_ST={wait:'等對方回覆',ok:'換好了 🎉',no:'對方婉拒了',cancel:'已取消',exp:'過期了'};
+const xcName=id=>(ITEMS[id]||{}).name||'公仔',xcImg=id=>{const m=/^bb(\d+)_(\d{2})$/.exec(id);return m?bbImg(+m[1],+m[2]-1):''};
+const xcMine=()=>(DB.trades||[]).filter(t=>DB.me&&t.from===DB.me.id),xcIn=()=>(DB.trades||[]).filter(t=>DB.me&&t.to===DB.me.id&&t.st==='wait');
+const XCDONE=new Set(),XCSEEN=new Set((()=>{try{return JSON.parse(localStorage.getItem('mhd_xcseen')||'[]')}catch(e){return []}})());
+// 同步回來：領回結果、提醒有新邀請
+function xcSync(){if(!DB.me||!ONLINE)return;
+  xcMine().filter(t=>t.st!=='wait'&&!t.fromDone&&!XCDONE.has(t.id)).forEach(t=>{XCDONE.add(t.id);
+    call('tradeClaim',Object.assign(cred(),{id:t.id}),true).then(r=>{if(!r||r.already||!r.item)return;bagAdd(r.item,1);t.fromDone=1;
+      toast(t.st==='ok'?`🔄 ${t.toNick} 答應交換了！拿到「${xcName(r.item)}」`:`🔄 「${xcName(r.item)}」退回背包了（${XC_ST[t.st]}）`);if(t.st==='ok')sfx('gift')}).catch(()=>XCDONE.delete(t.id))});
+  const fresh=xcIn().filter(t=>!XCSEEN.has(t.id));if(fresh.length){fresh.forEach(t=>XCSEEN.add(t.id));try{localStorage.setItem('mhd_xcseen',JSON.stringify([...XCSEEN].slice(-60)))}catch(e){}
+    setTimeout(()=>toast(`🔄 ${fresh[0].fromNick} 想跟你交換公仔，到毛二街「交換」看看`),1200)}
+  const b=$('#fsxc');if(b)b.innerHTML='🔄 交換'+(xcIn().length?`<span class="bdot">${xcIn().length}</span>`:'')}
+// 自己有沒有這隻（背包或自己家的展示櫃）
+function xcHave(id){if((bag()[id]||0)>0)return {bag:1};const h=myHouse();if(!h||!hasShow(h))return null;const s=showNorm(h.show);
+  for(let p=0;p<s.it.length;p++){const i=s.it[p].indexOf(id);if(i>=0)return {pos:p,i}}return null}
+function xcCard(t,mine){const other=mine?t.toNick:t.fromNick,a=mine?t.give:t.want,b=mine?t.want:t.give;
+  return `<div class="xcrow" style="flex-wrap:wrap"><div class="xcfig"><img src="${xcImg(a)}" alt="">${mine?'你給':'他要'}<br><b>${esc(xcName(a))}</b></div><div class="xcarr">⇄</div>
+    <div class="xcfig"><img src="${xcImg(b)}" alt="">${mine?'你要':'他給'}<br><b>${esc(xcName(b))}</b></div>
+    <div style="width:100%"><div class="xcmeta">${mine?'跟':'來自'} ${esc(other)}・${ago(t.at)}・${XC_ST[t.st]||''}</div>
+    ${t.st==='wait'?`<div class="xcbtns">${mine?`<button data-xcc="${t.id}">取消</button>`:`<button data-xcn="${t.id}">婉拒</button><button class="primary" data-xcy="${t.id}">答應交換</button>`}</div>`:''}</div></div>`}
+function xcSheet(tab){if(!needMe())return;tab=tab||(xcIn().length?'in':'new');const nIn=xcIn().length;
+  const tabs=`<div class="dctab"><button data-xt="in" class="${tab==='in'?'on':''}">📥 收到${nIn?`<span class="bdot">${nIn}</span>`:''}</button><button data-xt="out" class="${tab==='out'?'on':''}">📤 我發出的</button><button data-xt="new" class="${tab==='new'?'on':''}">＋ 發起</button></div>`;
+  let body='';
+  if(tab==='in'){const L=xcIn();body=L.length?L.map(t=>xcCard(t,false)).join(''):'<div class="locked">還沒有人想跟你換<br>櫃子擺滿一點，說不定就有人來問了</div>'}
+  else if(tab==='out'){const L=xcMine();body=(L.length?L.map(t=>xcCard(t,true)).join(''):'<div class="locked">你還沒發出交換邀請</div>')+`<p class="lead" style="font-size:12px">同時最多 ${XC_MAX} 個・3 天沒回覆會自動退回</p>`}
+  else{const P=(DB.players||[]).filter(p=>p.houseId&&p.id!==DB.me.id);
+    body=`<p class="lead" style="font-size:13px">想跟誰換？可以看到他背包和展示櫃裡的公仔</p><div class="xcpl">${P.map(p=>{const n=xcTheirs(p).length;return `<button data-xp="${p.id}" ${n?'':'disabled'}>${esc(p.nick)}<small style="color:var(--soft)">　${n?n+' 種公仔':'還沒有公仔'}</small></button>`}).join('')||'<div class="locked">島上還沒有其他人</div>'}</div>`}
+  openModal(`<h3>🔄 公仔交換</h3>${tabs}${body}<div class="row2"><button data-close>關閉</button></div>`);
+  $('#sheet').querySelectorAll('[data-xt]').forEach(b=>b.onclick=()=>xcSheet(b.dataset.xt));
+  $('#sheet').querySelectorAll('[data-xp]').forEach(b=>b.onclick=()=>xcPickWant(b.dataset.xp));
+  $('#sheet').querySelectorAll('[data-xcc]').forEach(b=>b.onclick=()=>xcCancel(b.dataset.xcc));
+  $('#sheet').querySelectorAll('[data-xcn]').forEach(b=>b.onclick=()=>xcAnswer(b.dataset.xcn,false));
+  $('#sheet').querySelectorAll('[data-xcy]').forEach(b=>b.onclick=()=>xcAnswer(b.dataset.xcy,true))}
+// 對方有的公仔：背包＋他家展示櫃
+function xcTheirs(p){const S=new Set((p.figs||[]).filter(id=>XC_RE.test(id)&&ITEMS[id]));const h=house(p.houseId);
+  if(h&&hasShow(h))showNorm(h.show).it.forEach(a=>a.forEach(id=>{if(id&&XC_RE.test(id)&&ITEMS[id])S.add(id)}));return [...S].sort()}
+function xcPickWant(pid){const p=(DB.players||[]).find(x=>x.id===pid);if(!p)return;const L=xcTheirs(p);
+  openModal(`<h3>🔄 想要 ${esc(p.nick)} 的哪一隻？</h3><div class="xcgrid">${L.map(id=>`<button data-w="${id}"><img src="${xcImg(id)}" alt="">${esc(xcName(id))}${xcHave(id)?'<i>有了</i>':''}</button>`).join('')}</div><div class="row2"><button id="xcb">← 回去</button></div>`);
+  $('#xcb').onclick=()=>xcSheet('new');$('#sheet').querySelectorAll('[data-w]').forEach(b=>b.onclick=()=>xcPickGive(pid,b.dataset.w))}
+function xcPickGive(pid,want){const p=(DB.players||[]).find(x=>x.id===pid);if(!p)return;const L=bagList('fig').filter(([id])=>XC_RE.test(id));
+  if(!L.length)return openModal(`<div style="text-align:center"><h3>背包裡沒有可以換的公仔</h3><p class="lead">去毛二街抽盲盒，或把展示櫃裡的公仔收回背包，就能拿來換了</p></div><div class="row2"><button data-close class="primary">好</button></div>`);
+  openModal(`<h3>🔄 用哪一隻跟 ${esc(p.nick)} 換「${esc(xcName(want))}」？</h3><p class="lead" style="font-size:12px">只能用背包裡的公仔換・送出後這隻先交給島上保管，對方沒答應就會退回</p>
+    <div class="xcgrid">${L.map(([id,n])=>`<button data-g="${id}"><img src="${xcImg(id)}" alt="">${esc(xcName(id))}<i>×${n}</i></button>`).join('')}</div><div class="row2"><button id="xcb">← 回去</button></div>`);
+  $('#xcb').onclick=()=>xcPickWant(pid);
+  $('#sheet').querySelectorAll('[data-g]').forEach(b=>b.onclick=()=>{const give=b.dataset.g;
+    openModal(`<h3>確定要提出交換嗎？</h3><div class="xcrow"><div class="xcfig"><img src="${xcImg(give)}" alt="">你給<br><b>${esc(xcName(give))}</b></div><div class="xcarr">⇄</div><div class="xcfig"><img src="${xcImg(want)}" alt="">你要<br><b>${esc(xcName(want))}</b></div></div>
+      <p class="lead" style="font-size:12px">${esc(p.nick)} 會收到通知，3 天內沒回覆會自動退回</p><div class="row2"><button id="xcno">← 回去</button><button class="primary" id="xcyes">送出邀請</button></div>`);
+    $('#xcno').onclick=()=>xcPickGive(pid,want);
+    $('#xcyes').onclick=async e=>{const bt=e.currentTarget;if(!((bag()[give]||0)>0))return toast('背包裡已經沒有這隻了');bt.disabled=true;bagAdd(give,-1);
+      try{const r=await call('tradeOffer',Object.assign(cred(),{to:pid,give,want}));(DB.trades=DB.trades||[]).unshift(r.trade);sfx('tap');toast(`🔄 邀請送出了，等 ${p.nick} 回覆`);xcSheet('out')}
+      catch(x){bagAdd(give,1);bt.disabled=false;toast(x.message)}}})}
+async function xcCancel(id){const t=(DB.trades||[]).find(x=>x.id===id);if(!t)return;
+  try{const r=await call('tradeCancel',Object.assign(cred(),{id}));Object.assign(t,r.trade);xcSync();setTimeout(()=>xcSheet('out'),400)}catch(e){toast(e.message)}}
+async function xcAnswer(id,ok){const t=(DB.trades||[]).find(x=>x.id===id);if(!t)return;
+  if(!ok){try{const r=await call('tradeAnswer',Object.assign(cred(),{id,ok:0}));Object.assign(t,r.trade);toast('婉拒了');xcSheet('in')}catch(e){toast(e.message)}return}
+  const have=xcHave(t.want);if(!have)return toast(`你已經沒有「${xcName(t.want)}」了，沒辦法換`);
+  try{const r=await call('tradeAnswer',Object.assign(cred(),{id,ok:1}));Object.assign(t,r.trade);
+    if(have.bag)bagAdd(t.want,-1);else{const h=myHouse();showDo(h.id,{op:'take',pos:have.pos,i:have.i})}
+    bagAdd(t.give,1);sfx('gift');
+    openModal(`<div style="text-align:center"><div class="giftopen"><img src="${xcImg(t.give)}" alt="" style="width:120px"></div><h3>🔄 換好了！</h3><p class="lead">你用「${esc(xcName(t.want))}」換到了「${esc(xcName(t.give))}」<br>已經放進背包了</p></div><div class="row2"><button id="xcback">回交換所</button><button data-close class="primary">好</button></div>`);
+    $('#xcback').onclick=()=>xcSheet('in')}catch(e){toast(e.message)}}
+// 朋友展示間：點公仔 → 想跟他換
+function xcFromShow(hid,id){const h=house(hid),it=ITEMS[id]||{};const M=(DB.players||[]).filter(p=>p.houseId===hid);
+  const can=XC_RE.test(id)&&DB.me&&myHouse()&&M.length;
+  openModal(`<div style="text-align:center">${itemIcon(id,'huge')}<h3>${esc(it.name||id)}</h3>${can?`<p class="lead" style="font-size:13px">喜歡的話，可以拿你的公仔跟${esc(h.name)}換</p>`:''}</div>
+    <div class="row2"><button data-close>關閉</button>${can?'<button class="primary" id="xcgo">🔄 想跟他換</button>':''}</div>`);
+  if($('#xcgo'))$('#xcgo').onclick=()=>{if(M.length===1)return xcPickGive(M[0].id,id);
+    openModal(`<h3>要跟誰換？</h3><div class="xcpl">${M.map(p=>`<button data-xm="${p.id}">${esc(p.nick)}</button>`).join('')}</div><div class="row2"><button data-close>取消</button></div>`);
+    $('#sheet').querySelectorAll('[data-xm]').forEach(b=>b.onclick=()=>xcPickGive(b.dataset.xm,id))}}
 // ================= 🎁 盲盒店（v1.95）=================
 // 機率和保底在後端抽，前端只知道名字和哪幾格是隱藏版（開箱時顯示金框「?」）
 const BB_PRICE=200,BB_PITY=150,BB_RN={N:'⚪ 普通',R:'🔵 稀有',S:'🟣 超稀有',H:'🌟 隱藏版！'};
@@ -5244,7 +5330,7 @@ function announceLetters(){if(!DB.me)return;let seen=[];try{seen=JSON.parse(loca
     sfx('gift');$('#lgopen').onclick=()=>openLetter(nw[0].id,()=>$('#bell').click())};
   setTimeout(go,1800)}
 // ================= 自動更新：發現新版本就重新載入 =================
-const APP_VER='v2.05';
+const APP_VER='v2.06';
 function checkUpdate(){
   if(!/^https?:/.test(location.protocol)||!API_URL)return;
   if(!$('#modal').classList.contains('hidden'))return; // 正在填表單時不打斷
