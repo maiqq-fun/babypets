@@ -1086,7 +1086,7 @@ img{-webkit-user-drag:none}
 .bbov .pity{margin-top:10px;font-size:12px;opacity:.75;min-height:1em}
 .bbspark{position:fixed;font-size:22px;pointer-events:none;z-index:99998;animation:bbspk 1.1s ease-out forwards}
 @keyframes bbspk{0%{transform:translate(0,0) scale(.4);opacity:1}100%{transform:translate(var(--dx),var(--dy)) scale(1.2);opacity:0}}
-.dctab{display:flex;gap:6px;margin:4px 0 8px}.dctab button{flex:1;border:2px solid var(--wood);border-radius:14px;background:#fffaf0;padding:7px 4px;font-size:13px;font-weight:700}
+.dctab{display:flex;gap:6px;margin:4px 0 8px}.dctab button{flex:1;min-width:0;border:2px solid var(--wood);border-radius:14px;background:#fffaf0;padding:7px 2px;font-size:13px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .dctab button.on{background:#ffd9a8}
 #toast,#busy{z-index:100000!important}
 /* v2.05：小島右上角 5 顆按鈕（多了音樂開關）在 iPhone 上會擠出畫面 → 按鈕跟著螢幕寬度縮小、Logo 小一點 */
@@ -4723,7 +4723,7 @@ const F2SHOP=[{id:'f2shop_pig',n:'粉紅小豬房',p:1500},{id:'f2shop_xmas',n:'
 const f2Shop=id=>F2SHOP.find(x=>x.id===id);
 const shHid=()=>(SHV&&$('#shv'))?SHV.hid:((myHouse()||{}).id);
 function decoShop(tab){if(!needMe())return;const h=myHouse();if(!h)return toast('要有家才能買裝潢');tab=tab||'f2';const g=DB.game;
-  const tabs=`<div class="dctab"><button data-dt="f2" class="${tab==='f2'?'on':''}">🛏️ 二樓背景</button><button data-dt="room" class="${tab==='room'?'on':''}">🖼️ 展示間</button><button data-dt="cab" class="${tab==='cab'?'on':''}">🗄️ 展示櫃</button><button data-dt="wall" class="${tab==='wall'?'on':''}">🧱 牆面</button></div>`;
+  const tabs=`<div class="dctab"><button data-dt="f2" class="${tab==='f2'?'on':''}">🛏️ 二樓</button><button data-dt="room" class="${tab==='room'?'on':''}">🖼️ 展示間</button><button data-dt="cab" class="${tab==='cab'?'on':''}">🗄️ 櫃子</button><button data-dt="wall" class="${tab==='wall'?'on':''}">🧱 牆面</button></div>`;
   if(tab!=='f2'){if(!hasShow(h))return openModal(`<h3>🛋️ 裝潢目錄</h3>${tabs}<div class="locked">你家還沒有展示間<br>到島民中心「擴建」蓋一間吧</div><div class="row2"><button data-close>關閉</button></div>`),decoTabs();return tab==='room'?showRoomShop(tabs):tab==='wall'?wallShop(tabs):showCabShop(null,tabs)}
   const own=owned(h.id);
   openModal(`<h3>🛋️ 裝潢目錄</h3>${tabs}<p class="lead" style="font-size:12px">你有 🪙${g.coins||0}・${hasF2(h)?'買了收進房間收藏，到二樓「🎨 背景」就能換':'要先在島民中心擴建二樓才能用'}</p>
@@ -5473,7 +5473,7 @@ function announceLetters(){if(!DB.me)return;let seen=[];try{seen=JSON.parse(loca
     sfx('gift');$('#lgopen').onclick=()=>openLetter(nw[0].id,()=>$('#bell').click())};
   setTimeout(go,1800)}
 // ================= 自動更新：發現新版本就重新載入 =================
-const APP_VER='v2.07';
+const APP_VER='v2.08';
 function checkUpdate(){
   if(!/^https?:/.test(location.protocol)||!API_URL)return;
   if(!$('#modal').classList.contains('hidden'))return; // 正在填表單時不打斷
