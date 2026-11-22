@@ -1159,8 +1159,8 @@ img{-webkit-user-drag:none}
 .arcm{position:absolute;transform:translate(-50%,-100%);border:0;background:none;padding:0;cursor:pointer}
 .arcm>img{display:block;width:100%;pointer-events:none;filter:drop-shadow(0 8px 6px rgba(60,30,60,.35))}
 .arcm .lbl{position:absolute;left:50%;bottom:-1.6em;transform:translateX(-50%);white-space:nowrap;background:rgba(255,250,238,.95);border:2px solid #c98bd6;color:#7a3f8a;border-radius:999px;padding:0 10px;font-weight:800;font-size:clamp(11px,3.2cqw,15px)}
-.arcdoor{position:absolute;transform:translate(-50%,-100%);border:0;padding:0;cursor:pointer;background:linear-gradient(#b98be0,#8e5fc0);border:4px solid #ffe08a;border-bottom:0;border-radius:999px 999px 0 0;color:#fff;font-weight:900;display:flex;flex-direction:column;align-items:center;justify-content:center;text-shadow:0 2px 3px rgba(0,0,0,.35);font-size:clamp(10px,3cqw,15px);line-height:1.3;box-shadow:inset 0 0 18px rgba(255,255,255,.35)}
-.arcdoor img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain}
+.arcdoor{position:absolute;transform:translate(-50%,-100%);border:0!important;padding:0;cursor:pointer;background:none!important;box-shadow:none!important;outline:0;filter:drop-shadow(0 6px 4px rgba(60,30,60,.3));color:#fff;font-weight:900;display:flex;flex-direction:column;align-items:center;justify-content:center;text-shadow:0 2px 3px rgba(0,0,0,.35);font-size:clamp(10px,3cqw,15px);line-height:1.3;}
+.arcdoor img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;pointer-events:none}
 .arcov{position:fixed;inset:0;z-index:99990;background:radial-gradient(circle at 50% 30%,#5a3a7a,#1f1430 75%);display:flex;flex-direction:column;align-items:center;color:#fff;overflow:hidden;touch-action:manipulation;user-select:none}
 .arcov .ah{display:flex;width:100%;max-width:440px;align-items:center;justify-content:space-between;padding:max(12px,env(safe-area-inset-top)) 14px 6px;font-weight:800}
 .arcov .ah .apill{background:rgba(255,255,255,.15);border-radius:999px;padding:4px 10px;display:flex;gap:4px;align-items:center;white-space:nowrap}
@@ -4709,7 +4709,7 @@ function wallShop(tabs){const hid=shHid(),h=house(hid),s=showNorm(h.show),g=DB.g
 const ARC_POS={x:640,y:1300},ARC_SC=1.25,TOK_P=[[1,100],[5,450],[12,1000]];
 const ARC_PRIZE=[{k:'tok',n:'代幣 ×1',t:12},{k:'coin',n:'🪙300 金幣',t:50},{k:'fig',n:'隨機公仔（普通款）',t:60}];
 function arcG(){const g=DB.game;if(!g.arc||typeof g.arc!=='object')g.arc={tok:0,tkt:0};g.arc.tok=+g.arc.tok||0;g.arc.tkt=+g.arc.tkt||0;return g.arc}
-const tokIcon='<img class="mic" src="assets/token.webp" alt="" style="width:1.3em;height:1.3em;vertical-align:-.3em">';
+const tokIcon='<img class="mic" src="assets/token.webp?v=2" alt="" style="width:1.3em;height:1.3em;vertical-align:-.3em">';
 // 娃娃機裡的公仔：上架系列的普通款
 function arcPool(){const L=[];bbOn().forEach(S=>S.t.forEach(i=>{const id=bbId(S.id,i);if(ITEMS[id])L.push(id)}));return L}
 function openArcade(){if(!needMe())return;sfx&&sfx('tap');const v=sceneOpen('arcv','玩個毛','🎪 遊樂場','assets/arcade_room.webp','<img class="mic" src="assets/icon_down.webp" alt="">小島');renderArcade()}
@@ -4718,7 +4718,7 @@ function renderArcade(){const v=$('#arcv');if(!v)return;const st=v.querySelector
   put('prize_counter',600,905,215,'🎟️ 獎品櫃台',arcPrize);
   put('claw_machine',230,1175,260,'🧸 娃娃機',clawGame);
   put('mole_machine',620,1185,280,'🔨 打地鼠',moleGame);
-  const d=document.createElement('button');d.className='arcdoor';d.innerHTML='<img src="assets/dance_door.webp" alt="" onerror="this.remove()"><span>💃</span><span>練舞室</span>';Object.assign(d.style,hp(330,905),{width:(140/RW*100)+'%',height:(210/RH*100)+'%',zIndex:900});
+  const d=document.createElement('button');d.className='arcdoor';d.innerHTML='<img src="assets/dance_door.webp" alt="">';Object.assign(d.style,hp(330,905),{width:(190/RW*100)+'%',height:(190*520/412/RH*100)+'%',zIndex:900});
   d.onclick=e=>{e.stopPropagation();openModal(`<div style="text-align:center"><div style="font-size:56px">🚧</div><h3>練舞室還在蓋</h3><p class="lead">工人正在趕工中……<br>之後這裡會有跟朋友 PK 的遊戲，敬請期待！</p></div><div class="row2"><button data-close class="primary">好期待</button></div>`)};st.appendChild(d);
   v.querySelector('.cbtns').innerHTML=`<button class="act" id="arctok">${tokIcon} ${a.tok}</button><button class="act" id="arctkt">🎟️ ${a.tkt}</button><button class="act" id="arcbuy">買代幣</button><button class="act" id="arcrk">🏆 排行</button>`;
   $('#arctok').onclick=$('#arcbuy').onclick=arcBuy;$('#arctkt').onclick=arcPrize;$('#arcrk').onclick=arcRank}
@@ -4732,7 +4732,7 @@ function arcPrize(){const a=arcG(),g=DB.game;openModal(`<h3>🎟️ 獎品櫃台
     if(x.k==='tok'){a.tok++;toast('換到 1 枚代幣！')}else if(x.k==='coin'){grant(0,300);toast('換到 🪙300！')}else{const P=arcPool(),id=P[Math.floor(Math.random()*P.length)];bagAdd(id,1);toast(`換到「${xcName(id)}」！放進背包了`)}
     save();sfx('gift');renderArcade();arcPrize()})}
 function arcOv(title,a){const ov=document.createElement('div');ov.className='arcov';const A=arcG();
-  ov.innerHTML=`<div class="ah"><button class="x">← 離開</button><b>${title}</b><span class="apill"><img src="assets/token.webp" alt=""><b class="atk">${A.tok}</b>　🎟️ <b class="att">${A.tkt}</b></span></div>`;
+  ov.innerHTML=`<div class="ah"><button class="x">← 離開</button><b>${title}</b><span class="apill"><img src="assets/token.webp?v=2" alt=""><b class="atk">${A.tok}</b>　🎟️ <b class="att">${A.tkt}</b></span></div>`;
   document.body.appendChild(ov);ov.querySelector('.x').onclick=()=>{ov.remove();renderArcade()};const upd=()=>{ov.querySelector('.atk').textContent=arcG().tok;ov.querySelector('.att').textContent=arcG().tkt};return {ov,upd}}
 // ---------- 🧸 娃娃機 ----------
 const CLAW={a:352/486,x:[16,84],top:29,floor:64.5,cw:15,ca:319/419,pw:13};
@@ -5595,7 +5595,7 @@ function announceLetters(){if(!DB.me)return;let seen=[];try{seen=JSON.parse(loca
     sfx('gift');$('#lgopen').onclick=()=>openLetter(nw[0].id,()=>$('#bell').click())};
   setTimeout(go,1800)}
 // ================= 自動更新：發現新版本就重新載入 =================
-const APP_VER='v2.09';
+const APP_VER='v2.10';
 function checkUpdate(){
   if(!/^https?:/.test(location.protocol)||!API_URL)return;
   if(!$('#modal').classList.contains('hidden'))return; // 正在填表單時不打斷
