@@ -1133,6 +1133,27 @@ img{-webkit-user-drag:none}
 .xcgrid button i{position:absolute;top:2px;right:4px;font-style:normal;font-size:10px;color:var(--soft)}
 .xcpl{display:flex;flex-direction:column;gap:6px;margin:8px 0}.xcpl button{text-align:left;padding:9px 12px;border:2px solid var(--wood);border-radius:14px;background:#fffaf0;font-size:14px}
 .bdot{display:inline-flex;min-width:18px;height:18px;border-radius:9px;background:#ff6b6b;color:#fff;font-size:11px;align-items:center;justify-content:center;padding:0 5px;margin-left:4px;vertical-align:1px}
+
+/* ===== 🧱 展示間牆面 ===== */
+.shw{position:absolute;border:0;background:none;padding:0;cursor:pointer}
+.shw>img.wimg{display:block;width:100%;height:auto;pointer-events:none;filter:drop-shadow(0 4px 3px rgba(40,25,15,.3))}
+.shwit{position:absolute;display:flex;align-items:flex-end;justify-content:center;pointer-events:none}
+.shwit img{max-width:92%;max-height:100%;object-fit:contain;filter:drop-shadow(0 2px 2px rgba(40,25,15,.35))}
+.shneon{position:absolute;transform:translate(-50%,-50%);font-weight:900;white-space:nowrap;letter-spacing:.06em;font-size:clamp(16px,6.2cqw,34px);color:#fff;padding:.15em .5em;border-radius:.4em;border:2px solid currentColor;
+  text-shadow:0 0 4px #fff,0 0 10px var(--nc),0 0 22px var(--nc),0 0 40px var(--nc);box-shadow:0 0 10px var(--nc),inset 0 0 10px var(--nc);border-color:var(--nc);background:rgba(20,10,30,.25);cursor:pointer;animation:neonflick 6s infinite}
+@keyframes neonflick{0%,92%,100%{opacity:1}93%{opacity:.75}95%{opacity:1}96%{opacity:.82}}
+.shframe{position:absolute;border:0;background:none;padding:0;cursor:pointer}
+.shframe .ph{position:absolute;object-fit:cover;border-radius:6%;background:#f3e6d2;display:flex;align-items:center;justify-content:center;font-size:clamp(14px,4cqw,24px)}
+.shframe>img.fimg{position:relative;display:block;width:100%;pointer-events:none;filter:drop-shadow(0 4px 3px rgba(40,25,15,.3))}
+.shbadge{position:absolute;border:0;background:none;padding:0;cursor:pointer}
+.shbadge .bin{position:absolute;border-radius:50%;overflow:hidden;background:radial-gradient(circle,#fff6d8,#f4d58a);display:flex;align-items:center;justify-content:center;font-weight:900;color:#8a5a12;font-size:clamp(9px,2.6cqw,15px)}
+.shbadge .bin img{width:86%;height:86%;object-fit:contain}
+.shbadge>img{position:relative;display:block;width:100%;pointer-events:none;filter:drop-shadow(0 3px 2px rgba(40,25,15,.3))}
+.shwghost{position:absolute;transform:translate(-50%,-50%);border:2px dashed rgba(255,255,255,.7);border-radius:14px;background:rgba(255,250,238,.28);color:#fff;font-weight:700;text-shadow:0 1px 3px rgba(0,0,0,.45);font-size:clamp(10px,3cqw,14px);display:flex;align-items:center;justify-content:center;text-align:center;line-height:1.3;cursor:pointer}
+.wallbig{position:relative;width:100%}.wallbig>img{display:block;width:100%;height:auto}
+.neonchips{display:flex;gap:8px;flex-wrap:wrap;margin:8px 0}.neonchips button{width:38px;height:38px;border-radius:50%;border:3px solid #fff;box-shadow:0 0 0 2px var(--wood)}
+.neonchips button.on{box-shadow:0 0 0 3px #ff8fb1}
+.dcsec{font-weight:800;margin:12px 2px 2px;color:var(--ink)}
 </style>
 </head>
 <body>
@@ -1702,8 +1723,8 @@ async function pushSheet(){const kinds=`<div class="sec"><h4>會通知你的事<
 // ---------- 👑 島主：玩家金幣、轉移碼 ----------
 // ================= v1.83 👑 島主上傳：背景、房子、商店商品、折扣碼 =================
 let ADM_D=null;
-const ROOM_TYPES=[['N','普通（可抽卡、一番賞）'],['R','稀有（可抽卡、一番賞）'],['SSR','超稀有（可抽卡、一番賞）'],['LTD','限定款（只進一番賞 A 賞）'],['CU','訂製款（不抽，送給某一家）']];
-const ROOM_TN={N:'普通',R:'稀有',SSR:'超稀有',LTD:'限定款',CU:'訂製款'};
+const ROOM_TYPES=[['SH','展示間裝潢（在裝潢目錄賣，不會被抽到）'],['N','普通（可抽卡、一番賞）'],['R','稀有（可抽卡、一番賞）'],['SSR','超稀有（可抽卡、一番賞）'],['LTD','限定款（只進一番賞 A 賞）'],['CU','訂製款（不抽，送給某一家）']];
+const ROOM_TN={N:'普通',R:'稀有',SSR:'超稀有',LTD:'限定款',CU:'訂製款',SH:'展示間'};
 const PRICE_TIERS={treat:[['cheap','🍬 便宜',10,10],['normal','🍪 普通',15,20],['high','🎁 高級',30,50]],toy:[['cheap','🍬 便宜',20,40],['normal','🍪 普通',50,80],['high','🎁 高級',100,140],['lux','💎 豪華',160,200]]};
 const FAV_SPECIES=['貓','狗','兔','倉鼠','鳥','其他'];
 function tierPrice(kind,t){const T=(PRICE_TIERS[kind]||PRICE_TIERS.toy).find(x=>x[0]===t)||PRICE_TIERS[kind][1];const a=T[2],b=T[3];return Math.round((a+Math.random()*(b-a))/5)*5||a}
@@ -1800,10 +1821,11 @@ function roomEditor(o){const E=o?JSON.parse(JSON.stringify(o)):{name:'',r:'N',bo
     <p class="lead" style="font-size:12px">拉黃色框對準軟木板（右下角圓點調大小）；藍線是毛孩可以走的地板最上緣</p>
     ${fld('rename','名字',`<input id="rename" maxlength="12" value="${esc(E.name)}" placeholder="例如：星空露營房">`)}
     ${fld('retype','類別',`<select id="retype">${ROOM_TYPES.map(([k,n])=>`<option value="${k}" ${E.r===k?'selected':''}>${n}</option>`).join('')}</select>`)}
+    <div id="resh" style="display:${E.r==='SH'?'':'none'}">${fld('reprice','價錢（🪙）',`<input id="reprice" type="number" min="0" max="99999" value="${+E.p||1500}">`,'藍線拉到牆和地板交界的地方，展示櫃會站在這條線上')}</div>
     <div id="recu" style="display:${E.r==='CU'?'':'none'}"><label class="chk"><input type="checkbox" id="ref2" ${E.f2?'checked':''}> 二樓專用（只能放二樓，只能送給有二樓的家）</label>${fld('rehouse','送給哪一家（可以之後再送）',`<select id="rehouse"><option value="">（先不送）</option>${hs}</select>`)}</div>
     ${o?`<label class="chk"><input type="checkbox" id="reoff" ${E.off?'checked':''}> 下架（抽卡、一番賞不會再出現；已經有的人保留）</label>`:''}
     <div class="err" id="reerr"></div><div class="row2 sticky"><button id="reback">← 後台</button><button class="primary" id="resave">${o?'儲存':'上傳'}</button></div>`);
-  $('#reback').onclick=adminSheet;$('#retype').onchange=e=>{$('#recu').style.display=e.target.value==='CU'?'':'none'};
+  $('#reback').onclick=adminSheet;$('#retype').onchange=e=>{$('#recu').style.display=e.target.value==='CU'?'':'none';$('#resh').style.display=e.target.value==='SH'?'':'none'};
   const f2Opts=()=>{const on=$('#ref2').checked;[...$('#rehouse').options].forEach(o=>{if(o.value)o.disabled=on&&!o.dataset.f2});if(on&&$('#rehouse').selectedOptions[0]&&$('#rehouse').selectedOptions[0].disabled)$('#rehouse').value=''};$('#ref2').onchange=f2Opts;f2Opts();
   const box=$('#redit'),bd=$('#rebd'),fl=$('#refl'),W=848,H=1264;
   const draw=()=>{const b=E.board;Object.assign(bd.style,{left:b[0]/W*100+'%',top:b[1]/H*100+'%',width:(b[2]-b[0])/W*100+'%',height:(b[3]-b[1])/H*100+'%'});
@@ -1819,7 +1841,7 @@ function roomEditor(o){const E=o?JSON.parse(JSON.stringify(o)):{name:'',r:'N',bo
   if($('#refile'))$('#refile').onchange=async e=>{const f=e.target.files[0];if(!f)return;$('#rel').textContent='處理中…';try{img=await roomCrop(f);file=1;$('#reimg').src=img;$('#reimg').style.opacity=1;$('#rel').textContent='📷 換一張'}catch(x){$('#rel').textContent='這張圖讀不了，換一張'}};
   $('#resave').onclick=async ev=>{const b=ev.currentTarget,name=$('#rename').value.trim(),r=$('#retype').value;if(!name)return $('#reerr').textContent='幫背景取個名字';if(!img)return $('#reerr').textContent='先選一張背景圖';
     b.disabled=true;try{let url=o?o.img:'';if(file){b.textContent='上傳圖片中…';url=await upImg(img)}b.textContent='儲存中…';
-      const res=await adminCall('adminRoomSave',{room:{id:o?o.id:'',name,r,img:url,board:E.board,floor:E.floor,off:$('#reoff')?$('#reoff').checked:false,f2:r==='CU'&&$('#ref2').checked,houseId:r==='CU'?($('#rehouse').value||E.houseId||''):''}});
+      const res=await adminCall('adminRoomSave',{room:{id:o?o.id:'',name,r,img:url,board:E.board,floor:E.floor,off:$('#reoff')?$('#reoff').checked:false,f2:r==='CU'&&$('#ref2').checked,p:r==='SH'?Math.max(0,Math.round(+$('#reprice').value||0)):'',houseId:r==='CU'?($('#rehouse').value||E.houseId||''):''}});
       const L=DB.rooms=DB.rooms||[],i=L.findIndex(x=>x.id===res.id);if(i>=0)L[i]=res;else L.push(res);applyRooms();
       const to=r==='CU'&&$('#rehouse').value;if(to&&to!==(o&&o.houseId)){b.textContent='送給那一家…';try{await adminCall('adminGiftHouse',{houseId:to,room:res.id,roomName:name})}catch(x){toast(x.message)}}
       toast(o?'背景改好了':'新背景上架了 🖼️'+(to?'，也送給那一家了':''));adminSheet()}catch(x){$('#reerr').textContent=x.message;b.disabled=false;b.textContent=o?'儲存':'上傳'}}}
@@ -3104,7 +3126,7 @@ function shopSheet(tab){
 const KUJI_TIER={LTD:'A',SSR:'B',R:'C',N:'D'};
 function applyRooms(){(DB.rooms||[]).forEach(r=>{const t=r.r||'CU';if(Array.isArray(r.board))BOARDS[r.id]=r.board;if(r.floor&&r.floor.t)RFLOOR[r.id]=Object.assign({b:[0,848]},r.floor);
   Object.keys(KUJI_POOL).forEach(k=>{const i=KUJI_POOL[k].indexOf(r.id);if(i>=0)KUJI_POOL[k].splice(i,1)});
-  if(t==='CU')return;let c=CARDS.find(x=>x.id===r.id);if(!c){c={id:r.id};CARDS.push(c)}Object.assign(c,{name:r.name,r:t==='LTD'?'H':t,img:r.img,off:!!r.off,custom:1});
+  if(t==='CU'||t==='SH')return;let c=CARDS.find(x=>x.id===r.id);if(!c){c={id:r.id};CARDS.push(c)}Object.assign(c,{name:r.name,r:t==='LTD'?'H':t,img:r.img,off:!!r.off,custom:1});
   if(!r.off&&KUJI_TIER[t])KUJI_POOL[KUJI_TIER[t]].push(r.id)})}
 const KUJI_POOL={
   A:['party','princess','redcheck','hawaiicat','sweetdevil','snoopy','stussy'],
@@ -4200,7 +4222,13 @@ function cropSwap(id){const it=ITEMS[id],T=Object.entries(ITEMS).filter(([k,x])=
 
 // ================= 🗄️ 展示間（v1.94）=================
 // 家裡擴建一間展示間：買裝潢、買櫃子（左中右 3 個位置），每個櫃子 4 層 × 5 格，放背包裡的玩具
-const SHOW_COST=1500,SHOW_ROWS=4,SHOW_COLS=5,SHOW_N=SHOW_ROWS*SHOW_COLS,SHOW_POS=3;
+const SHOW_COST=1500,SHOW_ROWS=4,SHOW_COLS=5,SHOW_N=SHOW_ROWS*SHOW_COLS,SHOW_POS=3,SHOW_IT=6;
+// 🧱 牆面（v2.07）：層板 2 排（it[3]、it[4]，各 5 格）或壁櫃 1 個（it[5]）、相框 2 個、霓虹招牌、榮譽牆
+const WSH={"wood":{"n":"原木層板","p":800,"a":3.551,"y":12},"white":{"n":"白金燈光","p":800,"a":3.638,"y":10},"metal":{"n":"工業鐵板","p":800,"a":3.698,"y":15},"checker":{"n":"黑白格子","p":1500,"a":2.182,"y":45},"cherry":{"n":"櫻桃奶油","p":1500,"a":1.89,"y":52},"cloud":{"n":"雲朵月亮","p":1500,"a":1.614,"y":62},"drip":{"n":"奶油滴滴","p":1500,"a":2.051,"y":60},"holo":{"n":"幻彩貓咪","p":1500,"a":1.966,"y":58},"lamp":{"n":"檯燈小貓","p":1500,"a":1.59,"y":62},"moon":{"n":"月亮夜空","p":1500,"a":1.767,"y":55},"mushroom":{"n":"蘑菇燈小貓","p":1500,"a":1.744,"y":60},"navy":{"n":"深藍星球","p":1500,"a":1.695,"y":57},"neon":{"n":"紫光星球","p":1500,"a":1.652,"y":60},"pinkbow":{"n":"蝴蝶結小貓","p":1500,"a":1.661,"y":60},"pinkglass":{"n":"粉紅玻璃","p":1500,"a":1.664,"y":58},"pipe":{"n":"工業水管","p":1500,"a":1.684,"y":53},"planet":{"n":"霓虹星環","p":1500,"a":2.0,"y":62},"rail":{"n":"金色扶手","p":1500,"a":2.806,"y":45},"scallop":{"n":"奶油拱門","p":1500,"a":1.653,"y":57},"snow":{"n":"雪景小屋","p":1500,"a":1.567,"y":57},"ufo":{"n":"UFO 飛碟","p":1500,"a":1.831,"y":66}},
+  WFR={"wood":{"n":"原木相框","p":300,"a":0.747,"h":[16.8,23.4,83.2,86.6]},"gold":{"n":"金色相框","p":300,"a":0.833,"h":[17.6,16.0,82.4,84.0]},"moon":{"n":"月亮雲朵","p":800,"a":0.984,"h":[19.5,22.9,81.7,83.3]},"game":{"n":"遊戲機","p":800,"a":0.965,"h":[18.3,27.1,86.7,69.7]},"catring":{"n":"貓耳圓框","p":800,"a":0.978,"h":[19.8,18.5,80.9,72.3]},"calico":{"n":"三花貓","p":800,"a":0.857,"h":[20.4,20.0,81.0,83.3]},"game2":{"n":"星球遊戲機","p":800,"a":0.995,"h":[18.0,20.2,82.5,70.7]},"globe":{"n":"雪花球","p":800,"a":0.887,"h":[15.7,16.2,82.2,73.5]},"mecha":{"n":"機械風","p":800,"a":1.266,"h":[11.5,30.3,89.0,81.8]},"polaroid":{"n":"拍立得","p":800,"a":0.84,"h":[9.1,14.7,91.1,74.4]},"chainheart":{"n":"鍊條愛心","p":800,"a":1.212,"h":[12.1,15.2,87.1,86.9]},"cattv":{"n":"貓耳電視","p":800,"a":1.07,"h":[11.7,22.0,89.0,74.4]},"starchain":{"n":"星星鍊條","p":800,"a":1.088,"h":[15.8,17.0,83.3,83.0]},"clapper":{"n":"電影場記板","p":800,"a":1.056,"h":[8.4,33.6,87.3,79.5]},"navybow":{"n":"深藍蝴蝶結","p":800,"a":0.877,"h":[24.2,23.3,80.5,86.9]},"navywave":{"n":"深藍波浪","p":800,"a":1.146,"h":[17.5,19.3,83.3,78.8]},"porthole":{"n":"太空舷窗","p":800,"a":1.0,"h":[17.4,17.8,82.8,82.2]},"creamwave":{"n":"奶油波浪","p":800,"a":0.923,"h":[19.2,17.9,80.6,81.9]},"creamarch":{"n":"奶油拱門","p":800,"a":0.858,"h":[15.0,13.5,84.5,84.8]},"creamring":{"n":"奶油蝴蝶結","p":800,"a":0.91,"h":[14.2,21.9,85.1,86.9]},"pinkarch":{"n":"粉紅緞帶","p":800,"a":0.94,"h":[22.8,20.4,78.0,85.4]},"pinkcat":{"n":"粉紅小貓","p":800,"a":0.938,"h":[19.3,25.4,81.6,80.8]},"pinkheart":{"n":"粉紅愛心","p":800,"a":1.088,"h":[15.8,22.0,83.8,82.1]}},
+  WCB={"cat":{"n":"貓耳拱門","p":2500,"a":0.982,"y":[42,63,79],"x":[18,82]},"purple":{"n":"紫色遮雨棚","p":2500,"a":0.963,"y":[57,80],"x":[16,84]},"shop":{"n":"紅色小店","p":2500,"a":1.066,"y":[57,80],"x":[22,78]}},
+  WBADGE={"a": 0.885, "h": [15.3, 15.8, 84.9, 70.6]};
+const NEON_C={pink:'#ff5fa2',blue:'#4fc3ff',yellow:'#ffd23f',purple:'#b46bff',mint:'#3ee8b5',white:'#ffffff'},NEON_P=1500;
 // f：牆和地板交界的高度（原圖 1536 高裡的位置）
 const SHOW_ROOMS={basic:{n:'溫馨木地板',p:0,f:1040},lilac:{n:'薰衣草',p:800,f:1050},mint:{n:'薄荷條紋',p:800,f:1075},
   steel:{n:'工業風',p:1500,f:1045},space:{n:'星空宇宙',p:1500,f:1040},pink:{n:'粉紅公主',p:3000,f:1000}};
@@ -4218,16 +4246,24 @@ const SHOW_CABS={
   noir:{n:'黑金星球',p:3000,a:800/1106,x:[11,89],y:[34,50,66,84.5]},
   pearl:{n:'珍珠白金',p:3000,a:800/1135,x:[9,91],y:[35,51,67,85]}};
 const hasShow=h=>!!(h&&h.show&&typeof h.show==='object');
-const showRoomImg=id=>`assets/show_room_${SHOW_ROOMS[id]?id:'basic'}.webp`,showCabImg=id=>`assets/show_cab_${id}.webp`;
+const shCustom=()=>(DB.rooms||[]).filter(r=>r.r==='SH');
+function showRoomDef(id){if(SHOW_ROOMS[id])return SHOW_ROOMS[id];const r=shCustom().find(x=>x.id===id);return r?{n:r.name,p:+r.p||0,f:Math.round((r.floor&&+r.floor.y0||800)*1536/1264),img:r.img,off:!!r.off}:SHOW_ROOMS.basic}
+const showRoomImg=id=>SHOW_ROOMS[id]?`assets/show_room_${id}.webp`:(shCustom().find(x=>x.id===id)||{}).img||'assets/show_room_basic.webp',showCabImg=id=>`assets/show_cab_${id}.webp`;
 const clone=o=>JSON.parse(JSON.stringify(o==null?null:o));
-function showNorm(s){s=s&&typeof s==='object'?s:{};if(!SHOW_ROOMS[s.room])s.room='basic';s.rooms=Array.isArray(s.rooms)?s.rooms.filter(r=>SHOW_ROOMS[r]):[];if(s.rooms.indexOf('basic')<0)s.rooms.unshift('basic');
+function showNorm(s){s=s&&typeof s==='object'?s:{};const okR=r=>!!(SHOW_ROOMS[r]||shCustom().some(x=>x.id===r));if(!okR(s.room))s.room='basic';s.rooms=Array.isArray(s.rooms)?s.rooms.filter(okR):[];if(s.rooms.indexOf('basic')<0)s.rooms.unshift('basic');
   s.cabs=s.cabs&&typeof s.cabs==='object'&&!Array.isArray(s.cabs)?s.cabs:{};s.pos=Array.isArray(s.pos)?s.pos.slice(0,SHOW_POS):[];while(s.pos.length<SHOW_POS)s.pos.push('');s.pos=s.pos.map(c=>SHOW_CABS[c]?c:'');
-  s.it=Array.isArray(s.it)?s.it.slice(0,SHOW_POS):[];while(s.it.length<SHOW_POS)s.it.push([]);s.it=s.it.map(a=>{a=Array.isArray(a)?a.slice(0,SHOW_N):[];while(a.length<SHOW_N)a.push('');return a.map(x=>x||'')});return s}
+  s.it=Array.isArray(s.it)?s.it.slice(0,SHOW_IT):[];while(s.it.length<SHOW_IT)s.it.push([]);s.it=s.it.map(a=>{a=Array.isArray(a)?a.slice(0,SHOW_N):[];while(a.length<SHOW_N)a.push('');return a.map(x=>x||'')});
+  s.wo=s.wo&&typeof s.wo==='object'&&!Array.isArray(s.wo)?s.wo:{};const two=(a,D)=>{a=Array.isArray(a)?a.slice(0,2):[];while(a.length<2)a.push('');return a.map(x=>D[x]?x:'')};
+  s.wsh=two(s.wsh,WSH);s.wcb=WCB[s.wcb]?s.wcb:'';s.wfr=two(s.wfr,WFR);s.wfp=Array.isArray(s.wfp)?s.wfp.slice(0,2).map(x=>String(x||'')):['',''];while(s.wfp.length<2)s.wfp.push('');
+  s.neon=s.neon&&typeof s.neon==='object'&&s.neon.t?{t:String(s.neon.t).slice(0,12),c:NEON_C[s.neon.c]?s.neon.c:'pink'}:null;s.hon=Array.isArray(s.hon)?s.hon.slice(0,30):[];return s}
+const wallCap=(s,p)=>p<3?(s.pos[p]?SHOW_N:0):p<5?(s.wsh[p-3]?5:0):(s.wcb?WCB[s.wcb].y.length*3:0);
+const wFree=(s,k,id,exRow)=>(+s.wo[k+':'+id]||0)-(k==='sh'?s.wsh:k==='fr'?s.wfr:[s.wcb]).filter((x,r)=>x===id&&r!==exRow).length;
 const showFree=(s,id,exceptPos)=>(+s.cabs[id]||0)-s.pos.filter((c,i)=>c===id&&i!==exceptPos).length;
 // 前後端同一套規則（後端 showEdit 也照這個檢查）
 function showOp(s,{op,id,pos,i,item}){s=showNorm(s);pos=+pos;i=+i;
-  const okPos=()=>{if(!(pos>=0&&pos<SHOW_POS))throw new Error('沒有這個位置')},okSlot=()=>{okPos();if(!s.pos[pos])throw new Error('這裡還沒有櫃子');if(!(i>=0&&i<SHOW_N))throw new Error('沒有這一格')};
-  if(op==='buyRoom'){if(!SHOW_ROOMS[id])throw new Error('沒有這款裝潢');if(s.rooms.indexOf(id)>=0)throw new Error('已經有這款裝潢了');s.rooms.push(id);s.room=id}
+  const okPos=()=>{if(!(pos>=0&&pos<SHOW_POS))throw new Error('沒有這個位置')},okSlot=()=>{if(!(pos>=0&&pos<SHOW_IT))throw new Error('沒有這個位置');const cap=wallCap(s,pos);if(!cap)throw new Error(pos<3?'這裡還沒有櫃子':'這裡還沒有層板');if(!(i>=0&&i<cap))throw new Error('沒有這一格')};
+  const W={sh:WSH,cb:WCB,fr:WFR},row=+arguments[1].row,kind=String(arguments[1].kind||''),busy=p=>s.it[p].some(Boolean);
+  if(op==='buyRoom'){if(!SHOW_ROOMS[id]&&!shCustom().some(x=>x.id===id&&!x.off))throw new Error('沒有這款裝潢');if(s.rooms.indexOf(id)>=0)throw new Error('已經有這款裝潢了');s.rooms.push(id);s.room=id}
   else if(op==='room'){if(s.rooms.indexOf(id)<0)throw new Error('還沒有這款裝潢');s.room=id}
   else if(op==='buyCab'){if(!SHOW_CABS[id])throw new Error('沒有這款櫃子');if(Object.values(s.cabs).reduce((a,b)=>a+(+b||0),0)>=30)throw new Error('倉庫放不下了');s.cabs[id]=(+s.cabs[id]||0)+1;
     if(!isNaN(pos)&&pos>=0&&pos<SHOW_POS&&!s.pos[pos])s.pos[pos]=id;else{const e=s.pos.indexOf('');if(e>=0)s.pos[e]=id}}
@@ -4235,6 +4271,17 @@ function showOp(s,{op,id,pos,i,item}){s=showNorm(s);pos=+pos;i=+i;
     else{if(!SHOW_CABS[id])throw new Error('沒有這款櫃子');if(s.pos[pos]!==id&&showFree(s,id,pos)<=0)throw new Error('這款櫃子都擺出去了');s.pos[pos]=id}}
   else if(op==='put'){okSlot();if(s.it[pos][i])throw new Error('這格已經有東西了');if(!/^[a-z0-9_]{1,20}$/i.test(String(item||'')))throw new Error('這不是玩具');s.it[pos][i]=String(item)}
   else if(op==='take'){okSlot();if(!s.it[pos][i])throw new Error('這格是空的');s.it[pos][i]=''}
+  else if(op==='buyW'){if(!W[kind]||!W[kind][id])throw new Error('沒有這個商品');if(Object.values(s.wo).reduce((a,b)=>a+(+b||0),0)>=60)throw new Error('倉庫放不下了');s.wo[kind+':'+id]=(+s.wo[kind+':'+id]||0)+1;
+    if(kind==='sh'&&!s.wcb){const e=s.wsh.indexOf('');if(e>=0)s.wsh[e]=id}else if(kind==='cb'&&!s.wcb&&!busy(3)&&!busy(4)){s.wsh=['',''];s.wcb=id}else if(kind==='fr'){const e=s.wfr.indexOf('');if(e>=0)s.wfr[e]=id}}
+  else if(op==='setW'){if(!W[kind])throw new Error('不知道要放什麼');if(id&&!W[kind][id])throw new Error('沒有這一款');
+    if(kind==='sh'){if(!(row===0||row===1))throw new Error('沒有這一排');if(!id){if(busy(3+row))throw new Error('層板上還有東西，先收回背包');s.wsh[row]='';return s}
+      if(wFree(s,'sh',id,row)<=0)throw new Error('這款層板都掛出去了');if(s.wcb){if(busy(5))throw new Error('壁櫃裡還有東西，先收回背包才能換成層板');s.wcb=''}s.wsh[row]=id}
+    else if(kind==='cb'){if(!id){if(busy(5))throw new Error('壁櫃裡還有東西，先收回背包');s.wcb='';return s}if(wFree(s,'cb',id,0)<=0)throw new Error('你還沒有這款壁櫃');
+      if(busy(3)||busy(4))throw new Error('層板上還有東西，先收回背包才能換成壁櫃');if(s.wcb!==id&&busy(5))throw new Error('壁櫃裡還有東西，先收回背包');s.wsh=['',''];s.wcb=id}
+    else{if(!(row===0||row===1))throw new Error('沒有這個位置');if(id&&wFree(s,'fr',id,row)<=0)throw new Error('這款相框都掛出去了');s.wfr[row]=id;if(!id)s.wfp[row]=''}}
+  else if(op==='frPet'){if(!(row===0||row===1)||!s.wfr[row])throw new Error('這裡還沒有相框');s.wfp[row]=String(arguments[1].pet||'').slice(0,40)}
+  else if(op==='neon'){const t=String(arguments[1].t||'').trim().slice(0,12),c=String(arguments[1].c||'');if(!t)throw new Error('招牌要寫字');if(!NEON_C[c])throw new Error('沒有這個顏色');s.neon={t,c}}
+  else if(op==='honor'){}
   else throw new Error('不知道要做什麼');return s}
 // 剛改的展示間先記著，同步回來的舊資料不會蓋掉
 const SHOWP={};function keepShow(){const nw=Date.now();for(const hid in SHOWP){const o=SHOWP[hid],h=house(hid);if(!h||nw-o.t>60000){delete SHOWP[hid];continue}h.show=clone(o.s)}}
@@ -4255,19 +4302,20 @@ let SHV=null;
 function openShow(hid){const h=house(hid);if(!hasShow(h))return;sfx&&sfx('tap');h.show=showNorm(h.show);
   sceneOpen('shv',esc(h.name),'🗄️ 展示間',showRoomImg(h.show.room),'<img class="mic" src="assets/icon_down.webp" alt="">一樓');SHV={hid};renderShow()}
 function renderShow(){const v=$('#shv');if(!v||!SHV)return;const h=house(SHV.hid);if(!hasShow(h))return;const s=showNorm(h.show),fam=isFamily(h.id),st=v.querySelector('.cstage');
-  st.querySelector('.cbg').src=showRoomImg(s.room);st.querySelectorAll('.shcab,.shghost,.f2hint').forEach(x=>x.remove());
-  const R=SHOW_ROOMS[s.room],bottom=(R.f+75)/1536*100,stA=RW/RH;
+  st.querySelector('.cbg').src=showRoomImg(s.room);st.querySelectorAll('.shcab,.shghost,.f2hint,.shw,.shwit,.shneon,.shframe,.shbadge,.shwghost').forEach(x=>x.remove());
+  const R=showRoomDef(s.room),bottom=(R.f+75)/1536*100,stA=RW/RH;
   s.pos.forEach((cid,p)=>{const cx=[22.5,50,77.5][p];   // 手機比較窄時房間左右會被裁掉，櫃子往中間靠
     if(!cid){if(!fam)return;const g=document.createElement('button');g.className='shghost';g.innerHTML='＋<br>放櫃子';Object.assign(g.style,{left:cx+'%',top:bottom+'%'});g.onclick=e=>{e.stopPropagation();showCabPick(p)};st.appendChild(g);return}
     const C=SHOW_CABS[cid],w=Math.min(25.5,C.a*25/stA),el=document.createElement('button');el.className='shcab';el.innerHTML=cabHTML(cid,s.it[p],false);
     Object.assign(el.style,{left:cx+'%',top:bottom+'%',width:w+'%',zIndex:10+p%2});el.onclick=e=>{e.stopPropagation();showClose(p)};st.appendChild(el)});
+  renderWall(st,s,fam);
   if(!s.pos.some(c=>c)){const tip=document.createElement('div');tip.className='f2hint';tip.textContent=fam?'展示間空空的，先買一個櫃子吧！':'展示間還在布置中';st.appendChild(tip)}
-  const n=s.it.reduce((a,x)=>a+x.filter(Boolean).length,0);
-  v.querySelector('.cbtns').innerHTML=fam?`<button class="act" id="shcabs">🗄️ 櫃子</button><button class="act" id="shroom">🎨 裝潢</button><button class="act" id="shinfo">🧸 ${n}</button>`
+  const n=s.it.reduce((a,x)=>a+x.filter(Boolean).length,0);if(fam&&ONLINE&&!SHV.hon){SHV.hon=1;call('showEdit',Object.assign(cred(),{houseId:h.id,op:'honor'}),true).then(r=>{if(r&&r.show){const hh=house(h.id);if(hh){hh.show=r.show;renderShow()}}}).catch(()=>{})}
+  v.querySelector('.cbtns').innerHTML=fam?`<button class="act" id="shcabs">🗄️ 櫃子</button><button class="act" id="shwall">🧱 牆面</button><button class="act" id="shroom">🎨 裝潢</button><button class="act" id="shinfo">🧸 ${n}</button>`
     :`<button class="act" id="shinfo">🧸 收藏 ${n} 件</button>`;
-  if($('#shcabs'))$('#shcabs').onclick=()=>showCabShop();if($('#shroom'))$('#shroom').onclick=()=>showRoomShop();$('#shinfo').onclick=()=>toast(`${h.name} 的展示間擺了 ${n} 件收藏`)}
+  if($('#shcabs'))$('#shcabs').onclick=()=>showCabShop();if($('#shwall'))$('#shwall').onclick=()=>decoShop('wall');if($('#shroom'))$('#shroom').onclick=()=>showRoomShop();$('#shinfo').onclick=()=>toast(`${h.name} 的展示間擺了 ${n} 件收藏`)}
 // 近看一個櫃子
-function showClose(p,sel){const h=house(SHV.hid),s=showNorm(h.show),cid=s.pos[p],fam=isFamily(h.id);if(!cid)return;const C=SHOW_CABS[cid],n=s.it[p].filter(Boolean).length;
+function showClose(p,sel){if(p>=3)return wallClose(p,sel);const h=house(SHV.hid),s=showNorm(h.show),cid=s.pos[p],fam=isFamily(h.id);if(!cid)return;const C=SHOW_CABS[cid],n=s.it[p].filter(Boolean).length;
   openModal(`<h3>🗄️ ${esc(C.n)}<small style="font-weight:normal;font-size:13px;color:var(--soft)">　${n}/${SHOW_N}</small></h3>
     <div class="cabwrap">${cabHTML(cid,s.it[p],true,fam,sel)}</div>
     <p class="lead" style="font-size:12px;margin:6px 0 0">${fam?'點空格放玩具，點玩具可以收回背包':'點玩具看看是什麼'}</p>
@@ -4306,9 +4354,9 @@ function showCabShop(p,tabs){const hid=shHid(),h=house(hid),s=showNorm(h.show),g
       if(showDo(hid,{op:'buyCab',id,pos:p},()=>{g.coins+=C.p;save();updTix&&updTix()})){sfx('coin');toast(`買到了 ${C.n}！${$('#shv')?'':'回家到展示間就能看到'}`);closeModal()}else{g.coins+=C.p;save()}}})}
 function showRoomShop(tabs){const hid=shHid(),h=house(hid),s=showNorm(h.show),g=DB.game;if(tabs&&typeof tabs!=='string')tabs='';
   openModal(`<h3>${tabs?'🛋️ 裝潢目錄':'🎨 展示間裝潢'}</h3>${tabs||''}<p class="lead">你有 🪙${g.coins||0}・買過的裝潢可以隨時換</p>
-    <div class="shgrid">${Object.entries(SHOW_ROOMS).map(([id,R])=>{const own=s.rooms.indexOf(id)>=0;return `<button class="si room${s.room===id?' on':''}" data-r="${id}"><img class="pv" src="${showRoomImg(id)}" alt=""><div class="sn">${esc(R.n)}</div><div class="sf">${s.room===id?'使用中':own?'換上':'🪙'+R.p}</div></button>`}).join('')}</div>
+    <div class="shgrid">${Object.entries(SHOW_ROOMS).concat(shCustom().filter(r=>!r.off||s.rooms.includes(r.id)).map(r=>[r.id,showRoomDef(r.id)])).map(([id,R])=>{const own=s.rooms.indexOf(id)>=0;return `<button class="si room${s.room===id?' on':''}" data-r="${id}"><img class="pv" src="${showRoomImg(id)}" alt=""><div class="sn">${esc(R.n)}</div><div class="sf">${s.room===id?'使用中':own?'換上':'🪙'+R.p}</div></button>`}).join('')}</div>
     <div class="row2"><button data-close>關閉</button></div>`);if(tabs)decoTabs();
-  $('#sheet').querySelectorAll('[data-r]').forEach(b=>b.onclick=()=>{const id=b.dataset.r,R=SHOW_ROOMS[id],own=s.rooms.indexOf(id)>=0;if(s.room===id)return;
+  $('#sheet').querySelectorAll('[data-r]').forEach(b=>b.onclick=()=>{const id=b.dataset.r,R=showRoomDef(id),own=s.rooms.indexOf(id)>=0;if(s.room===id)return;
     if(own){if(showDo(hid,{op:'room',id})){sfx('tap');closeModal()}return}
     if((g.coins||0)<R.p)return toast(`金幣不夠，要 🪙${R.p}`);
     openModal(`<div style="text-align:center"><img src="${showRoomImg(id)}" alt="" style="width:150px;border-radius:12px"><h3>${esc(R.n)}</h3><p class="lead">🪙${R.p}</p></div><div class="row2"><button id="shno">← 回去</button><button class="primary" id="shyes">買！（🪙${R.p}）</button></div>`);
@@ -4523,6 +4571,101 @@ function xcFromShow(hid,id){const h=house(hid),it=ITEMS[id]||{};const M=(DB.play
   if($('#xcgo'))$('#xcgo').onclick=()=>{if(M.length===1)return xcPickGive(M[0].id,id);
     openModal(`<h3>要跟誰換？</h3><div class="xcpl">${M.map(p=>`<button data-xm="${p.id}">${esc(p.nick)}</button>`).join('')}</div><div class="row2"><button data-close>取消</button></div>`);
     $('#sheet').querySelectorAll('[data-xm]').forEach(b=>b.onclick=()=>xcPickGive(b.dataset.xm,id))}}
+
+// ================= 🧱 展示間牆面（v2.07）=================
+const WL={neonY:20.5,shY:[33,44.5],shW:38,cbB:46.5,cbW:30,frX:16,frY:[27.5,40.5],frW:14,bdX:[79.5,87],bdY:[25,32.5,40],bdW:7};   // 手機上舞台左右會被裁掉約 7%，兩側的東西往內靠
+const stagePct=(w,a)=>w*(RW/RH)/a;   // 寬 w% 的圖，在舞台上是幾 % 高
+const HON_N=k=>{const m=/^set:(\d+)$/.exec(k);if(m){const S=bbSer(+m[1]);return `集滿「${S?S.n:'盲盒'}」全系列`}return {hid:'抽到過隱藏版',star:'幫毛球找回星寶',xmas:'幫豆豆送完聖誕禮物',lv20:'Lv.20 資深島民',lv40:'Lv.40 傳奇島民',trade:'完成過公仔交換'}[k]||k};
+const HON_IN=k=>{const m=/^set:(\d+)$/.exec(k);if(m)return `<img src="${bbBox(+m[1])}" alt="">`;return {hid:'<img src="assets/fx_star.webp" alt="">',star:'<img src="assets/sb_happy.webp" alt="">',xmas:'<img src="assets/xm_icon.webp" alt="">',lv20:'20',lv40:'40',trade:'🔄'}[k]||'🏅'};
+function wallItems(st,box,items,cls){items.forEach(o=>{const el=document.createElement('span');el.className='shwit';Object.assign(el.style,{left:o.x+'%',top:o.y+'%',width:o.w+'%',height:o.h+'%',zIndex:o.z||6});el.innerHTML=`<img src="${itemSrc(o.it)}" alt="">`;st.appendChild(el)})}
+function renderWall(st,s,fam){const add=(el,css,fn)=>{Object.assign(el.style,css);if(fn)el.onclick=e=>{e.stopPropagation();fn()};st.appendChild(el);return el};
+  const ghost=(txt,x,y,w,h,fn)=>{if(!fam)return;const g=document.createElement('button');g.className='shwghost';g.innerHTML=txt;add(g,{left:x+'%',top:y+'%',width:w+'%',height:h+'%',zIndex:3},fn)};
+  // ✨ 霓虹招牌
+  if(s.neon){const n=document.createElement('div');n.className='shneon';n.textContent=s.neon.t;n.style.setProperty('--nc',NEON_C[s.neon.c]);add(n,{left:'50%',top:WL.neonY+'%',zIndex:4},()=>fam?neonEdit():toast(`✨ ${s.neon.t}`))}
+  else ghost('＋ 霓虹招牌',50,WL.neonY,30,4.5,()=>neonEdit());
+  // 🪵 層板 or 🏠 壁櫃
+  if(s.wcb){const C=WCB[s.wcb],h=stagePct(WL.cbW,C.a),top=WL.cbB-h,x0=50-WL.cbW/2,el=document.createElement('button');el.className='shw';el.innerHTML=`<img class="wimg" src="assets/wcb_${s.wcb}.webp" alt="">`;
+    add(el,{left:x0+'%',top:top+'%',width:WL.cbW+'%',zIndex:5},()=>wallClose(5));
+    const cw=(C.x[1]-C.x[0])/3,I=[];C.y.forEach((yb,r)=>{const prev=r?C.y[r-1]:yb-(C.y[1]-C.y[0]),hh=(yb-prev)*.8*h/100;for(let c=0;c<3;c++){const it=s.it[5][r*3+c];if(it)I.push({it,x:x0+(C.x[0]+cw*c)*WL.cbW/100,w:cw*WL.cbW/100,y:top+yb*h/100-hh,h:hh})}});wallItems(st,null,I)}
+  else{let any=false;[0,1].forEach(r=>{const k=s.wsh[r];if(!k)return;any=true;const S=WSH[k],h=stagePct(WL.shW,S.a),y=WL.shY[r],top=y-h*S.y/100,x0=50-WL.shW/2,el=document.createElement('button');el.className='shw';
+      el.innerHTML=`<img class="wimg" src="assets/wsh_${k}.webp" alt="">`;add(el,{left:x0+'%',top:top+'%',width:WL.shW+'%',zIndex:5+r*2},()=>wallClose(3+r));
+      const sw=WL.shW*.76/5,I=[];for(let c=0;c<5;c++){const it=s.it[3+r][c];if(it)I.push({it,x:x0+WL.shW*.12+sw*c,w:sw,y:y-7,h:7,z:6+r*2})}wallItems(st,null,I)});
+    if(!any)ghost('＋ 層板<br>或壁櫃',50,(WL.shY[0]+WL.shY[1])/2-3,WL.shW,16,()=>decoShop('wall'));
+    else [0,1].forEach(r=>{if(!s.wsh[r])ghost('＋ 層板',50,WL.shY[r]-3,WL.shW*.7,5,()=>wallPick('sh',r))})}
+  // 📷 相框
+  [0,1].forEach(r=>{const k=s.wfr[r],cy=WL.frY[r];if(!k)return ghost('＋<br>相框',WL.frX,cy,WL.frW*.8,9,()=>wallPick('fr',r));
+    const F=WFR[k],h=stagePct(WL.frW,F.a),el=document.createElement('button');el.className='shframe';const ho=F.h||[15,15,85,85],pt=wallPhoto(s.wfp[r]);
+    el.innerHTML=`${pt?`<img class="ph" src="${pt}" alt="" style="left:${ho[0]}%;top:${ho[1]}%;width:${ho[2]-ho[0]}%;height:${ho[3]-ho[1]}%">`:`<span class="ph" style="left:${ho[0]}%;top:${ho[1]}%;width:${ho[2]-ho[0]}%;height:${ho[3]-ho[1]}%">🐾</span>`}<img class="fimg" src="assets/wfr_${k}.webp" alt="">`;
+    add(el,{left:(WL.frX-WL.frW/2)+'%',top:(cy-h/2)+'%',width:WL.frW+'%',zIndex:4},()=>frameMenu(r))});
+  // 🏆 榮譽牆
+  const B=s.hon.slice(0,6),bh=stagePct(WL.bdW,WBADGE.a),ho=WBADGE.h;
+  B.forEach((k,i)=>{const el=document.createElement('button');el.className='shbadge';el.innerHTML=`<span class="bin" style="left:${ho[0]}%;top:${ho[1]}%;width:${ho[2]-ho[0]}%;height:${ho[3]-ho[1]}%">${HON_IN(k)}</span><img src="assets/wbadge.webp" alt="">`;
+    add(el,{left:(WL.bdX[i%2]-WL.bdW/2)+'%',top:(WL.bdY[Math.floor(i/2)]-bh/2)+'%',width:WL.bdW+'%',zIndex:4},()=>honorSheet(s))});
+  if(!B.length&&fam)ghost('🏆<br>榮譽牆',(WL.bdX[0]+WL.bdX[1])/2,WL.bdY[1],15,10,()=>honorSheet(s))}
+function wallPhoto(pid){if(!pid)return '';const p=pet(pid);if(!p)return '';const ph=Array.isArray(p.photos)&&p.photos[0];return ph||petHead(p)}
+function honorSheet(s){const L=s.hon;openModal(`<h3>🏆 榮譽牆</h3>${L.length?`<div class="xcpl">${L.map(k=>`<div class="xcrow"><span style="width:38px;height:38px;display:inline-flex;align-items:center;justify-content:center">${HON_IN(k).replace('<img','<img style="width:34px;height:34px;object-fit:contain"')}</span><b style="flex:1">${esc(HON_N(k))}</b></div>`).join('')}</div>${L.length>6?`<p class="lead" style="font-size:12px">牆上只掛得下 6 個，全部 ${L.length} 個都在這裡</p>`:''}`:'<div class="locked">還沒有徽章</div>'}
+  <p class="lead" style="font-size:12px">徽章會自動掛上：集滿一套盲盒、抽到隱藏版、完成星寶或聖誕活動、等級 20／40、完成公仔交換（全家人的都算）</p><div class="row2"><button data-close class="primary">好</button></div>`)}
+// 近看層板、壁櫃
+function wallClose(p,sel){const h=house(SHV.hid),s=showNorm(h.show),fam=isFamily(h.id),cap=wallCap(s,p);if(!cap)return;let img,slots='';
+  let bigA=1,imgTop=0,imgH=100;
+  if(p<5){const k=s.wsh[p-3],S=WSH[k];img=`assets/wsh_${k}.webp`;const sw=76/5,hi=1/S.a,ht=.17,pad=Math.max(0,ht-S.y/100*hi),H=pad+hi;   // 扁的層板上面多留空間放公仔
+    bigA=1/H;imgTop=pad/H*100;imgH=hi/H*100;const sb=(pad+S.y/100*hi)/H*100,sh=ht/H*100;
+    for(let c=0;c<5;c++){const it=s.it[p][c];slots+=`<button class="shs${it?'':' empty'}${fam?' can':''}${sel===c?' sel':''}" data-i="${c}" style="left:${12+sw*c}%;width:${sw}%;top:${sb-sh}%;height:${sh}%">${it?`<img src="${itemSrc(it)}" alt="">`:''}</button>`}}
+  else{const C=WCB[s.wcb];img=`assets/wcb_${s.wcb}.webp`;bigA=C.a;const cw=(C.x[1]-C.x[0])/3;C.y.forEach((yb,r)=>{const prev=r?C.y[r-1]:yb-(C.y[1]-C.y[0]),hh=(yb-prev)*.86;
+    for(let c=0;c<3;c++){const i=r*3+c,it=s.it[5][i];slots+=`<button class="shs${it?'':' empty'}${fam?' can':''}${sel===i?' sel':''}" data-i="${i}" style="left:${C.x[0]+cw*c}%;width:${cw}%;top:${yb-hh}%;height:${hh}%">${it?`<img src="${itemSrc(it)}" alt="">`:''}</button>`}})}
+  const nm=p<5?WSH[s.wsh[p-3]].n:WCB[s.wcb].n,n=s.it[p].filter(Boolean).length;
+  openModal(`<h3>${p<5?'🪵':'🏠'} ${esc(nm)}<small style="font-weight:normal;font-size:13px;color:var(--soft)">　${n}/${cap}</small></h3><div class="cabwrap"><div class="wallbig cabbig" style="--a:${bigA};aspect-ratio:${bigA}"><img src="${img}" alt="" style="position:absolute;left:0;top:${imgTop}%;width:100%;height:${imgH}%">${slots}</div></div>
+    <p class="lead" style="font-size:12px;margin:6px 0 0">${fam?'點空格放公仔或玩具，點東西可以收回背包':'點公仔看看是什麼'}</p>
+    <div class="row2">${fam?`<button id="wswap">🔁 換一款</button><button id="wput">收起來</button>`:''}<button data-close class="primary">關閉</button></div>`);
+  if($('#wswap'))$('#wswap').onclick=()=>wallPick(p<5?'sh':'cb',p-3);
+  if($('#wput'))$('#wput').onclick=()=>{if(showDo(SHV.hid,p<5?{op:'setW',kind:'sh',row:p-3,id:''}:{op:'setW',kind:'cb',id:''}))closeModal()};
+  $('#sheet').querySelectorAll('.shs').forEach(b=>b.onclick=()=>{const i=+b.dataset.i,it=showNorm(house(SHV.hid).show).it[p][i];
+    if(!fam){if(it){if(XC_RE.test(it))xcFromShow(SHV.hid,it);else toast(`${(ITEMS[it]||{}).emo||''}${(ITEMS[it]||{}).name||'玩具'}`)}return}
+    it?showItemMenu(p,i,it):showToyPick(p,i)})}
+// 從倉庫挑一款掛上去
+function wallPick(kind,row){const h=house(SHV?SHV.hid:(myHouse()||{}).id);if(!h)return;const s=showNorm(h.show),D=kind==='sh'?WSH:kind==='cb'?WCB:WFR,pre={sh:'wsh',cb:'wcb',fr:'wfr'}[kind],cur=kind==='sh'?s.wsh[row]:kind==='cb'?s.wcb:s.wfr[row];
+  const own=Object.keys(D).filter(id=>(+s.wo[kind+':'+id]||0)>0),nm={sh:'層板',cb:'壁櫃',fr:'相框'}[kind];
+  openModal(`<h3>${cur?'換成哪一款':'掛哪一款'}${nm}？</h3>${kind==='cb'?'<p class="lead" style="font-size:12px">壁櫃會取代兩排層板（層板上要先清空）</p>':''}
+    <div class="shgrid">${own.map(id=>{const f=wFree(s,kind,id,kind==='cb'?0:row);return `<button class="si${id===cur?' on':''}" data-wp="${id}" ${f<=0&&id!==cur?'disabled':''}><img class="pv" src="assets/${pre}_${id}.webp" alt="" style="aspect-ratio:1"><div class="sn">${esc(D[id].n)}</div><div class="sf">${id===cur?'掛著':f>0?'倉庫 '+f:'都掛出去了'}</div></button>`}).join('')||`<div class="locked" style="grid-column:1/-1">還沒有${nm}，去裝潢目錄買一個吧</div>`}</div>
+    <div class="row2"><button id="wpbuy">🛒 買${nm}</button><button data-close>關閉</button></div>`);
+  $('#wpbuy').onclick=()=>decoShop('wall');
+  $('#sheet').querySelectorAll('[data-wp]').forEach(b=>b.onclick=()=>{const id=b.dataset.wp;if(id===cur)return closeModal();if(showDo(h.id,{op:'setW',kind,row,id})){sfx('tap');closeModal()}})}
+function frameMenu(r){const h=house(SHV.hid),s=showNorm(h.show),fam=isFamily(h.id),p=pet(s.wfp[r]),pt=wallPhoto(s.wfp[r]);
+  if(!fam)return openModal(`<div style="text-align:center">${pt?`<img src="${pt}" alt="" style="width:180px;border-radius:14px">`:'<div class="locked">還沒放照片</div>'}<h3>${p?esc(p.name):'📷 相框'}</h3></div><div class="row2"><button data-close class="primary">好</button></div>`);
+  const P=petsOf(h.id);
+  openModal(`<h3>📷 ${esc(WFR[s.wfr[r]].n)}</h3><p class="lead" style="font-size:13px">放哪一隻毛孩的照片？（用毛孩資料裡的第一張照片，沒有的話用大頭照）</p>
+    <div class="xcgrid">${P.map(x=>`<button data-fp="${x.id}" class="${x.id===s.wfp[r]?'on':''}"><img src="${wallPhoto(x.id)}" alt="" style="border-radius:10px;object-fit:cover">${esc(x.name)}</button>`).join('')||'<div class="locked" style="grid-column:1/-1">家裡還沒有毛孩</div>'}</div>
+    <div class="row2"><button id="frsw">🔁 換相框</button><button id="frput">收起來</button><button data-close class="primary">關閉</button></div>`);
+  $('#frsw').onclick=()=>wallPick('fr',r);$('#frput').onclick=()=>{if(showDo(h.id,{op:'setW',kind:'fr',row:r,id:''}))closeModal()};
+  $('#sheet').querySelectorAll('[data-fp]').forEach(b=>b.onclick=()=>{if(showDo(h.id,{op:'frPet',row:r,pet:b.dataset.fp})){sfx('tap');closeModal()}})}
+function neonEdit(){const hid=SHV?SHV.hid:(myHouse()||{}).id,h=house(hid);if(!h||!hasShow(h))return;const s=showNorm(h.show),g=DB.game,own=!!s.neon;let col=own?s.neon.c:'pink';
+  openModal(`<h3>✨ 霓虹招牌${own?'':`<small style="font-weight:normal;font-size:13px;color:var(--soft)">　🪙${NEON_P}</small>`}</h3>
+    <div style="background:#2a2030;border-radius:14px;padding:22px 8px;text-align:center;container-type:inline-size"><span class="shneon" id="neprev" style="position:relative;transform:none;left:auto;top:auto;display:inline-block">${esc(own?s.neon.t:h.name+'的收藏室')}</span></div>
+    ${fld('netxt','招牌上的字（最多 12 個字）',`<input id="netxt" maxlength="12" value="${esc(own?s.neon.t:h.name+'的收藏室')}">`)}
+    <div class="neonchips">${Object.entries(NEON_C).map(([k,c])=>`<button data-nc="${k}" style="background:${c}" class="${k===col?'on':''}" aria-label="${k}"></button>`).join('')}</div>
+    <div class="row2"><button data-close>取消</button><button class="primary" id="nesave">${own?'儲存':'買下來（🪙'+NEON_P+'）'}</button></div>`);
+  const upd=()=>{const e=$('#neprev');e.textContent=$('#netxt').value.trim()||'　';e.style.setProperty('--nc',NEON_C[col])};upd();$('#netxt').oninput=upd;
+  $('#sheet').querySelectorAll('[data-nc]').forEach(b=>b.onclick=()=>{col=b.dataset.nc;$('#sheet').querySelectorAll('[data-nc]').forEach(x=>x.classList.toggle('on',x===b));upd()});
+  $('#nesave').onclick=()=>{const t=$('#netxt').value.trim();if(!t)return toast('招牌要寫字');
+    if(!own){if((g.coins||0)<NEON_P)return toast(`金幣不夠，要 🪙${NEON_P}`);g.coins-=NEON_P;save();updTix&&updTix();
+      if(showDo(hid,{op:'neon',t,c:col},()=>{g.coins+=NEON_P;save();updTix&&updTix()})){sfx('coin');toast('✨ 招牌亮起來了！');closeModal()}else{g.coins+=NEON_P;save()}}
+    else if(showDo(hid,{op:'neon',t,c:col})){sfx('tap');closeModal()}}}
+// 裝潢目錄：牆面
+function wallShop(tabs){const hid=shHid(),h=house(hid),s=showNorm(h.show),g=DB.game;
+  const card=(kind,id,D,pre)=>{const n=+s.wo[kind+':'+id]||0;return `<button class="si" data-wb="${kind}:${id}"><img class="pv" src="assets/${pre}_${id}.webp" alt="" style="aspect-ratio:1">${n?`<span class="tag">有 ${n}</span>`:''}<div class="sn">${esc(D[id].n)}</div><div class="sf">🪙${D[id].p}</div></button>`};
+  openModal(`<h3>🛋️ 裝潢目錄</h3>${tabs||''}<p class="lead" style="font-size:12px">你有 🪙${g.coins||0}・買了會先掛到空位，沒空位就收進倉庫</p>
+    <div class="dcsec">✨ 霓虹招牌</div><div class="shgrid"><button class="si" id="wbneon"><div class="pv" style="aspect-ratio:1;display:flex;align-items:center;justify-content:center;background:#2a2030;border-radius:10px;container-type:inline-size"><span class="shneon" style="position:relative;transform:none;left:auto;top:auto;font-size:14px;--nc:#ff5fa2">OPEN</span></div><div class="sn">自己打字</div><div class="sf">${s.neon?'改字':'🪙'+NEON_P}</div></button></div>
+    <div class="dcsec">🪵 層板（最多 2 排，每排 5 格）</div><div class="shgrid">${Object.keys(WSH).map(id=>card('sh',id,WSH,'wsh')).join('')}</div>
+    <div class="dcsec">🏠 壁櫃（取代層板）</div><div class="shgrid">${Object.keys(WCB).map(id=>card('cb',id,WCB,'wcb')).join('')}</div>
+    <div class="dcsec">📷 相框（最多 2 個）</div><div class="shgrid">${Object.keys(WFR).map(id=>card('fr',id,WFR,'wfr')).join('')}</div>
+    <div class="row2"><button data-close>關閉</button></div>`);if(tabs)decoTabs();
+  $('#wbneon').onclick=neonEdit;
+  $('#sheet').querySelectorAll('[data-wb]').forEach(b=>b.onclick=()=>{const [kind,id]=b.dataset.wb.split(':'),D={sh:WSH,cb:WCB,fr:WFR}[kind],it=D[id],pre={sh:'wsh',cb:'wcb',fr:'wfr'}[kind];
+    if((g.coins||0)<it.p)return toast(`金幣不夠，要 🪙${it.p}`);
+    openModal(`<div style="text-align:center"><img src="assets/${pre}_${id}.webp" alt="" style="width:170px"><h3>${esc(it.n)}</h3><p class="lead">🪙${it.p}</p></div><div class="row2"><button id="wbno">← 回去</button><button class="primary" id="wbyes">買！（🪙${it.p}）</button></div>`);
+    $('#wbno').onclick=()=>wallShop(tabs);
+    $('#wbyes').onclick=()=>{if((g.coins||0)<it.p)return toast('金幣不夠');g.coins-=it.p;save();updTix&&updTix();
+      if(showDo(hid,{op:'buyW',kind,id},()=>{g.coins+=it.p;save();updTix&&updTix()})){sfx('coin');toast(`買到了 ${it.n}！`);wallShop(tabs)}else{g.coins+=it.p;save()}}})}
 // ================= 🎁 盲盒店（v1.95）=================
 // 機率和保底在後端抽，前端只知道名字和哪幾格是隱藏版（開箱時顯示金框「?」）
 const BB_PRICE=200,BB_PITY=150,BB_RN={N:'⚪ 普通',R:'🔵 稀有',S:'🟣 超稀有',H:'🌟 隱藏版！'};
@@ -4580,8 +4723,8 @@ const F2SHOP=[{id:'f2shop_pig',n:'粉紅小豬房',p:1500},{id:'f2shop_xmas',n:'
 const f2Shop=id=>F2SHOP.find(x=>x.id===id);
 const shHid=()=>(SHV&&$('#shv'))?SHV.hid:((myHouse()||{}).id);
 function decoShop(tab){if(!needMe())return;const h=myHouse();if(!h)return toast('要有家才能買裝潢');tab=tab||'f2';const g=DB.game;
-  const tabs=`<div class="dctab"><button data-dt="f2" class="${tab==='f2'?'on':''}">🛏️ 二樓背景</button><button data-dt="room" class="${tab==='room'?'on':''}">🖼️ 展示間</button><button data-dt="cab" class="${tab==='cab'?'on':''}">🗄️ 展示櫃</button></div>`;
-  if(tab!=='f2'){if(!hasShow(h))return openModal(`<h3>🛋️ 裝潢目錄</h3>${tabs}<div class="locked">你家還沒有展示間<br>到島民中心「擴建」蓋一間吧</div><div class="row2"><button data-close>關閉</button></div>`),decoTabs();return tab==='room'?showRoomShop(tabs):showCabShop(null,tabs)}
+  const tabs=`<div class="dctab"><button data-dt="f2" class="${tab==='f2'?'on':''}">🛏️ 二樓背景</button><button data-dt="room" class="${tab==='room'?'on':''}">🖼️ 展示間</button><button data-dt="cab" class="${tab==='cab'?'on':''}">🗄️ 展示櫃</button><button data-dt="wall" class="${tab==='wall'?'on':''}">🧱 牆面</button></div>`;
+  if(tab!=='f2'){if(!hasShow(h))return openModal(`<h3>🛋️ 裝潢目錄</h3>${tabs}<div class="locked">你家還沒有展示間<br>到島民中心「擴建」蓋一間吧</div><div class="row2"><button data-close>關閉</button></div>`),decoTabs();return tab==='room'?showRoomShop(tabs):tab==='wall'?wallShop(tabs):showCabShop(null,tabs)}
   const own=owned(h.id);
   openModal(`<h3>🛋️ 裝潢目錄</h3>${tabs}<p class="lead" style="font-size:12px">你有 🪙${g.coins||0}・${hasF2(h)?'買了收進房間收藏，到二樓「🎨 背景」就能換':'要先在島民中心擴建二樓才能用'}</p>
     <div class="shgrid">${F2SHOP.map(r=>`<button class="si room${own.has(r.id)?' on':''}" data-f2="${r.id}"><img class="pv" src="assets/room_${r.id}.webp?v=2" alt=""><div class="sn">${esc(r.n)}</div><div class="sf">${own.has(r.id)?'已經有了':'🪙'+r.p}</div></button>`).join('')}</div>
@@ -5330,7 +5473,7 @@ function announceLetters(){if(!DB.me)return;let seen=[];try{seen=JSON.parse(loca
     sfx('gift');$('#lgopen').onclick=()=>openLetter(nw[0].id,()=>$('#bell').click())};
   setTimeout(go,1800)}
 // ================= 自動更新：發現新版本就重新載入 =================
-const APP_VER='v2.06';
+const APP_VER='v2.07';
 function checkUpdate(){
   if(!/^https?:/.test(location.protocol)||!API_URL)return;
   if(!$('#modal').classList.contains('hidden'))return; // 正在填表單時不打斷
