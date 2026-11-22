@@ -4350,9 +4350,11 @@ const SHOWP={};function keepShow(){const nw=Date.now();for(const hid in SHOWP){c
 // req：要做的事；undo：失敗時要退回的（金幣、背包）
 function showDo(hid,req,undo){const h=house(hid);if(!h)return false;const before=clone(h.show);let s;
   try{s=showOp(clone(h.show),req)}catch(e){toast(e.message);return false}
-  h.show=s;SHOWP[hid]={t:Date.now(),s:clone(s)};renderShow();
-  call('showEdit',Object.assign(cred(),{houseId:hid},req),true).then(r=>{if(r&&r.show&&ONLINE){SHOWP[hid]={t:Date.now(),s:clone(r.show)}}})
-    .catch(e=>{const hh=house(hid);if(hh)hh.show=before;delete SHOWP[hid];undo&&undo();renderShow();toast(e.message)});return true}
+  h.show=s;SHOWP[hid]={t:Date.now(),s:clone(s)};renderShow();const seq=SHOWSEQ[hid]=(SHOWSEQ[hid]||0)+1;
+  // v2.20：只有「最後一次操作」的回覆才採用，前一個比較慢回來的舊資料不會把剛剛的擺設蓋回去
+  call('showEdit',Object.assign(cred(),{houseId:hid},req),true).then(r=>{if(r&&r.show&&ONLINE&&seq===SHOWSEQ[hid]){SHOWP[hid]={t:Date.now(),s:clone(r.show)}}})
+    .catch(e=>{const hh=house(hid);if(seq===SHOWSEQ[hid]){if(hh)hh.show=before;delete SHOWP[hid]}else if(hh){try{hh.show=showOp(clone(hh.show),Object.assign({},req,{op:req.op==='put'?'take':req.op==='take'?'put':req.op}))}catch(x){}SHOWP[hid]={t:Date.now(),s:clone(hh.show)}}undo&&undo();renderShow();toast(e.message)});return true}
+const SHOWSEQ={};
 const itemSrc=id=>{const it=ITEMS[id]||{};return it.img||`assets/item_${id}.webp`};
 // 一個櫃子（房間裡的小櫃子和近看的大櫃子共用）
 function cabHTML(cid,items,big,can,sel){const C=SHOW_CABS[cid];if(!C)return '';const [x0,x1]=C.x,cw=(x1-x0)/SHOW_COLS;let h='';
@@ -4372,7 +4374,7 @@ function renderShow(){const v=$('#shv');if(!v||!SHV)return;const h=house(SHV.hid
     Object.assign(el.style,{left:cx+'%',top:bottom+'%',width:w+'%',zIndex:10+p%2});el.onclick=e=>{e.stopPropagation();showClose(p)};st.appendChild(el)});
   renderWall(st,s,fam);
   if(!s.pos.some(c=>c)){const tip=document.createElement('div');tip.className='f2hint';tip.textContent=fam?'展示間空空的，先買一個櫃子吧！':'展示間還在布置中';st.appendChild(tip)}
-  const n=s.it.reduce((a,x)=>a+x.filter(Boolean).length,0);if(fam&&ONLINE&&!SHV.hon){SHV.hon=1;call('showEdit',Object.assign(cred(),{houseId:h.id,op:'honor'}),true).then(r=>{if(r&&r.show){const hh=house(h.id);if(hh){hh.show=r.show;renderShow()}}}).catch(()=>{})}
+  const n=s.it.reduce((a,x)=>a+x.filter(Boolean).length,0);if(fam&&ONLINE&&!SHV.hon){SHV.hon=1;call('showEdit',Object.assign(cred(),{houseId:h.id,op:'honor'}),true).then(r=>{if(r&&r.show&&Array.isArray(r.show.hon)){const hh=house(h.id);if(hh){const hon=r.show.hon;hh.show=Object.assign(showNorm(hh.show),{hon});if(SHOWP[h.id])SHOWP[h.id].s.hon=hon;renderShow()}}}).catch(()=>{})}   // v2.20：榮譽牆只更新徽章，不然慢回來的舊資料會蓋掉剛剛的擺設
   v.querySelector('.cbtns').innerHTML=fam?`<button class="act" id="shcabs">🗄️ 櫃子</button><button class="act" id="shwall">🧱 牆面</button><button class="act" id="shroom">🎨 裝潢</button><button class="act" id="shinfo">🧸 ${n}</button>`
     :`<button class="act" id="shinfo">🧸 收藏 ${n} 件</button>`;
   if($('#shcabs'))$('#shcabs').onclick=()=>showCabShop();if($('#shwall'))$('#shwall').onclick=()=>decoShop('wall');if($('#shroom'))$('#shroom').onclick=()=>showRoomShop();$('#shinfo').onclick=()=>toast(`${h.name} 的展示間擺了 ${n} 件收藏`)}
@@ -5668,7 +5670,7 @@ function announceLetters(){if(!DB.me)return;let seen=[];try{seen=JSON.parse(loca
     sfx('gift');$('#lgopen').onclick=()=>openLetter(nw[0].id,()=>$('#bell').click())};
   setTimeout(go,1800)}
 // ================= 自動更新：發現新版本就重新載入 =================
-const APP_VER='v2.19';
+const APP_VER='v2.20';
 function checkUpdate(){
   if(!/^https?:/.test(location.protocol)||!API_URL)return;
   if(!$('#modal').classList.contains('hidden'))return; // 正在填表單時不打斷
