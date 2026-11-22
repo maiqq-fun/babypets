@@ -4269,7 +4269,7 @@ async function bbDraw(sid){const S=BB_SERIES.find(x=>x.id===sid),g=DB.game;if(!S
 function bbSpark(el,n,emo){const r=el.getBoundingClientRect();for(let k=0;k<n;k++){const s=document.createElement('div');s.className='bbspark';s.textContent=emo[k%emo.length];
   s.style.left=(r.left+r.width/2)+'px';s.style.top=(r.top+r.height/2)+'px';const a=Math.random()*6.28,d=60+Math.random()*120;s.style.setProperty('--dx',Math.cos(a)*d+'px');s.style.setProperty('--dy',Math.sin(a)*d+'px');document.body.appendChild(s);setTimeout(()=>s.remove(),1200)}}
 // ================= 🛋️ 裝潢目錄（毛二街裝潢專櫃）=================
-const F2SHOP=[{id:'f2shop_pig',n:'粉紅小豬房',p:1500},{id:'f2shop_xmas',n:'聖誕小屋',p:3000},{id:'f2shop_ghost',n:'萬聖節幽靈屋',p:3000}];
+const F2SHOP=[{id:'f2shop_pig',n:'粉紅小豬房',p:1500},{id:'f2shop_xmas',n:'聖誕小屋',p:3000},{id:'f2shop_ghost',n:'萬聖節幽靈屋',p:3000},{id:'f2shop_space',n:'星空太空房',p:3000}];
 const f2Shop=id=>F2SHOP.find(x=>x.id===id);
 const shHid=()=>(SHV&&$('#shv'))?SHV.hid:((myHouse()||{}).id);
 function decoShop(tab){if(!needMe())return;const h=myHouse();if(!h)return toast('要有家才能買裝潢');tab=tab||'f2';const g=DB.game;
@@ -5000,7 +5000,7 @@ function announceLetters(){if(!DB.me)return;let seen=[];try{seen=JSON.parse(loca
     sfx('gift');$('#lgopen').onclick=()=>openLetter(nw[0].id,()=>$('#bell').click())};
   setTimeout(go,1800)}
 // ================= 自動更新：發現新版本就重新載入 =================
-const APP_VER='v1.98';
+const APP_VER='v1.99';
 function checkUpdate(){
   if(!/^https?:/.test(location.protocol)||!API_URL)return;
   if(!$('#modal').classList.contains('hidden'))return; // 正在填表單時不打斷
