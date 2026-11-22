@@ -1207,6 +1207,9 @@ img{-webkit-user-drag:none}
 .arcmach.shake{animation:bbshake .3s}
 .mlbar{width:min(84vw,380px);height:10px;border-radius:6px;background:rgba(255,255,255,.2);overflow:hidden;margin-top:6px}.mlbar i{display:block;height:100%;width:100%;background:linear-gradient(90deg,#ffd23f,#ff8fb1);transition:width .15s linear}
 
+/* v2.26 展示間：編輯模式 */
+.shedtag{position:absolute;left:50%;top:1.2%;transform:translateX(-50%);z-index:60;background:rgba(60,40,25,.82);color:#fff;font-size:clamp(11px,3.1cqw,14px);padding:5px 12px;border-radius:999px;white-space:nowrap;pointer-events:none}
+.cstage.shediting{outline:3px dashed rgba(255,210,63,.85);outline-offset:-6px}
 /* v2.22 🦹 小偷・📹 監視器・👛 扒手 */
 .thiefnpc>img{animation:sneak 1.6s ease-in-out infinite!important}
 @keyframes sneak{0%,100%{transform:translateX(0) rotate(-3deg)}50%{transform:translateX(6%) rotate(3deg)}}
@@ -4423,22 +4426,26 @@ function cabHTML(cid,items,big,can,sel){const C=SHOW_CABS[cid];if(!C)return '';c
   return `<div class="cabv${big?' cabbig':''}" style="--a:${C.a}"><img class="cabimg" src="${showCabImg(cid)}" alt="">${h}</div>`}
 let SHV=null;
 function openShow(hid){const h=house(hid);if(!hasShow(h))return;sfx&&sfx('tap');h.show=showNorm(h.show);
-  sceneOpen('shv',esc(h.name),'🗄️ 展示間',showRoomImg(h.show.room),'<img class="mic" src="assets/icon_down.webp" alt="">一樓');SHV={hid};renderShow()}
-function renderShow(){const v=$('#shv');if(!v||!SHV)return;const h=house(SHV.hid);if(!hasShow(h))return;const s=showNorm(h.show),fam=isFamily(h.id),st=v.querySelector('.cstage');
-  st.querySelector('.cbg').src=showRoomImg(s.room);st.querySelectorAll('.shcab,.shghost,.f2hint,.shw,.shwit,.shneon,.shframe,.shbadge,.shwghost').forEach(x=>x.remove());
-  const R=showRoomDef(s.room),bottom=(R.f+75)/1536*100,stA=RW/RH;
-  s.pos.forEach((cid,p)=>{const cx=[21.5,50,78.5][p];   // 手機比較窄時房間左右會被裁掉，櫃子往中間靠
-    if(!cid){if(!fam)return;const g=document.createElement('button');g.className='shghost';g.innerHTML='＋<br>放櫃子';Object.assign(g.style,{left:cx+'%',top:bottom+'%'});g.onclick=e=>{e.stopPropagation();showCabPick(p)};st.appendChild(g);return}
-    const C=SHOW_CABS[cid],w=Math.min(28.5,C.a*28/stA),el=document.createElement('button');el.className='shcab';el.innerHTML=cabHTML(cid,s.it[p],false);
-    Object.assign(el.style,{left:cx+'%',top:bottom+'%',width:w+'%',zIndex:10+p%2});el.onclick=e=>{e.stopPropagation();showClose(p)};st.appendChild(el)});
+  sceneOpen('shv',esc(h.name),'🗄️ 展示間',showRoomImg(h.show.room),'<img class="mic" src="assets/icon_down.webp" alt="">一樓');SHV={hid,edit:false};renderShow()}   // v2.26：先用客人的角度欣賞，按「布置」才編輯
+function renderShow(){const v=$('#shv');if(!v||!SHV)return;const h=house(SHV.hid);if(!hasShow(h))return;const own=isFamily(h.id),s=showNorm(h.show),fam=own&&!!SHV.edit,st=v.querySelector('.cstage');
+  st.querySelector('.cbg').src=showRoomImg(s.room);st.querySelectorAll('.shcab,.shghost,.f2hint,.shw,.shwit,.shneon,.shframe,.shbadge,.shwghost,.shedtag').forEach(x=>x.remove());st.classList.toggle('shediting',fam);
+  if(fam){const t=document.createElement('div');t.className='shedtag';t.textContent='✏️ 編輯模式・點虛線框擺東西，好了按「👀 完成」';st.appendChild(t)}
+  const R=showRoomDef(s.room),fl=R.f/1536*100,D=100-fl,stA=RW/RH;
+  // v2.26：左右兩個往前站（低一點、大一點），中間往後站，地板不會空一大片
+  s.pos.forEach((cid,p)=>{const cx=[21,50,79][p],side=p!==1,bottom=fl+D*(side?.62:.3),cw=side?31:28;
+    if(!cid){if(!fam)return;const g=document.createElement('button');g.className='shghost';g.innerHTML='＋<br>放櫃子';Object.assign(g.style,{left:cx+'%',top:bottom+'%',width:(cw-2)+'%',zIndex:side?12:10});g.onclick=e=>{e.stopPropagation();showCabPick(p)};st.appendChild(g);return}
+    const C=SHOW_CABS[cid],w=Math.min(cw,C.a*(cw*.98)/stA),el=document.createElement('button');el.className='shcab';el.innerHTML=cabHTML(cid,s.it[p],false);
+    Object.assign(el.style,{left:cx+'%',top:bottom+'%',width:w+'%',zIndex:side?12:10});el.onclick=e=>{e.stopPropagation();showClose(p)};st.appendChild(el)});
   renderWall(st,s,fam);
-  if(!s.pos.some(c=>c)){const tip=document.createElement('div');tip.className='f2hint';tip.textContent=fam?'展示間空空的，先買一個櫃子吧！':'展示間還在布置中';st.appendChild(tip)}
-  const n=s.it.reduce((a,x)=>a+x.filter(Boolean).length,0);if(fam&&ONLINE&&!SHV.hon){SHV.hon=1;call('showEdit',Object.assign(cred(),{houseId:h.id,op:'honor'}),true).then(r=>{if(r&&r.show&&Array.isArray(r.show.hon)){const hh=house(h.id);if(hh){const hon=r.show.hon;hh.show=Object.assign(showNorm(hh.show),{hon});if(SHOWP[h.id])SHOWP[h.id].s.hon=hon;renderShow()}}}).catch(()=>{})}   // v2.20：榮譽牆只更新徽章，不然慢回來的舊資料會蓋掉剛剛的擺設
-  v.querySelector('.cbtns').innerHTML=fam?`<button class="act" id="shcabs">🗄️ 櫃子</button><button class="act" id="shwall">🧱 牆面</button><button class="act" id="shroom">🎨 裝潢</button><button class="act" id="shinfo">🧸 ${n}</button>`
-    :`<button class="act" id="shinfo">🧸 收藏 ${n} 件</button>`;
-  if($('#shcabs'))$('#shcabs').onclick=()=>showCabShop();if($('#shwall'))$('#shwall').onclick=()=>decoShop('wall');if($('#shroom'))$('#shroom').onclick=()=>showRoomShop();$('#shinfo').onclick=()=>toast(`${h.name} 的展示間擺了 ${n} 件收藏`)}
+  if(!s.pos.some(c=>c)){const tip=document.createElement('div');tip.className='f2hint';tip.textContent=fam?'展示間空空的，先買一個櫃子吧！':own?'展示間空空的，按「✏️ 編輯」開始擺吧！':'展示間還在布置中';st.appendChild(tip)}
+  const n=s.it.reduce((a,x)=>a+x.filter(Boolean).length,0);if(own&&ONLINE&&!SHV.hon){SHV.hon=1;call('showEdit',Object.assign(cred(),{houseId:h.id,op:'honor'}),true).then(r=>{if(r&&r.show&&Array.isArray(r.show.hon)){const hh=house(h.id);if(hh){const hon=r.show.hon;hh.show=Object.assign(showNorm(hh.show),{hon});if(SHOWP[h.id])SHOWP[h.id].s.hon=hon;renderShow()}}}).catch(()=>{})}   // v2.20：榮譽牆只更新徽章，不然慢回來的舊資料會蓋掉剛剛的擺設
+  v.querySelector('.cbtns').innerHTML=fam?`<button class="act" id="shcabs">🗄️ 櫃子</button><button class="act" id="shwall">🧱 牆面</button><button class="act" id="shroom">🎨 裝潢</button><button class="act" id="shview">👀 完成</button>`
+    :`${own?'<button class="act" id="shedit">✏️ 編輯</button>':''}<button class="act" id="shinfo">🧸 收藏 ${n} 件</button><button class="act" id="shhon">🏆 榮譽牆</button><button class="act" id="shxc">🔄 公仔交換</button>`;
+  if($('#shhon'))$('#shhon').onclick=()=>honorSheet(s);if($('#shxc'))$('#shxc').onclick=()=>xcSheet(own?undefined:'new');
+  if($('#shedit'))$('#shedit').onclick=()=>{SHV.edit=true;sfx('tap');renderShow()};if($('#shview'))$('#shview').onclick=()=>{SHV.edit=false;sfx('tap');renderShow()};
+  if($('#shcabs'))$('#shcabs').onclick=()=>showCabShop();if($('#shwall'))$('#shwall').onclick=()=>decoShop('wall');if($('#shroom'))$('#shroom').onclick=()=>showRoomShop();if($('#shinfo'))$('#shinfo').onclick=()=>toast(`${h.name} 的展示間擺了 ${n} 件收藏`)}
 // 近看一個櫃子
-function showClose(p,sel){if(p>=3)return wallClose(p,sel);const h=house(SHV.hid),s=showNorm(h.show),cid=s.pos[p],fam=isFamily(h.id);if(!cid)return;const C=SHOW_CABS[cid],n=s.it[p].filter(Boolean).length;
+function showClose(p,sel){if(p>=3)return wallClose(p,sel);const h=house(SHV.hid),s=showNorm(h.show),cid=s.pos[p],fam=isFamily(h.id)&&!!SHV.edit;if(!cid)return;const C=SHOW_CABS[cid],n=s.it[p].filter(Boolean).length;
   openModal(`<h3>🗄️ ${esc(C.n)}<small style="font-weight:normal;font-size:13px;color:var(--soft)">　${n}/${SHOW_N}</small></h3>
     <div class="cabwrap">${cabHTML(cid,s.it[p],true,fam,sel)}</div>
     <p class="lead" style="font-size:12px;margin:6px 0 0">${fam?'點空格放玩具，點玩具可以收回背包':'點玩具看看是什麼'}</p>
@@ -4700,7 +4707,7 @@ function xcFromShow(hid,id){const h=house(hid),it=ITEMS[id]||{};const M=(DB.play
     $('#sheet').querySelectorAll('[data-xm]').forEach(b=>b.onclick=()=>xcPickGive(b.dataset.xm,id))}}
 
 // ================= 🧱 展示間牆面（v2.07）=================
-const WL={neonY:19.5,shY:[31,42],shW:36,cbB:44,cbW:30,frX:[19,19],frY:[26.5,39.5],frW:20,bdX:[79.5,87],bdY:[25,32.5,40],bdW:7};   // 手機上舞台左右會被裁掉約 7%，兩側的東西往內靠
+const WL={neonY:20,shY:[34.5,47.5],shW:40,cbB:53,cbW:36,frX:[19.5,19.5],frY:[30,48.5],frW:23,bdX:[78.5,88.5],bdY:[29,39,49],bdW:9};   // v2.26：牆上的東西放大約 1.25 倍   // 手機上舞台左右會被裁掉約 7%，兩側的東西往內靠
 const stagePct=(w,a)=>w*(RW/RH)/a;   // 寬 w% 的圖，在舞台上是幾 % 高
 const HON_N=k=>{const m=/^set:(\d+)$/.exec(k);if(m){const S=bbSer(+m[1]);return `集滿「${S?S.n:'盲盒'}」全系列`}return {hid:'抽到過隱藏版',star:'幫毛球找回星寶',xmas:'幫豆豆送完聖誕禮物',lv20:'Lv.20 資深島民',lv40:'Lv.40 傳奇島民',trade:'完成過公仔交換'}[k]||k};
 const HON_IN=k=>{const m=/^set:(\d+)$/.exec(k);if(m)return `<img src="${bbBox(+m[1])}" alt="">`;return {hid:'<img src="assets/fx_star.webp" alt="">',star:'<img src="assets/sb_happy.webp" alt="">',xmas:'<img src="assets/xm_icon.webp" alt="">',lv20:'20',lv40:'40',trade:'🔄'}[k]||'🏅'};
@@ -4733,7 +4740,7 @@ function wallPhoto(pid){if(!pid)return '';const p=pet(pid);if(!p)return '';const
 function honorSheet(s){const L=s.hon;openModal(`<h3>🏆 榮譽牆</h3>${L.length?`<div class="xcpl">${L.map(k=>`<div class="xcrow"><span style="width:38px;height:38px;display:inline-flex;align-items:center;justify-content:center">${HON_IN(k).replace('<img','<img style="width:34px;height:34px;object-fit:contain"')}</span><b style="flex:1">${esc(HON_N(k))}</b></div>`).join('')}</div>${L.length>6?`<p class="lead" style="font-size:12px">牆上只掛得下 6 個，全部 ${L.length} 個都在這裡</p>`:''}`:'<div class="locked">還沒有徽章</div>'}
   <p class="lead" style="font-size:12px">徽章會自動掛上：集滿一套盲盒、抽到隱藏版、完成星寶或聖誕活動、等級 20／40、完成公仔交換（全家人的都算）</p><div class="row2"><button data-close class="primary">好</button></div>`)}
 // 近看層板、壁櫃
-function wallClose(p,sel){const h=house(SHV.hid),s=showNorm(h.show),fam=isFamily(h.id),cap=wallCap(s,p);if(!cap)return;let img,slots='';
+function wallClose(p,sel){const h=house(SHV.hid),s=showNorm(h.show),fam=isFamily(h.id)&&!!SHV.edit,cap=wallCap(s,p);if(!cap)return;let img,slots='';
   let bigA=1,imgTop=0,imgH=100;
   if(p<5){const k=s.wsh[p-3],S=WSH[k];img=`assets/wsh_${k}.webp`;const sw=76/5,hi=1/S.a,ht=.17,pad=Math.max(0,ht-S.y/100*hi),H=pad+hi;   // 扁的層板上面多留空間放公仔
     bigA=1/H;imgTop=pad/H*100;imgH=hi/H*100;const sb=(pad+S.y/100*hi)/H*100,sh=ht/H*100;
@@ -4758,7 +4765,7 @@ function wallPick(kind,row){const h=house(SHV?SHV.hid:(myHouse()||{}).id);if(!h)
     <div class="row2"><button id="wpbuy">🛒 買${nm}</button><button data-close>關閉</button></div>`);
   $('#wpbuy').onclick=()=>decoShop('wall');if($('#wpcb'))$('#wpcb').onclick=()=>wallPick('cb',0);if($('#wpsh'))$('#wpsh').onclick=()=>wallPick('sh',s.wsh[0]?1:0);
   $('#sheet').querySelectorAll('[data-wp]').forEach(b=>b.onclick=()=>{const id=b.dataset.wp;if(id===cur)return closeModal();if(showDo(h.id,{op:'setW',kind,row,id})){sfx('tap');closeModal()}})}
-function frameMenu(r){const h=house(SHV.hid),s=showNorm(h.show),fam=isFamily(h.id),p=pet(s.wfp[r]),pt=wallPhoto(s.wfp[r]);
+function frameMenu(r){const h=house(SHV.hid),s=showNorm(h.show),fam=isFamily(h.id)&&!!SHV.edit,p=pet(s.wfp[r]),pt=wallPhoto(s.wfp[r]);
   if(!fam)return openModal(`<div style="text-align:center">${pt?`<img src="${pt}" alt="" style="width:180px;border-radius:14px">`:'<div class="locked">還沒放照片</div>'}<h3>${p?esc(p.name):'📷 相框'}</h3></div><div class="row2"><button data-close class="primary">好</button></div>`);
   const P=petsOf(h.id);
   openModal(`<h3>📷 ${esc(WFR[s.wfr[r]].n)}</h3><p class="lead" style="font-size:13px">放哪一隻毛孩的照片？（用毛孩資料裡的第一張照片，沒有的話用大頭照）</p>
@@ -5806,7 +5813,7 @@ function announceLetters(){if(!DB.me)return;let seen=[];try{seen=JSON.parse(loca
     sfx('gift');$('#lgopen').onclick=()=>openLetter(nw[0].id,()=>$('#bell').click())};
   setTimeout(go,1800)}
 // ================= 自動更新：發現新版本就重新載入 =================
-const APP_VER='v2.25';
+const APP_VER='v2.26';
 function checkUpdate(){
   if(!/^https?:/.test(location.protocol)||!API_URL)return;
   if(!$('#modal').classList.contains('hidden'))return; // 正在填表單時不打斷
