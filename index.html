@@ -3529,11 +3529,11 @@ function missionsSheet(){
   <div class="tk coin"><div><div style="font-size:13px;color:var(--soft)">我的金幣</div><div class="n">🪙 ${g.coins||0}</div></div><button id="toshop">🏪 去商店</button></div>
   <div class="howto"><p>💗 <b>怎麼升級</b>：在島上做任何事都會加愛心，集滿就升一級，送 1 張抽卡券＋🪙${LV_BONUS}</p>
     <p>🪙 <b>怎麼賺錢</b>：照顧毛孩、去別人家串門子、跟旅客聊天、做每日任務都會給金幣；路上的錢袋要快點撿！等級到了還可以蓋民宿、種菜賺更多</p>
-    <p>🎴 <b>卡包裡有</b>：零食、玩具、房間、限定玩具</p></div>
+    <p>🎴 <b>卡包裡有</b>：零食、玩具、金幣、房間、配件、限定玩具</p></div>
   <details class="earn"><summary>看詳細獎勵</summary><div class="frow"><span>每日簽到</span><span>見簽到卡・連續 7 天送抽卡券</span></div>${Object.values(REW).map(e=>`<div class="frow"><span>${e.n}</span><span>${e.x?`+${e.x} 💗`:''}${e.c?` +${e.c} 🪙`:''}${e.cap?`・前 ${e.cap} 次`:''}${e.cap&&e.after&&(e.after.x||e.after.c)?`<small class="aft">之後 ${e.after.x?`+${e.after.x} 💗`:''}${e.after.c?` +${e.after.c} 🪙`:''}</small>`:e.cap?'<small class="aft">之後沒有</small>':''}</span></div>`).join('')}</details>
   <div class="sec"><h4>🎴 卡包裡有什麼</h4>
-    <div class="frow"><span>🍤 零食包（隨機 3 個）</span><span>50%</span></div><div class="frow"><span>🧸 玩具</span><span>30%</span></div>
-    <div class="frow"><span>🏠 房間（不會重複）</span><span>15%</span></div><div class="frow"><span>✨ 限定玩具（商店不賣）</span><span>5%</span></div>
+    <div class="frow"><span>🍤 零食包（隨機 3 個）</span><span>35%</span></div><div class="frow"><span>🧸 玩具</span><span>23%</span></div><div class="frow"><span>💰 金幣（🪙100～2000）</span><span>15%</span></div>
+    <div class="frow"><span>🏠 房間（不會重複）</span><span>12%</span></div><div class="frow"><span>👗 配件</span><span>10%</span></div><div class="frow"><span>✨ 限定玩具（商店不賣）</span><span>4%</span></div>
     </div>
   ${h?`<div class="sec"><h4>🏠 ${esc(h.name)}・房間收藏<span>${CARDS.filter(c=>c.r!=='H'&&own.has(c.id)).length} / ${CARDS.filter(c=>c.r!=='H'&&!c.off).length}</span></h4>
   <div class="coll">${ROOMS.map(([k,n])=>`<div class="mini" style="--rc:#d8c8b4" title="${n}（初始）"><div class="art"><img src="${roomImg(k)}" alt="" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover"></div><em>初始</em></div>`).join('')}
@@ -3548,7 +3548,9 @@ function rollPack(h){
   const g=DB.game,own=owned(h.id),left=CARDS.filter(c=>c.r!=='H'&&!c.off&&!own.has(c.id));g.pity=(g.pity||0)+1;
   let type;
   if(g.pity>=10)type=left.length?'room':'limited';
-  else{const w={treat:50,toy:30,room:left.length?15:0,limited:5,acc:accLeft(h.id).length?12:0};let x=Math.random()*Object.values(w).reduce((a,b)=>a+b,0);for(const k in w){if((x-=w[k])<0){type=k;break}}}
+  else{const w={treat:42,toy:28,room:left.length?15:0,limited:5,acc:accLeft(h.id).length?12:0,coin:18};let x=Math.random()*Object.values(w).reduce((a,b)=>a+b,0);for(const k in w){if((x-=w[k])<0){type=k;break}}}
+  if(type==='coin'){const r=Math.random(),pick=a=>a[Math.floor(Math.random()*a.length)];   // v2.14：卡包抽到金幣 100～2000
+    return {type,amt:r<.017?2000:r<.083?pick([1000,1200,1500]):r<.306?pick([400,500,600,800]):pick([100,150,200,300])}}
   if(type==='room'){g.pity=0;const avail=Object.keys(RAR).filter(r=>left.some(c=>c.r===r));let x=Math.random()*avail.reduce((a,r)=>a+RAR[r].w,0),r=avail[0];for(const k of avail){if((x-=RAR[k].w)<0){r=k;break}}
     const pool=left.filter(c=>c.r===r);return {type,card:pool[Math.floor(Math.random()*pool.length)]}}
   const pick=f=>{const ids=Object.keys(ITEMS).filter(id=>f(ITEMS[id])&&!ITEMS[id].off);return ids[Math.floor(Math.random()*ids.length)]};
@@ -3571,6 +3573,9 @@ function openPack(o){o=o||{};
     face=cardArt(c);cap=`<b>${'★'.repeat(c.r==='SSR'?3:c.r==='R'?2:1)} ${RAR[c.r].name}房間</b><span>${c.name}</span>`;
     ftxt=`${DB.me.nick} 為 ${h.name} 抽到了 ${c.r==='SSR'?'✨超稀有・':c.r==='R'?'稀有・':''}${c.name}${c.r==='SSR'?'✨':''}`;
     call('drawCard',Object.assign(cred(),{cardId:c.id,feedText:ftxt}),true).catch(e=>toast('收藏沒存到：'+e.message))}
+  else if(R.type==='coin'){const big=R.amt>=1000;grant(0,R.amt);rar=R.amt>=2000?'SSR':big?'R':'N';rc=big?'#e8a400':'#e9c15c';glow=big?'rgba(255,214,90,1)':'rgba(255,230,160,.8)';
+    face=`<div class="itemface" style="flex-direction:column;gap:6px"><img src="assets/luckybag.webp" alt="" style="width:58%"><b style="font-size:26px;color:#a86a00">🪙${R.amt.toLocaleString()}</b></div>`;cap=`<b>${R.amt>=2000?'✨ 金幣大獎':'💰 金幣'}</b><span>${R.amt.toLocaleString()} 金幣</span>`;
+    if(big){ftxt=`${DB.me.nick} 開卡包抽到 🪙${R.amt.toLocaleString()}${R.amt>=2000?' ✨大獎✨':''}！`;call('feedOnly',{playerId:DB.me.id,t:ftxt},true).catch(()=>{})}}
   else if(R.type==='acc'){const id=R.acc;addAccLocal(h.id,[id]);rar='R';rc='#d98cb3';glow='rgba(255,180,210,.85)';face=`<div class="itemface"><span class="ii huge"><img src="${accImg(id)}" alt=""></span></div>`;cap=`<b>👗 配件</b><span>${ACC[id].n}</span>`}
   else{R.items.forEach(id=>bagAdd(id,1));const lim=R.type==='limited';rar=lim?'SSR':R.type==='toy'?'R':'N';
     rc=lim?'linear-gradient(#ff8fab,#ffd36e,#7fd1b9,#9b8cff)':R.type==='toy'?'#7fb069':'#e9a15c';glow=lim?'rgba(255,215,90,1)':'rgba(255,230,190,.6)';
@@ -3583,19 +3588,19 @@ function openPack(o){o=o||{};
     <div class="stage-area"><div class="pack" id="pk" role="button" aria-label="撕開卡包"><div class="pbody"><img class="plogo" src="assets/logo.webp" alt=""></div><div class="ptop"></div></div>
       <div class="card${R.type==='limited'?' gold':''}" id="cd" style="--rc:${rc.startsWith('linear')?'#e8a400':rc};--glow:${glow}"><div class="in"><div class="face back"></div>
         <div class="face front ${rc.startsWith('linear')?'rainbow':''}"><div class="art">${face}</div><div class="cap">${cap}</div></div></div></div></div>
-    <div class="gbtns" id="gb">${R.type==='room'?'<button id="guse" class="primary">換上這間</button>':''}<button id="gok" class="${R.type==='room'?'':'primary'}">${R.type==='room'?'收進收藏':R.type==='acc'?'收進衣櫃':'收進背包'}</button><button id="gmore">再抽一次</button></div>`;
+    <div class="gbtns" id="gb">${R.type==='room'?'<button id="guse" class="primary">換上這間</button>':''}<button id="gok" class="${R.type==='room'?'':'primary'}">${R.type==='room'?'收進收藏':R.type==='acc'?'收進衣櫃':R.type==='coin'?'收下金幣':'收進背包'}</button><button id="gmore">再抽一次</button></div>`;
   ov.classList.add('wait');document.body.appendChild(ov);const pk=ov.querySelector('#pk'),cd=ov.querySelector('#cd'),gh=ov.querySelector('#gh');let st=0;
   if(R.type==='room'){const ci=new Image();ci.src=R.card.img}
   Promise.race([preloadPack(),new Promise(r=>setTimeout(r,2500))]).then(()=>requestAnimationFrame(()=>ov.classList.remove('wait')));
   pk.onclick=()=>{if(st||ov.classList.contains('wait'))return;st=1;gh.textContent='';pk.classList.add('shake');setTimeout(()=>{pk.classList.remove('shake');pk.classList.add('torn')},900);setTimeout(()=>{pk.classList.add('gone');cd.classList.add('up');gh.textContent='點卡片翻開';st=2},1500)};
   cd.onclick=()=>{if(st!==2)return;st=3;gh.textContent='';cd.classList.add('flip');sfx('flip');if(typeof rar!=='undefined'&&rar==='SSR')setTimeout(()=>sfx('ssr'),650);
     setTimeout(()=>{if(rar!=='N'){ov.querySelector('#rays').classList.add('on');burst(ov,rar==='SSR'?28:14)}
-      gh.textContent=R.type==='limited'?'✨ 限定玩具！ ✨':R.type==='room'?(rar==='SSR'?'✨ 超稀有房間！ ✨':'抽到新房間！'):R.type==='toy'?'抽到玩具':R.type==='acc'?'抽到配件 👗':'抽到零食包';
+      gh.textContent=R.type==='coin'?(R.amt>=2000?'✨ 金幣大獎！ ✨':R.amt>=1000?'💰 大包金幣！':'💰 抽到金幣'):R.type==='limited'?'✨ 限定玩具！ ✨':R.type==='room'?(rar==='SSR'?'✨ 超稀有房間！ ✨':'抽到新房間！'):R.type==='toy'?'抽到玩具':R.type==='acc'?'抽到配件 👗':'抽到零食包';
       ov.querySelector('#gb').classList.add('on');ov.querySelector('#gmore').style.display=DB.game.tickets?'':'none';if(ONLINE&&ftxt)feedPush(ftxt)},700)};
   if(ov.querySelector('#guse'))ov.querySelector('#guse').onclick=async()=>{const b=ov.querySelector('#guse');b.disabled=true;b.textContent='換房間中…';
     const old=h.room;h.room=R.card.id;ov.remove();toast(`已經換成「${R.card.name}」🏠`);openHome(h.id);
     call('updateHouse',Object.assign(cred(),{patch:{room:R.card.id}}),true).catch(e=>{h.room=old;if(home&&home.id===h.id)openHome(h.id);toast('房間沒換成功：'+e.message)})};
-  ov.querySelector('#gok').onclick=()=>{ov.remove();toast(R.type==='room'?`已收進「${h.name}」的房間收藏`:R.type==='acc'?'放進衣櫃了 👗 點自己家的毛孩就能穿':'放進背包了 🎒')};
+  ov.querySelector('#gok').onclick=()=>{ov.remove();toast(R.type==='coin'?`🪙${R.amt.toLocaleString()} 放進錢包了`:R.type==='room'?`已收進「${h.name}」的房間收藏`:R.type==='acc'?'放進衣櫃了 👗 點自己家的毛孩就能穿':'放進背包了 🎒')};
   ov.querySelector('#gmore').onclick=()=>{ov.remove();openPack()};
 }
 // ================= 睡覺選單・頭像列 =================
@@ -5190,14 +5195,14 @@ iconize(document.body);
 async function pickCoin(d,el){if(!needMe())return;
   PICKED.add(d.id);DB.drops=(DB.drops||[]).filter(x=>x.id!==d.id);renderFloor();
   const known=d.amt!=null,g=DB.game;if(known){g.coins=(g.coins||0)+ +d.amt;save();updTix()}
-  const f=coinFloat(d,known?`+${d.amt}`:'…');sfx('bag');dmTick('coinbag');if(known){const rr=f.getBoundingClientRect();flyReward(0,+d.amt,{x:rr.left+rr.width/2,y:rr.top+rr.height/2})}if(known&&+d.amt>=100)bigCoin(d);
+  const f=coinFloat(d,known?`+${d.amt}`:'…');sfx('bag');dmTick('coinbag');if(known){const rr=f.getBoundingClientRect();flyReward(0,+d.amt,{x:rr.left+rr.width/2,y:rr.top+rr.height/2})}if(known&&+d.amt>=300)bigCoin(d);
   // v1.80：只有小島明確說「被別人撿走」才把錢收回；網路慢、逾時就隔幾秒再問一次（後端 v39 會認得自己撿過的）
   let r,err;for(let i=0;i<4;i++){try{r=await call('pickCoin',{playerId:DB.me.id,dropId:d.id},true);err=null;break}catch(e){err=e;if(/慢了一步/.test(e.message))break;await new Promise(z=>setTimeout(z,2500+i*2500))}}
   if(err&&/慢了一步/.test(err.message)){if(known){g.coins=Math.max(0,(g.coins||0)- +d.amt);save();updTix()}f.remove();coinFloat(d,'慢了一步 😆',true);return}
   if(err){if(!known){f.remove();coinFloat(d,'網路不穩，等一下再撿 🙏',true);PICKED.delete(d.id)}return}   // 撿到的錢先幫你收著
-  if(!known){g.coins=(g.coins||0)+r.amt;save();updTix();f.remove();coinFloat(d,`+${r.amt}`);if(r.amt>=100)bigCoin(d)}
+  if(!known){g.coins=(g.coins||0)+r.amt;save();updTix();f.remove();coinFloat(d,`+${r.amt}`);if(r.amt>=300)bigCoin(d)}
   else if(r.amt!==+d.amt){g.coins=(g.coins||0)+r.amt- +d.amt;save();updTix()}
-  if(ONLINE)feedPush(r.amt>=100?`✨ ${DB.me.nick} 撿到金色福袋 ${r.amt} 金幣！`:`${DB.me.nick} 在 ${house(d.houseId).name} 撿到 ${r.amt} 金幣 💰`)}
+  if(ONLINE)feedPush(r.amt>=300?`✨ ${DB.me.nick} 撿到金色福袋 ${r.amt} 金幣！`:`${DB.me.nick} 在 ${house(d.houseId).name} 撿到 ${r.amt} 金幣 💰`)}
 function coinFloat(d,txt,miss){const el=document.createElement('div');el.className='cfloat'+(miss?' miss':'');el.innerHTML=miss?esc(txt):`<img src="assets/money_bag.webp" alt="" onerror="this.replaceWith('💰')"><span>${esc(txt)}</span>`;
   Object.assign(el.style,hp(d.x,d.y-40));$('#floor').appendChild(el);setTimeout(()=>el.remove(),2400);return el}
 function bigCoin(d){fx('🎉',d.x-40,d.y-90);setTimeout(()=>fx('✨',d.x+40,d.y-110),200);setTimeout(()=>fx('🎉',d.x,d.y-130),400);sfx('ssr');toast('✨ 金色福袋！')}
@@ -5636,7 +5641,7 @@ function announceLetters(){if(!DB.me)return;let seen=[];try{seen=JSON.parse(loca
     sfx('gift');$('#lgopen').onclick=()=>openLetter(nw[0].id,()=>$('#bell').click())};
   setTimeout(go,1800)}
 // ================= 自動更新：發現新版本就重新載入 =================
-const APP_VER='v2.13';
+const APP_VER='v2.15';
 function checkUpdate(){
   if(!/^https?:/.test(location.protocol)||!API_URL)return;
   if(!$('#modal').classList.contains('hidden'))return; // 正在填表單時不打斷
