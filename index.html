@@ -4225,7 +4225,7 @@ const BB_SERIES=[{"id":1,"n":"喵星派對","en":"","c":"#7f9671","f":["太空�
 // 機率和保底在後端抽，前端只知道名字和哪幾格是隱藏版（開箱時顯示金框「?」）
 const BB_PRICE=200,BB_PITY=150,BB_RN={N:'⚪ 普通',R:'🔵 稀有',S:'🟣 超稀有',H:'🌟 隱藏版！'};
 const bbId=(sid,i)=>`bb${sid}_${String(i+1).padStart(2,'0')}`,bbImg=(sid,i)=>`assets/${bbId(sid,i)}.webp`,bbBox=sid=>`assets/bb${sid}_box.webp`;
-BB_SERIES.forEach(S=>S.f.forEach((n,i)=>{ITEMS[bbId(S.id,i)]={name:n,emo:'🎁',kind:'fig',price:0,img:bbImg(S.id,i),bb:S.id}}));
+BB_SERIES.filter(S=>!S.off).forEach(S=>S.f.forEach((n,i)=>{if((S.x||[]).includes(i))return;ITEMS[bbId(S.id,i)]={name:n,emo:'🎁',kind:'fig',price:0,img:bbImg(S.id,i),bb:S.id}}));
 const bbOn=()=>BB_SERIES.filter(S=>!S.off);
 const bbIdx=S=>S.f.map((n,i)=>i).filter(i=>!(S.x||[]).includes(i));
 function bbData(){const b=DB.bb&&typeof DB.bb==='object'?DB.bb:(DB.bb={});b.p=b.p||{};b.d=b.d||{};return b}
