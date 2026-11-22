@@ -1016,7 +1016,7 @@ img{-webkit-user-drag:none}
 .shcab{position:absolute;transform:translate(-50%,-100%);border:0;background:none;padding:0;cursor:pointer}
 .shcab::before{content:'';position:absolute;left:6%;right:6%;bottom:-3%;height:7%;border-radius:50%;background:radial-gradient(closest-side,rgba(40,25,15,.45),transparent);z-index:-1}
 .shcab:active{transform:translate(-50%,-100%) scale(.98)}
-.shghost{position:absolute;transform:translate(-50%,-100%);width:23%;aspect-ratio:.8;border:3px dashed rgba(120,90,60,.55);border-radius:18px;background:rgba(255,250,238,.45);color:#7a5a40;font-size:clamp(12px,3.6cqw,17px);font-weight:700;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;line-height:1.4}
+.shghost{position:absolute;transform:translate(-50%,-100%);width:26%;aspect-ratio:.8;border:3px dashed rgba(120,90,60,.55);border-radius:18px;background:rgba(255,250,238,.45);color:#7a5a40;font-size:clamp(12px,3.6cqw,17px);font-weight:700;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;line-height:1.4}
 .cabv{position:relative;width:100%}
 .cabv>img.cabimg{display:block;width:100%;height:auto;pointer-events:none;user-select:none}
 .shs{position:absolute;display:flex;align-items:flex-end;justify-content:center;padding:0;border:0;background:none}
@@ -4352,9 +4352,9 @@ function openShow(hid){const h=house(hid);if(!hasShow(h))return;sfx&&sfx('tap');
 function renderShow(){const v=$('#shv');if(!v||!SHV)return;const h=house(SHV.hid);if(!hasShow(h))return;const s=showNorm(h.show),fam=isFamily(h.id),st=v.querySelector('.cstage');
   st.querySelector('.cbg').src=showRoomImg(s.room);st.querySelectorAll('.shcab,.shghost,.f2hint,.shw,.shwit,.shneon,.shframe,.shbadge,.shwghost').forEach(x=>x.remove());
   const R=showRoomDef(s.room),bottom=(R.f+75)/1536*100,stA=RW/RH;
-  s.pos.forEach((cid,p)=>{const cx=[22.5,50,77.5][p];   // 手機比較窄時房間左右會被裁掉，櫃子往中間靠
+  s.pos.forEach((cid,p)=>{const cx=[21.5,50,78.5][p];   // 手機比較窄時房間左右會被裁掉，櫃子往中間靠
     if(!cid){if(!fam)return;const g=document.createElement('button');g.className='shghost';g.innerHTML='＋<br>放櫃子';Object.assign(g.style,{left:cx+'%',top:bottom+'%'});g.onclick=e=>{e.stopPropagation();showCabPick(p)};st.appendChild(g);return}
-    const C=SHOW_CABS[cid],w=Math.min(25.5,C.a*25/stA),el=document.createElement('button');el.className='shcab';el.innerHTML=cabHTML(cid,s.it[p],false);
+    const C=SHOW_CABS[cid],w=Math.min(28.5,C.a*28/stA),el=document.createElement('button');el.className='shcab';el.innerHTML=cabHTML(cid,s.it[p],false);
     Object.assign(el.style,{left:cx+'%',top:bottom+'%',width:w+'%',zIndex:10+p%2});el.onclick=e=>{e.stopPropagation();showClose(p)};st.appendChild(el)});
   renderWall(st,s,fam);
   if(!s.pos.some(c=>c)){const tip=document.createElement('div');tip.className='f2hint';tip.textContent=fam?'展示間空空的，先買一個櫃子吧！':'展示間還在布置中';st.appendChild(tip)}
@@ -4621,7 +4621,7 @@ function xcFromShow(hid,id){const h=house(hid),it=ITEMS[id]||{};const M=(DB.play
     $('#sheet').querySelectorAll('[data-xm]').forEach(b=>b.onclick=()=>xcPickGive(b.dataset.xm,id))}}
 
 // ================= 🧱 展示間牆面（v2.07）=================
-const WL={neonY:20.5,shY:[33,44.5],shW:38,cbB:46.5,cbW:30,frX:16,frY:[27.5,40.5],frW:14,bdX:[79.5,87],bdY:[25,32.5,40],bdW:7};   // 手機上舞台左右會被裁掉約 7%，兩側的東西往內靠
+const WL={neonY:19.5,shY:[31,42],shW:36,cbB:44,cbW:30,frX:[19,19],frY:[26.5,39.5],frW:20,bdX:[79.5,87],bdY:[25,32.5,40],bdW:7};   // 手機上舞台左右會被裁掉約 7%，兩側的東西往內靠
 const stagePct=(w,a)=>w*(RW/RH)/a;   // 寬 w% 的圖，在舞台上是幾 % 高
 const HON_N=k=>{const m=/^set:(\d+)$/.exec(k);if(m){const S=bbSer(+m[1]);return `集滿「${S?S.n:'盲盒'}」全系列`}return {hid:'抽到過隱藏版',star:'幫毛球找回星寶',xmas:'幫豆豆送完聖誕禮物',lv20:'Lv.20 資深島民',lv40:'Lv.40 傳奇島民',trade:'完成過公仔交換'}[k]||k};
 const HON_IN=k=>{const m=/^set:(\d+)$/.exec(k);if(m)return `<img src="${bbBox(+m[1])}" alt="">`;return {hid:'<img src="assets/fx_star.webp" alt="">',star:'<img src="assets/sb_happy.webp" alt="">',xmas:'<img src="assets/xm_icon.webp" alt="">',lv20:'20',lv40:'40',trade:'🔄'}[k]||'🏅'};
@@ -4641,10 +4641,10 @@ function renderWall(st,s,fam){const add=(el,css,fn)=>{Object.assign(el.style,css
     if(!any)ghost('＋ 層板<br>或壁櫃',50,(WL.shY[0]+WL.shY[1])/2-3,WL.shW,16,()=>decoShop('wall'));
     else [0,1].forEach(r=>{if(!s.wsh[r])ghost('＋ 層板',50,WL.shY[r]-3,WL.shW*.7,5,()=>wallPick('sh',r))})}
   // 📷 相框
-  [0,1].forEach(r=>{const k=s.wfr[r],cy=WL.frY[r];if(!k)return ghost('＋<br>相框',WL.frX,cy,WL.frW*.8,9,()=>wallPick('fr',r));
+  [0,1].forEach(r=>{const k=s.wfr[r],cy=WL.frY[r],fx=WL.frX[r];if(!k)return ghost('＋<br>相框',fx,cy,WL.frW*.7,10,()=>wallPick('fr',r));
     const F=WFR[k],h=stagePct(WL.frW,F.a),el=document.createElement('button');el.className='shframe';const ho=F.h||[15,15,85,85],pt=wallPhoto(s.wfp[r]);
     el.innerHTML=`${pt?`<img class="ph" src="${pt}" alt="" style="left:${ho[0]}%;top:${ho[1]}%;width:${ho[2]-ho[0]}%;height:${ho[3]-ho[1]}%">`:`<span class="ph" style="left:${ho[0]}%;top:${ho[1]}%;width:${ho[2]-ho[0]}%;height:${ho[3]-ho[1]}%">🐾</span>`}<img class="fimg" src="assets/wfr_${k}.webp" alt="">`;
-    add(el,{left:(WL.frX-WL.frW/2)+'%',top:(cy-h/2)+'%',width:WL.frW+'%',zIndex:4},()=>frameMenu(r))});
+    add(el,{left:(fx-WL.frW/2)+'%',top:(cy-h/2)+'%',width:WL.frW+'%',zIndex:4},()=>frameMenu(r))});
   // 🏆 榮譽牆
   const B=s.hon.slice(0,6),bh=stagePct(WL.bdW,WBADGE.a),ho=WBADGE.h;
   B.forEach((k,i)=>{const el=document.createElement('button');el.className='shbadge';el.innerHTML=`<span class="bin" style="left:${ho[0]}%;top:${ho[1]}%;width:${ho[2]-ho[0]}%;height:${ho[3]-ho[1]}%">${HON_IN(k)}</span><img src="assets/wbadge.webp" alt="">`;
@@ -5641,7 +5641,7 @@ function announceLetters(){if(!DB.me)return;let seen=[];try{seen=JSON.parse(loca
     sfx('gift');$('#lgopen').onclick=()=>openLetter(nw[0].id,()=>$('#bell').click())};
   setTimeout(go,1800)}
 // ================= 自動更新：發現新版本就重新載入 =================
-const APP_VER='v2.15';
+const APP_VER='v2.16';
 function checkUpdate(){
   if(!/^https?:/.test(location.protocol)||!API_URL)return;
   if(!$('#modal').classList.contains('hidden'))return; // 正在填表單時不打斷
