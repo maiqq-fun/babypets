@@ -4651,7 +4651,7 @@ function xcSheet(tab){if(!needMe())return;tab=tab||(xcIn().length?'in':'new');co
   if(tab==='in'){const L=xcIn();body=L.length?L.map(t=>xcCard(t,false)).join(''):'<div class="locked">還沒有人想跟你換<br>櫃子擺滿一點，說不定就有人來問了</div>'}
   else if(tab==='out'){const L=xcMine();body=(L.length?L.map(t=>xcCard(t,true)).join(''):'<div class="locked">你還沒發出交換邀請</div>')+`<p class="lead" style="font-size:12px">同時最多 ${XC_MAX} 個・3 天沒回覆會自動退回</p>`}
   else{const P=(DB.players||[]).filter(p=>p.houseId&&p.id!==DB.me.id);
-    body=`<p class="lead" style="font-size:13px">想跟誰換？可以看到他背包和展示櫃裡的公仔</p><div class="xcpl">${P.map(p=>{const n=xcTheirs(p).length;return `<button data-xp="${p.id}" ${n?'':'disabled'}>${esc(p.nick)}<small style="color:var(--soft)">　${n?n+' 種公仔':'還沒有公仔'}</small></button>`}).join('')||'<div class="locked">島上還沒有其他人</div>'}</div>`}
+    body=`<p class="lead" style="font-size:13px">想跟誰換？可以看到他背包和展示櫃裡的公仔</p><div class="xcpl">${P.map(p=>{const L=xcTheirs(p),n=L.length,nw=L.filter(id=>!xcMy(id)).length,dup=L.filter(id=>xcCnt(p,id).t>=2).length;return `<button data-xp="${p.id}" ${n?'':'disabled'}>${esc(p.nick)}<small style="color:var(--soft)">　${n?`${n} 種${nw?`・🟢 ${nw} 種你沒有`:''}${dup?`・${dup} 種有多的`:''}`:'還沒有公仔'}</small></button>`}).join('')||'<div class="locked">島上還沒有其他人</div>'}</div>`}
   openModal(`<h3>🔄 公仔交換</h3>${tabs}${body}<div class="row2"><button data-close>關閉</button></div>`);
   $('#sheet').querySelectorAll('[data-xt]').forEach(b=>b.onclick=()=>xcSheet(b.dataset.xt));
   $('#sheet').querySelectorAll('[data-xp]').forEach(b=>b.onclick=()=>xcPickWant(b.dataset.xp));
@@ -4659,15 +4659,19 @@ function xcSheet(tab){if(!needMe())return;tab=tab||(xcIn().length?'in':'new');co
   $('#sheet').querySelectorAll('[data-xcn]').forEach(b=>b.onclick=()=>xcAnswer(b.dataset.xcn,false));
   $('#sheet').querySelectorAll('[data-xcy]').forEach(b=>b.onclick=()=>xcAnswer(b.dataset.xcy,true))}
 // 對方有的公仔：背包＋他家展示櫃
+// v2.24：每一款有幾隻（背包＋展示櫃）。後端舊版沒給背包數量時，背包算 1 隻
+function xcShowN(h,id){if(!h||!hasShow(h))return 0;let n=0;showNorm(h.show).it.forEach(a=>a.forEach(x=>{if(x===id)n++}));return n}
+function xcCnt(p,id){const b=(p.figs||[]).includes(id)?(p.figN&&p.figN[id]!=null?+p.figN[id]||0:1):0;return {b,s:xcShowN(house(p.houseId),id),t:b+xcShowN(house(p.houseId),id)}}
+function xcMy(id){return (bag()[id]||0)+xcShowN(myHouse(),id)}
 function xcTheirs(p){const S=new Set((p.figs||[]).filter(id=>XC_RE.test(id)&&ITEMS[id]));const h=house(p.houseId);
   if(h&&hasShow(h))showNorm(h.show).it.forEach(a=>a.forEach(id=>{if(id&&XC_RE.test(id)&&ITEMS[id])S.add(id)}));return [...S].sort()}
-function xcPickWant(pid){const p=(DB.players||[]).find(x=>x.id===pid);if(!p)return;const L=xcTheirs(p);
-  openModal(`<h3>🔄 想要 ${esc(p.nick)} 的哪一隻？</h3><div class="xcgrid">${L.map(id=>`<button data-w="${id}"><img src="${xcImg(id)}" alt="">${esc(xcName(id))}${xcHave(id)?'<i>有了</i>':''}</button>`).join('')}</div><div class="row2"><button id="xcb">← 回去</button></div>`);
+function xcPickWant(pid){const p=(DB.players||[]).find(x=>x.id===pid);if(!p)return;const L=xcTheirs(p).map(id=>Object.assign({id,my:xcMy(id)},xcCnt(p,id))).sort((a,b)=>(a.my>0)-(b.my>0)||b.t-a.t||(a.id<b.id?-1:1));
+  openModal(`<h3>🔄 想要 ${esc(p.nick)} 的哪一隻？</h3><p class="lead" style="font-size:12px">🟢 你還沒有的排前面・他有 2 隻以上的比較好換</p><div class="xcgrid">${L.map(x=>`<button data-w="${x.id}"${x.t>=2?' style="box-shadow:0 0 0 2px #7fb069 inset"':''}><img src="${xcImg(x.id)}" alt="">${esc(xcName(x.id))}<small style="display:block;font-size:11px;color:var(--soft);line-height:1.4">他有 ×${x.t}${x.s?`（展示 ${x.s}）`:''}<br>${x.my?`你有 ×${x.my}`:'<b style="color:#3d9a5b">🟢 你還沒有</b>'}</small></button>`).join('')}</div><div class="row2"><button id="xcb">← 回去</button></div>`);
   $('#xcb').onclick=()=>xcSheet('new');$('#sheet').querySelectorAll('[data-w]').forEach(b=>b.onclick=()=>xcPickGive(pid,b.dataset.w))}
 function xcPickGive(pid,want){const p=(DB.players||[]).find(x=>x.id===pid);if(!p)return;const L=bagList('fig').filter(([id])=>XC_RE.test(id));
   if(!L.length)return openModal(`<div style="text-align:center"><h3>背包裡沒有可以換的公仔</h3><p class="lead">去毛二街抽盲盒，或把展示櫃裡的公仔收回背包，就能拿來換了</p></div><div class="row2"><button data-close class="primary">好</button></div>`);
   openModal(`<h3>🔄 用哪一隻跟 ${esc(p.nick)} 換「${esc(xcName(want))}」？</h3><p class="lead" style="font-size:12px">只能用背包裡的公仔換・送出後這隻先交給島上保管，對方沒答應就會退回</p>
-    <div class="xcgrid">${L.map(([id,n])=>`<button data-g="${id}"><img src="${xcImg(id)}" alt="">${esc(xcName(id))}<i>×${n}</i></button>`).join('')}</div><div class="row2"><button id="xcb">← 回去</button></div>`);
+    <div class="xcgrid">${L.map(([id,n])=>{const th=xcCnt(p,id).t;return `<button data-g="${id}"><img src="${xcImg(id)}" alt="">${esc(xcName(id))}<i>×${n}</i><small style="display:block;font-size:11px;color:var(--soft)">${th?`他有 ×${th}`:'<b style="color:#3d9a5b">他還沒有</b>'}</small></button>`}).join('')}</div><div class="row2"><button id="xcb">← 回去</button></div>`);
   $('#xcb').onclick=()=>xcPickWant(pid);
   $('#sheet').querySelectorAll('[data-g]').forEach(b=>b.onclick=()=>{const give=b.dataset.g;
     openModal(`<h3>確定要提出交換嗎？</h3><div class="xcrow"><div class="xcfig"><img src="${xcImg(give)}" alt="">你給<br><b>${esc(xcName(give))}</b></div><div class="xcarr">⇄</div><div class="xcfig"><img src="${xcImg(want)}" alt="">你要<br><b>${esc(xcName(want))}</b></div></div>
@@ -5800,7 +5804,7 @@ function announceLetters(){if(!DB.me)return;let seen=[];try{seen=JSON.parse(loca
     sfx('gift');$('#lgopen').onclick=()=>openLetter(nw[0].id,()=>$('#bell').click())};
   setTimeout(go,1800)}
 // ================= 自動更新：發現新版本就重新載入 =================
-const APP_VER='v2.23';
+const APP_VER='v2.24';
 function checkUpdate(){
   if(!/^https?:/.test(location.protocol)||!API_URL)return;
   if(!$('#modal').classList.contains('hidden'))return; // 正在填表單時不打斷
