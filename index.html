@@ -559,6 +559,8 @@ html,body,button,.island,.imap,.logo{touch-action:manipulation}
 
 .sndb img{width:74%;height:74%;object-fit:contain;display:block;margin:auto}
 .sndb.off img{opacity:.9}
+.musb img{width:74%;height:74%;object-fit:contain;display:block;margin:auto}.musb{font-size:20px;line-height:1}.musb.off{opacity:.75}.musb.nobgm{display:none!important}
+#homewrap .top.hbar .musb{padding:4px 8px;display:flex;align-items:center;justify-content:center;width:44px;height:38px}#homewrap .top.hbar .musb img{width:26px;height:26px}
 #homewrap .top.hbar .sndb{padding:4px 8px;display:flex;align-items:center;justify-content:center;width:44px;height:38px}
 #homewrap .top.hbar .sndb img{width:26px;height:26px}
 #homewrap .top.hbar #hname{max-width:46%}
@@ -1134,7 +1136,7 @@ img{-webkit-user-drag:none}
   </div>
   <div class="icol" id="icol">
   <div class="top" style="align-items:flex-start"><img class="logo" src="assets/logo.webp" alt="毛很多"><div class="topright">
-    <button class="circle sndb noic" id="sndI" aria-label="音效開關"></button>
+    <button class="circle sndb noic" id="sndI" aria-label="音效開關"></button><button class="circle musb noic" id="musI" aria-label="音樂開關"></button>
     <button class="circle" id="bell" aria-label="通知">🔔<span class="badge" id="belln"></span></button>
     <button class="circle" id="tix" aria-label="任務與抽卡">🎟️<span class="badge" id="tixn">0</span></button>
     <button class="circle" id="me" aria-label="我的設定"></button></div></div>
@@ -1157,7 +1159,7 @@ img{-webkit-user-drag:none}
 </div>
   <div class="top hbar"><button class="pill" id="back">← 小島</button><div class="pill housename" id="hname"></div><button class="pill cam" id="camh" aria-label="拍照">📷</button></div>
   <div class="actions hbar"><button class="act" id="feed">🍖 餵飯</button><button class="act" id="addnote">📝 留言</button><button class="act" id="giftbtn">🎁 送禮</button><button class="act" id="walkbtn">🦮 遛遛</button><button class="act" id="sweep">🧹 打掃</button><button class="act" id="notebook">📒</button></div>
-  <div class="hrow hbar" id="hrow"><button class="circle sndb noic" id="sndH" aria-label="音效開關"></button><span id="hudslot"></span><button class="circle gohome" id="gohome" aria-label="回我家">🏠</button></div>
+  <div class="hrow hbar" id="hrow"><button class="circle sndb noic" id="sndH" aria-label="音效開關"></button><button class="circle musb noic" id="musH" aria-label="音樂開關"></button><span id="hudslot"></span><button class="circle gohome" id="gohome" aria-label="回我家">🏠</button></div>
 </div>
 <div class="foot" id="foot"></div>
 <div id="modal" class="modal hidden"><div class="sheet" id="sheet" role="dialog" aria-modal="true"></div></div>
@@ -1307,7 +1309,7 @@ async function sync(quiet){
   try{const d=await api('getState',Object.assign(cred(),{where:curWhere()}));
     Object.assign(DB,{houses:d.houses,pets:d.pets,weights:d.weights,medical:d.medical,expenses:d.expenses,notes:d.notes,feed:d.feed,famOk:d.famOk,players:d.players||[],tlogs:d.tlogs||[]});
     DB.houses.forEach(h=>{if(!Array.isArray(h.poops))h.poops=[]});
-    keepPending();DB.letters=(d.letters||[]).filter(l=>!LGONE[l.id]).map(l=>Object.assign(l,LSTATE[l.id]||{},CLAIMED['l:'+l.id]?{claimed:true}:{}));DB.drops=(d.drops||[]).filter(x=>!PICKED.has(x.id));DB.notice=d.notice&&d.notice.t&&!(+d.notice.until&&Date.now()>+d.notice.until)?d.notice:null;DB.center=d.center||DB.center||null;DB.applies=d.applies||[];DB.rooms=d.rooms||DB.rooms||[];if(Array.isArray(d.bbx)){DB.bbx=d.bbx;bbRegister()}applyRooms();DB.amail=+d.amail||0;setTimeout(updAdminBadge,0);DB.kuji=d.kuji||DB.kuji||null;DB.online=d.online||[];setTimeout(checkAdminGifts,600);DB.rank=d.rank||DB.rank||null;osLogin();pushCheckLater();setTimeout(noticePop,1200);DB.dbl=d.dbl||'';DB.adminId=d.adminId||'';DB.star=d.star||null;DB.xmas=d.xmas||null;DB.jobs=d.jobs||null;setTimeout(jobPayCheck,1500);if(d.player)DB.starDone=+d.player.starDone||0;DB.xmasDone=+d.player.xmasDone||0;
+    keepPending();DB.letters=(d.letters||[]).filter(l=>!LGONE[l.id]).map(l=>Object.assign(l,LSTATE[l.id]||{},CLAIMED['l:'+l.id]?{claimed:true}:{}));DB.drops=(d.drops||[]).filter(x=>!PICKED.has(x.id));DB.notice=d.notice&&d.notice.t&&!(+d.notice.until&&Date.now()>+d.notice.until)?d.notice:null;DB.center=d.center||DB.center||null;DB.applies=d.applies||[];DB.rooms=d.rooms||DB.rooms||[];if(Array.isArray(d.bbx)){DB.bbx=d.bbx;bbRegister()}applyRooms();DB.amail=+d.amail||0;setTimeout(updAdminBadge,0);DB.kuji=d.kuji||DB.kuji||null;DB.online=d.online||[];setTimeout(checkAdminGifts,600);DB.rank=d.rank||DB.rank||null;osLogin();pushCheckLater();setTimeout(noticePop,1200);DB.dbl=d.dbl||'';DB.adminId=d.adminId||'';DB.star=d.star||null;DB.xmas=d.xmas||null;if(typeof bgmSync==='function')setTimeout(bgmSync,0);DB.jobs=d.jobs||null;setTimeout(jobPayCheck,1500);if(d.player)DB.starDone=+d.player.starDone||0;DB.xmasDone=+d.player.xmasDone||0;
     setTimeout(announceLetters,0);setTimeout(updGuestBar,0);
     if(d.player&&DB.me){DB.me.code=d.player.code||DB.me.code;if(d.player.pin)DB.me.pin=d.player.pin;const ml=Array.isArray(d.player.mail)?d.player.mail:[];if(ml.length)claimMail(ml)}
     DB.owned={};d.houses.forEach(h=>DB.owned[h.id]=Array.isArray(h.owned)?h.owned:[]);
@@ -5164,6 +5166,25 @@ function updSndBtns(){document.querySelectorAll('.sndb').forEach(b=>{b.innerHTML
 document.querySelectorAll('.sndb').forEach(b=>b.onclick=e=>{e.stopPropagation();sndOn=!sndOn;try{localStorage.setItem('mhd_snd',sndOn?'1':'0')}catch(x){}updSndBtns();toast(sndOn?'音效打開了 🔊':'音效關掉了 🔇');if(sndOn)sfx('tap')});
 updSndBtns();
 
+
+// ================= 🎵 背景音樂（v2.03）=================
+// 整個 App 只有一個 <audio>，在小島、各家之間切換不會重新播放；活動開始才放活動音樂
+// 瀏覽器規定要使用者先點一下畫面才能出聲，所以第一次點擊時才開始播
+const BGM={normal:'',xmas:'assets/bgm_xmas.mp3'};
+let musOn=true;try{musOn=localStorage.getItem('mhd_mus')!=='0'}catch(e){}
+const bgm=new Audio();bgm.loop=true;bgm.preload='none';bgm.volume=.45;let bgmUnlocked=false,bgmFade=0;
+function bgmWant(){const E=typeof xmEv==='function'&&xmEv();if(E&&E.on&&BGM.xmas)return BGM.xmas;return BGM.normal||''}
+function bgmSync(){const want=bgmWant();document.querySelectorAll('.musb').forEach(b=>b.classList.toggle('nobgm',!want));
+  if(!want||!musOn||!bgmUnlocked||document.hidden){if(!bgm.paused)bgm.pause();return}
+  if(!bgm.src.endsWith(want)){bgm.src=want;bgm.currentTime=0}
+  if(bgm.paused){bgm.volume=0;bgm.play().then(()=>{clearInterval(bgmFade);bgmFade=setInterval(()=>{bgm.volume=Math.min(.45,bgm.volume+.03);if(bgm.volume>=.45)clearInterval(bgmFade)},80)}).catch(()=>{})}}
+function updMusBtns(){document.querySelectorAll('.musb').forEach(b=>{b.innerHTML=`<img src="assets/icon_${musOn?'music':'music_off'}.webp" alt="" onerror="this.replaceWith('${musOn?'🎵':'🔕'}')">`;b.classList.toggle('off',!musOn);b.setAttribute('aria-label',musOn?'音樂：開（點一下關掉）':'音樂：關（點一下打開）')});bgmSync()}
+document.querySelectorAll('.musb').forEach(b=>b.onclick=e=>{e.stopPropagation();musOn=!musOn;bgmUnlocked=true;try{localStorage.setItem('mhd_mus',musOn?'1':'0')}catch(x){}updMusBtns();toast(musOn?'音樂打開了 🎵':'音樂關掉了 🔕')});
+['pointerdown','keydown','touchstart'].forEach(ev=>document.addEventListener(ev,()=>{if(bgmUnlocked)return;bgmUnlocked=true;bgmSync()},{once:true,capture:true,passive:true}));
+document.addEventListener('visibilitychange',bgmSync);
+setInterval(bgmSync,30000);   // 活動開始或結束時自動換音樂
+updMusBtns();
+
 // ================= 📣 叫在外面玩的毛孩回家 =================
 function recallSheet(p,o){
   openModal(`<div style="text-align:center"><div class="giftopen"><img class="rch" src="${petHead(p)}" alt=""></div><h3>${esc(p.name)} 正在「${esc(o.name)}」玩</h3><p class="lead">要叫牠回家嗎？</p></div>
@@ -5215,7 +5236,7 @@ function announceLetters(){if(!DB.me)return;let seen=[];try{seen=JSON.parse(loca
     sfx('gift');$('#lgopen').onclick=()=>openLetter(nw[0].id,()=>$('#bell').click())};
   setTimeout(go,1800)}
 // ================= 自動更新：發現新版本就重新載入 =================
-const APP_VER='v2.02';
+const APP_VER='v2.03';
 function checkUpdate(){
   if(!/^https?:/.test(location.protocol)||!API_URL)return;
   if(!$('#modal').classList.contains('hidden'))return; // 正在填表單時不打斷
