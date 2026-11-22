@@ -3775,10 +3775,11 @@ function isMgr(hid){return !!(DB.me&&isShopH(house(hid))&&shopMgrs().includes(DB
 function canEdit(hid){return isFamily(hid)||isMgr(hid)||(hid===PARK_ID&&!!adminPw())}
 function hcred(){const h=home&&house(home.id);return isParkH(h)?{playerId:DB.me&&DB.me.id,houseId:PARK_ID,pw:'',adminPw:adminPw()}:isShopH(h)?{playerId:DB.me&&DB.me.id,houseId:SHOP_ID,pw:''}:cred()}
 function shopStaffList(h){const L=Array.isArray(h&&h.staff)?h.staff.filter(x=>x&&x.name):[];return L.length?L.slice(0,SHOP_STAFF_MAX):SHOP_STAFF0}
-function shopBase(t,id){if(t==='acc')return (ACC[id]||{}).p||0;const it=ITEMS[id];if(!it)return 0;return it.price>0?it.price:LIMIT_BASE}
+function shopBase(t,id){if(t==='acc')return (ACC[id]||{}).p||0;if(t==='cab')return (SHOW_CABS[id]||{}).p||0;if(t==='w')return (wDef(id)||{}).p||0;const it=ITEMS[id];if(!it)return 0;return it.price>0?it.price:LIMIT_BASE}
 const shopPrice=(t,id)=>Math.max(1,Math.round(shopBase(t,id)*SHOP_RATE));
-const shopName=(t,id)=>t==='acc'?((ACC[id]||{}).n||id):((ITEMS[id]||{}).name||id);
-const shopIcon=(t,id)=>t==='acc'?`<span class="ii big"><img src="${accImg(id)}" alt=""></span>`:itemIcon(id,'big');
+const shopName=(t,id)=>t==='acc'?((ACC[id]||{}).n||id):t==='cab'?((SHOW_CABS[id]||{}).n||id)+'（展示櫃）':t==='w'?((wDef(id)||{}).n||id)+({sh:'（層板）',fr:'（相框）',cb:'（壁櫃）'}[String(id).split(':')[0]]||''):((ITEMS[id]||{}).name||id);
+const wDef=k=>{const [a,b]=String(k).split(':'),D=a==='sh'?WSH:a==='fr'?WFR:a==='cb'?WCB:null;return D&&D[b]?Object.assign({k:a,id:b},D[b]):null},wImg=k=>{const d=wDef(k);return d?`assets/w${d.k}_${d.id}.webp`:''};
+const shopIcon=(t,id)=>t==='cab'?`<span class="ii big"><img src="${showCabImg(id)}" alt=""></span>`:t==='w'?`<span class="ii big"><img src="${wImg(id)}" alt=""></span>`:t==='acc'?`<span class="ii big"><img src="${accImg(id)}" alt=""></span>`:itemIcon(id,'big');
 const keepScroll=fn=>{const st=$('#sheet').scrollTop;fn();$('#sheet').scrollTop=st};
 // ---------- 店裡的畫面 ----------
 function renderShopHome(h){const mg=isMgr(h.id);
@@ -3837,19 +3838,20 @@ async function shopBuyBg(x,pr,nm){let err=null;
   if(!err){if(ONLINE)feedPush(`🛍️ ${DB.me.nick} 在毛二街撿到便宜：${nm}`);return}
   if(/太慢|連不上|JSON|Unexpected|fetch|network/i.test(err.message))return;   // 不知道小島有沒有收到：先不收回（跟撿錢一樣）
   const g=DB.game;g.coins=(g.coins||0)+pr;
-  if(x.t==='acc'){const mh=myHouse(),hh=mh&&house(mh.id);if(hh)hh.acc=(hh.acc||[]).filter(a=>a!==x.item);const a=mh&&APEND[mh.id];if(a)a.ids=a.ids.filter(v=>v!==x.item)}else bagAdd(x.item,-1);
+  if(x.t==='acc'){const mh=myHouse(),hh=mh&&house(mh.id);if(hh)hh.acc=(hh.acc||[]).filter(a=>a!==x.item);const a=mh&&APEND[mh.id];if(a)a.ids=a.ids.filter(v=>v!==x.item)}else if(x.t==='cab'||x.t==='w'){const mh=myHouse();if(mh)showStore(mh.id,x,-1)}else bagAdd(x.item,-1);
   save();updTix();toast(/買走/.test(err.message)?`慢了一步，${nm} 被別人買走了，🪙${pr} 退給你`:`${err.message}（🪙${pr} 退給你）`);
   if($('#sheet')&&/毛二街/.test(($('#sheet h3')||{}).textContent||''))keepScroll(()=>tradeSheet());if(ONLINE)sync(true)}
 function tradeSheet(tab,sub){if(!needMe())return;if(tab)tradeTab=tab;if(sub)sellSub=sub;const s=house(SHOP_ID);if(!s)return toast('毛二街還在裝潢中');
   const g=DB.game,coins=g.coins||0,mh=myHouse(),own=mh?accOwn(mh.id):new Set();let body='';
-  if(tradeTab==='buy'){const L=(Array.isArray(s.stock)?s.stock:[]).filter(x=>x&&!(S2BUY[x.id]&&Date.now()-S2BUY[x.id]<12e4)&&(x.t==='acc'?ACC[x.item]:ITEMS[x.item])).slice().sort((a,b)=>(+b.at||0)-(+a.at||0));
-    body=L.length?`<div class="shopgrid">${L.map(x=>{const pr=shopPrice(x.t,x.item),has=x.t==='acc'&&own.has(x.item),lim=x.t==='item'&&ITEMS[x.item].limited;
-      return `<div class="si">${shopIcon(x.t,x.item)}<div class="sn">${esc(shopName(x.t,x.item))}</div><div class="sf"><s>原價 ${shopBase(x.t,x.item)}</s>${lim?' ✨限定':x.t==='acc'?' 👗':''}</div><button data-sb="${x.id}" ${coins>=pr&&!has?'':'disabled'}>${has?'已擁有':'🪙 '+pr}</button><small>${x.src==='p'?(x.by?esc(x.by)+' 寄賣':'島民寄賣'):'店家補貨'}</small></div>`}).join('')}</div>`:'<div class="locked">架上空空的，晚點再來撿便宜</div>';
+  if(tradeTab==='buy'){const L=(Array.isArray(s.stock)?s.stock:[]).filter(x=>x&&!(S2BUY[x.id]&&Date.now()-S2BUY[x.id]<12e4)&&(x.t==='acc'?ACC[x.item]:x.t==='cab'?SHOW_CABS[x.item]:x.t==='w'?wDef(x.item):ITEMS[x.item])).slice().sort((a,b)=>(+b.at||0)-(+a.at||0));
+    body=L.length?`<div class="shopgrid">${L.map(x=>{const pr=shopPrice(x.t,x.item),has=x.t==='acc'&&own.has(x.item),lim=x.t==='item'&&ITEMS[x.item].limited,noShow=(x.t==='cab'||x.t==='w')&&!(mh&&hasShow(mh));
+      return `<div class="si">${shopIcon(x.t,x.item)}<div class="sn">${esc(shopName(x.t,x.item))}</div><div class="sf"><s>原價 ${shopBase(x.t,x.item)}</s>${lim?' ✨限定':x.t==='acc'?' 👗':''}</div><button data-sb="${x.id}" ${coins>=pr&&!has&&!noShow?'':'disabled'}>${has?'已擁有':noShow?'要先有展示間':'🪙 '+pr}</button><small>${x.src==='p'?(x.by?esc(x.by)+' 寄賣':'島民寄賣'):'店家補貨'}</small></div>`}).join('')}</div>`:'<div class="locked">架上空空的，晚點再來撿便宜</div>';
     body+=`<div class="hint">二手價都是原價的一半・限定玩具以 🪙${LIMIT_BASE} 當原價・每天店家會補 3 樣新貨</div>`}
   else if(sellSub==='crop'){body=cropSellBody()}
   else if(sellSub==='cab'){const sv=mh&&hasShow(mh)?showNorm(clone(mh.show)):null,L=sv?Object.keys(sv.cabs).filter(id=>SHOW_CABS[id]&&(+sv.cabs[id]||0)>0):[];   // v2.22：沒擺出去的展示櫃可以賣
-    body=L.length?`<div class="shopgrid">${L.map(id=>{const fr=showFree(sv,id,-1);return `<div class="si"><span class="ii big"><img src="${showCabImg(id)}" alt=""></span><div class="sn">${esc(SHOW_CABS[id].n)}</div><div class="sf">倉庫 ${fr} 個${fr<(+sv.cabs[id]||0)?`・擺出去 ${(+sv.cabs[id]||0)-fr} 個`:''}</div><button data-sc="${id}" ${fr>0?'':'disabled'}>賣 🪙 ${Math.round(SHOW_CABS[id].p/2)}</button></div>`}).join('')}</div>`:'<div class="locked">展示間裡沒有櫃子</div>';
-    body+='<div class="hint">擺在展示間的櫃子要先收起來才能賣・展示櫃不會上二手架</div>'}
+    const WL=sv?Object.keys(sv.wo).filter(k=>wDef(k)&&(+sv.wo[k]||0)>0):[];
+    body=L.length||WL.length?`<div class="shopgrid">${L.map(id=>{const fr=showFree(sv,id,-1);return `<div class="si"><span class="ii big"><img src="${showCabImg(id)}" alt=""></span><div class="sn">${esc(SHOW_CABS[id].n)}</div><div class="sf">倉庫 ${fr} 個${fr<(+sv.cabs[id]||0)?`・擺出去 ${(+sv.cabs[id]||0)-fr} 個`:''}</div><button data-sc="${id}" ${fr>0?'':'disabled'}>賣 🪙 ${Math.round(SHOW_CABS[id].p/2)}</button></div>`}).join('')}${WL.map(k=>{const d=wDef(k),fr=wFree(sv,d.k,d.id,-1);return `<div class="si">${shopIcon('w',k)}<div class="sn">${esc(shopName('w',k))}</div><div class="sf">倉庫 ${fr} 個${fr<(+sv.wo[k]||0)?`・掛出去 ${(+sv.wo[k]||0)-fr} 個`:''}</div><button data-sw="${k}" ${fr>0?'':'disabled'}>賣 🪙 ${Math.round(d.p/2)}</button></div>`}).join('')}</div>`:'<div class="locked">展示間裡沒有可以賣的東西</div>';
+    body+='<div class="hint">擺出去、掛出去的要先收起來才能賣・賣掉的會放上二手架，別人可以半價買</div>'}
   else if(sellSub==='bag'){const L=bagList().filter(([id])=>!['seed','crop','fig'].includes(ITEMS[id].kind));
     body=L.length?`<div class="shopgrid">${L.map(([id,n])=>`<div class="si">${itemIcon(id,'big')}<div class="sn">${esc(ITEMS[id].name)}</div><div class="sf">× ${n}${ITEMS[id].limited?' ✨限定':''}</div><button data-ss="${id}">賣 🪙 ${shopPrice('item',id)}</button></div>`).join('')}</div>`:'<div class="locked">背包是空的</div>';
     body+='<div class="hint">按一次會問你確定，再按一次才會賣・擺在家裡的玩具要先「收回背包」才能賣</div>'}
@@ -3859,24 +3861,27 @@ function tradeSheet(tab,sub){if(!needMe())return;if(tab)tradeTab=tab;if(sub)sell
     body+='<div class="hint">配件是全家共用的，賣掉後全家的衣櫃都會少這件，毛孩身上戴著的也會脫下來</div>'}
   openModal(`<h3>🛍️ 毛二街</h3><p class="lead">我的金幣：<b class="coinv">🪙 ${coins}</b>・收購和賣出都是原價的一半</p>
     <div class="tabs3"><button data-tt="buy" class="${tradeTab==='buy'?'on':''}">🛍️ 買二手</button><button data-tt="sell" class="${tradeTab==='sell'?'on':''}">💰 賣東西</button></div>
-    ${tradeTab==='sell'?`<div class="rtabs"><button data-st="bag" class="${sellSub==='bag'?'on':''}">🎒 背包</button><button data-st="acc" class="${sellSub==='acc'?'on':''}">👗 衣櫃配件</button><button data-st="crop" class="${sellSub==='crop'?'on':''}">🌱 作物</button>${mh&&hasShow(mh)?`<button data-st="cab" class="${sellSub==='cab'?'on':''}">🗄️ 展示櫃</button>`:''}</div>`:''}
+    ${tradeTab==='sell'?`<div class="rtabs"><button data-st="bag" class="${sellSub==='bag'?'on':''}">🎒 背包</button><button data-st="acc" class="${sellSub==='acc'?'on':''}">👗 衣櫃配件</button><button data-st="crop" class="${sellSub==='crop'?'on':''}">🌱 作物</button>${mh&&hasShow(mh)?`<button data-st="cab" class="${sellSub==='cab'?'on':''}">🗄️ 展示間</button>`:''}</div>`:''}
     ${body}<div class="row2" style="margin-top:12px"><button data-close>關閉</button></div>`);
   const S=$('#sheet');
   S.querySelectorAll('[data-tt]').forEach(b=>b.onclick=()=>tradeSheet(b.dataset.tt));
   S.querySelectorAll('[data-st]').forEach(b=>b.onclick=()=>tradeSheet('sell',b.dataset.st));if(sellSub==='crop')cropBind(S);
   const pushStock=it=>{if(it&&it.id&&!(s.stock||[]).some(y=>y.id===it.id))(s.stock=s.stock||[]).push(it)};
   S.querySelectorAll('[data-sb]').forEach(b=>b.onclick=()=>{const x=(s.stock||[]).find(y=>y.id===b.dataset.sb);if(!x||S2BUY[x.id])return;const pr=shopPrice(x.t,x.item),nm=shopName(x.t,x.item);
-    if((g.coins||0)<pr)return toast('金幣不夠喔');if(x.t==='acc'&&!myHouse())return toast('有家之後才能買配件');
+    if((g.coins||0)<pr)return toast('金幣不夠喔');if(x.t==='acc'&&!myHouse())return toast('有家之後才能買配件');if((x.t==='cab'||x.t==='w')&&!(myHouse()&&hasShow(myHouse())))return toast('要先有展示間才能買這個喔');
     // v1.86：先在畫面上買好（不跳「處理中」），小島在背後確認；被別人先買走才退錢
     S2BUY[x.id]=Date.now();s.stock=(s.stock||[]).filter(y=>y.id!==x.id);g.coins=Math.max(0,(g.coins||0)-pr);sfx('coin');
-    if(x.t==='acc'){const hid=myHouse().id,hh=house(hid);hh.acc=[...new Set([...(hh.acc||[]),x.item])];const a=APEND[hid]||(APEND[hid]={ids:[],t:0});a.ids=[...new Set(a.ids.concat([x.item]))];a.t=Date.now()}else bagAdd(x.item,1);
-    save();updTix();dmTick('buy');toast(`撿到便宜！${nm} ${x.t==='acc'?'放進衣櫃了 👗':'放進背包了 🎒'}`);keepScroll(()=>tradeSheet());shopBuyBg(x,pr,nm)});
+    if(x.t==='acc'){const hid=myHouse().id,hh=house(hid);hh.acc=[...new Set([...(hh.acc||[]),x.item])];const a=APEND[hid]||(APEND[hid]={ids:[],t:0});a.ids=[...new Set(a.ids.concat([x.item]))];a.t=Date.now()}else if(x.t==='cab'||x.t==='w')showStore(myHouse().id,x,1);else bagAdd(x.item,1);
+    save();updTix();dmTick('buy');toast(`撿到便宜！${nm} ${x.t==='acc'?'放進衣櫃了 👗':x.t==='cab'||x.t==='w'?'放進展示間的倉庫了 🗄️':'放進背包了 🎒'}`);keepScroll(()=>tradeSheet());shopBuyBg(x,pr,nm)});
   S.querySelectorAll('[data-ss]').forEach(b=>b.onclick=async()=>{const id=b.dataset.ss,pr=shopPrice('item',id),nm=ITEMS[id].name;if(!(bag()[id]>0))return;if(!armBtn(b,`確定賣？🪙${pr}`))return;
     let r;try{r=await call('shopSell',{playerId:DB.me.id,item:id,t:'item',name:nm})}catch(e){return toast(e.message)}
     bagAdd(id,-1);pushStock(r&&r.it);const rc=b.getBoundingClientRect();sfx('coin');grant(0,pr,{x:rc.left+rc.width/2,y:rc.top});if(ONLINE)feedPush(`💰 ${DB.me.nick} 把 ${nm} 賣給毛二街`);toast(`賣掉 ${nm}，拿到 🪙${pr}`);keepScroll(()=>tradeSheet())});
   S.querySelectorAll('[data-sc]').forEach(b=>b.onclick=()=>{const id=b.dataset.sc,mh2=myHouse(),pr=Math.round(SHOW_CABS[id].p/2),nm=SHOW_CABS[id].n;if(!mh2||!isFamily(mh2.id))return toast('正在跟小島同步，等一下再試');if(!armBtn(b,`確定賣？🪙${pr}`))return;
     if(!showDo(mh2.id,{op:'sellCab',id},()=>{g.coins=Math.max(0,(g.coins||0)-pr);save();updTix()}))return;
     const rc=b.getBoundingClientRect();sfx('coin');grant(0,pr,{x:rc.left+rc.width/2,y:rc.top});if(ONLINE)feedPush(`💰 ${DB.me.nick} 把展示櫃「${nm}」賣給毛二街`);toast(`賣掉 ${nm}，拿到 🪙${pr}`);keepScroll(()=>tradeSheet('sell','cab'))});
+  S.querySelectorAll('[data-sw]').forEach(b=>b.onclick=()=>{const k=b.dataset.sw,d=wDef(k),mh2=myHouse();if(!d)return;const pr=Math.round(d.p/2),nm=shopName('w',k);if(!mh2||!isFamily(mh2.id))return toast('正在跟小島同步，等一下再試');if(!armBtn(b,`確定賣？🪙${pr}`))return;
+    if(!showDo(mh2.id,{op:'sellW',kind:d.k,id:d.id},()=>{g.coins=Math.max(0,(g.coins||0)-pr);save();updTix()}))return;
+    const rc=b.getBoundingClientRect();sfx('coin');grant(0,pr,{x:rc.left+rc.width/2,y:rc.top});if(ONLINE)feedPush(`💰 ${DB.me.nick} 把${nm}賣給毛二街`);toast(`賣掉 ${nm}，拿到 🪙${pr}`);keepScroll(()=>tradeSheet('sell','cab'))});
   S.querySelectorAll('[data-sa]').forEach(b=>b.onclick=async()=>{const id=b.dataset.sa,mh2=myHouse(),pr=shopPrice('acc',id),nm=ACC[id].n;if(!mh2||!isFamily(mh2.id))return toast('正在跟小島同步，等一下再試');if(!armBtn(b,`確定賣？🪙${pr}`))return;
     let r;try{r=await call('shopSell',Object.assign(cred(),{item:id,t:'acc',name:nm}))}catch(e){return toast(e.message)}
     const hh=house(mh2.id);hh.acc=(hh.acc||[]).filter(x=>x!==id);if(APEND[mh2.id])APEND[mh2.id].ids=APEND[mh2.id].ids.filter(x=>x!==id);
@@ -4178,7 +4183,7 @@ function walkTick(st){st.querySelectorAll('.walker').forEach(el=>{if(el._busy||M
   el.style.zIndex=Math.round(Math.max(el._y,ty));Object.assign(el.style,hp(tx,ty));el._x=tx;el._y=ty;setTimeout(()=>{el._busy=0;el.classList.remove('walking');el.style.zIndex=Math.round(ty)},dur*1000)})}
 function sayOn(el,t){el.querySelectorAll('.say').forEach(x=>x.remove());const b=document.createElement('div');b.className='say';b.textContent=t;el.appendChild(b);setTimeout(()=>{b.classList.add('out');setTimeout(()=>b.remove(),400)},3000)}
 // ================= 🛏️ 二樓民宿 =================
-const GUESTS=[{img:'assets/guest_bunny.webp',n:'兔兔旅客'},{img:'assets/guest_cat.webp',n:'橘貓旅客'},{img:'assets/guest_duck.webp',n:'鴨鴨旅客'},{img:'assets/guest_bear.webp',n:'熊熊旅客'}];
+const GUESTS=[{img:'assets/guest_bunny.webp',n:'珍奶學長'},{img:'assets/guest_cat.webp',n:'珍珠美鳳'},{img:'assets/guest_duck.webp',n:'泳圈仔阿彬'},{img:'assets/guest_bear.webp',n:'秀英阿嬤'}];   // v2.22：素材換過了，名字跟著換
 const GUEST_SAY=['這裡好舒服～','玩具好多喔！','我還想再住一晚','老闆，早餐幾點？','這間民宿五顆星 ⭐','帶了紀念品給你～','窗外的風景好棒'];
 const comfortOf=h=>Math.min(TOY_MAX,(h.toys2||[]).length)*2;
 const rentRate=h=>comfortOf(h)/2;   // 每小時的租金（v2.22：舒適度÷2，擺滿一小時 20、存滿 12 小時 240）
@@ -4329,7 +4334,8 @@ const WSH={"wood":{"n":"原木層板","p":1000,"a":3.551,"y":12},"white":{"n":"�
 const NEON_C={pink:'#ff5fa2',blue:'#4fc3ff',yellow:'#ffd23f',purple:'#b46bff',mint:'#3ee8b5',white:'#ffffff'},NEON_P=1500;
 // f：牆和地板交界的高度（原圖 1536 高裡的位置）
 const SHOW_ROOMS={basic:{n:'溫馨木地板',p:0,f:1040},lilac:{n:'薰衣草',p:800,f:1050},mint:{n:'薄荷條紋',p:800,f:1075},
-  steel:{n:'工業風',p:1500,f:1045},space:{n:'星空宇宙',p:1500,f:1040},pink:{n:'粉紅公主',p:2000,f:1000}};
+  steel:{n:'工業風',p:1500,f:1045},space:{n:'星空宇宙',p:1500,f:1040},pink:{n:'粉紅公主',p:2000,f:1000},
+  stone:{n:'奶茶石屋',p:1500,f:1085},latte:{n:'拿鐵格紋',p:800,f:1068},ufo:{n:'紫色太空喵',p:1500,f:1065},moonblue:{n:'藍色月光',p:1500,f:1045},sunny:{n:'奶油黃小舖',p:800,f:1068}};   // v2.22 新背景
 // a：寬÷高；x：可以放東西的左右範圍（%）；y：4 層層板的高度（%，東西站在這條線上）
 const SHOW_CABS={
   wood:{n:'木頭腳掌',p:300,a:800/1153,x:[9,91],y:[30.5,48.5,64,81.5]},
@@ -4377,6 +4383,7 @@ function showOp(s,{op,id,pos,i,item}){s=showNorm(s);pos=+pos;i=+i;
   else if(op==='room'){if(s.rooms.indexOf(id)<0)throw new Error('還沒有這款裝潢');s.room=id}
   else if(op==='buyCab'){if(!SHOW_CABS[id])throw new Error('沒有這款櫃子');if(Object.values(s.cabs).reduce((a,b)=>a+(+b||0),0)>=30)throw new Error('倉庫放不下了');s.cabs[id]=(+s.cabs[id]||0)+1;
     if(!isNaN(pos)&&pos>=0&&pos<SHOW_POS&&!s.pos[pos])s.pos[pos]=id;else{const e=s.pos.indexOf('');if(e>=0)s.pos[e]=id}}
+  else if(op==='sellW'){if(!W[kind]||!W[kind][id])throw new Error('沒有這個商品');if(wFree(s,kind,id,-1)<=0)throw new Error('這款都掛出去了，先收起來才能賣');const wk=kind+':'+id;s.wo[wk]=(+s.wo[wk]||0)-1;if(s.wo[wk]<=0)delete s.wo[wk]}
   else if(op==='sellCab'){if(!SHOW_CABS[id])throw new Error('沒有這款櫃子');if(showFree(s,id,-1)<=0)throw new Error('這款櫃子都擺出去了，先收起來才能賣');s.cabs[id]=(+s.cabs[id]||0)-1;if(s.cabs[id]<=0)delete s.cabs[id]}
   else if(op==='cab'){okPos();if(!id){if(s.it[pos].some(x=>x))throw new Error('櫃子裡還有東西，先收回背包才能收起來');s.pos[pos]=''}
     else{if(!SHOW_CABS[id])throw new Error('沒有這款櫃子');if(s.pos[pos]!==id&&showFree(s,id,pos)<=0)throw new Error('這款櫃子都擺出去了');s.pos[pos]=id}}
@@ -4404,6 +4411,8 @@ function showDo(hid,req,undo){const h=house(hid);if(!h)return false;const before
   call('showEdit',Object.assign(cred(),{houseId:hid},req),true).then(r=>{if(r&&r.show&&ONLINE&&seq===SHOWSEQ[hid]){SHOWP[hid]={t:Date.now(),s:clone(r.show)}}})
     .catch(e=>{const hh=house(hid);if(seq===SHOWSEQ[hid]){if(hh)hh.show=before;delete SHOWP[hid]}else if(hh){try{hh.show=showOp(clone(hh.show),Object.assign({},req,{op:req.op==='put'?'take':req.op==='take'?'put':req.op}))}catch(x){}SHOWP[hid]={t:Date.now(),s:clone(hh.show)}}undo&&undo();renderShow();toast(e.message)});return true}
 const SHOWSEQ={};
+// v2.22：毛二街買到（d=1）或退回（d=-1）的展示櫃、牆面裝飾，直接放進展示間倉庫
+function showStore(hid,x,d){const h=house(hid);if(!h||!hasShow(h))return;const s=showNorm(clone(h.show)),o=x.t==='cab'?s.cabs:s.wo;o[x.item]=Math.max(0,(+o[x.item]||0)+d);if(!o[x.item])delete o[x.item];h.show=s;SHOWP[hid]={t:Date.now(),s:clone(s)};renderShow()}
 const itemSrc=id=>{const it=ITEMS[id]||{};return it.img||`assets/item_${id}.webp`};
 // 一個櫃子（房間裡的小櫃子和近看的大櫃子共用）
 function cabHTML(cid,items,big,can,sel){const C=SHOW_CABS[cid];if(!C)return '';const [x0,x1]=C.x,cw=(x1-x0)/SHOW_COLS;let h='';
@@ -5105,7 +5114,7 @@ function toastOnce(n){try{const k='mhd_amailt',o=+(localStorage.getItem(k)||0);i
 // 公園是特別的「家」（id park）：毛孩可以遛去、島主免費布置；沒住民宿的旅客在公園散步、去島民家晃、或出去旅行
 const GIFT_DAY=10,GIFT_P=1,PARK_ID='park',PARK_POS={x:440,y:1262},PARK_SC=1.45,PARK_GUESTS=8;
 const isParkH=h=>!!(h&&(h.kind==='park'||h.id===PARK_ID)),isSpecialH=h=>isShopH(h)||isParkH(h);
-GUESTS.push(...[['alpaca','羊駝'],['otter','水獺'],['fox','狐狸'],['sloth','樹懶'],['dog','小狗'],['penguin','企鵝'],['horse','小馬'],['sheep','綿羊'],['monkey','猴子'],['cow','乳牛'],['lion','獅子'],['zebra','斑馬']].map(([k,n])=>({img:`assets/guest_${k}.webp`,n:n+'旅客'})));
+GUESTS.push(...[['alpaca','外星人 Bobo'],['otter','河豚師傅'],['fox','燈泡哥'],['sloth','名媛 Vivian'],['dog','貝斯手阿翔'],['penguin','女僕咪咪'],['horse','MC 阿傑'],['sheep','太空人陳大明'],['monkey','打工仔小胖'],['cow','刺青雄哥'],['lion','郵差伯伯'],['zebra','王課長']].map(([k,n])=>({img:`assets/guest_${k}.webp`,n})));
 // v1.89 新島民 9 位（黏土魚人）
 GUESTS.push(...[['captain','菸斗船長'],['hoops','二十三號'],['chef','鬍子主廚'],['leopard','豹紋阿姨'],['bubble','泡泡糖少年'],['grandpa','魚骨爺爺'],['punk','龐克刺刺'],['icecream','冰淇淋小妹'],['diver','咕嚕潛水員']].map(([k,n])=>({img:`assets/guest_${k}.webp`,n})));
 GUESTS.forEach((g,i)=>g.i=i);
