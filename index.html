@@ -4706,8 +4706,8 @@ function wallShop(tabs){const hid=shHid(),h=house(hid),s=showNorm(h.show),g=DB.g
 
 // ================= 🎪 玩個毛（v2.09）=================
 // 用金幣買代幣，娃娃機（夾公仔）、打地鼠（冒出來的是島上的毛孩），票券到獎品櫃台換獎品；打地鼠每週排行榜
-const ARC_POS={x:640,y:1300},ARC_SC=1.25,TOK_P=[[1,100],[5,450],[12,1000]];
-const ARC_PRIZE=[{k:'tok',n:'代幣 ×1',t:12},{k:'coin',n:'🪙300 金幣',t:50},{k:'fig',n:'隨機公仔（普通款）',t:60}];
+const ARC_POS={x:640,y:1300},ARC_SC=1.25,TOK_P=[[1,30],[5,135],[12,300]];
+const ARC_PRIZE=[{k:'tok',n:'代幣 ×1',t:12},{k:'coin',n:'🪙100 金幣',t:50},{k:'fig',n:'隨機公仔（普通款）',t:60}];
 function arcG(){const g=DB.game;if(!g.arc||typeof g.arc!=='object')g.arc={tok:0,tkt:0};g.arc.tok=+g.arc.tok||0;g.arc.tkt=+g.arc.tkt||0;return g.arc}
 const tokIcon='<img class="mic" src="assets/token.webp?v=2" alt="" style="width:1.3em;height:1.3em;vertical-align:-.3em">';
 // 娃娃機裡的公仔：上架系列的普通款
@@ -4723,13 +4723,13 @@ function renderArcade(){const v=$('#arcv');if(!v)return;const st=v.querySelector
   v.querySelector('.cbtns').innerHTML=`<button class="act" id="arctok">${tokIcon} ${a.tok}</button><button class="act" id="arctkt">🎟️ ${a.tkt}</button><button class="act" id="arcbuy">買代幣</button><button class="act" id="arcrk">🏆 排行</button>`;
   $('#arctok').onclick=$('#arcbuy').onclick=arcBuy;$('#arctkt').onclick=arcPrize;$('#arcrk').onclick=arcRank}
 function arcBuy(){const g=DB.game,a=arcG();openModal(`<h3>${tokIcon} 買代幣</h3><p class="lead">你有 🪙${g.coins||0}・代幣 ${a.tok} 枚<br>娃娃機、打地鼠玩一次都是 1 枚</p>
-  <div class="xcpl">${TOK_P.map(([n,c],i)=>`<button data-tk="${i}">${tokIcon} 代幣 ×${n}<small style="color:var(--soft)">　🪙${c}${n>1?`（省 ${n*100-c}）`:''}</small></button>`).join('')}</div><div class="row2"><button data-close>關閉</button></div>`);
+  <div class="xcpl">${TOK_P.map(([n,c],i)=>`<button data-tk="${i}">${tokIcon} 代幣 ×${n}<small style="color:var(--soft)">　🪙${c}${n>1?`（省 ${n*30-c}）`:''}</small></button>`).join('')}</div><div class="row2"><button data-close>關閉</button></div>`);
   $('#sheet').querySelectorAll('[data-tk]').forEach(b=>b.onclick=()=>{const [n,c]=TOK_P[+b.dataset.tk];if((g.coins||0)<c)return toast(`金幣不夠，要 🪙${c}`);g.coins-=c;a.tok+=n;save();updTix&&updTix();sfx('coin');toast(`買了 ${n} 枚代幣！`);renderArcade();arcBuy()})}
 function arcPay(){const a=arcG();if(a.tok<1){arcBuy();toast('代幣不夠，先買幾枚');return false}a.tok--;save();renderArcade();return true}
 function arcPrize(){const a=arcG(),g=DB.game;openModal(`<h3>🎟️ 獎品櫃台</h3><p class="lead">你有 🎟️ ${a.tkt} 張票券<br>打地鼠、娃娃機沒夾到都會拿到票券</p>
   <div class="xcpl">${ARC_PRIZE.map((x,i)=>`<button data-pz="${i}" ${a.tkt<x.t?'disabled':''}>${x.k==='tok'?tokIcon+' ':''}${x.n}<small style="color:var(--soft)">　🎟️ ${x.t}</small></button>`).join('')}</div><div class="row2"><button data-close>關閉</button></div>`);
   $('#sheet').querySelectorAll('[data-pz]').forEach(b=>b.onclick=()=>{const x=ARC_PRIZE[+b.dataset.pz];if(a.tkt<x.t)return toast('票券不夠');a.tkt-=x.t;
-    if(x.k==='tok'){a.tok++;toast('換到 1 枚代幣！')}else if(x.k==='coin'){grant(0,300);toast('換到 🪙300！')}else{const P=arcPool(),id=P[Math.floor(Math.random()*P.length)];bagAdd(id,1);toast(`換到「${xcName(id)}」！放進背包了`)}
+    if(x.k==='tok'){a.tok++;toast('換到 1 枚代幣！')}else if(x.k==='coin'){grant(0,100);toast('換到 🪙100！')}else{const P=arcPool(),id=P[Math.floor(Math.random()*P.length)];bagAdd(id,1);toast(`換到「${xcName(id)}」！放進背包了`)}
     save();sfx('gift');renderArcade();arcPrize()})}
 function arcOv(title,a){const ov=document.createElement('div');ov.className='arcov';const A=arcG();
   ov.innerHTML=`<div class="ah"><button class="x">← 離開</button><b>${title}</b><span class="apill"><img src="assets/token.webp?v=2" alt=""><b class="atk">${A.tok}</b>　🎟️ <b class="att">${A.tkt}</b></span></div>`;
@@ -5595,7 +5595,7 @@ function announceLetters(){if(!DB.me)return;let seen=[];try{seen=JSON.parse(loca
     sfx('gift');$('#lgopen').onclick=()=>openLetter(nw[0].id,()=>$('#bell').click())};
   setTimeout(go,1800)}
 // ================= 自動更新：發現新版本就重新載入 =================
-const APP_VER='v2.11';
+const APP_VER='v2.12';
 function checkUpdate(){
   if(!/^https?:/.test(location.protocol)||!API_URL)return;
   if(!$('#modal').classList.contains('hidden'))return; // 正在填表單時不打斷
