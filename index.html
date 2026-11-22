@@ -4715,10 +4715,10 @@ function arcPool(){const L=[];bbOn().forEach(S=>S.t.forEach(i=>{const id=bbId(S.
 function openArcade(){if(!needMe())return;sfx&&sfx('tap');const v=sceneOpen('arcv','玩個毛','🎪 遊樂場','assets/arcade_room.webp','<img class="mic" src="assets/icon_down.webp" alt="">小島');renderArcade()}
 function renderArcade(){const v=$('#arcv');if(!v)return;const st=v.querySelector('.cstage'),a=arcG();st.querySelectorAll('.arcm,.arcdoor').forEach(x=>x.remove());
   const put=(img,x,y,w,lbl,fn)=>{const el=document.createElement('button');el.className='arcm';el.innerHTML=`<img src="assets/${img}.webp" alt="">${lbl?`<span class="lbl">${lbl}</span>`:''}`;Object.assign(el.style,hp(x,y),{width:(w/RW*100)+'%',zIndex:Math.round(y)});el.onclick=e=>{e.stopPropagation();fn()};st.appendChild(el)};
-  put('prize_counter',600,905,215,'🎟️ 獎品櫃台',arcPrize);
+  put('prize_counter',610,880,215,'🎟️ 獎品櫃台',arcPrize);
   put('claw_machine',230,1175,260,'🧸 娃娃機',clawGame);
   put('mole_machine',620,1185,280,'🔨 打地鼠',moleGame);
-  const d=document.createElement('button');d.className='arcdoor';d.innerHTML='<img src="assets/dance_door.webp" alt="">';Object.assign(d.style,hp(330,905),{width:(190/RW*100)+'%',height:(190*520/412/RH*100)+'%',zIndex:900});
+  const d=document.createElement('button');d.className='arcdoor';d.innerHTML='<img src="assets/dance_door.webp" alt="">';Object.assign(d.style,hp(250,732),{width:(250/RW*100)+'%',height:(250*520/412/RH*100)+'%',zIndex:700});   // 門底貼著牆和地板的交界，看起來像牆後面的房間
   d.onclick=e=>{e.stopPropagation();openModal(`<div style="text-align:center"><div style="font-size:56px">🚧</div><h3>練舞室還在蓋</h3><p class="lead">工人正在趕工中……<br>之後這裡會有跟朋友 PK 的遊戲，敬請期待！</p></div><div class="row2"><button data-close class="primary">好期待</button></div>`)};st.appendChild(d);
   v.querySelector('.cbtns').innerHTML=`<button class="act" id="arctok">${tokIcon} ${a.tok}</button><button class="act" id="arctkt">🎟️ ${a.tkt}</button><button class="act" id="arcbuy">買代幣</button><button class="act" id="arcrk">🏆 排行</button>`;
   $('#arctok').onclick=$('#arcbuy').onclick=arcBuy;$('#arctkt').onclick=arcPrize;$('#arcrk').onclick=arcRank}
@@ -5595,7 +5595,7 @@ function announceLetters(){if(!DB.me)return;let seen=[];try{seen=JSON.parse(loca
     sfx('gift');$('#lgopen').onclick=()=>openLetter(nw[0].id,()=>$('#bell').click())};
   setTimeout(go,1800)}
 // ================= 自動更新：發現新版本就重新載入 =================
-const APP_VER='v2.10';
+const APP_VER='v2.11';
 function checkUpdate(){
   if(!/^https?:/.test(location.protocol)||!API_URL)return;
   if(!$('#modal').classList.contains('hidden'))return; // 正在填表單時不打斷
