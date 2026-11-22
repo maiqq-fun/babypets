@@ -1217,7 +1217,8 @@ img{-webkit-user-drag:none}
 @keyframes camrec{50%{opacity:.15}}
 .walker.flee{transition:left .9s ease-in,top .9s ease-in,opacity .9s ease-in!important;opacity:0;pointer-events:none}
 .copov{position:fixed;inset:0;z-index:9000;background:rgba(20,10,30,.72);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:16px;text-align:center;color:#fff}
-.copov img{width:min(70vw,300px);height:auto;animation:coppop .5s cubic-bezier(.2,1.6,.4,1)}
+.copov>img{width:min(70vw,300px);max-height:42vh;object-fit:contain;height:auto;animation:coppop .5s cubic-bezier(.2,1.6,.4,1)}
+.copov p .ii img,.copov p img{width:1.1em!important;height:1.1em!important;max-height:none;animation:none;vertical-align:-.15em}
 .copov h3{margin:10px 0 4px;font-size:24px}.copov p{margin:4px 0;line-height:1.6;max-width:340px}
 .copov .siren{font-size:40px;animation:camrec .5s steps(2) infinite}
 .copov button{margin-top:14px;font-size:16px;padding:10px 26px;border:0;border-radius:999px;background:#ffd23f;color:#5a3a10;font-weight:700}
@@ -5180,7 +5181,7 @@ async function thiefCatch(t,el){if(!needMe())return;if(thiefCatch.busy)return;th
   DB.game.coins=(DB.game.coins||0)+(+r.coins||0);save();updTix&&updTix();sfx('ssr');   // 金幣先加好（不用等按按鈕）
   const ov=document.createElement('div');ov.className='copov';ov.innerHTML=`<div class="siren">🚨</div><img src="${THIEF_CAUGHT}" alt=""><h3>抓到小偷了！</h3>
     <p>${r.own?`被偷的 ${r.n} 個玩具都拿回來了 🧸<br>還在小偷的包袱裡找到 🪙${r.coins}${extra}！`:`${esc(h?h.name:'')}被偷的 ${r.n} 個玩具都還回去了<br>獲得良民獎金 🪙${r.coins} 👏`}</p><button>太好了！</button>`;
-  document.body.appendChild(ov);ov.querySelector('button').onclick=()=>{ov.remove();sfx('coin');if($('#f2v'))renderF2();else if(home&&!$('#home').classList.contains('hidden'))renderFloor()};
+  document.body.appendChild(ov);ov.onclick=()=>{ov.remove();sfx('coin');if($('#f2v'))renderF2();else if(home&&!$('#home').classList.contains('hidden'))renderFloor()};
   if(ONLINE)sync(true)}
 // 📹 租監視器（一樓、二樓分開租）
 function camSheet(){const h=house(home.id);if(!h||!isFamily(h.id))return;const g=DB.game,fls=hasF2(h)?[1,2]:[1];
@@ -5217,7 +5218,7 @@ function scamCatch(el){const st=scamSt(),c=st.cur;if(!c||+c.until<=Date.now())re
   st.cur=null;const bonus=100+Math.floor(Math.random()*21)*10;DB.game.coins=(DB.game.coins||0)+c.amt+bonus;save();updTix&&updTix();sfx('ssr');if(el)el.remove();
   const ov=document.createElement('div');ov.className='copov';ov.innerHTML=`<div class="siren">🚨</div><img src="${esc(c.img)}" alt="" style="width:min(50vw,200px)"><h3>抓到你了！</h3>
     <p>「${esc(c.n)}」${c.kind==='pick'?'這個扒手':'這個詐騙集團'}已經報警處理～<br>拿回 🪙${c.amt}，還獲得檢舉獎金 🪙${bonus}！</p><button>正義勝利 ✌️</button>`;
-  document.body.appendChild(ov);ov.querySelector('button').onclick=()=>{ov.remove();sfx('coin')};
+  document.body.appendChild(ov);ov.onclick=()=>{ov.remove();sfx('coin')};   // 點畫面任何地方都能關
   if(ONLINE)feedPush(`🚨 ${DB.me.nick} 抓到了${c.kind==='pick'?'扒手':'詐騙集團'}「${c.n}」，拿回被${c.kind==='pick'?'偷':'騙'}的錢！`)}
 // 💼 玩個毛、島民中心的打工：場景裡畫出上班中的毛孩＋徵才按鈕
 function jobScene(st,place,host){if(!ONLINE||!st)return;st.querySelectorAll('.jobw').forEach(x=>x.remove());
@@ -5799,7 +5800,7 @@ function announceLetters(){if(!DB.me)return;let seen=[];try{seen=JSON.parse(loca
     sfx('gift');$('#lgopen').onclick=()=>openLetter(nw[0].id,()=>$('#bell').click())};
   setTimeout(go,1800)}
 // ================= 自動更新：發現新版本就重新載入 =================
-const APP_VER='v2.22';
+const APP_VER='v2.23';
 function checkUpdate(){
   if(!/^https?:/.test(location.protocol)||!API_URL)return;
   if(!$('#modal').classList.contains('hidden'))return; // 正在填表單時不打斷
