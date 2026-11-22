@@ -1152,7 +1152,7 @@ const SPK={狗:'dog',貓:'cat',兔:'rabbit',倉鼠:'hamster',鳥:'bird',其他:'
 const defHead=s=>`assets/pet_head_${SPK[s]||'other'}.webp`,defBody=s=>`assets/pet_body_${SPK[s]||'other'}.webp`;
 const petHead=p=>p.head||defHead(p.species),petBody=p=>p.body||defBody(p.species);
 const ROOMS=[['basic1','木質暖陽'],['basic2','復古木屋'],['basic3','森林小屋']];
-const roomImg=id=>/^f2shop_/.test(id)?`assets/room_${id}.webp`:(typeof customRoom==='function'&&customRoom(id))?customRoom(id).img:id==='park'?'assets/room_park.webp':id==='shop2'?'assets/room_shop2.webp':ROOMS.some(r=>r[0]===id)?`assets/room_${id}.webp`:(typeof CARDS!=='undefined'&&CARDS.some(c=>c.id===id))?`assets/room_card_${id}.webp`:'assets/room_basic1.webp';
+const roomImg=id=>/^f2shop_/.test(id)?`assets/room_${id}.webp?v=2`:(typeof customRoom==='function'&&customRoom(id))?customRoom(id).img:id==='park'?'assets/room_park.webp':id==='shop2'?'assets/room_shop2.webp':ROOMS.some(r=>r[0]===id)?`assets/room_${id}.webp`:(typeof CARDS!=='undefined'&&CARDS.some(c=>c.id===id))?`assets/room_card_${id}.webp`:'assets/room_basic1.webp';
 const CARD_COLORS=[['蜜桃橘','#ff9a6b'],['櫻花粉','#f48fb1'],['天空藍','#64b5f6'],['薄荷綠','#5fbf95'],['薰衣草','#9b8cff'],['奶茶棕','#b98d62']];
 const NOTE_COLORS=['#ffe98a','#ffc7d4','#bfe3ff','#c9f0c0','#ffd6a8'];
 const MED_TYPES=['看診','疫苗','驅蟲','健檢','手術','用藥','其他'];
@@ -4277,15 +4277,15 @@ function decoShop(tab){if(!needMe())return;const h=myHouse();if(!h)return toast(
   if(tab!=='f2'){if(!hasShow(h))return openModal(`<h3>🛋️ 裝潢目錄</h3>${tabs}<div class="locked">你家還沒有展示間<br>到島民中心「擴建」蓋一間吧</div><div class="row2"><button data-close>關閉</button></div>`),decoTabs();return tab==='room'?showRoomShop(tabs):showCabShop(null,tabs)}
   const own=owned(h.id);
   openModal(`<h3>🛋️ 裝潢目錄</h3>${tabs}<p class="lead" style="font-size:12px">你有 🪙${g.coins||0}・${hasF2(h)?'買了收進房間收藏，到二樓「🎨 背景」就能換':'要先在島民中心擴建二樓才能用'}</p>
-    <div class="shgrid">${F2SHOP.map(r=>`<button class="si room${own.has(r.id)?' on':''}" data-f2="${r.id}"><img class="pv" src="assets/room_${r.id}.webp" alt=""><div class="sn">${esc(r.n)}</div><div class="sf">${own.has(r.id)?'已經有了':'🪙'+r.p}</div></button>`).join('')}</div>
+    <div class="shgrid">${F2SHOP.map(r=>`<button class="si room${own.has(r.id)?' on':''}" data-f2="${r.id}"><img class="pv" src="assets/room_${r.id}.webp?v=2" alt=""><div class="sn">${esc(r.n)}</div><div class="sf">${own.has(r.id)?'已經有了':'🪙'+r.p}</div></button>`).join('')}</div>
     <div class="row2"><button data-close>關閉</button></div>`);decoTabs();
   $('#sheet').querySelectorAll('[data-f2]').forEach(b=>b.onclick=()=>{const r=f2Shop(b.dataset.f2);if(owned(h.id).has(r.id))return toast('你家已經有這間了');if(!hasF2(h))return toast('要先擴建二樓才能買二樓背景');
     if((g.coins||0)<r.p)return toast(`金幣不夠，要 🪙${r.p}`);
-    openModal(`<div style="text-align:center"><img src="assets/room_${r.id}.webp" alt="" style="width:160px;border-radius:12px"><h3>${esc(r.n)}</h3><p class="lead">🪙${r.p}・二樓背景</p></div><div class="row2"><button id="dcno">← 回去</button><button class="primary" id="dcyes">買！（🪙${r.p}）</button></div>`);
+    openModal(`<div style="text-align:center"><img src="assets/room_${r.id}.webp?v=2" alt="" style="width:160px;border-radius:12px"><h3>${esc(r.n)}</h3><p class="lead">🪙${r.p}・二樓背景</p></div><div class="row2"><button id="dcno">← 回去</button><button class="primary" id="dcyes">買！（🪙${r.p}）</button></div>`);
     $('#dcno').onclick=()=>decoShop('f2');
     $('#dcyes').onclick=async e=>{const bt=e.currentTarget;bt.disabled=true;if((g.coins||0)<r.p)return toast('金幣不夠');g.coins-=r.p;save();updTix&&updTix();
       try{await call('decoBuy',Object.assign(cred(),{houseId:h.id,kind:'f2room',id:r.id}));const o=new Set(DB.owned[h.id]||[]);o.add(r.id);DB.owned[h.id]=[...o];sfx('coin');
-        openModal(`<div style="text-align:center"><img src="assets/room_${r.id}.webp" alt="" style="width:160px;border-radius:12px"><h3>買到了！</h3><p class="lead">到二樓按「🎨 背景」就能換上「${esc(r.n)}」</p></div><div class="row2"><button data-close>好</button>${hasF2(h)?'<button class="primary" id="dcgo">現在去二樓</button>':''}</div>`);
+        openModal(`<div style="text-align:center"><img src="assets/room_${r.id}.webp?v=2" alt="" style="width:160px;border-radius:12px"><h3>買到了！</h3><p class="lead">到二樓按「🎨 背景」就能換上「${esc(r.n)}」</p></div><div class="row2"><button data-close>好</button>${hasF2(h)?'<button class="primary" id="dcgo">現在去二樓</button>':''}</div>`);
         if($('#dcgo'))$('#dcgo').onclick=()=>{closeModal();openFloor2(h.id)}}
       catch(x){g.coins+=r.p;save();updTix&&updTix();bt.disabled=false;toast(x.message)}}})}
 function decoTabs(){$('#sheet').querySelectorAll('[data-dt]').forEach(b=>b.onclick=()=>decoShop(b.dataset.dt))}
@@ -5000,7 +5000,7 @@ function announceLetters(){if(!DB.me)return;let seen=[];try{seen=JSON.parse(loca
     sfx('gift');$('#lgopen').onclick=()=>openLetter(nw[0].id,()=>$('#bell').click())};
   setTimeout(go,1800)}
 // ================= 自動更新：發現新版本就重新載入 =================
-const APP_VER='v1.97';
+const APP_VER='v1.98';
 function checkUpdate(){
   if(!/^https?:/.test(location.protocol)||!API_URL)return;
   if(!$('#modal').classList.contains('hidden'))return; // 正在填表單時不打斷
