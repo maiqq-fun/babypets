@@ -1186,6 +1186,12 @@ img{-webkit-user-drag:none}
 .arcmsg{margin-top:8px;min-height:1.4em;font-weight:700;text-align:center;padding:0 16px}
 .arcrank{display:flex;flex-direction:column;gap:6px;margin:8px 0}.arcrank div{display:flex;gap:8px;align-items:center;background:#fffaf0;border:2px solid var(--wood);border-radius:12px;padding:6px 10px}
 .arcrank b{width:24px}.arcrank span{flex:1}.arcrank i{font-style:normal;font-weight:800;color:#c2477a}
+
+.pshc{position:absolute;transform:translate(-50%,-50%);width:7.5%;pointer-events:none;filter:drop-shadow(0 1px 1px rgba(0,0,0,.35))}
+.pshbar{position:absolute;left:24%;width:52%;height:3.2%;border-radius:6px;background:linear-gradient(#ffe0ea,#f7a9c0);box-shadow:0 2px 3px rgba(0,0,0,.25);pointer-events:none}
+.pshfall{position:absolute;transform:translate(-50%,-50%);width:7.5%;pointer-events:none;transition:top .5s ease-in,opacity .5s;z-index:6}
+.pshbag{position:absolute;transform:translate(-50%,-100%);width:13%;pointer-events:none;filter:drop-shadow(0 0 8px rgba(255,214,90,.9))}
+.pshwin{position:absolute;left:50%;top:84%;transform:translate(-50%,-50%);font-weight:900;font-size:clamp(20px,7vw,32px);color:#ffd23f;text-shadow:0 0 8px #ff9a00,0 2px 3px rgba(0,0,0,.5);pointer-events:none;animation:arcup 1.2s ease-out forwards}
 </style>
 </head>
 <body>
@@ -3387,10 +3393,10 @@ $('#sweep').onclick=async()=>{
 };
 
 // ================= 愛心值・金幣（統一獎勵） =================
-const REW={visit:{x:3,c:2,cap:5,after:{x:0,c:0},n:'串門子'},pat:{x:2,c:1,cap:20,after:{x:0,c:0},n:'摸摸頭'},
-  feed:{x:5,c:3,cap:10,after:{x:0,c:0},n:'餵飯'},poop:{x:5,c:2,cap:10,after:{x:0,c:0},n:'鏟屎'},treat:{x:15,c:5,n:'餵零食'},treatFav:{x:25,c:10,n:'餵到最愛的零食'},npc:{x:5,c:0,capH:6,n:'跟旅客聊天'},
-  gift:{x:20,c:0,n:'送禮物'},open:{x:5,c:5,n:'拆禮物'},note:{x:10,c:5,cap:3,after:{x:0,c:0},n:'在別人家留言'},rec:{x:5,c:3,cap:10,n:'記錄體重／紀錄項目'},
-  walk:{x:10,c:5,cap:3,after:{x:0,c:0},n:'遛遛（帶毛孩去別人家）'},wake:{x:2,c:1,cap:10,after:{x:0,c:0},n:'叫醒／蓋被子'},guest:{x:2,c:1,cap:20,n:'你的毛孩在別人家被照顧'}};
+const REW={visit:{x:3,c:4,cap:5,after:{x:0,c:0},n:'串門子'},pat:{x:2,c:2,cap:20,after:{x:0,c:0},n:'摸摸頭'},
+  feed:{x:5,c:6,cap:10,after:{x:0,c:0},n:'餵飯'},poop:{x:5,c:4,cap:10,after:{x:0,c:0},n:'鏟屎'},treat:{x:15,c:10,n:'餵零食'},treatFav:{x:25,c:20,n:'餵到最愛的零食'},npc:{x:5,c:0,capH:6,n:'跟旅客聊天'},
+  gift:{x:20,c:0,n:'送禮物'},open:{x:5,c:10,n:'拆禮物'},note:{x:10,c:10,cap:3,after:{x:0,c:0},n:'在別人家留言'},rec:{x:5,c:6,cap:10,n:'記錄體重／紀錄項目'},
+  walk:{x:10,c:10,cap:3,after:{x:0,c:0},n:'遛遛（帶毛孩去別人家）'},wake:{x:2,c:2,cap:10,after:{x:0,c:0},n:'叫醒／蓋被子'},guest:{x:2,c:2,cap:20,n:'你的毛孩在別人家被照顧'}};
 // v1.45：越高級越難升（Lv.1→2 要 100，之後每級多 20）
 const xpNeed=lv=>100+20*(Math.max(1,+lv||1)-1);
 function reward(k,mult){
@@ -3406,7 +3412,7 @@ function reward(k,mult){
   return true;
 }
 // 每天互動＋任務賺的金幣上限（簽到、撿錢、島主禮物不算）
-const COIN_CAP=150,LV_BONUS=200;
+const COIN_CAP=300,LV_BONUS=200;   // v2.13：互動金幣 ×2、每 8 小時上限 150 → 300
 // v1.83：金幣上限每 8 小時重算一次（台北時間 0～8、8～16、16～24 點三段），畫面上不顯示
 const coinWin=()=>todayTW()+'#'+Math.floor(taipeiHour()/8);
 function capCoins(c){if(!(c>0))return c||0;const g=DB.game,d=todayTW();if(!g.cc||g.cc.d!==coinWin())g.cc={d:coinWin(),n:0};const ok=Math.max(0,Math.min(c,COIN_CAP-g.cc.n));g.cc.n+=ok;
@@ -4716,8 +4722,9 @@ function openArcade(){if(!needMe())return;sfx&&sfx('tap');const v=sceneOpen('arc
 function renderArcade(){const v=$('#arcv');if(!v)return;const st=v.querySelector('.cstage'),a=arcG();st.querySelectorAll('.arcm,.arcdoor').forEach(x=>x.remove());
   const put=(img,x,y,w,lbl,fn)=>{const el=document.createElement('button');el.className='arcm';el.innerHTML=`<img src="assets/${img}.webp" alt="">${lbl?`<span class="lbl">${lbl}</span>`:''}`;Object.assign(el.style,hp(x,y),{width:(w/RW*100)+'%',zIndex:Math.round(y)});el.onclick=e=>{e.stopPropagation();fn()};st.appendChild(el)};
   put('prize_counter',610,880,215,'🎟️ 獎品櫃台',arcPrize);
-  put('claw_machine',230,1175,260,'🧸 娃娃機',clawGame);
-  put('mole_machine',620,1185,280,'🔨 打地鼠',moleGame);
+  put('claw_machine',195,1165,205,'🧸 娃娃機',clawGame);
+  put('mole_machine',425,1200,230,'🔨 打地鼠',moleGame);
+  put('pusher',655,1165,185,'🪙 推幣機',pusherGame);   // 手機上舞台左右會被裁掉，三台往中間靠
   const d=document.createElement('button');d.className='arcdoor';d.innerHTML='<img src="assets/dance_door.webp" alt="">';Object.assign(d.style,hp(250,732),{width:(250/RW*100)+'%',height:(250*520/412/RH*100)+'%',zIndex:700});   // 門底貼著牆和地板的交界，看起來像牆後面的房間
   d.onclick=e=>{e.stopPropagation();openModal(`<div style="text-align:center"><div style="font-size:56px">🚧</div><h3>練舞室還在蓋</h3><p class="lead">工人正在趕工中……<br>之後這裡會有跟朋友 PK 的遊戲，敬請期待！</p></div><div class="row2"><button data-close class="primary">好期待</button></div>`)};st.appendChild(d);
   v.querySelector('.cbtns').innerHTML=`<button class="act" id="arctok">${tokIcon} ${a.tok}</button><button class="act" id="arctkt">🎟️ ${a.tkt}</button><button class="act" id="arcbuy">買代幣</button><button class="act" id="arcrk">🏆 排行</button>`;
@@ -4762,6 +4769,40 @@ function clawGame(){const {ov,upd}=arcOv('🧸 娃娃機');const P=arcPool();if(
       near.el.remove();prizes=prizes.filter(x=>x!==near);if(prizes.length<3)deal()}
     else{const a=arcG();a.tkt+=1;save();upd();if(!carry)msg.textContent='沒夾到……送你 1 張票券 🎟️';else msg.textContent='差一點點！送你 1 張票券 🎟️'}
     cx=Math.max(CLAW.x[0]+3,Math.min(CLAW.x[1]-3,cx));state='move';btn.disabled=false}}
+
+// ---------- 🪙 推幣機（v2.13）：丟 1 枚代幣，硬幣推下去；平均拿回約 9 成，偶爾福袋大獎 ----------
+const PSH={a:382/600,x:[23,77],y:[54,68],bar:49.5};
+function pushRoll(){const r=Math.random();if(r<.012)return {c:0,bag:200+Math.floor(Math.random()*7)*50};if(r<.022)return {c:0,fig:1};
+  if(r<.30)return {c:0};if(r<.62)return {c:10+Math.floor(Math.random()*3)*5};if(r<.86)return {c:25+Math.floor(Math.random()*4)*5};if(r<.97)return {c:50+Math.floor(Math.random()*3)*10};return {c:90+Math.floor(Math.random()*4)*15}}
+function pusherGame(){const {ov,upd}=arcOv('🪙 推幣機');const M=document.createElement('div');M.className='arcmach';M.style.setProperty('--a',PSH.a);M.innerHTML='<img class="bg" src="assets/pusher.webp" alt="">';ov.appendChild(M);
+  const bar=document.createElement('div');bar.className='pshbar';M.appendChild(bar);
+  const msg=document.createElement('div');msg.className='arcmsg';msg.innerHTML='丟一枚代幣，把檯子上的金幣推下來！<br>運氣好會掉出 ✨福袋大獎';ov.appendChild(msg);
+  const btn=document.createElement('button');btn.className='arcbig';btn.textContent='投幣（1 枚代幣）';ov.appendChild(btn);
+  const coins=[];const addCoin=(x,y)=>{const c=document.createElement('img');c.className='pshc';c.src='assets/icon_coin.webp';c.onerror=()=>{c.src='assets/token.webp'};Object.assign(c.style,{left:x+'%',top:y+'%',zIndex:Math.round(y)});M.appendChild(c);coins.push({el:c,x,y})};
+  for(let k=0;k<34;k++)addCoin(PSH.x[0]+3+Math.random()*(PSH.x[1]-PSH.x[0]-6),PSH.y[0]+2+Math.random()*(PSH.y[1]-PSH.y[0]-3));
+  let bag=null;const putBag=()=>{bag=document.createElement('img');bag.className='pshbag';bag.src='assets/luckybag.webp';Object.assign(bag.style,{left:'50%',top:(PSH.y[0]+6)+'%',zIndex:70});M.appendChild(bag)};if(Math.random()<.5)putBag();
+  let t0=performance.now();const anim=t=>{if(!document.body.contains(ov))return;const k=(Math.sin((t-t0)/700)+1)/2;bar.style.top=(PSH.bar+k*2.2)+'%';requestAnimationFrame(anim)};requestAnimationFrame(anim);
+  let busy=false;const W=ms=>new Promise(r=>setTimeout(r,ms));
+  btn.onclick=async()=>{if(busy)return;if(!arcPay())return;upd();busy=true;btn.disabled=true;sfx&&sfx('tap');
+    // 投下去的代幣
+    const drop=document.createElement('img');drop.className='pshfall';drop.src='assets/token.webp';Object.assign(drop.style,{left:(35+Math.random()*30)+'%',top:'44%'});M.appendChild(drop);await W(30);drop.style.top=(PSH.y[0]+1)+'%';await W(550);drop.remove();
+    addCoin(parseFloat(drop.style.left),PSH.y[0]+1);
+    const res=pushRoll();let n=res.c?Math.max(1,Math.round(res.c/8)):(res.bag||res.fig?2:0);
+    // 前面幾枚往下推、掉出去
+    coins.forEach(c=>{c.y+=0.6+Math.random()*0.8;c.el.style.transition='top .6s ease-out';c.el.style.top=c.y+'%'});await W(650);
+    const front=coins.slice().sort((a,b)=>b.y-a.y).slice(0,n);
+    front.forEach((c,i)=>{c.el.style.transition='top .5s ease-in,opacity .5s';c.el.style.top='86%';c.el.style.opacity='0';setTimeout(()=>c.el.remove(),550)});
+    front.forEach(c=>coins.splice(coins.indexOf(c),1));
+    if((res.bag||res.fig)&&bag){bag.style.transition='top .7s ease-in';bag.style.top='92%';setTimeout(()=>{bag&&bag.remove();bag=null},750)}
+    await W(600);
+    while(coins.length<34)addCoin(PSH.x[0]+3+Math.random()*(PSH.x[1]-PSH.x[0]-6),PSH.y[0]+2+Math.random()*(PSH.y[1]-PSH.y[0]-6));
+    const win=document.createElement('div');win.className='pshwin';
+    if(res.bag){grant(0,res.bag);win.textContent=`✨ 福袋！🪙${res.bag}`;msg.textContent=`中大獎！福袋裡有 🪙${res.bag}`;sfx('levelup');bbSpark(M,22,['💰','✨','🎉']);if(ONLINE)feedPush(`🪙 ${DB.me.nick} 在玩個毛的推幣機推出福袋，拿到 🪙${res.bag}！`)}
+    else if(res.fig){const P=arcPool(),id=P[Math.floor(Math.random()*P.length)];bagAdd(id,1);win.textContent='🎁 掉出公仔！';msg.textContent=`掉出「${xcName(id)}」！放進背包了`;sfx('gift')}
+    else if(res.c){grant(0,res.c);win.textContent=`+🪙${res.c}`;msg.textContent=res.c>=50?`推下一大堆！🪙${res.c}`:`推下 🪙${res.c}`;sfx('coin')}
+    else{win.textContent='……';msg.textContent='差一點點，金幣卡在邊邊了'}
+    M.appendChild(win);setTimeout(()=>win.remove(),1200);if(!bag&&Math.random()<.35)putBag();
+    save();upd();busy=false;btn.disabled=false}}
 // ---------- 🔨 打地鼠 ----------
 const MOLE={a:402/461,disp:[50,26.5],holes:[[26.9,42.4,16.4],[49.9,42.4,16.4],[72.9,42.4,16.4],[25.6,51.8,17.4],[49.8,51.8,17.4],[74.1,51.8,17.7],[24.4,62,18.4],[49.8,62,18.2],[75.2,62,18.4]],sec:30};
 function moleGame(){const {ov,upd}=arcOv('🔨 打地鼠');const M=document.createElement('div');M.className='arcmach';M.style.setProperty('--a',MOLE.a);M.innerHTML='<img class="bg" src="assets/mole_machine.webp" alt="">';ov.appendChild(M);
@@ -5595,7 +5636,7 @@ function announceLetters(){if(!DB.me)return;let seen=[];try{seen=JSON.parse(loca
     sfx('gift');$('#lgopen').onclick=()=>openLetter(nw[0].id,()=>$('#bell').click())};
   setTimeout(go,1800)}
 // ================= 自動更新：發現新版本就重新載入 =================
-const APP_VER='v2.12';
+const APP_VER='v2.13';
 function checkUpdate(){
   if(!/^https?:/.test(location.protocol)||!API_URL)return;
   if(!$('#modal').classList.contains('hidden'))return; // 正在填表單時不打斷
