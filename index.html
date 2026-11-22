@@ -1089,6 +1089,11 @@ img{-webkit-user-drag:none}
 .dctab{display:flex;gap:6px;margin:4px 0 8px}.dctab button{flex:1;border:2px solid var(--wood);border-radius:14px;background:#fffaf0;padding:7px 4px;font-size:13px;font-weight:700}
 .dctab button.on{background:#ffd9a8}
 #toast,#busy{z-index:100000!important}
+/* v2.05：小島右上角 5 顆按鈕（多了音樂開關）在 iPhone 上會擠出畫面 → 按鈕跟著螢幕寬度縮小、Logo 小一點 */
+#icol .top .logo{width:34%!important}
+#icol .topright{gap:6px!important;flex-wrap:nowrap;min-width:0}
+#icol .topright .circle{width:clamp(34px,calc((100vw - 34vw - 62px) / 5),46px)!important;height:clamp(34px,calc((100vw - 34vw - 62px) / 5),46px)!important;font-size:clamp(15px,4.6vw,20px)!important}
+#icol .topright .circle .badge{transform:scale(.9);transform-origin:top right}
 .bbshelf{position:absolute;transform:translate(-50%,-100%);border:0;background:none;padding:0;cursor:pointer}
 .bbshelf img{display:block;width:100%;pointer-events:none;filter:drop-shadow(0 6px 4px rgba(60,35,15,.25))}
 
@@ -5239,7 +5244,7 @@ function announceLetters(){if(!DB.me)return;let seen=[];try{seen=JSON.parse(loca
     sfx('gift');$('#lgopen').onclick=()=>openLetter(nw[0].id,()=>$('#bell').click())};
   setTimeout(go,1800)}
 // ================= 自動更新：發現新版本就重新載入 =================
-const APP_VER='v2.04';
+const APP_VER='v2.05';
 function checkUpdate(){
   if(!/^https?:/.test(location.protocol)||!API_URL)return;
   if(!$('#modal').classList.contains('hidden'))return; // 正在填表單時不打斷
