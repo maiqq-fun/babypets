@@ -1,0 +1,585 @@
+{
+ "_說明": "盲盒系列資料。r：n 普通、r 稀有、sr 超稀有、h 隱藏。機率見 odds（每一隻的 %）。圖片：assets/bb{系列}_{編號}.webp",
+ "odds": {
+  "h1": {
+   "n": 14,
+   "r": 9.5,
+   "sr": 5,
+   "h": 1
+  },
+  "h2": {
+   "n": 14,
+   "r": 10,
+   "sr": 9,
+   "h": 0.5
+  }
+ },
+ "pity": 150,
+ "price": 200,
+ "series": [
+  {
+   "id": 1,
+   "name": "喵星派對",
+   "odds": "h1",
+   "figs": [
+    [
+     "太空橘貓",
+     "n"
+    ],
+    [
+     "青蛙外星貓",
+     "n"
+    ],
+    [
+     "潮流耳機貓",
+     "n"
+    ],
+    [
+     "星星魔法師",
+     "sr"
+    ],
+    [
+     "天使奶油貓",
+     "sr"
+    ],
+    [
+     "鯊魚橘貓",
+     "n"
+    ],
+    [
+     "冰淇淋黑貓",
+     "r"
+    ],
+    [
+     "恐龍貓",
+     "n"
+    ],
+    [
+     "蛋殼小貓",
+     "r"
+    ],
+    [
+     "UFO 貓",
+     "h"
+    ]
+   ]
+  },
+  {
+   "id": 2,
+   "name": "甜點喵咪烘焙所",
+   "odds": "h1",
+   "figs": [
+    [
+     "草莓蛋糕貓",
+     "n"
+    ],
+    [
+     "奶油泡芙貓",
+     "n"
+    ],
+    [
+     "草莓甜甜圈貓",
+     "n"
+    ],
+    [
+     "蜂蜜鬆餅貓",
+     "r"
+    ],
+    [
+     "可頌貓",
+     "n"
+    ],
+    [
+     "藍莓塔貓",
+     "sr"
+    ],
+    [
+     "櫻桃卷貓",
+     "r"
+    ],
+    [
+     "葡萄馬卡龍貓",
+     "sr"
+    ],
+    [
+     "吐司小貓",
+     "n"
+    ],
+    [
+     "草莓烘焙師",
+     "h"
+    ]
+   ]
+  },
+  {
+   "id": 3,
+   "name": "夜行少年團 NIGHT CREW",
+   "odds": "h2",
+   "figs": [
+    [
+     "ACE PILOT",
+     "n"
+    ],
+    [
+     "SHADOW CAT",
+     "n"
+    ],
+    [
+     "NIGHT RIDER",
+     "n"
+    ],
+    [
+     "STREET DJ",
+     "n"
+    ],
+    [
+     "MOON WIZARD",
+     "r"
+    ],
+    [
+     "ANGEL ZERO",
+     "sr"
+    ],
+    [
+     "SLIME X",
+     "h"
+    ],
+    [
+     "LITTLE DEMON",
+     "r"
+    ],
+    [
+     "ROBOT KID",
+     "n"
+    ],
+    [
+     "UNKNOWN",
+     "h"
+    ]
+   ]
+  },
+  {
+   "id": 4,
+   "name": "SNOWTOWN 怪咖小鎮",
+   "odds": "h2",
+   "figs": [
+    [
+     "ZIPP",
+     "n"
+    ],
+    [
+     "PUFF",
+     "n"
+    ],
+    [
+     "BLAZE",
+     "n"
+    ],
+    [
+     "PAWBOY",
+     "r"
+    ],
+    [
+     "PINKY",
+     "n"
+    ],
+    [
+     "SNOWBALL",
+     "n"
+    ],
+    [
+     "MOOSE",
+     "r"
+    ],
+    [
+     "GOTH",
+     "sr"
+    ],
+    [
+     "UFO KID",
+     "h"
+    ],
+    [
+     "DINO BUD",
+     "h"
+    ]
+   ]
+  },
+  {
+   "id": 5,
+   "name": "BEAR CLUB 潮熊俱樂部",
+   "odds": "h2",
+   "figs": [
+    [
+     "AVIATOR",
+     "n"
+    ],
+    [
+     "BEAT BEAR",
+     "n"
+    ],
+    [
+     "HOOD",
+     "n"
+    ],
+    [
+     "LILAC",
+     "r"
+    ],
+    [
+     "PANDA CLUB",
+     "n"
+    ],
+    [
+     "UFO BEAR",
+     "h"
+    ],
+    [
+     "PINK PUFF",
+     "r"
+    ],
+    [
+     "SKATER",
+     "n"
+    ],
+    [
+     "STAR KING",
+     "sr"
+    ],
+    [
+     "ANGEL JELLY",
+     "h"
+    ]
+   ]
+  },
+  {
+   "id": 6,
+   "name": "MIMI MONSTERS 毛茸茸俱樂部",
+   "odds": "h2",
+   "figs": [
+    [
+     "Momo Pilot",
+     "n"
+    ],
+    [
+     "Teddy Punk",
+     "n"
+    ],
+    [
+     "Midnight",
+     "n"
+    ],
+    [
+     "Witchy",
+     "sr"
+    ],
+    [
+     "Space Baby",
+     "r"
+    ],
+    [
+     "Berry",
+     "n"
+    ],
+    [
+     "Dino Boo",
+     "r"
+    ],
+    [
+     "Moo Moo",
+     "h"
+    ],
+    [
+     "Cookie Chef",
+     "n"
+    ],
+    [
+     "Angel Puff",
+     "h"
+    ]
+   ]
+  },
+  {
+   "id": 7,
+   "name": "LUCKY NEKO CLUB 招財喵俱樂部",
+   "odds": "h2",
+   "figs": [
+    [
+     "招財喵",
+     "n"
+    ],
+    [
+     "黑曜喵",
+     "r"
+    ],
+    [
+     "櫻花喵",
+     "n"
+    ],
+    [
+     "宇宙喵",
+     "n"
+    ],
+    [
+     "舞獅喵",
+     "sr"
+    ],
+    [
+     "森林喵",
+     "n"
+    ],
+    [
+     "電玩喵",
+     "n"
+    ],
+    [
+     "鯛魚燒喵",
+     "r"
+    ],
+    [
+     "福氣喵",
+     "h"
+    ],
+    [
+     "財神喵",
+     "h"
+    ]
+   ]
+  },
+  {
+   "id": 8,
+   "name": "PIGGY CLUB 胖胖豬俱樂部",
+   "odds": "h2",
+   "figs": [
+    [
+     "BUBBLE",
+     "n"
+    ],
+    [
+     "KITTY",
+     "n"
+    ],
+    [
+     "FROGGY",
+     "n"
+    ],
+    [
+     "CHEF P",
+     "n"
+    ],
+    [
+     "COSMO",
+     "r"
+    ],
+    [
+     "STRAWBY",
+     "n"
+    ],
+    [
+     "SHARKY",
+     "r"
+    ],
+    [
+     "HIP-HOP",
+     "h"
+    ],
+    [
+     "SWEETIE",
+     "sr"
+    ],
+    [
+     "MAGIC",
+     "h"
+    ]
+   ]
+  },
+  {
+   "id": 9,
+   "name": "SUNNY TOWN 陽光小鎮",
+   "odds": "h2",
+   "figs": [
+    [
+     "ZAP",
+     "n"
+    ],
+    [
+     "BUBBLES",
+     "n"
+    ],
+    [
+     "DINER DOT",
+     "n"
+    ],
+    [
+     "DOC",
+     "sr"
+    ],
+    [
+     "CHILL",
+     "n"
+    ],
+    [
+     "ARTSY",
+     "r"
+    ],
+    [
+     "STARRY",
+     "h"
+    ],
+    [
+     "SCOUT",
+     "n"
+    ],
+    [
+     "NEKO GAMER",
+     "r"
+    ],
+    [
+     "ROCKY",
+     "h"
+    ]
+   ]
+  },
+  {
+   "id": 10,
+   "name": "CHIHUAHUA CHAOS 吉娃娃暴走團",
+   "odds": "h2",
+   "figs": [
+    [
+     "ALOHA",
+     "n"
+    ],
+    [
+     "MONDAY",
+     "n"
+    ],
+    [
+     "SPA DAY",
+     "n"
+    ],
+    [
+     "QUACK",
+     "r"
+    ],
+    [
+     "PUNK",
+     "sr"
+    ],
+    [
+     "CHOMP",
+     "r"
+    ],
+    [
+     "HOWDY",
+     "n"
+    ],
+    [
+     "CLOWNY",
+     "h"
+    ],
+    [
+     "DINO PUP",
+     "n"
+    ],
+    [
+     "SPACE PUP",
+     "h"
+    ]
+   ]
+  },
+  {
+   "id": 11,
+   "name": "SLEEPY BOYS 厭世男孩",
+   "odds": "h2",
+   "figs": [
+    [
+     "SKATE",
+     "n"
+    ],
+    [
+     "BUBBLE",
+     "n"
+    ],
+    [
+     "INK",
+     "n"
+    ],
+    [
+     "MONSTER",
+     "r"
+    ],
+    [
+     "NO.23",
+     "n"
+    ],
+    [
+     "LEO",
+     "sr"
+    ],
+    [
+     "BONES",
+     "n"
+    ],
+    [
+     "FLUFF",
+     "h"
+    ],
+    [
+     "BEATS",
+     "r"
+    ],
+    [
+     "JUICE",
+     "h"
+    ]
+   ]
+  },
+  {
+   "id": 12,
+   "name": "SLEEPY GIRLS 厭世女孩",
+   "odds": "h2",
+   "figs": [
+    [
+     "SUNNY",
+     "n"
+    ],
+    [
+     "NOISE",
+     "n"
+    ],
+    [
+     "LOLLI",
+     "r"
+    ],
+    [
+     "LEOPARD",
+     "n"
+    ],
+    [
+     "KITTEN",
+     "n"
+    ],
+    [
+     "POP",
+     "r"
+    ],
+    [
+     "ANGEL",
+     "h"
+    ],
+    [
+     "BOW",
+     "sr"
+    ],
+    [
+     "FLUFFY",
+     "n"
+    ],
+    [
+     "CAMO",
+     "h"
+    ]
+   ]
+  }
+ ]
+}
