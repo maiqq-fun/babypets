@@ -5170,13 +5170,16 @@ updSndBtns();
 // ================= 🎵 背景音樂（v2.03）=================
 // 整個 App 只有一個 <audio>，在小島、各家之間切換不會重新播放；活動開始才放活動音樂
 // 瀏覽器規定要使用者先點一下畫面才能出聲，所以第一次點擊時才開始播
-const BGM={normal:'',xmas:'assets/bgm_xmas.mp3'};
+// 平常：三首隨機輪播（播完換下一首，不會連續同一首）；聖誕活動期間：聖誕歌一直重複
+const BGM={normal:['assets/bgm_n1.mp3','assets/bgm_n2.mp3','assets/bgm_n3.mp3'],xmas:['assets/bgm_xmas.mp3']};let bgmList='',bgmCur='';
 let musOn=true;try{musOn=localStorage.getItem('mhd_mus')!=='0'}catch(e){}
-const bgm=new Audio();bgm.loop=true;bgm.preload='none';bgm.volume=.45;let bgmUnlocked=false,bgmFade=0;
-function bgmWant(){const E=typeof xmEv==='function'&&xmEv();if(E&&E.on&&BGM.xmas)return BGM.xmas;return BGM.normal||''}
+const bgm=new Audio();bgm.loop=false;bgm.preload='none';bgm.volume=.45;let bgmUnlocked=false,bgmFade=0;
+function bgmWant(){const E=typeof xmEv==='function'&&xmEv();return E&&E.on&&BGM.xmas.length?'xmas':BGM.normal.length?'normal':''}
+function bgmNext(){const L=BGM[bgmList]||[];if(!L.length)return '';const C=L.length>1?L.filter(x=>x!==bgmCur):L;return C[Math.floor(Math.random()*C.length)]}
+bgm.addEventListener('ended',()=>{bgmCur=bgmNext();bgm.src=bgmCur;bgm.play().catch(()=>{})});
 function bgmSync(){const want=bgmWant();document.querySelectorAll('.musb').forEach(b=>b.classList.toggle('nobgm',!want));
   if(!want||!musOn||!bgmUnlocked||document.hidden){if(!bgm.paused)bgm.pause();return}
-  if(!bgm.src.endsWith(want)){bgm.src=want;bgm.currentTime=0}
+  if(bgmList!==want){bgmList=want;bgmCur=bgmNext();bgm.src=bgmCur}
   if(bgm.paused){bgm.volume=0;bgm.play().then(()=>{clearInterval(bgmFade);bgmFade=setInterval(()=>{bgm.volume=Math.min(.45,bgm.volume+.03);if(bgm.volume>=.45)clearInterval(bgmFade)},80)}).catch(()=>{})}}
 function updMusBtns(){document.querySelectorAll('.musb').forEach(b=>{b.innerHTML=`<img src="assets/icon_${musOn?'music':'music_off'}.webp" alt="" onerror="this.replaceWith('${musOn?'🎵':'🔕'}')">`;b.classList.toggle('off',!musOn);b.setAttribute('aria-label',musOn?'音樂：開（點一下關掉）':'音樂：關（點一下打開）')});bgmSync()}
 document.querySelectorAll('.musb').forEach(b=>b.onclick=e=>{e.stopPropagation();musOn=!musOn;bgmUnlocked=true;try{localStorage.setItem('mhd_mus',musOn?'1':'0')}catch(x){}updMusBtns();toast(musOn?'音樂打開了 🎵':'音樂關掉了 🔕')});
@@ -5236,7 +5239,7 @@ function announceLetters(){if(!DB.me)return;let seen=[];try{seen=JSON.parse(loca
     sfx('gift');$('#lgopen').onclick=()=>openLetter(nw[0].id,()=>$('#bell').click())};
   setTimeout(go,1800)}
 // ================= 自動更新：發現新版本就重新載入 =================
-const APP_VER='v2.03';
+const APP_VER='v2.04';
 function checkUpdate(){
   if(!/^https?:/.test(location.protocol)||!API_URL)return;
   if(!$('#modal').classList.contains('hidden'))return; // 正在填表單時不打斷
