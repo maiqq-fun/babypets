@@ -4731,8 +4731,8 @@ function wallShop(tabs){const hid=shHid(),h=house(hid),s=showNorm(h.show),g=DB.g
 
 // ================= 🎪 玩個毛（v2.09）=================
 // 用金幣買代幣，娃娃機（夾公仔）、打地鼠（冒出來的是島上的毛孩），票券到獎品櫃台換獎品；打地鼠每週排行榜
-const ARC_POS={x:640,y:1300},ARC_SC=1.25,TOK_P=[[1,30],[5,135],[12,300]];
-const ARC_PRIZE=[{k:'tok',n:'代幣 ×1',t:12},{k:'coin',n:'🪙100 金幣',t:50},{k:'fig',n:'隨機公仔（普通款）',t:60}];
+const ARC_POS={x:640,y:1300},ARC_SC=1.25,TOK_P=[[1,10],[10,100],[30,270]];
+const ARC_PRIZE=[{k:'tok',n:'代幣 ×1',t:12},{k:'coin',n:'🪙40 金幣',t:50},{k:'fig',n:'隨機公仔（普通款）',t:150}];
 function arcG(){const g=DB.game;if(!g.arc||typeof g.arc!=='object')g.arc={tok:0,tkt:0};g.arc.tok=+g.arc.tok||0;g.arc.tkt=+g.arc.tkt||0;return g.arc}
 const tokIcon='<img class="mic" src="assets/token.webp?v=3" alt="" style="width:1.3em;height:1.3em;vertical-align:-.3em">';
 // 娃娃機裡的公仔：上架系列的普通款
@@ -4748,14 +4748,14 @@ function renderArcade(){const v=$('#arcv');if(!v)return;const st=v.querySelector
   d.onclick=e=>{e.stopPropagation();openModal(`<div style="text-align:center"><div style="font-size:56px">🚧</div><h3>練舞室還在蓋</h3><p class="lead">工人正在趕工中……<br>之後這裡會有跟朋友 PK 的遊戲，敬請期待！</p></div><div class="row2"><button data-close class="primary">好期待</button></div>`)};st.appendChild(d);
   v.querySelector('.cbtns').innerHTML=`<button class="act" id="arctok">${tokIcon} ${a.tok}</button><button class="act" id="arctkt">🎟️ ${a.tkt}</button><button class="act" id="arcbuy">買代幣</button><button class="act" id="arcrk">🏆 排行</button>`;
   $('#arctok').onclick=$('#arcbuy').onclick=arcBuy;$('#arctkt').onclick=arcPrize;$('#arcrk').onclick=arcRank}
-function arcBuy(){const g=DB.game,a=arcG();openModal(`<h3>${tokIcon} 買代幣</h3><p class="lead">你有 🪙${g.coins||0}・代幣 ${a.tok} 枚<br>娃娃機、打地鼠玩一次都是 1 枚</p>
-  <div class="xcpl">${TOK_P.map(([n,c],i)=>`<button data-tk="${i}">${tokIcon} 代幣 ×${n}<small style="color:var(--soft)">　🪙${c}${n>1?`（省 ${n*30-c}）`:''}</small></button>`).join('')}</div><div class="row2"><button data-close>關閉</button></div>`);
+function arcBuy(){const g=DB.game,a=arcG();openModal(`<h3>${tokIcon} 買代幣</h3><p class="lead">你有 🪙${g.coins||0}・代幣 ${a.tok} 枚<br>娃娃機 3 枚、打地鼠和推幣機 1 枚</p>
+  <div class="xcpl">${TOK_P.map(([n,c],i)=>`<button data-tk="${i}">${tokIcon} 代幣 ×${n}<small style="color:var(--soft)">　🪙${c}${n*10>c?`（省 ${n*10-c}）`:''}</small></button>`).join('')}</div><div class="row2"><button data-close>關閉</button></div>`);
   $('#sheet').querySelectorAll('[data-tk]').forEach(b=>b.onclick=()=>{const [n,c]=TOK_P[+b.dataset.tk];if((g.coins||0)<c)return toast(`金幣不夠，要 🪙${c}`);g.coins-=c;a.tok+=n;save();updTix&&updTix();sfx('coin');toast(`買了 ${n} 枚代幣！`);renderArcade();arcBuy()})}
-function arcPay(){const a=arcG();if(a.tok<1){arcBuy();toast('代幣不夠，先買幾枚');return false}a.tok--;save();renderArcade();return true}
+function arcPay(n){n=n||1;const a=arcG();if(a.tok<n){arcBuy();toast(`代幣不夠，要 ${n} 枚`);return false}a.tok-=n;save();renderArcade();return true}
 function arcPrize(){const a=arcG(),g=DB.game;openModal(`<h3>🎟️ 獎品櫃台</h3><p class="lead">你有 🎟️ ${a.tkt} 張票券<br>打地鼠每 5 分 1 張、娃娃機沒夾到 1 張</p>
   <div class="xcpl">${ARC_PRIZE.map((x,i)=>`<button data-pz="${i}" ${a.tkt<x.t?'disabled':''}>${x.k==='tok'?tokIcon+' ':''}${x.n}<small style="color:var(--soft)">　🎟️ ${x.t}</small></button>`).join('')}</div><div class="row2"><button data-close>關閉</button></div>`);
   $('#sheet').querySelectorAll('[data-pz]').forEach(b=>b.onclick=()=>{const x=ARC_PRIZE[+b.dataset.pz];if(a.tkt<x.t)return toast('票券不夠');a.tkt-=x.t;
-    if(x.k==='tok'){a.tok++;toast('換到 1 枚代幣！')}else if(x.k==='coin'){grant(0,100);toast('換到 🪙100！')}else{const P=arcPool(),id=P[Math.floor(Math.random()*P.length)];bagAdd(id,1);toast(`換到「${xcName(id)}」！放進背包了`)}
+    if(x.k==='tok'){a.tok++;toast('換到 1 枚代幣！')}else if(x.k==='coin'){grant(0,40);toast('換到 🪙40！')}else{const P=arcPool(),id=P[Math.floor(Math.random()*P.length)];bagAdd(id,1);toast(`換到「${xcName(id)}」！放進背包了`)}
     save();sfx('gift');renderArcade();arcPrize()})}
 function arcOv(title,a){const ov=document.createElement('div');ov.className='arcov';const A=arcG();
   ov.innerHTML=`<div class="ah"><button class="x">← 離開</button><b>${title}</b><span class="apill"><img src="assets/token.webp?v=3" alt=""><b class="atk">${A.tok}</b>　🎟️ <b class="att">${A.tkt}</b></span></div>`;
@@ -4765,7 +4765,7 @@ const CLAW={a:352/486,x:[16,84],top:29,floor:64.5,cw:15,ca:319/419,pw:13};
 function clawGame(){const {ov,upd}=arcOv('🧸 娃娃機');const P=arcPool();if(!P.length){ov.remove();return toast('娃娃機還沒放公仔')}
   const M=document.createElement('div');M.className='arcmach';M.style.setProperty('--a',CLAW.a);M.innerHTML='<img class="bg" src="assets/claw_machine.webp" alt="">';ov.appendChild(M);
   const msg=document.createElement('div');msg.className='arcmsg';msg.textContent='爪子會左右移動，抓準時機按「夾！」';ov.appendChild(msg);
-  const btn=document.createElement('button');btn.className='arcbig';btn.textContent=`夾！（1 枚代幣）`;ov.appendChild(btn);
+  const btn=document.createElement('button');btn.className='arcbig';btn.textContent=`夾！（3 枚代幣）`;ov.appendChild(btn);
   let prizes=[];const deal=()=>{M.querySelectorAll('.prz').forEach(x=>x.remove());prizes=[];const n=6;for(let k=0;k<n;k++){const id=P[Math.floor(Math.random()*P.length)],x=CLAW.x[0]+4+(CLAW.x[1]-CLAW.x[0]-8)*(k+.5)/n+(Math.random()*4-2);
     const el=document.createElement('img');el.className='prz';el.src=xcImg(id);Object.assign(el.style,{left:x+'%',top:CLAW.floor+'%',width:CLAW.pw+'%',zIndex:2});M.appendChild(el);prizes.push({id,x,el})}};deal();
   const claw=document.createElement('img');claw.className='claw';claw.src='assets/claw_grab.webp';const cable=document.createElement('div');cable.className='cable';M.append(cable,claw);
@@ -4773,7 +4773,7 @@ function clawGame(){const {ov,upd}=arcOv('🧸 娃娃機');const P=arcPool();if(
   const draw=()=>{Object.assign(claw.style,{left:cx+'%',top:cy+'%',width:CLAW.cw+'%'});Object.assign(cable.style,{left:cx+'%',top:CLAW.top-6+'%',height:Math.max(0,cy-CLAW.top+6+ch*.1)+'%'})};
   const loop=t=>{const dt=Math.min(50,t-last);last=t;if(state==='move'){cx+=dir*dt*.028;if(cx>CLAW.x[1]-3){cx=CLAW.x[1]-3;dir=-1}if(cx<CLAW.x[0]+3){cx=CLAW.x[0]+3;dir=1}}draw();if(document.body.contains(ov))raf=requestAnimationFrame(loop)};raf=requestAnimationFrame(loop);
   const tween=(from,to,ms,fn)=>new Promise(r=>{const t0=performance.now();const f=t=>{const k=Math.min(1,(t-t0)/ms);fn(from+(to-from)*k);if(k<1)requestAnimationFrame(f);else r()};requestAnimationFrame(f)});
-  btn.onclick=async()=>{if(state!=='move')return;if(!arcPay())return;upd();state='drop';btn.disabled=true;msg.textContent='……';sfx&&sfx('tap');
+  btn.onclick=async()=>{if(state!=='move')return;if(!arcPay(3))return;upd();state='drop';btn.disabled=true;msg.textContent='……';sfx&&sfx('tap');
     const down=CLAW.floor-ch*.95,top0=cy;await tween(cy,down,800,v=>{cy=v});
     const near=prizes.slice().sort((a,b)=>Math.abs(a.x-cx)-Math.abs(b.x-cx))[0],dx=near?Math.abs(near.x-cx):99;
     const win=dx<2.5?Math.random()<.5:dx<5?Math.random()<.28:false,slip=!win&&dx<5;
@@ -4792,13 +4792,13 @@ function clawGame(){const {ov,upd}=arcOv('🧸 娃娃機');const P=arcPool();if(
 // ---------- 🪙 推幣機（v2.13）：丟 1 枚代幣，硬幣推下去；平均拿回約 9 成，偶爾福袋大獎 ----------
 const PSH={a:382/600,x:[23,77],y:[54,68],bar:49.5};
 // v2.17：檯子上有金幣、代幣、五枚代幣籌碼，推下什麼拿什麼（平均拿回約 9 成，代幣算 🪙30）
-function pushRoll(){const r=Math.random(),pk=a=>a[Math.floor(Math.random()*a.length)];
-  if(r<.012)return {c:0,t:0,bag:200+Math.floor(Math.random()*7)*50};if(r<.022)return {c:0,t:0,fig:1};
-  if(r<.042)return {c:0,t:5};if(r<.102)return {c:pk([50,60,70]),t:1};if(r<.117)return {c:pk([90,105,120,135]),t:0};
-  if(r<.257)return {c:0,t:1};if(r<.377)return {c:pk([25,30,35,40]),t:0};if(r<.677)return {c:pk([10,15,20]),t:0};return {c:0,t:0}}
+function pushRoll(){const r=Math.random(),pk=a=>a[Math.floor(Math.random()*a.length)];   // v2.19：代幣 🪙10，獎勵跟著 ÷3
+  if(r<.01)return {c:0,t:0,bag:60+Math.floor(Math.random()*10)*10};if(r<.013)return {c:0,t:0,fig:1};
+  if(r<.033)return {c:0,t:5};if(r<.093)return {c:pk([15,20,25]),t:1};if(r<.108)return {c:pk([30,40,50]),t:0};
+  if(r<.248)return {c:0,t:1};if(r<.368)return {c:pk([8,10,12,15]),t:0};if(r<.668)return {c:pk([3,5,7]),t:0};return {c:0,t:0}}
 function pusherGame(){const {ov,upd}=arcOv('🪙 推幣機');const M=document.createElement('div');M.className='arcmach';M.style.setProperty('--a',PSH.a);M.innerHTML='<img class="bg" src="assets/pusher.webp" alt="">';ov.appendChild(M);
   const bar=document.createElement('div');bar.className='pshbar';M.appendChild(bar);
-  const msg=document.createElement('div');msg.className='arcmsg';msg.innerHTML='丟一枚代幣，把檯子上的東西推下來！<br>🪙金幣進錢包・🟣代幣 +1・🔵籌碼 +5・✨福袋大獎';ov.appendChild(msg);
+  const msg=document.createElement('div');msg.className='arcmsg';msg.innerHTML='丟一枚代幣，把檯子上的東西推下來！<br>🪙金幣進錢包・🟣代幣 +1・🔵籌碼 +5・✨福袋 🪙60～150';ov.appendChild(msg);
   const btn=document.createElement('button');btn.className='arcbig';btn.textContent='投幣（1 枚代幣）';ov.appendChild(btn);
   const PIMG={c:'assets/icon_coin.webp',t:'assets/token.webp?v=3',t5:'assets/token5.webp'};
   const coins=[];const addCoin=(x,y,kd)=>{kd=kd||(Math.random()<.68?'c':Math.random()<.9?'t':'t5');const c=document.createElement('img');c.className='pshc';c.src=PIMG[kd];if(kd!=='c')c.style.width='8.5%';Object.assign(c.style,{left:x+'%',top:y+'%',zIndex:Math.round(y)});M.appendChild(c);coins.push({el:c,x,y,kd})};
@@ -4823,7 +4823,7 @@ function pusherGame(){const {ov,upd}=arcOv('🪙 推幣機');const M=document.cr
     if(res.bag){grant(0,res.bag);win.textContent=`✨ 福袋！🪙${res.bag}`;msg.textContent=`中大獎！福袋裡有 🪙${res.bag}`;sfx('levelup');bbSpark(M,22,['💰','✨','🎉']);if(ONLINE)feedPush(`🪙 ${DB.me.nick} 在玩個毛的推幣機推出福袋，拿到 🪙${res.bag}！`)}
     else if(res.fig){const P=arcPool(),id=P[Math.floor(Math.random()*P.length)];bagAdd(id,1);win.textContent='🎁 掉出公仔！';msg.textContent=`掉出「${xcName(id)}」！放進背包了`;sfx('gift')}
     else if(res.c||res.t){if(res.c)grant(0,res.c);if(res.t){arcG().tok+=res.t}const parts=[res.c?`🪙${res.c}`:'',res.t===5?'代幣 ×5 🔵':res.t?'代幣 ×1 🟣':''].filter(Boolean);
-      win.textContent='+'+parts.join(' ＋ ');msg.textContent=(res.t===5?'推下五枚籌碼！':res.c>=50?'推下一大堆！':'推下 ')+parts.join(' ＋ ');sfx('coin')}
+      win.textContent='+'+parts.join(' ＋ ');msg.textContent=(res.t===5?'推下五枚籌碼！':res.c>=30?'推下一大堆！':'推下 ')+parts.join(' ＋ ');sfx('coin')}
     else{win.textContent='……';msg.textContent='差一點點，金幣卡在邊邊了'}
     M.appendChild(win);setTimeout(()=>win.remove(),1200);if(!bag&&Math.random()<.35)putBag();
     save();upd();busy=false;btn.disabled=false}}
@@ -5668,7 +5668,7 @@ function announceLetters(){if(!DB.me)return;let seen=[];try{seen=JSON.parse(loca
     sfx('gift');$('#lgopen').onclick=()=>openLetter(nw[0].id,()=>$('#bell').click())};
   setTimeout(go,1800)}
 // ================= 自動更新：發現新版本就重新載入 =================
-const APP_VER='v2.18';
+const APP_VER='v2.19';
 function checkUpdate(){
   if(!/^https?:/.test(location.protocol)||!API_URL)return;
   if(!$('#modal').classList.contains('hidden'))return; // 正在填表單時不打斷
