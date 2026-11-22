@@ -1284,7 +1284,7 @@ async function sync(quiet){
   try{const d=await api('getState',Object.assign(cred(),{where:curWhere()}));
     Object.assign(DB,{houses:d.houses,pets:d.pets,weights:d.weights,medical:d.medical,expenses:d.expenses,notes:d.notes,feed:d.feed,famOk:d.famOk,players:d.players||[],tlogs:d.tlogs||[]});
     DB.houses.forEach(h=>{if(!Array.isArray(h.poops))h.poops=[]});
-    keepPending();DB.letters=(d.letters||[]).filter(l=>!LGONE[l.id]).map(l=>Object.assign(l,LSTATE[l.id]||{},CLAIMED['l:'+l.id]?{claimed:true}:{}));DB.drops=(d.drops||[]).filter(x=>!PICKED.has(x.id));DB.notice=d.notice&&d.notice.t&&!(+d.notice.until&&Date.now()>+d.notice.until)?d.notice:null;DB.center=d.center||DB.center||null;DB.applies=d.applies||[];DB.rooms=d.rooms||DB.rooms||[];applyRooms();DB.amail=+d.amail||0;setTimeout(updAdminBadge,0);DB.kuji=d.kuji||DB.kuji||null;DB.online=d.online||[];setTimeout(checkAdminGifts,600);DB.rank=d.rank||DB.rank||null;osLogin();pushCheckLater();setTimeout(noticePop,1200);DB.dbl=d.dbl||'';DB.adminId=d.adminId||'';DB.star=d.star||null;DB.jobs=d.jobs||null;setTimeout(jobPayCheck,1500);if(d.player)DB.starDone=+d.player.starDone||0;
+    keepPending();DB.letters=(d.letters||[]).filter(l=>!LGONE[l.id]).map(l=>Object.assign(l,LSTATE[l.id]||{},CLAIMED['l:'+l.id]?{claimed:true}:{}));DB.drops=(d.drops||[]).filter(x=>!PICKED.has(x.id));DB.notice=d.notice&&d.notice.t&&!(+d.notice.until&&Date.now()>+d.notice.until)?d.notice:null;DB.center=d.center||DB.center||null;DB.applies=d.applies||[];DB.rooms=d.rooms||DB.rooms||[];if(Array.isArray(d.bbx)){DB.bbx=d.bbx;bbRegister()}applyRooms();DB.amail=+d.amail||0;setTimeout(updAdminBadge,0);DB.kuji=d.kuji||DB.kuji||null;DB.online=d.online||[];setTimeout(checkAdminGifts,600);DB.rank=d.rank||DB.rank||null;osLogin();pushCheckLater();setTimeout(noticePop,1200);DB.dbl=d.dbl||'';DB.adminId=d.adminId||'';DB.star=d.star||null;DB.jobs=d.jobs||null;setTimeout(jobPayCheck,1500);if(d.player)DB.starDone=+d.player.starDone||0;
     setTimeout(announceLetters,0);setTimeout(updGuestBar,0);
     if(d.player&&DB.me){DB.me.code=d.player.code||DB.me.code;if(d.player.pin)DB.me.pin=d.player.pin;const ml=Array.isArray(d.player.mail)?d.player.mail:[];if(ml.length)claimMail(ml)}
     DB.owned={};d.houses.forEach(h=>DB.owned[h.id]=Array.isArray(h.owned)?h.owned:[]);
@@ -1384,9 +1384,12 @@ const LOCAL={
   demonHelp({houseId,kind}){const h=house(houseId),d=h&&h.demon;if(!d)return {none:true};return {prog:d.prog,until:d.until||0}},
   demonEnd({houseId}){const h=house(houseId);delete h.demon;return {}},
   showEdit({houseId}){const h=house(houseId);return {show:h&&h.show}},
-  bbDraw({sid}){const S=BB_SERIES.find(x=>x.id===+sid),b=bbData(),n=(+b.p[sid]||0)+1;let i;if(n>=BB_PITY||Math.random()<.01)i=S.h[Math.floor(Math.random()*S.h.length)];else{const L=bbIdx(S).filter(k=>!S.h.includes(k));i=L[Math.floor(Math.random()*L.length)]}
+  bbDraw({sid}){const S=bbSer(sid),b=bbData(),n=(+b.p[sid]||0)+1;let i;if(n>=BB_PITY||Math.random()<.01)i=S.h[Math.floor(Math.random()*S.h.length)];else{const L=bbIdx(S).filter(k=>!S.h.includes(k));i=L[Math.floor(Math.random()*L.length)]}
     const H=S.h.includes(i),d=bbDex(sid),complete=bbIdx(S).every(k=>k===i||+d[k]>0)&&!(+d[i]>0);return {i,r:H?'H':'N',pity:H?0:n,complete,bonus:1000}},
   decoBuy({houseId,id}){return {owned:[...owned(houseId),id]}},
+  adminBbGet({id}){const S=(DB.bbxFull||[]).find(x=>x.id===+id);if(!S)throw new Error('找不到這個系列');return {series:JSON.parse(JSON.stringify(S))}},
+  adminBbSave({series}){const F=DB.bbxFull=DB.bbxFull||[];let S=series.id?F.find(x=>x.id===+series.id):null;if(!S){S={id:101+F.length};F.push(S)}Object.assign(S,series,{id:S.id});
+    DB.bbx=F.map(x=>({id:x.id,n:x.n,en:x.en,c:x.c,off:x.off,box:x.box,f:x.f.map(y=>y.n),img:x.f.map(y=>y.img),h:x.f.map((y,i)=>y.r==='H'?i:-1).filter(i=>i>=0),t:x.f.map((y,i)=>y.r==='N'?i:-1).filter(i=>i>=0).slice(0,3)}));return {list:DB.bbx}},
   shopBuy({stockId,name}){const s=house(SHOP_ID),it=(s.stock||[]).find(x=>x.id===stockId);if(!it)throw new Error('慢了一步，這個被別人買走了 😆');s.stock=s.stock.filter(x=>x!==it);feedPush(`🛍️ ${DB.me.nick} 在毛二街撿到便宜：${name||it.item}`);return {item:it.item,t:it.t}},
   shopSell({item,t,name}){const s=house(SHOP_ID);(s.stock=s.stock||[]).push({id:uid(),item,t,at:Date.now(),src:'p',by:DB.me.nick});while(s.stock.length>40){const i=s.stock.findIndex(x=>x.src!=='p');s.stock.splice(i>=0?i:0,1)}feedPush(`💰 ${DB.me.nick} 把 ${name||item} 賣給毛二街`);return {ok:true}},
   shopRestock({items}){const s=house(SHOP_ID),d=todayTW();if(s.rday===d)return {stock:s.stock};(items||[]).slice(0,3).forEach(x=>(s.stock=s.stock||[]).push({id:uid(),item:x.item,t:x.t,at:Date.now(),src:'s'}));s.rday=d;return {stock:s.stock}},
@@ -1689,14 +1692,57 @@ function adminUploadSec(d){
     <p class="lead">建議尺寸 256×256，綠底會自動去背；價格選價位就好，也可以自己打</p>
     <div class="row2"><button id="auit">＋ 上傳新商品</button></div>
     <div class="upgrid">${(C.items||[]).map(x=>th(x.img,x.name,`${x.kind==='toy'?'玩具':'零食'}・${x.limited?'限定':'🪙'+x.price}${x.off?'・已下架':''}`,`data-uit="${x.id}"`)).join('')}</div></div>
+  <div class="sec adm"><h4>🎁 盲盒系列<span>${(DB.bbx||[]).length} 套自己上傳的</span></h4>
+    <p class="lead">一套 4～12 隻公仔，每隻一張圖（綠底會自動去背）。稀有度只有後台看得到，玩家抽到才知道</p>
+    <div class="row2"><button id="aubb">＋ 新的盲盒系列</button></div>
+    <div class="upgrid">${(DB.bbx||[]).map(x=>th(x.box||(x.img||[])[0]||'',x.n,`${x.f.length} 隻${x.off?'・已下架':'・上架中'}`,`data-ubb="${x.id}"`)).join('')||'<p class="lead">還沒有自己上傳的系列</p>'}</div></div>
   <div class="sec adm"><h4>🎨 訂製款折扣碼</h4><p class="lead">島民申請訂製裝潢時打這組碼就免費，不限次數</p>
     <div class="row2"><input id="adcode" maxlength="20" value="${esc(d.decoCode||'我毛很多')}"><button id="adcodeb">儲存</button></div></div>`}
 function adminUploadBind(d){
   $('#aurm').onclick=()=>roomEditor(null);$('#aust').onclick=()=>styleEditor(null);$('#auit').onclick=()=>itemEditor(null);
+  $('#aubb').onclick=()=>bbEditor(null);document.querySelectorAll('[data-ubb]').forEach(b=>b.onclick=()=>bbEditor(+b.dataset.ubb));
   document.querySelectorAll('[data-urm]').forEach(b=>b.onclick=()=>roomEditor((DB.rooms||[]).find(r=>r.id===b.dataset.urm)));
   document.querySelectorAll('[data-ust]').forEach(b=>b.onclick=()=>styleEditor((CAT.styles||[]).find(x=>String(x.n)===b.dataset.ust)));
   document.querySelectorAll('[data-uit]').forEach(b=>b.onclick=()=>itemEditor((CAT.items||[]).find(x=>x.id===b.dataset.uit)));
   $('#adcodeb').onclick=async()=>{try{const r=await adminCall('adminDecoCode',{code:$('#adcode').value.trim()});toast('折扣碼改成「'+r.code+'」了')}catch(e){toast(e.message)}}}
+
+// ---------- 🎁 島主上傳盲盒系列 ----------
+const BBR_OPT=[['N','⚪ 普通'],['R','🔵 稀有'],['S','🟣 超稀有'],['H','🌟 隱藏']];
+async function bbFig(file,maxH){const im=await fileImg(file),c=chromaCut(im,1400),sc=Math.min(1,(maxH||520)/c.height),o=document.createElement('canvas');o.width=Math.round(c.width*sc);o.height=Math.round(c.height*sc);o.getContext('2d').drawImage(c,0,0,o.width,o.height);return canvasUrl(o,.9)}
+async function bbEditor(sid){let E;
+  if(sid){try{const r=await adminCall('adminBbGet',{id:sid});E=r.series}catch(e){return toast(e.message)}}
+  E=E||{n:'',en:'',c:'#7f9671',off:1,box:'',f:[]};if(!E.f.length)for(let i=0;i<10;i++)E.f.push({n:'',img:'',r:i===9?'H':i>=7?'S':i>=5?'R':'N'});
+  const draw=()=>{openModal(`<h3>🎁 ${sid?'編輯':'新的'}盲盒系列</h3>
+    ${fld('bbn','系列名字','<input id="bbn" maxlength="16" placeholder="例如：海灘小貓俱樂部">')}
+    ${fld('bben','英文副標（選填）','<input id="bben" maxlength="24" placeholder="BEACH CLUB">')}
+    <div class="row2"><label class="chk" style="flex:1">卡片顏色 <input id="bbc" type="color" style="width:46px;height:30px;vertical-align:middle"></label><label class="chk" style="flex:1"><input type="checkbox" id="bboff"> 先不上架</label></div>
+    <div class="field"><label>單盒圖（綠底自動去背）</label><div class="row2"><img id="bbboxp" src="${E.box||''}" alt="" style="height:70px;${E.box?'':'display:none'}"><input type="file" id="bbbox" accept="image/*"></div></div>
+    <div class="field"><label>公仔（${E.f.length} 隻）・可以一次選很多張，會照順序放進去</label><input type="file" id="bbmany" accept="image/*" multiple></div>
+    <div id="bbfs">${E.f.map((f,i)=>`<div style="display:flex;align-items:center;gap:6px;margin:6px 0"><b style="width:18px;flex:none">${i+1}</b>
+      <label style="width:54px;height:54px;border-radius:10px;background:#f3eadb;display:flex;align-items:center;justify-content:center;overflow:hidden;flex:none">${f.img?`<img src="${f.img}" style="max-width:100%;max-height:100%">`:'＋'}<input type="file" accept="image/*" data-fi="${i}" style="display:none"></label>
+      <input data-fn="${i}" maxlength="16" placeholder="名字" value="${esc(f.n)}" style="flex:1;min-width:0;padding:8px;border-radius:10px">
+      <select data-fr="${i}" style="flex:none;width:96px;padding:6px;border-radius:10px">${BBR_OPT.map(([k,t])=>`<option value="${k}" ${f.r===k?'selected':''}>${t}</option>`).join('')}</select>
+      <button data-fx="${i}" style="flex:none;width:34px;padding:6px 0;border-radius:10px">✕</button></div>`).join('')}</div>
+    <div class="row2"><button id="bbadd" ${E.f.length>=12?'disabled':''}>＋ 加一隻</button></div>
+    <p class="lead" style="font-size:12px">機率：普通每隻 14%、稀有 10%、超稀有 9%，隱藏版 1 隻時 1%、2 隻以上合計 1%（會自動換算成 100%）。${BB_PITY} 盒保底</p>
+    <div class="err" id="bberr"></div><div class="row2"><button data-close>取消</button><button class="primary" id="bbsave">儲存</button></div>`);
+    $('#bbn').value=E.n||'';$('#bben').value=E.en||'';$('#bbc').value=E.c||'#7f9671';$('#bboff').checked=!!E.off;
+    const keep=()=>{E.n=$('#bbn').value.trim();E.en=$('#bben').value.trim();E.c=$('#bbc').value;E.off=$('#bboff').checked?1:0;
+      document.querySelectorAll('[data-fn]').forEach(x=>E.f[+x.dataset.fn].n=x.value.trim());document.querySelectorAll('[data-fr]').forEach(x=>E.f[+x.dataset.fr].r=x.value)};
+    $('#bbbox').onchange=async e=>{const f=e.target.files[0];if(!f)return;keep();E.box=await bbFig(f,520);draw()};
+    $('#bbmany').onchange=async e=>{keep();const fs=[...e.target.files];let k=0;for(const f of fs){while(k<E.f.length&&E.f[k].img)k++;if(k>=12)break;if(k>=E.f.length)E.f.push({n:'',img:'',r:'N'});E.f[k].img=await bbFig(f,520);k++}draw()};
+    document.querySelectorAll('[data-fi]').forEach(x=>x.onchange=async e=>{const f=e.target.files[0];if(!f)return;keep();E.f[+x.dataset.fi].img=await bbFig(f,520);draw()});
+    document.querySelectorAll('[data-fx]').forEach(x=>x.onclick=()=>{keep();if(E.f.length<=4)return toast('一套至少 4 隻');E.f.splice(+x.dataset.fx,1);draw()});
+    $('#bbadd').onclick=()=>{keep();if(E.f.length<12)E.f.push({n:'',img:'',r:'N'});draw()};
+    $('#bbsave').onclick=async e=>{keep();const err=t=>$('#bberr').textContent=t;
+      if(!E.n)return err('幫系列取個名字');if(E.f.some(f=>!f.img))return err('每一隻都要有圖');if(E.f.some(f=>!f.n))return err('每一隻都要有名字');
+      if(!E.f.some(f=>f.r==='H'))return err('至少要有 1 隻隱藏版');if(!E.f.some(f=>f.r!=='H'))return err('不能全部都是隱藏版');
+      const bt=e.currentTarget;bt.disabled=true;
+      try{if(ONLINE){const up=async u=>String(u||'').startsWith('data:')?(await call('upload',Object.assign(cred(),{dataUrl:u}),true)).url:u;
+          if(E.box){bt.textContent='上傳盒子…';E.box=await up(E.box)}for(let i=0;i<E.f.length;i++){bt.textContent=`上傳公仔 ${i+1}/${E.f.length}…`;E.f[i].img=await up(E.f[i].img)}}
+        bt.textContent='儲存中…';const r=await adminCall('adminBbSave',{series:Object.assign({},E,{id:sid||0})});DB.bbx=r.list;bbRegister();toast(E.off?'存好了（還沒上架）':'上架了 🎁');adminSheet()}
+      catch(x){bt.disabled=false;bt.textContent='儲存';err(x.message)}}};
+  draw()}
 // ---------- 背景編輯：裁圖、拉軟木板框、拉地板範圍 ----------
 function roomEditor(o){const E=o?JSON.parse(JSON.stringify(o)):{name:'',r:'N',board:[470,240,780,440],floor:{y0:760,t:[120,730]}};let img=o?o.img:'',file=null;
   E.board=Array.isArray(E.board)?E.board:[470,240,780,440];E.floor=E.floor&&E.floor.t?E.floor:{y0:760,t:[120,730]};
@@ -4225,9 +4271,15 @@ const BB_SERIES=[{"id":1,"n":"喵星派對","en":"","c":"#7f9671","f":["太空�
 // ================= 🎁 盲盒店（v1.95）=================
 // 機率和保底在後端抽，前端只知道名字和哪幾格是隱藏版（開箱時顯示金框「?」）
 const BB_PRICE=200,BB_PITY=150,BB_RN={N:'⚪ 普通',R:'🔵 稀有',S:'🟣 超稀有',H:'🌟 隱藏版！'};
-const bbId=(sid,i)=>`bb${sid}_${String(i+1).padStart(2,'0')}`,bbImg=(sid,i)=>`assets/${bbId(sid,i)}.webp`,bbBox=sid=>`assets/bb${sid}_box.webp`;
-BB_SERIES.filter(S=>!S.off).forEach(S=>S.f.forEach((n,i)=>{if((S.x||[]).includes(i))return;ITEMS[bbId(S.id,i)]={name:n,emo:'🎁',kind:'fig',price:0,img:bbImg(S.id,i),bb:S.id}}));
-const bbOn=()=>BB_SERIES.filter(S=>!S.off);
+// 島主自己上傳的系列（DB.bbx，id 從 101 開始）和內建的放在一起
+const bbAll=()=>BB_SERIES.concat((Array.isArray(DB.bbx)?DB.bbx:[]).filter(S=>S&&S.id&&Array.isArray(S.f)));
+const bbSer=sid=>bbAll().find(x=>x.id===+sid);
+const bbId=(sid,i)=>`bb${sid}_${String(i+1).padStart(2,'0')}`;
+const bbImg=(sid,i)=>{const S=bbSer(sid);return S&&Array.isArray(S.img)&&S.img[i]?S.img[i]:`assets/${bbId(sid,i)}.webp`};
+const bbBox=sid=>{const S=bbSer(sid);return S&&S.box?S.box:`assets/bb${sid}_box.webp`};
+function bbRegister(){bbAll().filter(S=>!S.off).forEach(S=>S.f.forEach((n,i)=>{if((S.x||[]).includes(i))return;ITEMS[bbId(S.id,i)]={name:n,emo:'🎁',kind:'fig',price:0,img:bbImg(S.id,i),bb:S.id}}))}
+bbRegister();
+const bbOn=()=>bbAll().filter(S=>!S.off);
 const bbIdx=S=>S.f.map((n,i)=>i).filter(i=>!(S.x||[]).includes(i));
 function bbData(){const b=DB.bb&&typeof DB.bb==='object'?DB.bb:(DB.bb={});b.p=b.p||{};b.d=b.d||{};return b}
 const bbDex=sid=>{const d=bbData().d[sid];return Array.isArray(d)?d:[]};
@@ -4241,7 +4293,7 @@ function bbShopRender(){const v=$('#bbv');if(!v)return;const g=DB.game;
     <button class="buy" data-bb="${S.id}">抽一盒<small>🪙${BB_PRICE}</small></button></div>`}).join('')}</div>`;
   v.querySelector('.x').onclick=()=>v.remove();v.querySelectorAll('[data-bb]').forEach(b=>b.onclick=()=>bbDraw(+b.dataset.bb))}
 let bbBusy=false;
-async function bbDraw(sid){const S=BB_SERIES.find(x=>x.id===sid),g=DB.game;if(!S||S.off||bbBusy)return;
+async function bbDraw(sid){const S=bbSer(sid),g=DB.game;if(!S||S.off||bbBusy)return;
   if((g.coins||0)<BB_PRICE)return toast(`金幣不夠，要 🪙${BB_PRICE}`);
   bbBusy=true;g.coins-=BB_PRICE;save();updTix&&updTix();bbShopRender();sfx&&sfx('coin');
   const own=S.f.map((x,i)=>bbHas(sid,i));let res=null,err=null;
@@ -5000,7 +5052,7 @@ function announceLetters(){if(!DB.me)return;let seen=[];try{seen=JSON.parse(loca
     sfx('gift');$('#lgopen').onclick=()=>openLetter(nw[0].id,()=>$('#bell').click())};
   setTimeout(go,1800)}
 // ================= 自動更新：發現新版本就重新載入 =================
-const APP_VER='v1.99';
+const APP_VER='v2.00';
 function checkUpdate(){
   if(!/^https?:/.test(location.protocol)||!API_URL)return;
   if(!$('#modal').classList.contains('hidden'))return; // 正在填表單時不打斷
