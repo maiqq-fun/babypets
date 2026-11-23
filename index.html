@@ -4456,7 +4456,9 @@ function showClose(p,sel){if(p>=3)return wallClose(p,sel);const h=house(SHV.hid)
     it?showItemMenu(p,i,it):showToyPick(p,i)})}
 function showToyPick(p,i){const L=bagList('fig').concat(bagList('toy'));
   if(!L.length)return openModal(`<div style="text-align:center"><h3>背包裡沒有玩具</h3><p class="lead">去毛二街抽盲盒、去商店買玩具，或把家裡地上的玩具收回背包，就能擺進展示櫃了</p></div><div class="row2"><button id="shbk">← 回去</button></div>`),$('#shbk').onclick=()=>showClose(p,i);
-  openModal(`<h3>放哪個玩具？</h3><div class="shopgrid">${L.map(([id,n])=>`<button class="si pick" data-t="${id}">${itemIcon(id,'big')}<div class="sn">${esc((ITEMS[id]||{}).name||id)}</div><div class="sf">×${n}</div></button>`).join('')}</div><div class="row2"><button id="shbk">← 回去</button></div>`);
+  // v2.28：分成公仔、玩具兩區（原本混在一起，公仔一多玩具就被擠到最下面）
+  const F=bagList('fig'),T=bagList('toy'),grid=A=>`<div class="shopgrid">${A.map(([id,n])=>`<button class="si pick" data-t="${id}">${itemIcon(id,'big')}<div class="sn">${esc((ITEMS[id]||{}).name||id)}</div><div class="sf">×${n}</div></button>`).join('')}</div>`;
+  openModal(`<h3>放什麼進櫃子？</h3>${T.length?`<div class="dcsec">🧸 玩具（${T.length} 種）</div>${grid(T)}`:'<div class="dcsec">🧸 玩具</div><p class="lead" style="font-size:12px">背包裡沒有玩具・擺在家裡地上的要先「收回背包」才能放進櫃子</p>'}${F.length?`<div class="dcsec">🎁 公仔（${F.length} 種）</div>${grid(F)}`:''}<div class="row2"><button id="shbk">← 回去</button></div>`);
   $('#shbk').onclick=()=>showClose(p,i);
   $('#sheet').querySelectorAll('[data-t]').forEach(b=>b.onclick=()=>{const id=b.dataset.t;if(!(bag()[id]>0))return;
     bagAdd(id,-1);if(showDo(SHV.hid,{op:'put',pos:p,i,item:id},()=>bagAdd(id,1))){sfx('tap');showClose(p)}else bagAdd(id,1)})}
@@ -5816,7 +5818,7 @@ function announceLetters(){if(!DB.me)return;let seen=[];try{seen=JSON.parse(loca
     sfx('gift');$('#lgopen').onclick=()=>openLetter(nw[0].id,()=>$('#bell').click())};
   setTimeout(go,1800)}
 // ================= 自動更新：發現新版本就重新載入 =================
-const APP_VER='v2.27';
+const APP_VER='v2.28';
 function checkUpdate(){
   if(!/^https?:/.test(location.protocol)||!API_URL)return;
   if(!$('#modal').classList.contains('hidden'))return; // 正在填表單時不打斷
