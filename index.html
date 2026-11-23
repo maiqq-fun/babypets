@@ -1419,8 +1419,10 @@ function optDone(k,o,r){if(r&&r.id){Object.assign(o,r)}}
 function optFail(k,o){DB[k]=(DB[k]||[]).filter(x=>x!==o);ADDS[k]=ADDS[k].filter(x=>x!==o)}
 // v1.83：農田剛種、剛澆、剛收的格子先記著，小島還沒確認前同步回來也不會被蓋掉（植物不會突然不見）
 const FARMP={};function farmPend(hid,i,cell){(FARMP[hid]=FARMP[hid]||{})[i]={c:cell?JSON.parse(JSON.stringify(cell)):null,t:Date.now()}}
-function farmDone(hid,i){if(FARMP[hid])delete FARMP[hid][i]}
-function keepFarm(){const nw=Date.now();for(const hid in FARMP){const h=house(hid);if(!h||!h.farm)continue;for(const i in FARMP[hid]){const o=FARMP[hid][i];if(nw-o.t>60000){delete FARMP[hid][i];continue}h.farm.p=h.farm.p||[];h.farm.p[i]=o.c}}}
+function farmDone(hid,i,cell){const o=FARMP[hid]&&FARMP[hid][i];if(!o)return;o.done=Date.now();if(cell!==undefined)o.c=cell?JSON.parse(JSON.stringify(cell)):null}   // 不馬上放掉，等同步回來的資料一樣才放
+const cellSig=c=>c?c.c+'|'+(+c.at)+'|'+((c.w||[]).length):'';
+function keepFarm(){const nw=Date.now();for(const hid in FARMP){const h=house(hid);if(!h||!h.farm)continue;for(const i in FARMP[hid]){const o=FARMP[hid][i];h.farm.p=h.farm.p||[];
+  if(o.done&&(cellSig(h.farm.p[i])===cellSig(o.c)||nw-o.done>120000)){delete FARMP[hid][i];continue}if(!o.done&&nw-o.t>120000){delete FARMP[hid][i];continue}h.farm.p[i]=o.c}}}
 function keepPending(){keepToys();keepShow();keepFarm();keepLists();keepReplies();keepDemon();keepWear();const nw=Date.now();for(const id in GONEPOOP)if(nw-GONEPOOP[id]>5*60e3)delete GONEPOOP[id];DB.houses.forEach(h=>{if(Array.isArray(h.poops))h.poops=h.poops.filter(x=>!GONEPOOP[x.id])});for(const id in GONEGIFT)if(nw-GONEGIFT[id]>5*60e3)delete GONEGIFT[id];DB.houses.forEach(h=>{if(Array.isArray(h.gifts)){h.gifts=h.gifts.filter(x=>!(GONEGIFT[x.id]&&!x.admin));h.gifts.forEach(x=>{if(x.admin&&GONEGIFT[x.id]&&DB.me)x.opened=[...new Set([...(Array.isArray(x.opened)?x.opened:[]),DB.me.id])]})}});const now=Date.now(),T=120000;
   DB.pets.forEach(p=>{const w=PEND.wake[p.id];if(w&&now-w.t<T&&!(+p.wakeUntil>=w.v))p.wakeUntil=w.v;const f=FED[p.id];if(f&&now-f.t<T&&!(+p.lastFed>=f.v)){p.lastFed=f.v;p.meals=f.m;p.mealDay=f.d}});
   for(const pid in PEND.walk){const w=PEND.walk[pid];if(now-w.t>T)continue;DB.houses.forEach(h=>{if(h.id!==w.hid)h.guests=(h.guests||[]).filter(g=>g.petId!==pid)});const h=house(w.hid);if(h&&!(h.guests||[]).some(g=>g.petId===pid))(h.guests=h.guests||[]).push(w.g)}
@@ -1436,6 +1438,7 @@ function claimMail(ml){const g=DB.game,ids=[];ml.forEach(m=>{ids.push(m.id);if(M
     if(msg.length)setTimeout(()=>openModal(`<div style="text-align:center"><div class="giftopen">👑</div><h3>島主送你禮物！</h3>${m.msg?`<p class="lead">「${esc(m.msg)}」</p>`:''}<p class="lead">${msg.join('、')}</p></div><div class="row2"><button data-close>謝謝島主 🎉</button></div>`),900)});
   save();updTix();api('claimMail',{playerId:DB.me.id,ids}).catch(()=>{})}
 let syncing=false,lastSig='';
+let T_OFF=0;const sNow=()=>Date.now()+T_OFF;   // v2.39：小島的時間（手機時間不準時，農田用這個算）
 // v2.32：線上時每 12 秒只問便利貼有沒有新的（不用等 45 秒的整島同步），有人留言、回覆就馬上跳通知
 let nwSince=0,nwBusy=false,nwOff=false;
 async function noteWatch(){if(!ONLINE||nwOff||nwBusy||document.visibilityState!=='visible'||!DB.me||!DB.synced)return;nwBusy=true;
@@ -1446,7 +1449,7 @@ async function noteWatch(){if(!ONLINE||nwOff||nwBusy||document.visibilityState!=
 setInterval(noteWatch,12000);
 async function sync(quiet){
   if(!ONLINE||syncing)return;syncing=true;
-  try{const d=await api('getState',Object.assign(cred(),{where:curWhere()}));
+  try{const t0=Date.now(),d=await api('getState',Object.assign(cred(),{where:curWhere()}));if(+d.now){const o=+d.now-(t0+Date.now())/2;T_OFF=Math.abs(o)<5000?0:o}
     Object.assign(DB,{houses:d.houses,pets:d.pets,weights:d.weights,medical:d.medical,expenses:d.expenses,notes:d.notes,feed:d.feed,famOk:d.famOk,players:d.players||[],tlogs:d.tlogs||[]});
     DB.houses.forEach(h=>{if(!Array.isArray(h.poops))h.poops=[]});
     keepPending();DB.letters=(d.letters||[]).filter(l=>!LGONE[l.id]).map(l=>Object.assign(l,LSTATE[l.id]||{},CLAIMED['l:'+l.id]?{claimed:true}:{}));DB.drops=(d.drops||[]).filter(x=>!PICKED.has(x.id));DB.notice=d.notice&&d.notice.t&&!(+d.notice.until&&Date.now()>+d.notice.until)?d.notice:null;DB.center=d.center||DB.center||null;DB.applies=d.applies||[];DB.rooms=d.rooms||DB.rooms||[];if(Array.isArray(d.bbx)){DB.bbx=d.bbx;bbRegister()}applyRooms();DB.amail=+d.amail||0;setTimeout(updAdminBadge,0);DB.kuji=d.kuji||DB.kuji||null;DB.online=d.online||[];setTimeout(checkAdminGifts,600);DB.rank=d.rank||DB.rank||null;osLogin();pushCheckLater();setTimeout(noticePop,1200);DB.dbl=d.dbl||'';DB.adminId=d.adminId||'';DB.star=d.star||null;DB.xmas=d.xmas||null;DB.trades=Array.isArray(d.trades)?d.trades:(DB.trades||[]);if(typeof xcSync==='function')setTimeout(xcSync,0);if(typeof bgmSync==='function')setTimeout(bgmSync,0);DB.jobs=d.jobs||null;DB.thief=d.thief||null;setTimeout(jobPayCheck,1500);if(d.player){DB.starDone=+d.player.starDone||0;DB.xmasDone=+d.player.xmasDone||0}   // v2.29：後端找不到玩家（無痕、資料被換掉）時不要整個卡住
@@ -1461,7 +1464,7 @@ async function sync(quiet){
     DB.gameSynced=true;DB.synced=true;DB.fromCache=false;syncFail=0;setTimeout(dailyLogin,800);try{localStorage.setItem(OKEY+'_g','1')}catch(e){}
     try{localStorage.setItem(OKEY+'_c',JSON.stringify({at:Date.now(),houses:d.houses,pets:d.pets,players:d.players||[],notes:d.notes,feed:d.feed,notice:DB.notice,center:DB.center,rooms:DB.rooms}))}catch(e){}
     const sig=JSON.stringify([d.houses,d.pets,DB.drops,d.online,d.notes,(d.feed||[])[0],DB.letters.length,DB.notice,DB.applies,d.kuji,d.star,d.jobs,Math.floor(Date.now()/600000)]);
-    save();if(sig!==lastSig){lastSig=sig;rerender()}else{tickerShow();updBell()}
+    save();if(sig!==lastSig){lastSig=sig;rerender()}else{tickerShow();updBell()}if($('#farmv')&&typeof renderFarm==='function')renderFarm();
   }catch(e){if(!quiet&&DB.synced)toast('連不上小島：'+e.message);
     if(!DB.synced&&++syncFail<=8){conBar(true);setTimeout(()=>sync(true),3000+syncFail*1500)}else if(!DB.synced){conBar(false);toast('連不上小島，網路好了會自動再試 🙏')}}
   finally{syncing=false;if(DB.synced)conBar(false)}
@@ -4381,7 +4384,7 @@ let FM=null,fmTick=0;
 function openFarm(hid){const h=house(hid);if(!hasFarm(h))return;sfx&&sfx('tap');
   const v=sceneOpen('farmv',esc(h.name),'🌱 農田・番茄 4 小時、其他 8 小時','assets/room_farm.webp','← 回家');FM={hid};renderFarm();
   clearInterval(fmTick);fmTick=setInterval(()=>{if(!$('#farmv'))return clearInterval(fmTick);renderFarm()},30000)}
-function renderFarm(){const v=$('#farmv');if(!v||!FM)return;const h=house(FM.hid),f=farmOf(h),st=v.querySelector('.cstage'),fam=isFamily(h.id),now=Date.now();
+function renderFarm(){const v=$('#farmv');if(!v||!FM)return;const h=house(FM.hid),f=farmOf(h),st=v.querySelector('.cstage'),fam=isFamily(h.id),now=sNow();
   st.querySelectorAll('.plot,.plab').forEach(x=>x.remove());
   PLOTS.forEach(([x,y],i)=>{const el=document.createElement('button');el.className='plot noic';const c=f.p[i],lock=i>=f.n;let crop='',lab='';
     if(lock)lab=fam?`🔒 加開 🪙${PLOT_COST}`:'🔒';
@@ -4396,9 +4399,9 @@ function renderFarm(){const v=$('#farmv');if(!v||!FM)return;const h=house(FM.hid
   $('#fmseed').onclick=()=>fam?shopSheet('seed'):toast('點有作物的田就能幫忙澆水，一格每小時可以澆一次');
   $('#fmsell').onclick=()=>fam?(house(SHOP_ID)?tradeSheet('sell','crop'):toast('毛二街還沒開')):farmHelp()}
 function farmHelp(){openModal(`<h3>🌱 農田怎麼玩</h3><p class="lead">種子在毛毛商店買。小番茄 4 小時成熟（澆 1 次水快 1 小時）；南瓜、金蘋果 8 小時成熟，每澆一次水快 1 小時，最多澆 3 次。每次澆水要隔 1 小時（朋友也可以幫忙澆）。<br>🍅 小番茄 +50・🎃 南瓜 +70・🍎 金蘋果 +60（還有機會多一個錢袋）<br>收成的作物可以拿去毛二街全價賣掉，或換成零食（打 8 折）。金蘋果有機會多長出一個錢袋！</p>
-  <table class="ftab"><tr><th>作物</th><th>種子</th><th>賣價</th></tr><tr><td>🍅 小番茄</td><td>🪙10</td><td>🪙20</td></tr><tr><td>🎃 南瓜</td><td>🪙30</td><td>🪙70</td></tr><tr><td>🍎 金蘋果</td><td>🪙80</td><td>🪙90（可能有錢袋）</td></tr></table>
+  <table class="ftab"><tr><th>作物</th><th>種子</th><th>賣價</th></tr><tr><td>🍅 小番茄</td><td>🪙30</td><td>🪙80</td></tr><tr><td>🎃 南瓜</td><td>🪙50</td><td>🪙120</td></tr><tr><td>🍎 金蘋果</td><td>🪙90</td><td>🪙150（可能有錢袋）</td></tr></table>
   <div class="row2"><button data-close class="primary">好</button></div>`)}
-async function plotTap(i){if(!needMe())return;const h=house(FM.hid),f=farmOf(h),fam=isFamily(h.id),c=f.p[i],now=Date.now();
+async function plotTap(i){if(!needMe())return;const h=house(FM.hid),f=farmOf(h),fam=isFamily(h.id),c=f.p[i],now=sNow();
   if(i>=f.n){if(!fam)return toast('這格還沒開放');const g=DB.game;
     return openModal(`<div style="text-align:center"><img src="assets/plot_lock.webp" alt="" style="width:110px"><h3>加開一格田？</h3><p class="lead">花 🪙${PLOT_COST} 多開一格（最多 ${FARM_MAX} 格）<br>我的金幣：🪙${g.coins||0}</p></div><div class="row2"><button data-close>取消</button><button class="primary" id="pbuy" ${(g.coins||0)>=PLOT_COST?'':'disabled'}>🪙 ${PLOT_COST} 開墾</button></div>`)||($('#pbuy').onclick=async()=>{
       try{const r=await call('farmBuyPlot',Object.assign(cred(),{houseId:h.id}));g.coins-=PLOT_COST;save();sfx('coin');updTix&&updTix();f.n=r.n;closeModal();renderFarm();toast('開墾好了 🌱')}catch(e){toast(e.message)}})}
@@ -4406,22 +4409,22 @@ async function plotTap(i){if(!needMe())return;const h=house(FM.hid),f=farmOf(h),
   if(now>=ripeAt(c)){if(!fam)return toast('成熟了！等主人來收成');
     // v1.82：先在畫面上收成（不用等小島），小島回來再補錢袋；失敗就放回去
     const old=c,P=PLOTS[i],st=$('#farmv .cstage');f.p[i]=null;farmPend(h.id,i,null);bagAdd(CROP[old.c].item,1);sfx('gift');renderFarm();scenePop(st,`${itemIcon(CROP[old.c].item)} +1`,P[0],P[1]-200);
-    try{const r=await call('farmHarvest',Object.assign(cred(),{houseId:h.id,i}),true);farmDone(h.id,i);
+    try{const r=await call('farmHarvest',Object.assign(cred(),{houseId:h.id,i}),true);farmDone(h.id,i,null);
       if(r.bag){grant(0,r.bag);setTimeout(()=>{scenePop(st,`<img src="assets/icon_moneyburst.webp" alt="" style="width:60px"> +${r.bag}`,P[0],P[1]-280);toast(`💰 金蘋果樹上還掛著一個錢袋：${r.bag} 金幣！`)},300)}
-      else toast(`收成了 ${CROP[old.c].n}！放進背包了`)}catch(e){farmDone(h.id,i);if(!/空的/.test(e.message)){farmOf(house(h.id)).p[i]=old;bagAdd(CROP[old.c].item,-1);renderFarm()}toast(e.message)}return}
+      else toast(`收成了 ${CROP[old.c].n}！放進背包了`)}catch(e){if(!/空的/.test(e.message)){farmDone(h.id,i,old);farmOf(house(h.id)).p[i]=old;bagAdd(CROP[old.c].item,-1);renderFarm()}else farmDone(h.id,i,null);toast(e.message)}return}
   const wn=(c.w||[]).length;if(wn>=cropWMax(c))return toast(`這格已經澆滿 ${cropWMax(c)} 次了，還要 ${fmLeft(ripeAt(c)-now)}`);
   if(now-lastW(c)<HOUR)return toast(`剛剛才澆過，${fmLeft(HOUR-(now-lastW(c)))}後可以再澆`);
   // v1.82：先在畫面上澆水，小島在背後確認；失敗才退回
   const old=JSON.parse(JSON.stringify(c)),P=PLOTS[i];c.w=(c.w||[]).concat({t:now,by:DB.me.id});farmPend(h.id,i,c);sfx('sweep');renderFarm();scenePop($('#farmv .cstage'),'<img src="assets/icon_water.webp" alt="" style="width:56px"> 快 1 小時！',P[0],P[1]-200);
-  try{const r=await call('farmWater',{playerId:DB.me.id,houseId:h.id,i},true);farmDone(h.id,i);farmOf(house(h.id)).p[i]=r;if(!fam)earn('water');renderFarm();
-    if(!fam&&ONLINE)feedPush(`${DB.me.nick} 幫「${h.name}」的田澆水 💧`)}catch(e){farmDone(h.id,i);farmOf(house(h.id)).p[i]=old;renderFarm();toast(e.message)}}
+  try{const r=await call('farmWater',{playerId:DB.me.id,houseId:h.id,i},true);farmDone(h.id,i,r);farmOf(house(h.id)).p[i]=r;if(!fam)earn('water');renderFarm();
+    if(!fam&&ONLINE)feedPush(`${DB.me.nick} 幫「${h.name}」的田澆水 💧`)}catch(e){farmDone(h.id,i,old);farmOf(house(h.id)).p[i]=old;renderFarm();toast(e.message)}}
 function seedPick(i){const g=DB.game;
   openModal(`<h3>🌱 要種什麼？</h3><div class="shopgrid">${Object.entries(CROP).map(([k,c])=>{const s=ITEMS[c.seed],n=bag()[c.seed]||0;return `<div class="si">${itemIcon(c.seed,'big')}<div class="sn">${c.n}</div><div class="sf">賣 🪙${ITEMS[c.item].price}${k==='apple'?'・可能有錢袋':''}</div>
     ${n?`<button data-pl="${k}">種下（有 ${n}）</button>`:`<button data-pb="${k}" ${(g.coins||0)>=s.price?'':'disabled'}>🪙${s.price} 買來種</button>`}</div>`}).join('')}</div>
     <div class="hint">小番茄 4 小時、南瓜和金蘋果 8 小時成熟，澆水可以更快</div><div class="row2"><button data-close>取消</button></div>`);
   // v1.82：先種下去（畫面馬上看到），小島在背後確認；失敗才把種子還你
   const plant=async k=>{const h=house(FM.hid),f=farmOf(h);if(f.p[i])return;f.p[i]={c:k,at:Date.now(),w:[]};farmPend(h.id,i,f.p[i]);bagAdd(CROP[k].seed,-1);closeModal();sfx('pat');renderFarm();toast(`種下${CROP[k].n}了 🌱`);
-    try{const r=await call('farmPlant',Object.assign(cred(),{houseId:h.id,i,c:k}),true);farmDone(h.id,i);farmOf(house(h.id)).p[i]=r;renderFarm()}catch(e){farmDone(h.id,i);if(!/已經種/.test(e.message)){farmOf(house(h.id)).p[i]=null;bagAdd(CROP[k].seed,1);renderFarm()}toast(e.message)}};
+    try{const r=await call('farmPlant',Object.assign(cred(),{houseId:h.id,i,c:k}),true);farmDone(h.id,i,r);farmOf(house(h.id)).p[i]=r;renderFarm()}catch(e){if(!/已經種/.test(e.message)){farmDone(h.id,i,null);farmOf(house(h.id)).p[i]=null;bagAdd(CROP[k].seed,1);renderFarm()}else{const o=FARMP[h.id];if(o)delete o[i];sync(true)}toast(e.message)}};
   $('#sheet').querySelectorAll('[data-pl]').forEach(b=>b.onclick=()=>plant(b.dataset.pl));
   $('#sheet').querySelectorAll('[data-pb]').forEach(b=>b.onclick=()=>{const s=ITEMS[CROP[b.dataset.pb].seed];if((g.coins||0)<s.price)return;g.coins-=s.price;sfx('coin');bagAdd(CROP[b.dataset.pb].seed,1);updTix&&updTix();plant(b.dataset.pb)})}
 // 毛二街：作物全價賣掉，或換零食（零食打 8 折，剩下的零頭換成金幣）
@@ -6098,7 +6101,7 @@ function announceLetters(){if(!DB.me)return;let seen=[];try{seen=JSON.parse(loca
     sfx('gift');$('#lgopen').onclick=()=>openLetter(nw[0].id,()=>$('#bell').click())};
   setTimeout(go,1800)}
 // ================= 自動更新：發現新版本就重新載入 =================
-const APP_VER='v2.38';
+const APP_VER='v2.39';
 function checkUpdate(){
   if(!/^https?:/.test(location.protocol)||!API_URL)return;
   if(!$('#modal').classList.contains('hidden'))return; // 正在填表單時不打斷
