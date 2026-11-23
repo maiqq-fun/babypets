@@ -1183,6 +1183,8 @@ img{-webkit-user-drag:none}
 .arcbig{margin-top:14px;border:0;border-radius:22px;padding:14px 42px;font-size:20px;font-weight:900;background:linear-gradient(#ff8fb1,#ff5f8f);color:#fff;box-shadow:0 5px 0 #c23f6a}
 .arcbig:active{transform:translateY(3px);box-shadow:0 2px 0 #c23f6a}
 .arcbig:disabled{opacity:.5}
+body:has(.arcov) .modal{z-index:100000}   /* v2.36：遊戲畫面裡買代幣，視窗要在最上面 */
+.arcov .ah .apill .abuy{margin-left:6px;padding:3px 9px;border-radius:999px;font-size:12px}
 .arccv{position:relative;width:min(92vw,400px,calc(64vh * var(--a)));aspect-ratio:var(--a);margin-top:6px;border-radius:24px;padding:8px;background:linear-gradient(#ff9ec0,#f2709c);box-shadow:0 8px 0 #b84a74,0 12px 24px rgba(0,0,0,.35)}
 .arccv canvas{display:block;width:100%;height:100%;border-radius:18px;touch-action:none}
 .arccv .pshwin{top:40%}.pshwin.big{font-size:clamp(26px,9vw,40px)}
@@ -4935,7 +4937,7 @@ function renderArcade(){const v=$('#arcv');if(!v)return;const st=v.querySelector
   $('#arctok').onclick=$('#arcbuy').onclick=arcBuy;$('#arctkt').onclick=arcPrize;$('#arcrk').onclick=arcRank;jobScene(st,'arcade',v.querySelector('.cbtns'))}
 function arcBuy(){const g=DB.game,a=arcG();openModal(`<h3>${tokIcon} 買代幣</h3><p class="lead">你有 🪙${g.coins||0}・代幣 ${a.tok} 枚<br>娃娃機 3 枚、打地鼠和推幣機 1 枚</p>
   <div class="xcpl">${TOK_P.map(([n,c],i)=>`<button data-tk="${i}">${tokIcon} 代幣 ×${n}<small style="color:var(--soft)">　🪙${c}${n*10>c?`（省 ${n*10-c}）`:''}</small></button>`).join('')}</div><div class="row2"><button data-close>關閉</button></div>`);
-  $('#sheet').querySelectorAll('[data-tk]').forEach(b=>b.onclick=()=>{const [n,c]=TOK_P[+b.dataset.tk];if((g.coins||0)<c)return toast(`金幣不夠，要 🪙${c}`);g.coins-=c;a.tok+=n;save();updTix&&updTix();sfx('coin');toast(`買了 ${n} 枚代幣！`);renderArcade();arcBuy()})}
+  $('#sheet').querySelectorAll('[data-tk]').forEach(b=>b.onclick=()=>{const [n,c]=TOK_P[+b.dataset.tk];if((g.coins||0)<c)return toast(`金幣不夠，要 🪙${c}`);g.coins-=c;a.tok+=n;save();updTix&&updTix();sfx('coin');toast(`買了 ${n} 枚代幣！`);renderArcade();document.querySelectorAll('.arcov .atk').forEach(e=>e.textContent=a.tok);if(document.querySelector('.arcov'))closeModal();else arcBuy()})}
 function arcPay(n){n=n||1;const a=arcG();if(a.tok<n){arcBuy();toast(`代幣不夠，要 ${n} 枚`);return false}a.tok-=n;save();renderArcade();return true}
 function arcPrize(){const a=arcG(),g=DB.game;openModal(`<h3>🎟️ 獎品櫃台</h3><p class="lead">你有 🎟️ ${a.tkt} 張票券<br>打地鼠每 5 分 1 張、娃娃機沒夾到 1 張</p>
   <div class="xcpl">${ARC_PRIZE.map((x,i)=>`<button data-pz="${i}" ${a.tkt<x.t?'disabled':''}>${x.k==='tok'?tokIcon+' ':''}${x.n}<small style="color:var(--soft)">　🎟️ ${x.t}</small></button>`).join('')}</div><div class="row2"><button data-close>關閉</button></div>`);
@@ -4943,8 +4945,8 @@ function arcPrize(){const a=arcG(),g=DB.game;openModal(`<h3>🎟️ 獎品櫃台
     if(x.k==='tok'){a.tok++;toast('換到 1 枚代幣！')}else if(x.k==='coin'){grant(0,40);toast('換到 🪙40！')}else{const P=arcPool(),id=P[Math.floor(Math.random()*P.length)];bagAdd(id,1);toast(`換到「${xcName(id)}」！放進背包了`)}
     save();sfx('gift');renderArcade();arcPrize()})}
 function arcOv(title,a){const ov=document.createElement('div');ov.className='arcov';const A=arcG();
-  ov.innerHTML=`<div class="ah"><button class="x">← 離開</button><b>${title}</b><span class="apill"><img src="assets/token.webp?v=3" alt=""><b class="atk">${A.tok}</b>　🎟️ <b class="att">${A.tkt}</b></span></div>`;
-  document.body.appendChild(ov);ov.querySelector('.x').onclick=()=>{ov.remove();renderArcade()};const upd=()=>{ov.querySelector('.atk').textContent=arcG().tok;ov.querySelector('.att').textContent=arcG().tkt};return {ov,upd}}
+  ov.innerHTML=`<div class="ah"><button class="x">← 離開</button><b>${title}</b><span class="apill"><img src="assets/token.webp?v=3" alt=""><b class="atk">${A.tok}</b>　🎟️ <b class="att">${A.tkt}</b><button class="abuy">＋買</button></span></div>`;
+  document.body.appendChild(ov);ov.querySelector('.x').onclick=()=>{ov.remove();renderArcade()};ov.querySelector('.abuy').onclick=arcBuy;const upd=()=>{ov.querySelector('.atk').textContent=arcG().tok;ov.querySelector('.att').textContent=arcG().tkt};return {ov,upd}}
 // ---------- 🧸 娃娃機 ----------
 // ================= v2.36 玩個毛：娃娃機、推幣機改成真的物理（自己操作、自己瞄準）=================
 // 共用：畫布機台（邏輯大小 W×H，依螢幕縮放；圖片先載好）
