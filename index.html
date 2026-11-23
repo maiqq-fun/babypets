@@ -229,7 +229,8 @@ b.dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:#ff
 .tabs3 button{flex:1;border:0;background:none;border-radius:11px;padding:8px 2px;font-size:13px;color:var(--soft)}
 .tabs3 button.on{background:#fff;color:var(--ink);box-shadow:0 2px 0 var(--line)}
 .shopgrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
-.si{background:#fff;border:2px solid var(--line);border-radius:14px;padding:8px 4px;display:flex;flex-direction:column;align-items:center;gap:2px;min-width:0}
+.si{background:#fff;border:2px solid var(--line);border-radius:14px;padding:8px 4px;display:flex;flex-direction:column;align-items:center;gap:2px;min-width:0;position:relative}
+.fmk{position:absolute;top:3px;right:3px;width:30px;height:30px;z-index:3;cursor:pointer;background:url(assets/fx_star.webp) center/70% no-repeat;filter:grayscale(1) opacity(.28)}.fmk.on{filter:drop-shadow(0 1px 2px rgba(200,140,0,.5));background-size:88%}.xcgrid button{position:relative}
 .si.pick{cursor:pointer}.si.on{border-color:var(--accent);background:#fff0e8}
 .si .sn{font-size:13px}.si .sf{font-size:10px;color:#a08670;min-height:14px;text-align:center}
 .si button{border:0;background:#f0b429;color:#fff;border-radius:10px;padding:4px 10px;font-size:13px;margin-top:2px}
@@ -3298,6 +3299,9 @@ async function loadCatalog(ver){if(catLoading||!ONLINE)return;catLoading=true;tr
 function itemIcon(id,cls){const it=ITEMS[id]||{emo:'❓'};return `<span class="ii ${cls||''}"><img src="${it.img||`assets/item_${id}.webp`}" alt="" onerror="this.remove()"><b>${it.emo||''}</b></span>`}
 const bag=()=>DB.game.bag||(DB.game.bag={});
 function bagAdd(id,n){const b=bag();b[id]=(b[id]||0)+n;if(b[id]<=0)delete b[id];save()}
+// v2.53：公仔格子右上角的星星記號（玩家自己用：重複、不能賣……），存在 DB.game.mk
+const figMk=id=>!!(DB.game&&DB.game.mk&&DB.game.mk[id]),mkBtn=id=>ITEMS[id]&&ITEMS[id].kind==='fig'?`<i class="fmk${figMk(id)?' on':''}" data-fmk="${id}" role="button" aria-label="做記號"></i>`:'';
+document.addEventListener('click',e=>{const t=e.target.closest&&e.target.closest('[data-fmk]');if(!t)return;e.preventDefault();e.stopPropagation();const g=DB.game;g.mk=g.mk&&typeof g.mk==='object'?g.mk:{};const id=t.dataset.fmk;if(g.mk[id])delete g.mk[id];else g.mk[id]=1;save();document.querySelectorAll(`[data-fmk="${id}"]`).forEach(x=>x.classList.toggle('on',!!g.mk[id]));sfx&&sfx('tap')},true);
 const bagList=kind=>Object.entries(bag()).filter(([id,n])=>n>0&&ITEMS[id]&&(!kind||ITEMS[id].kind===kind));
 function treatsToday(p){return p.treatDay===todayTW()?(+p.treatN||0):0}
 // ---------- 商店 ----------
@@ -3314,7 +3318,7 @@ function shopSheet(tab){
       <button data-buy="${id}" ${coins>=it.price?'':'disabled'}>🪙 ${it.price}</button><small>${bag()[id]?`背包裡有 ${bag()[id]}`:''}</small></div>`).join('')}</div>
       <div class="hint">${shopTab==='seed'?'種子要種在農田裡（在島民中心申請擴建農田），小番茄 4 小時、南瓜和金蘋果 8 小時成熟，收成拿去毛二街賣':shopTab==='treat'?`零食可以去任何人家餵毛孩，每隻毛孩一天最多吃 ${TREAT_MAX} 個；也可以包成禮物送人`:'玩具可以擺在自己家，也可以送給朋友，會放在他們家的地上'}</div>`}
   if(shopTab==='kuji')body=kujiBody(coins);
-  if(shopTab==='bag'){const L=bagList(),SB=starEv()&&starG().n&&!starDone()?`<div class="sbbag"><img src="assets/sb_happy.webp" alt=""><div><b>⭐ 星寶 × ${starG().n}</b><small>毛球的好朋友，不能送也不能賣・集滿 ${STAR_GOAL} 次去找毛球</small></div></div>`:'';body=SB+(L.length?`<div class="shopgrid">${L.map(([id,n])=>`<div class="si">${itemIcon(id,'big')}<div class="sn">${ITEMS[id].name}</div><div class="sf">× ${n}</div></div>`).join('')}</div><div class="hint">零食：在別人家點毛孩 →「🍤 零食」。玩具：自己家點「🧸 玩具」擺出來，或在朋友家點「🎁 送禮」</div>`:(SB?'':'<div class="locked">背包是空的，買點東西吧</div>'))}
+  if(shopTab==='bag'){const L=bagList(),SB=starEv()&&starG().n&&!starDone()?`<div class="sbbag"><img src="assets/sb_happy.webp" alt=""><div><b>⭐ 星寶 × ${starG().n}</b><small>毛球的好朋友，不能送也不能賣・集滿 ${STAR_GOAL} 次去找毛球</small></div></div>`:'';body=SB+(L.length?`<div class="shopgrid">${L.map(([id,n])=>`<div class="si">${mkBtn(id)}${itemIcon(id,'big')}<div class="sn">${ITEMS[id].name}</div><div class="sf">× ${n}</div></div>`).join('')}</div><div class="hint">零食：在別人家點毛孩 →「🍤 零食」。玩具：自己家點「🧸 玩具」擺出來，或在朋友家點「🎁 送禮」</div>`:(SB?'':'<div class="locked">背包是空的，買點東西吧</div>'))}
   openModal(`<h3>🏪 毛毛商店</h3><p class="lead">我的金幣：<b class="coinv">🪙 ${coins}</b></p>
     <div class="tabs3 tabs6">${tabs.map(([k,ic,n])=>`<button data-tab="${k}" class="${k===shopTab?'on':''}"><span class="tbi">${ic}</span><span class="tbn">${n}</span></button>`).join('')}</div>${body}
     <div class="row2" style="margin-top:12px"><button data-close>關閉</button></div>`);
@@ -3402,7 +3406,7 @@ function treatPicker(r,p){
   if(!needMe())return;const L=bagList('treat');
   if(treatsToday(p)>=TREAT_MAX)return toast(`${p.name} 今天已經吃了 ${TREAT_MAX} 個零食，不能再吃了～`);
   openModal(`<h3>🍤 給 ${esc(p.name)} 零食</h3><p class="lead">今天還能吃 ${TREAT_MAX-treatsToday(p)} 個・${esc(p.species)}最愛：${Object.values(ITEMS).filter(i=>i.fav&&i.fav.includes(p.species)).map(i=>i.emo+i.name).join('、')||'都愛'}</p>
-    ${L.length?`<div class="shopgrid">${L.map(([id,n])=>`<button class="si pick" data-t="${id}">${itemIcon(id,'big')}<div class="sn">${ITEMS[id].name}</div><div class="sf">× ${n}</div></button>`).join('')}</div>`:'<div class="locked">背包裡沒有零食</div>'}
+    ${L.length?`<div class="shopgrid">${L.map(([id,n])=>`<button class="si pick" data-t="${id}">${mkBtn(id)}${itemIcon(id,'big')}<div class="sn">${ITEMS[id].name}</div><div class="sf">× ${n}</div></button>`).join('')}</div>`:'<div class="locked">背包裡沒有零食</div>'}
     <div class="row2" style="margin-top:12px"><button data-close>取消</button><button id="goshop">🏪 去商店買</button></div>`);
   $('#goshop').onclick=()=>shopSheet('treat');
   $('#sheet').querySelectorAll('[data-t]').forEach(b=>b.onclick=()=>{
@@ -4468,10 +4472,10 @@ const SHOW_ROOMS={basic:{n:'溫馨木地板',p:0,f:1040},lilac:{n:'薰衣草',p:
 const SHOW_CABS={
   wood:{n:'木頭腳掌',p:300,a:800/1153,x:[9,91],y:[30.5,48.5,64,81.5]},
   plain:{n:'簡約原木',p:600,a:420/513,x:[9,91],y:[30,46.5,63,80]},
-  butter:{n:'奶油黃',p:600,a:482/542,x:[11,89],y:[34.5,50,65.5,84]},
-  sky:{n:'天空藍',p:600,a:482/542,x:[11,89],y:[34.5,50,65.5,84]},
-  peach:{n:'蜜桃粉',p:600,a:483/553,x:[11,89],y:[33.5,49.5,65,83]},
-  lilac:{n:'薰衣草紫',p:600,a:483/553,x:[11,89],y:[33.5,49.5,65,83]},
+  butter:{n:'奶油黃',p:600,a:482/542,x:[11,89],y:[37.5,53,68.5,86]},
+  sky:{n:'天空藍',p:600,a:482/542,x:[11,89],y:[37.5,53,68.5,86]},
+  peach:{n:'蜜桃粉',p:600,a:483/553,x:[11,89],y:[38,53.5,69.5,86]},
+  lilac:{n:'薰衣草紫',p:600,a:483/553,x:[11,89],y:[38,53.5,69.5,86]},
   steel:{n:'不鏽鋼',p:1000,a:440/515,x:[10,90],y:[31,48,66,84]},
   cat:{n:'貓咪薄荷',p:1000,a:485/543,x:[14,86],y:[33,47.5,62.5,77.5]},
   princess:{n:'公主蝴蝶結',p:1000,a:446/551,x:[12,88],y:[34,50,65,80]},
@@ -4581,7 +4585,7 @@ function showClose(p,sel){if(p>=3&&p<6)return wallClose(p,sel);const h=house(SHV
 function showToyPick(p,i){const L=bagList('fig').concat(bagList('toy'));
   if(!L.length)return openModal(`<div style="text-align:center"><h3>背包裡沒有玩具</h3><p class="lead">去毛二街抽盲盒、去商店買玩具，或把家裡地上的玩具收回背包，就能擺進展示櫃了</p></div><div class="row2"><button id="shbk">← 回去</button></div>`),$('#shbk').onclick=()=>showClose(p,i);
   // v2.28：分成公仔、玩具兩區（原本混在一起，公仔一多玩具就被擠到最下面）
-  const F=bagList('fig'),T=bagList('toy'),grid=A=>`<div class="shopgrid">${A.map(([id,n])=>`<button class="si pick" data-t="${id}">${itemIcon(id,'big')}<div class="sn">${esc((ITEMS[id]||{}).name||id)}</div><div class="sf">×${n}</div></button>`).join('')}</div>`;
+  const F=bagList('fig'),T=bagList('toy'),grid=A=>`<div class="shopgrid">${A.map(([id,n])=>`<button class="si pick" data-t="${id}">${mkBtn(id)}${itemIcon(id,'big')}<div class="sn">${esc((ITEMS[id]||{}).name||id)}</div><div class="sf">×${n}</div></button>`).join('')}</div>`;
   openModal(`<h3>放什麼進櫃子？</h3>${T.length?`<div class="dcsec">🧸 玩具（${T.length} 種）</div>${grid(T)}`:'<div class="dcsec">🧸 玩具</div><p class="lead" style="font-size:12px">背包裡沒有玩具・擺在家裡地上的要先「收回背包」才能放進櫃子</p>'}${F.length?`<div class="dcsec">🎁 公仔（${F.length} 種）</div>${grid(F)}`:''}<div class="row2"><button id="shbk">← 回去</button></div>`);
   $('#shbk').onclick=()=>showClose(p,i);
   $('#sheet').querySelectorAll('[data-t]').forEach(b=>b.onclick=()=>{const id=b.dataset.t;if(!(bag()[id]>0))return;
@@ -4806,7 +4810,7 @@ function xcPickWant(pid){const p=(DB.players||[]).find(x=>x.id===pid);if(!p)retu
 function xcPickGive(pid,want){const p=(DB.players||[]).find(x=>x.id===pid);if(!p)return;const L=bagList('fig').filter(([id])=>XC_RE.test(id));
   if(!L.length)return openModal(`<div style="text-align:center"><h3>背包裡沒有可以換的公仔</h3><p class="lead">去毛二街抽盲盒，或把展示櫃裡的公仔收回背包，就能拿來換了</p></div><div class="row2"><button data-close class="primary">好</button></div>`);
   openModal(`<h3>🔄 用哪一隻跟 ${esc(p.nick)} 換「${esc(xcName(want))}」？</h3><p class="lead" style="font-size:12px">只能用背包裡的公仔換・送出後這隻先交給島上保管，對方沒答應就會退回</p>
-    <div class="xcgrid">${L.map(([id,n])=>{const th=xcCnt(p,id).t;return `<button data-g="${id}"><img src="${xcImg(id)}" alt="">${esc(xcName(id))}<i>×${n}</i><small style="display:block;font-size:11px;color:var(--soft)">${th?`他有 ×${th}`:'<b style="color:#3d9a5b">他還沒有</b>'}</small></button>`}).join('')}</div><div class="row2"><button id="xcb">← 回去</button></div>`);
+    <div class="xcgrid">${L.map(([id,n])=>{const th=xcCnt(p,id).t;return `<button data-g="${id}">${mkBtn(id)}<img src="${xcImg(id)}" alt="">${esc(xcName(id))}<i>×${n}</i><small style="display:block;font-size:11px;color:var(--soft)">${th?`他有 ×${th}`:'<b style="color:#3d9a5b">他還沒有</b>'}</small></button>`}).join('')}</div><div class="row2"><button id="xcb">← 回去</button></div>`);
   $('#xcb').onclick=()=>xcPickWant(pid);
   $('#sheet').querySelectorAll('[data-g]').forEach(b=>b.onclick=()=>{const give=b.dataset.g;
     openModal(`<h3>確定要提出交換嗎？</h3><div class="xcrow"><div class="xcfig"><img src="${xcImg(give)}" alt="">你給<br><b>${esc(xcName(give))}</b></div><div class="xcarr">⇄</div><div class="xcfig"><img src="${xcImg(want)}" alt="">你要<br><b>${esc(xcName(want))}</b></div></div>
@@ -6201,7 +6205,7 @@ function announceLetters(){if(!DB.me)return;let seen=[];try{seen=JSON.parse(loca
     sfx('gift');$('#lgopen').onclick=()=>openLetter(nw[0].id,()=>$('#bell').click())};
   setTimeout(go,1800)}
 // ================= 自動更新：發現新版本就重新載入 =================
-const APP_VER='v2.52';
+const APP_VER='v2.53';
 function checkUpdate(){
   if(!/^https?:/.test(location.protocol)||!API_URL)return;
   if(!$('#modal').classList.contains('hidden'))return; // 正在填表單時不打斷
