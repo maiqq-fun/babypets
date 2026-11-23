@@ -4408,8 +4408,8 @@ const clone=o=>JSON.parse(JSON.stringify(o==null?null:o));
 function showNorm(s){s=s&&typeof s==='object'?s:{};const okR=r=>!!(SHOW_ROOMS[r]||shCustom().some(x=>x.id===r));if(!okR(s.room))s.room='basic';s.rooms=Array.isArray(s.rooms)?s.rooms.filter(okR):[];if(s.rooms.indexOf('basic')<0)s.rooms.unshift('basic');
   s.cabs=s.cabs&&typeof s.cabs==='object'&&!Array.isArray(s.cabs)?s.cabs:{};s.pos=Array.isArray(s.pos)?s.pos.slice(0,SHOW_POS):[];while(s.pos.length<SHOW_POS)s.pos.push('');s.pos=s.pos.map(c=>SHOW_CABS[c]?c:'');
   s.it=Array.isArray(s.it)?s.it.slice(0,SHOW_IT):[];while(s.it.length<SHOW_IT)s.it.push([]);s.it=s.it.map(a=>{a=Array.isArray(a)?a.slice(0,SHOW_N):[];while(a.length<SHOW_N)a.push('');return a.map(x=>x||'')});
-  s.wo=s.wo&&typeof s.wo==='object'&&!Array.isArray(s.wo)?s.wo:{};const two=(a,D)=>{a=Array.isArray(a)?a.slice(0,2):[];while(a.length<2)a.push('');return a.map(x=>D[x]?x:'')};
-  s.wsh=two(s.wsh,WSH);s.wcb=WCB[s.wcb]?s.wcb:'';s.wfr=two(s.wfr,WFR);s.wfp=Array.isArray(s.wfp)?s.wfp.slice(0,2).map(x=>String(x||'')):['',''];while(s.wfp.length<2)s.wfp.push('');
+  s.wo=s.wo&&typeof s.wo==='object'&&!Array.isArray(s.wo)?s.wo:{};const two=(a,D,n)=>{n=n||2;a=Array.isArray(a)?a.slice(0,n):[];while(a.length<n)a.push('');return a.map(x=>D[x]?x:'')};
+  s.wsh=two(s.wsh,WSH);s.wcb=WCB[s.wcb]?s.wcb:'';s.wfr=two(s.wfr,WFR,4);s.wfp=Array.isArray(s.wfp)?s.wfp.slice(0,4).map(x=>String(x||'')):[];while(s.wfp.length<4)s.wfp.push('');while(s.wfp.length<2)s.wfp.push('');
   s.neon=s.neon&&typeof s.neon==='object'&&s.neon.t?{t:String(s.neon.t).slice(0,12),c:NEON_C[s.neon.c]?s.neon.c:'pink'}:null;s.hon=Array.isArray(s.hon)?s.hon.slice(0,30):[];return s}
 const wallCap=(s,p)=>p>=6?(s.pos[p-3]?SHOW_N:0):p<3?(s.pos[p]?SHOW_N:0):p<5?(s.wsh[p-3]?5:0):(s.wcb?WCB[s.wcb].y.length*3:0);
 const wFree=(s,k,id,exRow)=>(+s.wo[k+':'+id]||0)-(k==='sh'?s.wsh:k==='fr'?s.wfr:[s.wcb]).filter((x,r)=>x===id&&r!==exRow).length;
@@ -4435,8 +4435,8 @@ function showOp(s,{op,id,pos,i,item}){s=showNorm(s);pos=+pos;i=+i;
       if(wFree(s,'sh',id,row)<=0)throw new Error('這款層板都掛出去了');if(s.wcb){if(busy(5))throw new Error('壁櫃裡還有東西，先收回背包才能換成層板');s.wcb=''}s.wsh[row]=id}
     else if(kind==='cb'){if(!id){if(busy(5))throw new Error('壁櫃裡還有東西，先收回背包');s.wcb='';return s}if(wFree(s,'cb',id,0)<=0)throw new Error('你還沒有這款壁櫃');
       if(busy(3)||busy(4))throw new Error('層板上還有東西，先收回背包才能換成壁櫃');if(s.wcb!==id&&busy(5))throw new Error('壁櫃裡還有東西，先收回背包');s.wsh=['',''];s.wcb=id}
-    else{if(!(row===0||row===1))throw new Error('沒有這個位置');if(id&&wFree(s,'fr',id,row)<=0)throw new Error('這款相框都掛出去了');s.wfr[row]=id;if(!id)s.wfp[row]=''}}
-  else if(op==='frPet'){if(!(row===0||row===1)||!s.wfr[row])throw new Error('這裡還沒有相框');s.wfp[row]=String(arguments[1].pet||'').slice(0,40)}
+    else{if(!(row>=0&&row<4))throw new Error('沒有這個位置');if(id&&wFree(s,'fr',id,row)<=0)throw new Error('這款相框都掛出去了');s.wfr[row]=id;if(!id)s.wfp[row]=''}}
+  else if(op==='frPet'){if(!(row>=0&&row<4)||!s.wfr[row])throw new Error('這裡還沒有相框');s.wfp[row]=String(arguments[1].pet||'').slice(0,40)}
   else if(op==='neon'){const t=String(arguments[1].t||'').trim().slice(0,12),c=String(arguments[1].c||'');if(!t)throw new Error('招牌要寫字');if(!NEON_C[c])throw new Error('沒有這個顏色');s.neon={t,c}}
   else if(op==='honor'){}
   else throw new Error('不知道要做什麼');return s}
@@ -4746,7 +4746,7 @@ function xcFromShow(hid,id){const h=house(hid),it=ITEMS[id]||{};const M=(DB.play
     $('#sheet').querySelectorAll('[data-xm]').forEach(b=>b.onclick=()=>xcPickGive(b.dataset.xm,id))}}
 
 // ================= 🧱 展示間牆面（v2.07）=================
-const WL={neonY:20,shY:[34.5,47.5],shW:40,cbB:53,cbW:36,frX:[19.5,19.5],frY:[27.5,43.5],frW:21,bdX:[78.5,88.5],bdY:[27,36,45],bdW:9};   // v2.26：牆上的東西放大約 1.25 倍   // 手機上舞台左右會被裁掉約 7%，兩側的東西往內靠
+const WL={neonY:20,shY:[34.5,47.5],shW:40,cbB:53,cbW:36,frX:[19.5,19.5,80.5,80.5],frY:[27.5,43.5,27.5,43.5],frW:21,bdX:[78.5,88.5],bdY:[27,36,45],bdW:9};   // v2.26：牆上的東西放大約 1.25 倍   // 手機上舞台左右會被裁掉約 7%，兩側的東西往內靠
 const stagePct=(w,a)=>w*(RW/RH)/a;   // 寬 w% 的圖，在舞台上是幾 % 高
 const HON_N=k=>{const m=/^set:(\d+)$/.exec(k);if(m){const S=bbSer(+m[1]);return `集滿「${S?S.n:'盲盒'}」全系列`}return {hid:'抽到過隱藏版',star:'幫毛球找回星寶',xmas:'幫豆豆送完聖誕禮物',lv20:'Lv.20 資深島民',lv40:'Lv.40 傳奇島民',trade:'完成過公仔交換'}[k]||k};
 const HON_IN=k=>{const m=/^set:(\d+)$/.exec(k);if(m)return `<img src="${bbBox(+m[1])}" alt="">`;return {hid:'<img src="assets/fx_star.webp" alt="">',star:'<img src="assets/sb_happy.webp" alt="">',xmas:'<img src="assets/xm_icon.webp" alt="">',lv20:'20',lv40:'40',trade:'🔄'}[k]||'🏅'};
@@ -4766,16 +4766,18 @@ function renderWall(st,s,fam){const add=(el,css,fn)=>{Object.assign(el.style,css
     if(!any)ghost('＋ 層板<br>或壁櫃',50,(WL.shY[0]+WL.shY[1])/2-3,WL.shW,16,()=>{const has=k=>Object.keys(k==='sh'?WSH:WCB).some(id=>(+s.wo[k+':'+id]||0)>0);has('sh')?wallPick('sh',0):has('cb')?wallPick('cb',0):decoShop('wall')});   // v2.25：收起來的層板要拿得出來
     else [0,1].forEach(r=>{if(!s.wsh[r])ghost('＋ 層板',50,WL.shY[r]-3,WL.shW*.7,5,()=>wallPick('sh',r))})}
   // 📷 相框
-  [0,1].forEach(r=>{const k=s.wfr[r],cy=WL.frY[r],fx=WL.frX[r];if(!k)return ghost('＋<br>相框',fx,cy,WL.frW*.7,10,()=>wallPick('fr',r));
-    const F=WFR[k],h=stagePct(WL.frW,F.a),el=document.createElement('button');el.className='shframe';const ho=F.h||[15,15,85,85],pt=wallPhoto(s.wfp[r]);
+  [0,1,2,3].forEach(r=>{const k=s.wfr[r],cy=WL.frY[r],fx=WL.frX[r];if(!k)return ghost('＋<br>相框',fx,cy,WL.frW*.7,10,()=>wallPick('fr',r));
+    const F=WFR[k],h=stagePct(WL.frW,F.a),el=document.createElement('button');el.className='shframe';const ho=F.h||[15,15,85,85],pt=wallPhoto(s.wfp[r],r,s);
     el.innerHTML=`${pt?`<img class="ph" src="${pt}" alt="" style="left:${ho[0]}%;top:${ho[1]}%;width:${ho[2]-ho[0]}%;height:${ho[3]-ho[1]}%">`:`<span class="ph" style="left:${ho[0]}%;top:${ho[1]}%;width:${ho[2]-ho[0]}%;height:${ho[3]-ho[1]}%">🐾</span>`}<img class="fimg" src="assets/wfr_${k}.webp" alt="">`;
     add(el,{left:(fx-WL.frW/2)+'%',top:(cy-h/2)+'%',width:WL.frW+'%',zIndex:4},()=>frameMenu(r))});
-  // 🏆 榮譽牆
-  const B=s.hon.slice(0,6),bh=stagePct(WL.bdW,WBADGE.a),ho=WBADGE.h;
+  // 🏆 榮譽牆：v2.34 右半邊改成相框，徽章改看下方的「🏆 榮譽牆」按鈕
+  const B=[].slice(0,6),bh=stagePct(WL.bdW,WBADGE.a),ho=WBADGE.h;
   B.forEach((k,i)=>{const el=document.createElement('button');el.className='shbadge';el.innerHTML=`<span class="bin" style="left:${ho[0]}%;top:${ho[1]}%;width:${ho[2]-ho[0]}%;height:${ho[3]-ho[1]}%">${HON_IN(k)}</span><img src="assets/wbadge.webp" alt="">`;
     add(el,{left:(WL.bdX[i%2]-WL.bdW/2)+'%',top:(WL.bdY[Math.floor(i/2)]-bh/2)+'%',width:WL.bdW+'%',zIndex:4},()=>honorSheet(s))});
-  if(!B.length&&fam)ghost('🏆<br>榮譽牆',(WL.bdX[0]+WL.bdX[1])/2,WL.bdY[1],15,10,()=>honorSheet(s))}
-function wallPhoto(pid){if(!pid)return '';const p=pet(pid);if(!p)return '';const ph=Array.isArray(p.photos)&&p.photos[0];return ph||petHead(p)}
+}
+// v2.34：同一隻毛孩掛在好幾個相框 → 依序放第 1、2、3…張照片（沒有下一張就用最後一張）
+function wallPhoto(pid,r,s){if(!pid)return '';const p=pet(pid);if(!p)return '';const L=Array.isArray(p.photos)?p.photos.filter(Boolean):[];if(!L.length)return petHead(p);
+  const k=s&&r!=null?s.wfp.slice(0,r).filter((x,i)=>x===pid&&s.wfr[i]).length:0;return L[Math.min(k,L.length-1)]}
 function honorSheet(s){const L=s.hon;openModal(`<h3>🏆 榮譽牆</h3>${L.length?`<div class="xcpl">${L.map(k=>`<div class="xcrow"><span style="width:38px;height:38px;display:inline-flex;align-items:center;justify-content:center">${HON_IN(k).replace('<img','<img style="width:34px;height:34px;object-fit:contain"')}</span><b style="flex:1">${esc(HON_N(k))}</b></div>`).join('')}</div>${L.length>6?`<p class="lead" style="font-size:12px">牆上只掛得下 6 個，全部 ${L.length} 個都在這裡</p>`:''}`:'<div class="locked">還沒有徽章</div>'}
   <p class="lead" style="font-size:12px">徽章會自動掛上：集滿一套盲盒、抽到隱藏版、完成星寶或聖誕活動、等級 20／40、完成公仔交換（全家人的都算）</p><div class="row2"><button data-close class="primary">好</button></div>`)}
 // 近看層板、壁櫃
@@ -4831,11 +4833,11 @@ function wallShop(tabs){const hid=shHid(),h=house(hid),s=showNorm(h.show),g=DB.g
     <div class="dcsec">✨ 霓虹招牌</div><div class="shgrid"><button class="si" id="wbneon"><div class="pv" style="aspect-ratio:1;display:flex;align-items:center;justify-content:center;background:#2a2030;border-radius:10px;container-type:inline-size"><span class="shneon" style="position:relative;transform:none;left:auto;top:auto;font-size:14px;--nc:#ff5fa2">OPEN</span></div><div class="sn">自己打字</div><div class="sf">${s.neon?'改字':'🪙'+NEON_P}</div></button></div>
     <div class="dcsec">🪵 層板（最多 2 排，每排 5 格）</div><div class="shgrid">${Object.keys(WSH).map(id=>card('sh',id,WSH,'wsh')).join('')}</div>
     <div class="dcsec">🏠 壁櫃（取代層板）</div><div class="shgrid">${Object.keys(WCB).map(id=>card('cb',id,WCB,'wcb')).join('')}</div>
-    <div class="dcsec">📷 相框（最多 2 個）</div><div class="shgrid">${Object.keys(WFR).map(id=>card('fr',id,WFR,'wfr')).join('')}</div>
+    <div class="dcsec">📷 相框（最多 4 個）</div><div class="shgrid">${Object.keys(WFR).map(id=>card('fr',id,WFR,'wfr')).join('')}</div>
     <div class="row2"><button data-close>關閉</button></div>`);if(tabs)decoTabs();
   $('#wbneon').onclick=neonEdit;
   $('#sheet').querySelectorAll('[data-wb]').forEach(b=>b.onclick=()=>{const [kind,id]=b.dataset.wb.split(':'),D={sh:WSH,cb:WCB,fr:WFR}[kind],it=D[id],pre={sh:'wsh',cb:'wcb',fr:'wfr'}[kind];
-    const free=wFree(s,kind,id,-1),row=kind==='sh'?(s.wsh[0]?1:0):kind==='fr'?(s.wfr[0]?1:0):0;
+    const free=wFree(s,kind,id,-1),row=kind==='sh'?(s.wsh[0]?1:0):kind==='fr'?Math.max(0,s.wfr.indexOf('')):0;
     if(free<=0&&(g.coins||0)<it.p)return toast(`金幣不夠，要 🪙${it.p}`);
     openModal(`<div style="text-align:center"><img src="assets/${pre}_${id}.webp" alt="" style="width:170px"><h3>${esc(it.n)}</h3><p class="lead">${free>0?`倉庫裡有 ${free} 個・`:''}🪙${it.p}</p></div>${free>0?'<div class="row2"><button class="primary" id="wbuse">🔨 拿出來掛上去</button></div>':''}<div class="row2"><button id="wbno">← 回去</button><button class="${free>0?'':'primary'}" id="wbyes" ${(g.coins||0)>=it.p?'':'disabled'}>${free>0?'再買一個':'買！'}（🪙${it.p}）</button></div>`);
     $('#wbno').onclick=()=>wallShop(tabs);if($('#wbuse'))$('#wbuse').onclick=()=>wallPick(kind,row);
@@ -5945,7 +5947,7 @@ function announceLetters(){if(!DB.me)return;let seen=[];try{seen=JSON.parse(loca
     sfx('gift');$('#lgopen').onclick=()=>openLetter(nw[0].id,()=>$('#bell').click())};
   setTimeout(go,1800)}
 // ================= 自動更新：發現新版本就重新載入 =================
-const APP_VER='v2.33';
+const APP_VER='v2.34';
 function checkUpdate(){
   if(!/^https?:/.test(location.protocol)||!API_URL)return;
   if(!$('#modal').classList.contains('hidden'))return; // 正在填表單時不打斷
