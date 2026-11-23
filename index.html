@@ -4992,7 +4992,7 @@ function clawGame(){const {ov,upd}=arcOv('🧸 娃娃機');const P=arcPool();if(
     await W2(150);cl.open=0;sfx&&sfx('tap');await W2(280);
     // 抓：爪子中心離公仔中心越近抓越牢
     const cand=pz.filter(p=>!p.gone).map(p=>({p,d:Math.hypot(p.x-cl.x,p.y-(cl.y+44+p.r*.2))})).sort((a,b)=>a.d-b.d)[0];
-    if(cand&&cand.d<cand.p.r*1.1&&Math.abs(cand.p.x-cl.x)<cand.p.r*.85){const p=cand.p,off=Math.abs(p.x-cl.x)/(p.r*.85);cl.hold=p;p.held=true;cl.grip=Math.max(0,1-off*off)*(.75+Math.random()*.3);cl.ox=p.x-cl.x;cl.sw=0;cl.swv=(p.x>cl.x?1:-1)*.04}
+    if(cand&&cand.d<cand.p.r*1.1&&Math.abs(cand.p.x-cl.x)<cand.p.r*.85){const p=cand.p,off=Math.abs(p.x-cl.x)/(p.r*.85);cl.hold=p;p.held=true;cl.grip=Math.max(0,1-off*off)*(.8+Math.random()*.2)*(Math.random()<.4?1:.55);cl.ox=p.x-cl.x;cl.sw=0;cl.swv=(p.x>cl.x?1:-1)*.04}
     // 往上（抓不牢的會在半空中滑掉）
     await new Promise(r=>{const f=()=>{cl.y-=2.6;slip();if(cl.y<=C.top){cl.y=C.top;r()}else requestAnimationFrame(f)};f()});
     await W2(200);if(cl.hold){cl.swv+=(Math.random()-.5)*.06}
@@ -5006,7 +5006,7 @@ function clawGame(){const {ov,upd}=arcOv('🧸 娃娃機');const P=arcPool();if(
     pz=pz.filter(p=>!p.gone);if(pz.length<5){spawn()}upd();
     await tw(cl,'x',(C.chute+C.R)/2,2.6);cl.lost=false;cl.t=C.sec;cl.st='move';go.disabled=false}
   function slip(){const p=cl.hold;if(!p)return;cl.swv+=-cl.sw*.02;cl.sw+=cl.swv;cl.swv*=.98;p.x=cl.x+cl.ox+Math.sin(cl.sw)*14;p.y=cl.y+44+p.r*.6;
-    const risk=(1-cl.grip)*.022+Math.abs(cl.swv)*.15+.0015;if(Math.random()<risk){p.held=false;p.vx=cl.swv*20;p.vy=0;cl.hold=null;cl.lost=true;cl.open=.5;msg.textContent='啊——！'}}
+    const risk=(1-cl.grip)*.025+Math.abs(cl.swv)*.15+.003;if(Math.random()<risk){p.held=false;p.vx=cl.swv*20;p.vy=0;cl.hold=null;cl.lost=true;cl.open=.5;msg.textContent='啊——！'}}
   go.onclick=grab;
   function draw(){const c=ctx;c.clearRect(0,0,C.W,C.H);
     const bg=c.createLinearGradient(0,0,0,C.H);bg.addColorStop(0,'#ffe6ef');bg.addColorStop(1,'#ffc7d9');c.fillStyle=bg;rrect(c,C.L-8,10,C.R-C.L+16,C.floor-2,18);c.fill();
@@ -6098,7 +6098,7 @@ function announceLetters(){if(!DB.me)return;let seen=[];try{seen=JSON.parse(loca
     sfx('gift');$('#lgopen').onclick=()=>openLetter(nw[0].id,()=>$('#bell').click())};
   setTimeout(go,1800)}
 // ================= 自動更新：發現新版本就重新載入 =================
-const APP_VER='v2.37';
+const APP_VER='v2.38';
 function checkUpdate(){
   if(!/^https?:/.test(location.protocol)||!API_URL)return;
   if(!$('#modal').classList.contains('hidden'))return; // 正在填表單時不打斷
