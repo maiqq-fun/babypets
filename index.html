@@ -2574,7 +2574,7 @@ function placePet(r){
   const asleep=!!r.sleep;r.el.style.display=asleep?'none':'';r.tentEl.style.display=asleep?'':'none';
   if(asleep){const lb=$('#tl_'+r.id);if(lb)lb.textContent=`${p.name}・${r.sleep.label} ${r.sleep.icon}`;if(r.tentEl)r.tentEl.style.transform=(r.hs||1)<0.995?`scale(${r.hs})`:'';return}
   if(r.demon){const want=r.state==='walk'?r.dw:r.di,im=r.el.querySelector('.body img');if(im&&r.dsrc!==want){r.dsrc=want;im.src=want}}
-  const hs=r.keepS!=null?r.keepS:(r.hs||1),s=petScale(r.y)*hs,w=215*s;
+  const hs=r.keepS!=null?r.keepS:(r.hs||1),s=petScale(r.y)*hs,w=215*s*Math.sqrt(1.1/Math.min(1.8,Math.max(.6,r.ar||1.1)));   // v2.58：照面積算，瘦高、寬扁的照片看起來一樣大
   Object.assign(r.el.style,{left:((r.x-w/2)/RW*100)+'%',top:((r.y-w*(r.ar||1))/RH*100)+'%',width:(w/RW*100)+'%',zIndex:Math.round(r.y)});
   let dy=r.state==='walk'?-Math.abs(Math.sin(r.hop))*(r.fast?20:14)*s:0,dx=0,sq=r.state==='happy'?1+Math.sin(r.hop*2)*0.06:1,sx=1,rot=r.fast?r.facing*8:0;
   let ctr=0;if(r.anim){const A=ACTS[r.anim.type],t=(performance.now()-r.anim.t0)/A.dur;if(t>=1)r.anim=null;else{const o=A.f(t);dy+=(o.dy||0)*s;dx+=(o.dx||0)*s;rot+=(o.rot||0)*r.facing;if(o.sq)sq=o.sq;if(o.sx)sx=o.sx;if(o.c)ctr=1}}
@@ -6205,7 +6205,7 @@ function announceLetters(){if(!DB.me)return;let seen=[];try{seen=JSON.parse(loca
     sfx('gift');$('#lgopen').onclick=()=>openLetter(nw[0].id,()=>$('#bell').click())};
   setTimeout(go,1800)}
 // ================= 自動更新：發現新版本就重新載入 =================
-const APP_VER='v2.57';
+const APP_VER='v2.58';
 function checkUpdate(){
   if(!/^https?:/.test(location.protocol)||!API_URL)return;
   if(!$('#modal').classList.contains('hidden'))return; // 正在填表單時不打斷
