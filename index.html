@@ -3299,8 +3299,8 @@ async function loadCatalog(ver){if(catLoading||!ONLINE)return;catLoading=true;tr
 function itemIcon(id,cls){const it=ITEMS[id]||{emo:'❓'};return `<span class="ii ${cls||''}"><img src="${it.img||`assets/item_${id}.webp`}" alt="" onerror="this.remove()"><b>${it.emo||''}</b></span>`}
 const bag=()=>DB.game.bag||(DB.game.bag={});
 function bagAdd(id,n){const b=bag();b[id]=(b[id]||0)+n;if(b[id]<=0)delete b[id];save()}
-// v2.53：公仔格子右上角的星星記號（玩家自己用：重複、不能賣……），存在 DB.game.mk
-const figMk=id=>!!(DB.game&&DB.game.mk&&DB.game.mk[id]),mkBtn=id=>ITEMS[id]&&ITEMS[id].kind==='fig'?`<i class="fmk${figMk(id)?' on':''}" data-fmk="${id}" role="button" aria-label="做記號"></i>`:'';
+// v2.53／2.55：公仔、玩具格子右上角的星星記號（玩家自己用：重複、不能賣……），存在 DB.game.mk
+const figMk=id=>!!(DB.game&&DB.game.mk&&DB.game.mk[id]),mkBtn=id=>ITEMS[id]&&['fig','toy'].includes(ITEMS[id].kind)?`<i class="fmk${figMk(id)?' on':''}" data-fmk="${id}" role="button" aria-label="做記號"></i>`:'';
 document.addEventListener('click',e=>{const t=e.target.closest&&e.target.closest('[data-fmk]');if(!t)return;e.preventDefault();e.stopPropagation();const g=DB.game;g.mk=g.mk&&typeof g.mk==='object'?g.mk:{};const id=t.dataset.fmk;if(g.mk[id])delete g.mk[id];else g.mk[id]=1;save();document.querySelectorAll(`[data-fmk="${id}"]`).forEach(x=>x.classList.toggle('on',!!g.mk[id]));sfx&&sfx('tap')},true);
 const bagList=kind=>Object.entries(bag()).filter(([id,n])=>n>0&&ITEMS[id]&&(!kind||ITEMS[id].kind===kind));
 function treatsToday(p){return p.treatDay===todayTW()?(+p.treatN||0):0}
@@ -3527,10 +3527,10 @@ function toyPlacer(){
   const h=house(home.id),L=bagList('toy');
   if((h.toys||[]).length>=TOY_MAX)return toast(`地上最多放 ${TOY_MAX} 個玩具，先收一些起來吧`);
   if(isSpecialH(h)){const S=Object.entries(ITEMS).filter(([id,it])=>it.kind==='toy'&&!it.limited&&!it.off&&!it.bday);
-    openModal(`<h3>🧸 布置毛二街</h3><p class="lead">店裡的擺設免費，毛毛商店的玩具都可以用；收起來就會消失，不會進背包</p><div class="shopgrid">${S.map(([id,it])=>`<button class="si pick" data-p="${id}">${itemIcon(id,'big')}<div class="sn">${it.name}</div><div class="sf">免費</div></button>`).join('')}</div>
+    openModal(`<h3>🧸 布置毛二街</h3><p class="lead">店裡的擺設免費，毛毛商店的玩具都可以用；收起來就會消失，不會進背包</p><div class="shopgrid">${S.map(([id,it])=>`<button class="si pick" data-p="${id}">${mkBtn(id)}${itemIcon(id,'big')}<div class="sn">${it.name}</div><div class="sf">免費</div></button>`).join('')}</div>
       <div class="row2" style="margin-top:12px"><button data-close>取消</button></div>`);
     $('#sheet').querySelectorAll('[data-p]').forEach(b=>b.onclick=()=>{closeModal();startPlacing({item:b.dataset.p,free:1})});return}
-  openModal(`<h3>🧸 擺玩具到家裡</h3>${L.length?`<div class="shopgrid">${L.map(([id,n])=>`<button class="si pick" data-p="${id}">${itemIcon(id,'big')}<div class="sn">${ITEMS[id].name}</div><div class="sf">× ${n}</div></button>`).join('')}</div>`:'<div class="locked">背包裡沒有玩具</div>'}
+  openModal(`<h3>🧸 擺玩具到家裡</h3>${L.length?`<div class="shopgrid">${L.map(([id,n])=>`<button class="si pick" data-p="${id}">${mkBtn(id)}${itemIcon(id,'big')}<div class="sn">${ITEMS[id].name}</div><div class="sf">× ${n}</div></button>`).join('')}</div>`:'<div class="locked">背包裡沒有玩具</div>'}
     <div class="row2" style="margin-top:12px"><button data-close>取消</button><button id="goshop">🏪 去商店</button></div>`);
   $('#goshop').onclick=()=>shopSheet('toy');
   $('#sheet').querySelectorAll('[data-p]').forEach(b=>b.onclick=()=>{closeModal();startPlacing({item:b.dataset.p})});
@@ -4364,7 +4364,7 @@ function f2Bg(){const h=house(F2.hid);openModal(`<h3>🎨 二樓的背景</h3><p
   let room=h.room2||'basic1';bindRoom('f2rm',v=>room=v);
   $('#f2rok').onclick=async()=>{try{await call('updateHouse',Object.assign(cred(),{patch:{room2:room}}));h.room2=room;closeModal();renderF2();toast('換好了 🎨')}catch(e){toast(e.message)}}}
 function f2Placer(){const h=house(F2.hid),L=bagList('toy');if((h.toys2||[]).length>=TOY_MAX)return toast(`二樓最多放 ${TOY_MAX} 個玩具`);
-  openModal(`<h3>🧸 布置二樓</h3><p class="lead">每擺一個玩具，舒適度 +2，旅客會越來越多</p>${L.length?`<div class="shopgrid">${L.map(([id,n])=>`<button class="si pick" data-p="${id}">${itemIcon(id,'big')}<div class="sn">${ITEMS[id].name}</div><div class="sf">× ${n}</div></button>`).join('')}</div>`:'<div class="locked">背包裡沒有玩具</div>'}
+  openModal(`<h3>🧸 布置二樓</h3><p class="lead">每擺一個玩具，舒適度 +2，旅客會越來越多</p>${L.length?`<div class="shopgrid">${L.map(([id,n])=>`<button class="si pick" data-p="${id}">${mkBtn(id)}${itemIcon(id,'big')}<div class="sn">${ITEMS[id].name}</div><div class="sf">× ${n}</div></button>`).join('')}</div>`:'<div class="locked">背包裡沒有玩具</div>'}
     <div class="row2" style="margin-top:12px"><button data-close>取消</button><button id="goshop2">🏪 去商店</button></div>`);
   $('#goshop2').onclick=()=>shopSheet('toy');$('#sheet').querySelectorAll('[data-p]').forEach(b=>b.onclick=()=>{closeModal();F2.placing={item:b.dataset.p};renderF2();toast(gSpan(b.dataset.p)===2?'點格子放下（這個比較大，會占 2 格）':'點格子放下（紅色有東西、灰色不能放）')})}
 function f2ToyMenu(t){const h=house(F2.hid);openModal(`<h3>${itemIcon(t.item)} ${esc((ITEMS[t.item]||{}).name||'玩具')}</h3>
@@ -6205,7 +6205,7 @@ function announceLetters(){if(!DB.me)return;let seen=[];try{seen=JSON.parse(loca
     sfx('gift');$('#lgopen').onclick=()=>openLetter(nw[0].id,()=>$('#bell').click())};
   setTimeout(go,1800)}
 // ================= 自動更新：發現新版本就重新載入 =================
-const APP_VER='v2.54';
+const APP_VER='v2.55';
 function checkUpdate(){
   if(!/^https?:/.test(location.protocol)||!API_URL)return;
   if(!$('#modal').classList.contains('hidden'))return; // 正在填表單時不打斷
