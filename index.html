@@ -2037,10 +2037,10 @@ function renderIsland(){
     if(pk&&jobOpen('park').length){const jb=document.createElement('div');jb.className='bubble';jb.textContent='📋';Object.assign(jb.style,ipct(sp.x+50,sp.y-170),{zIndex:2001});box.appendChild(jb)}}
   {const sp=ARC_POS,el=document.createElement('div');el.className='thing';el.setAttribute('role','button');el.tabIndex=0;el.setAttribute('aria-label','玩個毛');
     Object.assign(el.style,ipct(sp.x,sp.y),{width:(HOUSE_W*ARC_SC/1024*100)+'%',zIndex:sp.y});el.innerHTML=`<img src="assets/arcade_${p}.webp" alt="" onerror="this.src='assets/arcade_day.webp'">`;el.onclick=openArcade;box.appendChild(el);
-    box.appendChild(signEl('玩個毛',sp.x,sp.y,'center'))}
+    box.appendChild(signEl('玩個毛',sp.x,sp.y,'center'));jobBubbles(box,'arcade',sp,170)}
   {const sp=centerPos(),el=document.createElement('div');el.className='thing';el.setAttribute('role','button');el.tabIndex=0;el.setAttribute('aria-label','島民中心');
     Object.assign(el.style,ipct(sp.x,sp.y),{width:(HOUSE_W*SHOP_SC/1024*100)+'%',zIndex:sp.y});el.innerHTML=`<img src="assets/center_${p}.webp" alt="" onerror="this.src='assets/center_day.webp'">`;el.onclick=openCenter;box.appendChild(el);
-    box.appendChild(signEl('島民中心',sp.x,sp.y,'center'));
+    box.appendChild(signEl('島民中心',sp.x,sp.y,'center'));jobBubbles(box,'center',sp,160);
     if(false){const gb=document.createElement('div');gb.className='bubble';gb.textContent='📌';Object.assign(gb.style,ipct(sp.x+45,sp.y-165),{zIndex:2001});box.appendChild(gb)}}
   $('#pickbar').classList.toggle('hidden',!picking);$('#ticker').classList.toggle('hidden',picking);
   renderMe();updTix();if(typeof updBell==='function')updBell();updOnline();
@@ -5233,6 +5233,9 @@ function scamCatch(el){const st=scamSt(),c=st.cur;if(!c||+c.until<=Date.now())re
     <p>「${esc(c.n)}」${c.kind==='pick'?'這個扒手':'這個詐騙集團'}已經報警處理～<br>拿回 🪙${c.amt}，還獲得檢舉獎金 🪙${bonus}！</p><button>正義勝利 ✌️</button>`;
   document.body.appendChild(ov);ov.onclick=()=>{ov.remove();sfx('coin')};   // 點畫面任何地方都能關
   if(ONLINE)feedPush(`🚨 ${DB.me.nick} 抓到了${c.kind==='pick'?'扒手':'詐騙集團'}「${c.n}」，拿回被${c.kind==='pick'?'偷':'騙'}的錢！`)}
+// 💼 小島上：玩個毛、島民中心有毛孩在上班冒 🐾、有徵才單冒 📋（跟毛二街、公園一樣）
+function jobBubbles(box,place,sp,up){if(!ONLINE)return;const bb=(t,x,y)=>{const b=document.createElement('div');b.className='bubble';b.textContent=t;Object.assign(b.style,ipct(x,y),{zIndex:2001});box.appendChild(b)};
+  if(workersAt(place).length)bb('🐾',sp.x-45,sp.y-up);if(jobOpen(place).length)bb('📋',sp.x+45,sp.y-up)}
 // 💼 玩個毛、島民中心的打工：場景裡畫出上班中的毛孩＋徵才按鈕
 function jobScene(st,place,host){if(!ONLINE||!st)return;st.querySelectorAll('.jobw').forEach(x=>x.remove());
   workersAt(place).forEach((w,i)=>{const p=pet(w.petId);if(!p)return;const x=place==='arcade'?[300,520,420][i%3]:[180,640,420][i%3],y=place==='arcade'?[1010,1030,1110][i%3]:[1120,1120,1180][i%3];
@@ -5813,7 +5816,7 @@ function announceLetters(){if(!DB.me)return;let seen=[];try{seen=JSON.parse(loca
     sfx('gift');$('#lgopen').onclick=()=>openLetter(nw[0].id,()=>$('#bell').click())};
   setTimeout(go,1800)}
 // ================= 自動更新：發現新版本就重新載入 =================
-const APP_VER='v2.26';
+const APP_VER='v2.27';
 function checkUpdate(){
   if(!/^https?:/.test(location.protocol)||!API_URL)return;
   if(!$('#modal').classList.contains('hidden'))return; // 正在填表單時不打斷
