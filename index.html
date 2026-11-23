@@ -1217,6 +1217,9 @@ body:has(.arcov) .modal{z-index:100000}   /* v2.36：遊戲畫面裡買代幣，
 
 .tcats{display:flex;gap:6px;overflow-x:auto;padding:2px 2px 10px;margin:0 -2px;scrollbar-width:none}.tcats::-webkit-scrollbar{display:none}
 .tcats button{flex:none;border:0;border-radius:999px;padding:6px 12px;background:#f3e6d2;color:#7a5a40;font-size:13px;white-space:nowrap}.tcats button.on{background:#e8915a;color:#fff;font-weight:700}
+.jobtag{position:absolute;left:50%;top:-1.9em;transform:translateX(-50%);z-index:3;white-space:nowrap;pointer-events:none;font-size:clamp(10px,2.7cqw,13px);font-weight:800;color:#fff;background:linear-gradient(#ffa94d,#f06f3a);border:2px solid #fff;border-radius:999px;padding:1px 8px;box-shadow:0 2px 4px rgba(0,0,0,.25);animation:jtbob 1.6s ease-in-out infinite}
+.walker .jobtag{top:-3.3em}
+@keyframes jtbob{50%{transform:translate(-50%,-3px)}}
 /* v2.31 線上留言通知 */
 .notepop{position:fixed;left:50%;top:calc(env(safe-area-inset-top,0px) + 12px);transform:translateX(-50%);z-index:2147483000;width:min(92vw,420px);text-align:left;border:0;border-radius:18px;padding:12px 16px;background:#fffaf0;color:#6b3f1d;box-shadow:0 8px 24px rgba(60,35,15,.3);font-size:15px;line-height:1.5;animation:npin .35s ease-out}
 .notepop small{display:block;font-size:12px;color:#a07a5a}
@@ -2515,7 +2518,7 @@ function renderFloor(){
     const el=document.createElement('div');el.className='pet';el.setAttribute('role','button');el.setAttribute('aria-label',p.name);el.tabIndex=0;
     const dm=!r.guest&&demonShown(h);r.demon=dm;if(dm){r.di=r.di||DEMON_IMG[Math.floor(Math.random()*2)];r.dw=r.dw||DEMON_WALK[Math.floor(Math.random()*2)]}r.dsrc=dm?r.di:null;
     const bar='';   // v48：別人互動一次就解救，不用進度條
-    el.innerHTML=`<div class="body"><img src="${dm?r.di:petBody(p)}" alt=""><div class="shadow"></div>${dm?'':wearHTML(p)}</div><span class="nm">${r.guest?'🐾 ':''}${dm?'餓魔':''}${esc(p.name)}${!dm&&popKing(p.id)?'<span class="crownk">🏅</span>':''}</span>${bar}`;if(dm)el.classList.add('demon');
+    el.innerHTML=`${jobTag(p.id)}<div class="body"><img src="${dm?r.di:petBody(p)}" alt=""><div class="shadow"></div>${dm?'':wearHTML(p)}</div><span class="nm">${r.guest?'🐾 ':''}${dm?'餓魔':''}${esc(p.name)}${!dm&&popKing(p.id)?'<span class="crownk">🏅</span>':''}</span>${bar}`;if(dm)el.classList.add('demon');
     const im=el.querySelector('img');r.ar=r.ar||1;im.onload=()=>{r.ar=im.naturalHeight/im.naturalWidth;placePet(r)};im.onerror=()=>{if(!im.dataset.fb&&!r.demon){im.dataset.fb=1;im.src=defBody(p.species)}};
     el.onclick=e=>{e.stopPropagation();if(!r.demon||isFamily(home.id))doPat(r,p);petMenu(r,p)};r.el=el;f.appendChild(el);   // v1.83：點毛孩就直接摸摸，連點一直摸
     const sp=tentSpot(p,i),tw=230*petScale(sp.y),te=document.createElement('div');te.className='tent';
@@ -5421,10 +5424,13 @@ function scamCatch(el){const st=scamSt(),c=st.cur;if(!c||+c.until<=Date.now())re
 // 💼 小島上：玩個毛、島民中心有毛孩在上班冒 🐾、有徵才單冒 📋（跟毛二街、公園一樣）
 function jobBubbles(box,place,sp,up){if(!ONLINE)return;const bb=(t,x,y)=>{const b=document.createElement('div');b.className='bubble';b.textContent=t;Object.assign(b.style,ipct(x,y),{zIndex:2001});box.appendChild(b)};
   if(workersAt(place).length)bb('🐾',sp.x-45,sp.y-up);if(jobOpen(place).length)bb('📋',sp.x+45,sp.y-up)}
+// v2.37：上班中的毛孩頭上有字（每隻每天固定一句）
+const JOB_TAGS=['打工中 💼','上班ing','薪水小偷','賺罐罐錢'];
+function jobTag(pid){if(typeof jobNow!=='function'||!jobNow(pid))return '';return `<span class="jobtag">${JOB_TAGS[Math.floor(hash01(pid+todayTW())*JOB_TAGS.length)]}</span>`}
 // 💼 玩個毛、島民中心的打工：場景裡畫出上班中的毛孩＋徵才按鈕
 function jobScene(st,place,host){if(!ONLINE||!st)return;st.querySelectorAll('.jobw').forEach(x=>x.remove());
   workersAt(place).forEach((w,i)=>{const p=pet(w.petId);if(!p)return;const x=place==='arcade'?[300,520,420][i%3]:[180,640,420][i%3],y=place==='arcade'?[1010,1030,1110][i%3]:[1120,1120,1180][i%3];
-    const el=walker(st,petBody(p),x,y,190,p.name,e=>{sayOn(e,jobSay(p));sfx('tap')},wearHTML(p));el.classList.add('jobw')});
+    const el=walker(st,petBody(p),x,y,190,p.name,e=>{sayOn(e,jobSay(p));sfx('tap')},wearHTML(p));el.classList.add('jobw');el.insertAdjacentHTML('beforeend',jobTag(p.id))});
   if(host&&!host.querySelector('.jobbtn')){const n=jobOpen(place).length,b=document.createElement('button');b.className='act jobbtn';b.innerHTML=`📋 徵才${n?`<i class="jdot">${n}</i>`:''}`;b.onclick=()=>jobBoard(place);host.appendChild(b)}}
 
 // ================= 🧸 v2.33 新玩具 85 個＋玩具分類（玩具、寵物用品、家電、家具、擺飾）=================
@@ -6092,7 +6098,7 @@ function announceLetters(){if(!DB.me)return;let seen=[];try{seen=JSON.parse(loca
     sfx('gift');$('#lgopen').onclick=()=>openLetter(nw[0].id,()=>$('#bell').click())};
   setTimeout(go,1800)}
 // ================= 自動更新：發現新版本就重新載入 =================
-const APP_VER='v2.36';
+const APP_VER='v2.37';
 function checkUpdate(){
   if(!/^https?:/.test(location.protocol)||!API_URL)return;
   if(!$('#modal').classList.contains('hidden'))return; // 正在填表單時不打斷
