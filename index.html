@@ -2099,10 +2099,10 @@ const INTRO_SL=[   // v2.30：新手說明更新（打工、民宿、農田、�
   {art:`<img src="assets/claw_machine.webp" alt="" style="width:34%;left:8%;bottom:2%"><img src="assets/icon_rank.webp" alt="" style="width:30%;right:10%;top:4%"><img src="assets/icon_expand.webp" alt="" style="width:30%;right:12%;bottom:2%">`,h:'還有好多可以玩',p:'去<b>玩個毛</b>夾娃娃、打地鼠、推幣機，<br>拚<b>排行榜</b>、在毛二街買賣二手……<br>島上還會不定期舉辦活動，<br>有什麼想要的，也可以寫信給島主許願！'}];
 function introCards(mode,startLast){const start=mode==='start';try{localStorage.setItem('mhd_intro','1')}catch(e){}
   const last=start?`<div class="islide"><div class="amy"><img src="assets/center_npc_wave.webp" alt=""><div class="obub">準備好了嗎？<br>你想怎麼開始呢～</div></div>
-      <div class="ichoices"><button class="ibtn pri" id="ojoin"><img src="assets/icon_mail.webp" alt=""><span>加入現有家庭<small>家人已經在島上了：選家、打家庭密碼</small></span></button>
-        <button class="ibtn" id="obuild"><img src="assets/icon_deco.webp" alt=""><span>蓋一棟房子<small>打島主給的邀請碼，自己設家庭密碼</small></span></button>
+      <div class="ichoices"><button class="ibtn pri" id="ojoin"><img src="assets/icon_mail.webp" alt=""><span>加入毛很多<small>我是新玩家：有島主推薦碼，或家庭鑰匙碼</small></span></button>
+        <button class="ibtn" id="obuild"><img src="assets/icon_deco.webp" alt=""><span>登入毛很多<small>我已經有帳號：選家庭、打 PIN 碼</small></span></button>
         <button class="ibtn" id="oguest"><img src="assets/guest_cat.webp" alt=""><span>我是遊客（先逛逛）<small>先看看大家的毛孩，之後再決定</small></span></button></div>
-      <button class="ilink" id="orec">換手機了？用轉移碼找回帳號</button></div>`:'';
+      </div>`:'';
   openModal(`<div class="intro"><button class="iskip" id="iskip">略過</button><div class="itrack" id="itrack">${INTRO_SL.map(x=>`<div class="islide"><div class="iart"><div class="iblob"></div>${x.art}</div><h2>${x.h}</h2><p>${x.p}</p></div>`).join('')}${last}</div>
     <div class="idots" id="idots"></div><button class="ibtn pri" id="inext">下一頁</button></div>`,true);
   const T=$('#itrack'),N=T.children.length,cur=()=>Math.round(T.scrollLeft/T.clientWidth),D=$('#idots');D.innerHTML='<i></i>'.repeat(N);
@@ -2111,8 +2111,70 @@ function introCards(mode,startLast){const start=mode==='start';try{localStorage.
   $('#inext').onclick=()=>{if(cur()===N-1)return closeModal();T.scrollTo({left:(cur()+1)*T.clientWidth,behavior:'smooth'})};
   $('#iskip').onclick=()=>{if(!start)return closeModal();T.scrollTo({left:(N-1)*T.clientWidth,behavior:'smooth'})};
   if(startLast)setTimeout(()=>{T.scrollLeft=(N-1)*T.clientWidth;upd()},30);
-  if(start){$('#ojoin').onclick=()=>joinFlow();$('#obuild').onclick=inviteStep;$('#orec').onclick=recoverSheet;
+  if(start){$('#ojoin').onclick=joinStart;$('#obuild').onclick=()=>loginFlow();
     $('#oguest').onclick=()=>{setGuest(true);closeModal();renderIsland();toast('參觀中，想加入隨時點上面的「🔒 參觀中」')}}}
+
+// ================= v2.35 登入毛很多（家庭＋PIN 碼）・加入毛很多（島主推薦碼／家庭鑰匙碼） =================
+const KEY_CH='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+function randKey(){let k='';do{k='';for(let i=0;i<6;i++)k+=KEY_CH[Math.floor(Math.random()*KEY_CH.length)]}while(!(/[A-Z]/.test(k)&&/[0-9]/.test(k)));return k}
+const randPin=()=>String(1000+Math.floor(Math.random()*9000));
+const normKey=v=>String(v||'').toUpperCase().replace(/[^A-Z0-9]/g,'');
+const keyValid=k=>/^[A-Z0-9]{6}$/.test(k)&&/[A-Z]/.test(k)&&/[0-9]/.test(k);
+const famSel=(id,hid)=>`<select id="${id}">${DB.houses.filter(h=>!isSpecialH(h)).sort((a,b)=>a.name.localeCompare(b.name,'zh-Hant')).map(h=>`<option value="${h.id}" ${h.id===hid?'selected':''}>${esc(h.name)}</option>`).join('')}</select>`;
+// 🔑 登入毛很多
+function loginFlow(hid){
+  openModal(`<h3>🔑 登入毛很多</h3><p class="lead">選你的家，點自己的名字，再打你的 PIN 碼</p>
+    ${fld('lh','我的家',famSel('lh',hid))}<div class="fmlist" id="lml"></div>
+    <div class="row2"><button id="lback">返回</button></div><p class="lead" style="font-size:12px;text-align:center">忘記 PIN 碼的話問島主・<button class="ilink" id="lold">用以前的轉移碼登入</button></p>`,true);
+  const draw=()=>{const h=house($('#lh').value),L=h?membersOf(h.id):[];$('#lml').innerHTML=L.length?L.map(m=>`<button data-lm="${m.id}"><span><b>${esc(m.nick)}</b><small>Lv${lvOf?lvOf(m.id):''}</small></span></button>`).join(''):'<p class="lead">這家還沒有家人</p>';
+    $('#lml').querySelectorAll('[data-lm]').forEach(b=>b.onclick=()=>pinLogin(h,L.find(m=>m.id===b.dataset.lm),()=>loginFlow(h.id)))};
+  $('#lh').onchange=draw;draw();$('#lback').onclick=onboarding;$('#lold').onclick=recoverSheet}
+function pinLogin(h,m,back){
+  openModal(`<h3>🔢 你是「${esc(m.nick)}」嗎？</h3><p class="lead">輸入 ${esc(m.nick)} 的 4 位數 PIN 碼<br><small>在舊手機的「😊 我的設定」可以看到；忘記的話問島主</small></p>
+    ${fld('pin','PIN 碼','<input id="pin" inputmode="numeric" maxlength="4" pattern="[0-9]*" autocomplete="off" placeholder="4 個數字" style="font-size:22px;letter-spacing:.3em;text-align:center">')}
+    <div class="err" id="pinerr"></div><div class="row2"><button id="pinb">返回</button><button class="primary" id="pinok">登入</button></div>`,true);
+  $('#pinb').onclick=back;setTimeout(()=>$('#pin')?.focus(),60);$('#pin').onkeydown=e=>{if(e.key==='Enter')$('#pinok').click()};
+  $('#pinok').onclick=async e=>{const v=$('#pin').value.trim();if(!/^\d{4}$/.test(v))return $('#pinerr').textContent='PIN 碼是 4 個數字';const b=e.currentTarget;b.disabled=true;
+    let r;try{r=await call('loginPin',{houseId:h.id,targetId:m.id,pin:v})}catch(x){$('#pinerr').textContent=x.message;b.disabled=false;return}
+    const p=r.player;DB.me={id:p.id,nick:p.nick,houseId:p.houseId||null,pw:r.pw||'',code:p.code,pin:p.pin};
+    if(p.game&&typeof p.game==='object')DB.game=fixGame(Object.assign({},p.game));
+    DB.gameSynced=true;setGuest(false);try{localStorage.setItem(OKEY+'_g','1')}catch(x){}save();closeModal();updTix();toast(`歡迎回來，${p.nick}！🎉`);await sync(true);renderIsland();if(p.houseId)openHome(p.houseId)}}
+// 🏠 加入毛很多
+function joinStart(){
+  openModal(`<h3>🏠 加入毛很多</h3><p class="lead">你是怎麼來的呢？</p>
+    <div class="big3"><button id="js1"><span class="e">🎟️</span><span>我有島主推薦碼<small>自己蓋一棟新房子</small></span></button>
+      <button id="js2"><span class="e">🔑</span><span>我有家庭鑰匙碼<small>家人已經在島上，跟他們住一起</small></span></button></div>
+    <div class="row2"><button id="jsb">返回</button></div>`,true);
+  $('#js1').onclick=inviteStep;$('#js2').onclick=()=>keyJoinFlow();$('#jsb').onclick=onboarding}
+function keyJoinFlow(hid){
+  openModal(`<h3>🔑 我有家庭鑰匙碼</h3><p class="lead">選家人的家，輸入家人給你的 6 碼鑰匙碼</p>
+    ${fld('kh','哪一個家？',famSel('kh',hid))}
+    ${fld('kk','家庭鑰匙碼','<input id="kk" maxlength="6" autocapitalize="characters" autocomplete="off" placeholder="例如：MAO8K2" style="font-size:20px;letter-spacing:.2em;text-align:center">','6 個英文或數字，家人在「😊 我的設定」看得到')}
+    <div class="err" id="kerr"></div><div class="row2"><button id="kb">返回</button><button class="primary" id="kok">下一步</button></div>`,true);
+  const ip=$('#kk');ip.oninput=()=>{ip.value=normKey(ip.value);$('#kerr').textContent=''};$('#kb').onclick=joinStart;
+  $('#kok').onclick=async()=>{const h=house($('#kh').value),k=normKey(ip.value);if(k.length!==6)return $('#kerr').textContent='鑰匙碼是 6 個英文或數字';
+    let r;try{r=await call('keyCheck',{houseId:h.id,key:k})}catch(e){$('#kerr').textContent=e.message;return}keyPick(h,k,r.members||[])}}
+function keyPick(h,k,list){
+  openModal(`<h3>🏠 「${esc(h.name)}」的家人</h3><p class="lead">以前就住這裡的話，點自己的名字用 PIN 碼回家</p>
+    <div class="fmlist">${list.length?list.map(m=>`<button data-m="${m.id}"><span><b>${esc(m.nick)}</b><small>Lv${m.lv}・${m.on?ago(m.on):'很久沒上線'}</small></span></button>`).join(''):'<p class="lead">這家還沒有其他家人</p>'}</div>
+    ${list.length<MAX_MEMBERS?'<div class="row2"><button class="primary" id="fmnew">＋ 我是新的家人</button></div>':'<p class="lead">這家已經滿 '+MAX_MEMBERS+' 個家人了</p>'}<div class="row2"><button id="fmback">返回</button></div>`,true);
+  $('#fmback').onclick=()=>keyJoinFlow(h.id);
+  $('#sheet').querySelectorAll('[data-m]').forEach(b=>b.onclick=()=>pinLogin(h,list.find(m=>m.id===b.dataset.m),()=>keyPick(h,k,list)));
+  if($('#fmnew'))$('#fmnew').onclick=()=>nameStep(async()=>{let r;try{r=await call('keyJoin',{playerId:DB.me.id,houseId:h.id,key:k})}catch(e){toast(e.message);return}
+      DB.me.houseId=h.id;DB.me.pw=r.pw;DB.famOk=true;save();toast(`歡迎回家！你現在是「${h.name}」的家人`);await sync(true);updGuestBar();openHome(h.id)},()=>keyPick(h,k,list),
+    n=>{const same=list.find(m=>m.nick===n);if(same){$('#nerr').innerHTML=`這家已經有「${esc(n)}」了，<button class="ilink" id="nsame">我就是 ${esc(n)}</button>`;$('#nsame').onclick=()=>pinLogin(h,same,()=>keyPick(h,k,list));return false}return true})}
+// 😊 改 PIN 碼、家庭鑰匙碼
+function pinSheet(){openModal(`<h3>🔢 改我的 PIN 碼</h3><p class="lead">換手機、被登出時，選家庭＋點自己名字＋打這組就能登入</p>
+    ${fld('np','新的 PIN 碼',`<input id="np" inputmode="numeric" maxlength="4" pattern="[0-9]*" autocomplete="off" value="${esc(DB.me.pin||'')}" style="font-size:22px;letter-spacing:.3em;text-align:center">`,'4 個數字')}<div class="err" id="nperr"></div>
+    <div class="row2"><button data-close>取消</button><button class="primary" id="npok">儲存</button></div>`);
+  $('#npok').onclick=async()=>{const v=$('#np').value.trim();if(!/^\d{4}$/.test(v))return $('#nperr').textContent='PIN 碼是 4 個數字';
+    try{const r=await call('setPin',{playerId:DB.me.id,pin:v});DB.me.pin=r.pin;save();closeModal();toast('PIN 碼改好了 🔢')}catch(e){$('#nperr').textContent=e.message}}}
+function keySheet(){const h=myHouse();if(!h)return;openModal(`<h3>🔑 改家庭鑰匙碼</h3><p class="lead">新家人加入、舊家人回家時要打這組。改了之後，已經在家裡的家人不會被登出</p>
+    ${fld('nk','新的家庭鑰匙碼',`<input id="nk" maxlength="6" autocapitalize="characters" autocomplete="off" value="${esc(h.key||'')}" style="font-size:20px;letter-spacing:.2em;text-align:center">`,'6 個英文或數字，英文和數字都要有')}<div class="err" id="nkerr"></div>
+    <div class="row2"><button data-close>取消</button><button class="primary" id="nkok">儲存</button></div>`);
+  const ip=$('#nk');ip.oninput=()=>{ip.value=normKey(ip.value);$('#nkerr').textContent=''};
+  $('#nkok').onclick=async()=>{const k=normKey(ip.value);if(!keyValid(k))return $('#nkerr').textContent='要 6 個英文或數字，英文和數字都要有';
+    try{const r=await call('setKey',Object.assign(cred(),{key:k}));h.key=r.key;closeModal();toast('家庭鑰匙碼改好了 🔑')}catch(e){$('#nkerr').textContent=e.message}}}
 // 加入現有家庭：打對家庭密碼 → 列出家人 → 點自己＋換機碼，或「我是新的家人」
 function famPick(h,pw,list){
   const recent=m=>m.on&&Date.now()-m.on<864e5;
@@ -2142,13 +2204,12 @@ function pinStep(h,pw,m,list){
 function onboardingOld(){
   openModal(`<div class="deco"><img src="assets/logo_deco.webp" alt=""><span>歡迎來到毛很多</span></div><p class="lead">${ONLINE?'這是一座私人小島，有島主的邀請碼或家人密碼才能加入':'你想怎麼開始？'}</p>
     <div class="big3">
-      <button id="o1"><span class="e">🏠</span><span>${ONLINE?'我有邀請碼，要蓋房子':'蓋我自己的家'}<small>在島上選一塊空地，替你的毛孩建檔</small></span></button>
-      <button id="o2"><span class="e">🔑</span><span>${ONLINE?'我有家人密碼':'加入家人的家'}<small>家人已經蓋好房子，一起照顧毛孩</small></span></button>
-      ${ONLINE?'<button id="o4"><span class="e">🔄</span><span>我是老玩家<small>換手機了，用轉移碼找回帳號</small></span></button>':''}
+      <button id="o1"><span class="e">🏠</span><span>${ONLINE?'加入毛很多':'蓋我自己的家'}<small>${ONLINE?'我是新玩家：有島主推薦碼或家庭鑰匙碼':'在島上選一塊空地，替你的毛孩建檔'}</small></span></button>
+      <button id="o2"><span class="e">🔑</span><span>${ONLINE?'登入毛很多':'加入家人的家'}<small>${ONLINE?'我已經有帳號：選家庭、打 PIN 碼':'家人已經蓋好房子，一起照顧毛孩'}</small></span></button>
       <button id="o3"><span class="e">👀</span><span>先看看<small>參觀小島和大家的毛孩，不用取名字</small></span></button>
     </div>`,true);
-  $('#o1').onclick=inviteStep;
-  $('#o2').onclick=()=>joinFlow();
+  $('#o1').onclick=ONLINE?joinStart:inviteStep;
+  $('#o2').onclick=()=>ONLINE?loginFlow():joinFlow();
   if($('#o4'))$('#o4').onclick=recoverSheet;
   $('#o3').onclick=()=>{setGuest(true);closeModal();renderIsland();toast('參觀中，想加入隨時點上面的「🔒 參觀中」')};
 }
@@ -2165,11 +2226,13 @@ function inviteStep(){
 function nameStep(next,back,check){
   openModal(`<div class="deco"><img src="assets/logo_deco.webp" alt=""><span>取一個暱稱</span></div><p class="lead">大家在動態和便利貼上會看到這個名字</p>
     ${fld('nick','你的暱稱',`<input id="nick" maxlength="12" placeholder="例如：小麥" value="${esc(DB.me?.nick||'')}">`)}
+    ${ONLINE?fld('npin','我的 PIN 碼（4 個數字）',`<input id="npin" inputmode="numeric" maxlength="4" pattern="[0-9]*" autocomplete="off" placeholder="${nameStep.pp=DB.me?.pin||randPin()}">`,'換手機、被登出時登入用。不打的話就用灰字這組，之後在「😊 我的設定」看得到、也可以改'):''}
     <div class="err" id="nerr"></div><div class="row2"><button id="nback">返回</button><button class="primary" id="nnext">下一步</button></div>`,true);
   $('#nback').onclick=back||onboarding;
   $('#nnext').onclick=async()=>{const n=$('#nick').value.trim();if(!n){$('#nerr').textContent='請先輸入暱稱';return}if(check&&!check(n))return;
     const me={id:DB.me?.id||(uid()+uid()),nick:n,houseId:DB.me?.houseId||null,pw:DB.me?.pw||''};
-    try{await call('savePlayer',{player:{id:me.id,nick:n,game:DB.game}})}catch(e){$('#nerr').textContent=e.message;return}
+    const pv=$('#npin')?($('#npin').value.trim()||nameStep.pp):'';if(pv&&!/^\d{4}$/.test(pv)){$('#nerr').textContent='PIN 碼是 4 個數字';return}if(pv)me.pin=pv;
+    try{await call('savePlayer',Object.assign({player:{id:me.id,nick:n,game:DB.game}},pv?{pin:pv}:{}))}catch(e){$('#nerr').textContent=e.message;return}
     DB.me=me;save();setGuest(false);closeModal();next()};
   $('#nick').onkeydown=e=>{if(e.key==='Enter')$('#nnext').click()};
   setTimeout(()=>$('#nick')?.focus(),60);
@@ -2224,18 +2287,19 @@ function buildFlow(slot){
     setTimeout(()=>$('#bn')?.focus(),60);
   }
   function s3(){
-    openModal(`<h3>🔑 設定家庭密碼</h3>${steps(3)}<p class="lead">一起照顧毛孩的家人輸入這組密碼，就能一起編輯資料、看醫療和支出紀錄</p>
-      ${ONLINE?fld('pinv','島主給的邀請碼',`<input id="pinv" placeholder="例如：MAO-4821" autocapitalize="characters" autocomplete="off" value="${esc(B.invite||PENDING_INVITE||'')}">`,'這是私人小島，要有邀請碼才能蓋房子'):''}
-      ${fld('p1','家庭密碼',`<input id="p1" minlength="4" autocomplete="off" autocapitalize="none" value="${esc(B.pw1||(B.pw1='mao'+String(1000+Math.floor(Math.random()*9000))))}">`,'已經幫你想好一組了，也可以改成好記的（至少 4 個字）。家人加入時要打這組，先截圖存起來')}
+    openModal(`<h3>🔑 設定家庭鑰匙碼</h3>${steps(3)}<p class="lead">家人要加入你家時，選你家＋打這組鑰匙碼就能一起照顧毛孩</p>
+      ${ONLINE?fld('pinv','島主推薦碼',`<input id="pinv" placeholder="例如：MAO-4821" autocapitalize="characters" autocomplete="off" value="${esc(B.invite||PENDING_INVITE||'')}">`,'這是私人小島，要有邀請碼才能蓋房子'):''}
+      ${fld('p1','家庭鑰匙碼（6 個英文或數字）',`<input id="p1" maxlength="6" autocomplete="off" autocapitalize="characters" placeholder="${esc(B.kp||(B.kp=randKey()))}" value="${esc(B.pw1||'')}" style="letter-spacing:.2em">`,'不打的話就用灰字這組。之後在「😊 我的設定」看得到、也可以改')}
       <div class="err" id="perr"></div>
       <div class="row2"><button id="pb">上一步</button><button class="primary" id="b3">蓋好了！</button></div>`);
     $('#pb').onclick=s2;
-    $('#b3').onclick=async()=>{const a=$('#p1').value.trim(),b=a,inv=$('#pinv')?$('#pinv').value.trim():'';B.invite=inv;
-      if(ONLINE&&!inv){$('#perr').textContent='請輸入島主給的邀請碼';return}
-      if(a.length<4){$('#perr').textContent='密碼至少 4 個字';return}
+    $('#p1').oninput=()=>{$('#p1').value=normKey($('#p1').value);B.pw1=$('#p1').value};
+    $('#b3').onclick=async()=>{const a=ONLINE?(normKey($('#p1').value)||B.kp):$('#p1').value.trim()||B.kp,b=a,inv=$('#pinv')?$('#pinv').value.trim():'';B.invite=inv;
+      if(ONLINE&&!inv){$('#perr').textContent='請輸入島主推薦碼';return}
+      if(ONLINE&&!keyValid(a)){$('#perr').textContent='鑰匙碼要 6 個英文或數字，英文和數字都要有';return}
       if(a!==b){$('#perr').textContent='兩次輸入的密碼不一樣';return}
       const pw=hashPw(a);let r;
-      try{r=await call('buildHouse',{playerId:DB.me.id,house:{slot:B.slot,style:B.style,name:B.name,motto:B.motto,room:B.room},pw,invite:inv})}catch(e){$('#perr').textContent=e.message;return}
+      try{r=await call('buildHouse',{playerId:DB.me.id,house:{slot:B.slot,style:B.style,name:B.name,motto:B.motto,room:B.room},pw,key:a,invite:inv})}catch(e){$('#perr').textContent=e.message;return}
       DB.me.houseId=r.houseId;DB.me.pw=pw;DB.famOk=true;PENDING_INVITE='';save();setTimeout(updGuestBar,0);
       if(ONLINE)await sync(true);
       closeModal();renderIsland();openHome(r.houseId);setTimeout(()=>petForm(r.houseId),600)};
@@ -2919,26 +2983,26 @@ $('#me').onclick=()=>{
     ${fld('mn','暱稱',`<input id="mn" maxlength="12" value="${esc(DB.me.nick)}">`)}
     <div class="row2"><button class="primary" id="msave">儲存暱稱</button></div>
     <div class="big3" style="margin-top:14px">
-      ${h?`<button id="mhome"><span class="e">🏠</span><span>回我家<small>${esc(h.name)}</small></span></button>`:`<button id="mbuild"><span class="e">🏠</span><span>蓋我的家<small>選一塊空地</small></span></button><button id="mjoin"><span class="e">🔑</span><span>加入家人的家<small>需要家人密碼</small></span></button>`}
+      ${h?`<button id="mhome"><span class="e">🏠</span><span>回我家<small>${esc(h.name)}</small></span></button>`:`<button id="mbuild"><span class="e">🏠</span><span>蓋我的家<small>選一塊空地</small></span></button><button id="mjoin"><span class="e">🔑</span><span>加入家人的家<small>需要家庭鑰匙碼</small></span></button>`}
     </div>
     <div class="row2" style="margin-top:10px"><button id="mguide">📲 加到主畫面</button><button id="minv">🔗 複製邀請連結</button></div>${ONLINE&&myHouse()?'<div class="row2"><button id="mmail" class="mbtn"><img class="mic" src="assets/icon_mail.webp" alt="">島主信箱</button></div>':''}
     <div class="row2" style="margin-top:8px"><button id="msnd">${sndOn?'🔊 音效：開':'🔇 音效：關'}</button>${ONLINE?`<button id="mpush">🔔 通知…</button>`:''}</div>
     <p class="lead" style="font-size:11px;opacity:.6;margin:8px 0 0">App 版本 ${typeof APP_VER!=='undefined'?APP_VER:''}</p>
     <div class="row2" style="margin-top:8px"><button id="mci">${((DB.game.ci||{}).last)===todayTW()?'📅 簽到 ✅':'📅 每日簽到'}</button><button id="mdm">📋 今日任務</button></div>
-    ${ONLINE?`<div class="codebox"><div><small>我的轉移碼（換手機時用，截圖存起來）</small><b>${esc(DB.me.code||'同步後就會出現')}</b></div><span class="cbtns"><button id="mcode">複製</button> <button id="mcodee">✏️ 改</button></span></div>`:''}
-    ${ONLINE?`<div class="codebox"><div><small>我的換機碼（加入現有家庭→點自己名字時要打）</small><b>${esc(DB.me.pin||'同步後就會出現')}</b></div></div>`:''}
-    ${ONLINE?'<div class="row2" style="margin-top:8px"><button id="mrec">🔑 用轉移碼登入其他帳號</button></div>':''}
+    ${ONLINE?`<div class="codebox"><div><small>我的 PIN 碼（4 個數字，換手機、被登出時用）</small><b>${esc(DB.me.pin||'同步後就會出現')}</b></div><span class="cbtns"><button id="mpine">✏️ 改</button></span></div>`:''}
+    ${ONLINE&&h?`<div class="codebox"><div><small>我的家庭鑰匙碼（6 碼，新家人加入、舊家人回家時用）</small><b>${esc(h.key||'同步後就會出現')}</b></div><span class="cbtns"><button id="mkey">複製</button> <button id="mkeye">✏️ 改</button></span></div>`:''}
+    ${ONLINE?'<p class="lead" style="font-size:12px;text-align:center;margin:4px 0">兩組都可以隨時改，忘記的話問島主</p><div class="row2" style="margin-top:4px"><button id="mrec">🔑 登入其他帳號</button></div>':''}
     ${adminPw()?'<div class="row2" style="margin-top:10px"><button id="madmin">👑 島主後台'+(DB.amail?' <b class="mbadge">📮 '+DB.amail+'</b>':'')+'</button></div>':''}
     <div class="row2" style="margin-top:10px"><button data-close>關閉</button></div>`);
-  $('#mguide').onclick=()=>homeGuide(false);if($('#mmail'))$('#mmail').onclick=()=>mailAdminSheet();$('#msnd').onclick=()=>{sndOn=!sndOn;try{localStorage.setItem('mhd_snd',sndOn?'1':'0')}catch(e){}$('#msnd').textContent=sndOn?'🔊 音效：開':'🔇 音效：關';updSndBtns();if(sndOn)sfx('tap')};if($('#madmin'))$('#madmin').onclick=adminSheet;$('#mci').onclick=checkinSheet;$('#mdm').onclick=missionsSheet;if($('#mrec'))$('#mrec').onclick=recoverSheet;
-  if($('#mcodee'))$('#mcodee').onclick=()=>{if(!DB.me.code)return toast('同步後再改');codeSheet()};if($('#mpush')){$('#mpush').onclick=pushSheet;refreshPushBtn()}
+  $('#mguide').onclick=()=>homeGuide(false);if($('#mmail'))$('#mmail').onclick=()=>mailAdminSheet();$('#msnd').onclick=()=>{sndOn=!sndOn;try{localStorage.setItem('mhd_snd',sndOn?'1':'0')}catch(e){}$('#msnd').textContent=sndOn?'🔊 音效：開':'🔇 音效：關';updSndBtns();if(sndOn)sfx('tap')};if($('#madmin'))$('#madmin').onclick=adminSheet;$('#mci').onclick=checkinSheet;$('#mdm').onclick=missionsSheet;if($('#mrec'))$('#mrec').onclick=()=>{closeModal();loginFlow((myHouse()||{}).id)};
+  if($('#mpine'))$('#mpine').onclick=pinSheet;if($('#mkeye'))$('#mkeye').onclick=keySheet;if($('#mkey'))$('#mkey').onclick=async()=>{const k=(myHouse()||{}).key;if(!k)return;try{await navigator.clipboard.writeText(k);toast('家庭鑰匙碼已複製 🔑')}catch(e){toast(k)}};if($('#mpush')){$('#mpush').onclick=pushSheet;refreshPushBtn()}
   if($('#mcode'))$('#mcode').onclick=async()=>{const c=DB.me.code;if(!c)return;try{await navigator.clipboard.writeText(c);toast('轉移碼已複製 🔑')}catch(e){toast(c)}};
   $('#minv').onclick=async()=>{const u=inviteUrl();try{await navigator.clipboard.writeText(u);toast('邀請連結已複製，貼到 LINE 給朋友吧 🔗')}catch(e){toast(u)}};
   $('#msave').onclick=async()=>{const n=$('#mn').value.trim();if(!n)return toast('暱稱不能空白');
     try{await call('savePlayer',{player:{id:DB.me.id,nick:n,game:DB.game}})}catch(e){toast(e.message);return}DB.me.nick=n;save();closeModal();toast('暱稱改好了')};
   if($('#mhome'))$('#mhome').onclick=()=>{closeModal();openHome(h.id)};
   if($('#mbuild'))$('#mbuild').onclick=()=>{closeModal();picking=true;renderIsland();toast('點一塊「＋」空地')};
-  if($('#mjoin'))$('#mjoin').onclick=()=>joinFlow();
+  if($('#mjoin'))$('#mjoin').onclick=()=>ONLINE?keyJoinFlow():joinFlow();
 };
 
 // ================= 任務・抽卡 =================
@@ -5623,7 +5687,7 @@ function adminRender(d){
     ${[0,1].map(i=>{const cur=(d.shopMgr||shopMgrs())[i]||'';return `<div class="row2"><select id="asm${i}"><option value="">（不指派）</option>${d.players.filter(p=>p.houseId).map(p=>`<option value="${p.id}" ${p.id===cur?'selected':''}>${esc(p.nick)}${p.house?'（'+esc(p.house)+'）':''}</option>`).join('')}</select></div>`}).join('')}
     <div class="row2"><button id="asmb">儲存店長</button></div></div>
   <div class="sec adm"><h4>🏠 家的管理</h4><div class="row2"><select id="ahh">${hs}</select></div>
-    <div class="row2"><input id="ahp" type="password" placeholder="新的家人密碼（4 字以上）"><button id="ahpb">重設密碼</button></div>
+    <p class="lead" id="ahkey" style="font-size:13px"></p><div class="row2"><input id="ahp" maxlength="6" autocapitalize="characters" placeholder="新的家庭鑰匙碼（6 碼英數）"><button id="ahpb">改鑰匙碼</button></div>
     <div class="row2"><button id="ahrb" class="danger">收回成空地</button></div><p class="lead">收回會刪掉這個家的毛孩和紀錄，不能復原</p></div>
   ${adminUploadSec(d)}
   <div class="sec adm"><h4>🙋 玩家列表<span>${d.players.length} 人・🔔 ${d.players.filter(p=>p.pushSt==='on').length} 人有開通知・全島 🪙${d.players.reduce((a,p)=>a+(+p.coins||0),0).toLocaleString()}</span></h4><p class="lead">照金幣多到少排，點 ⚙️ 可以改金幣、轉移碼<br>🔔 收得到通知・🔕 沒開・📲 還沒加主畫面・❔ 還沒更新到新版</p><div class="plist">${d.players.slice().sort((a,b)=>(+b.coins||0)-(+a.coins||0)).map(p=>`<div class="frow"><span>${pushIc(p)}${esc(p.nick)}<small>${p.house?esc(p.house):'沒有家'}・Lv.${p.lv}・🪙${p.coins}${p.createdAt?'・'+new Date(p.createdAt).toLocaleDateString('zh-TW',{month:'numeric',day:'numeric'})+' 加入':''}</small></span><span>${p.house?'':`<button class="mini danger" data-dpl="${p.id}">刪除</button> `}<button class="mini" data-code="${esc(p.code)}">${esc(p.code)||'—'}</button> <button class="mini" data-apl="${p.id}" aria-label="管理">⚙️</button></span></div>`).join('')}</div><p class="lead">點轉移碼可以複製，傳給換手機的朋友</p></div>
@@ -5655,7 +5719,8 @@ function adminRender(d){
     try{await adminCall('adminGiftHouse',o);toast('送出了，禮物盒已經放在他們家 👑');['agc','agt','agn','agm'].forEach(k=>$('#'+k).value='');$('#agi').value='';$('#agr').value='';sync(true)}catch(e){toast(e.message)}};
   S.querySelectorAll('[data-apl]').forEach(b=>b.onclick=()=>{const p=d.players.find(x=>x.id===b.dataset.apl);if(p)adminPlayerSheet(p)});
   S.querySelectorAll('[data-code]').forEach(b=>b.onclick=async()=>{const c=b.dataset.code;if(!c)return;try{await navigator.clipboard.writeText(c);toast('轉移碼已複製：'+c)}catch(e){toast(c)}});
-  $('#ahpb').onclick=async()=>{const v=$('#ahp').value;if(v.length<4)return toast('密碼至少 4 個字');try{await adminCall('adminResetPw',{houseId:$('#ahh').value,pw:await hashPw(v)});toast('密碼重設好了，記得告訴他們家 🔑')}catch(e){toast(e.message)}};
+  const ahk=()=>{const x=(d.houses||[]).find(y=>y.id===$('#ahh').value);$('#ahkey').textContent=x?`🔑 「${x.name}」的家庭鑰匙碼：${x.key||'（還沒產生）'}`:''};$('#ahh').addEventListener('change',ahk);ahk();
+  $('#ahpb').onclick=async()=>{const v=normKey($('#ahp').value);if(!keyValid(v))return toast('要 6 個英文或數字，英文和數字都要有');try{await adminCall('adminResetPw',{houseId:$('#ahh').value,key:v});const x=(d.houses||[]).find(y=>y.id===$('#ahh').value);if(x)x.key=v;ahk();toast('鑰匙碼改好了，記得告訴他們家 🔑')}catch(e){toast(e.message)}};
   $('#ahrb').onclick=async()=>{const h=house($('#ahh').value);if(!h||!window.confirm(`確定要把「${h.name}」收回成空地嗎？毛孩和紀錄都會刪掉，不能復原。`))return;try{await adminCall('adminRemoveHouse',{houseId:h.id});closeModal();ok('收回了')}catch(e){toast(e.message)}};
   $('#ainb').onclick=async()=>{try{const r=await adminCall('adminInviteNew',{n:1,note:$('#ainn').value.trim()});const c=r&&r[0];try{await navigator.clipboard.writeText(c)}catch(e){}toast(`邀請碼 ${c} 已複製 🔑`);adminSheet()}catch(e){toast(e.message)}};
   S.querySelectorAll('[data-icp]').forEach(b=>b.onclick=async()=>{try{await navigator.clipboard.writeText(b.dataset.icp);toast('已複製 '+b.dataset.icp)}catch(e){toast(b.dataset.icp)}});
@@ -5949,7 +6014,7 @@ function announceLetters(){if(!DB.me)return;let seen=[];try{seen=JSON.parse(loca
     sfx('gift');$('#lgopen').onclick=()=>openLetter(nw[0].id,()=>$('#bell').click())};
   setTimeout(go,1800)}
 // ================= 自動更新：發現新版本就重新載入 =================
-const APP_VER='v2.34';
+const APP_VER='v2.35';
 function checkUpdate(){
   if(!/^https?:/.test(location.protocol)||!API_URL)return;
   if(!$('#modal').classList.contains('hidden'))return; // 正在填表單時不打斷
