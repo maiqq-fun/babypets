@@ -5041,7 +5041,7 @@ function clawGame(){const {ov,upd}=arcOv('<img class="mic" src="assets/icon_claw
 
 // ---------- 🪙 推幣機：點檯面任何位置投下代幣，推板會一直推，從前緣掉下來的是你的、從兩邊掉下去就沒了 ----------
 const PSX={W:360,H:520,L:34,R:326,front:470,pt:60,pl:120,pmin:88,pmax:150,r:15};
-const PSK={c:{img:'assets/icon_coin.webp',r:15},t:{img:'assets/token.webp?v=3',r:16},t5:{img:'assets/token5.webp',r:17},t10:{r:18,col:'#e8455f',n:10},t20:{r:19,col:'#f2b51c',n:20},bag:{img:'assets/luckybag.webp',r:28}};
+const PSK={c:{img:'assets/icon_coin.webp',r:15},t:{img:'assets/token.webp?v=3',r:16},t5:{img:'assets/token5.webp',r:17},t10:{img:'assets/icon_chip10.webp',r:18,n:10},t20:{r:19,col:'#f2b51c',n:20},bag:{img:'assets/luckybag.webp',r:28}};
 // v2.36：籌碼多了紅色 ×10、金色 ×20（拿藍綠籌碼的圖重新上色）；機率調過，平均回收還是約 9 成
 function pushKind(){const r=Math.random();return r<.0045?'t10':r<.0165?'t5':r<.167?'t':'c'}   // v2.42：拿掉金色 ×20，紅色 ×10 變多一點，平均回收不變
 // 紅色 ×10、金色 ×20 籌碼：用畫的（賭場籌碼的樣子：邊緣白色色塊、中間圓圈寫數字）
@@ -5735,7 +5735,7 @@ else setTimeout(dailyLogin,800);
 const ICMAP={'🔄':'sync','🗄':'showcase','🎨':'palette','🌟':'sparkle','💼':'briefcase','👋':'wave','🔕':'mute2','👀':'eyes','🟢':'online','🙏':'pray','🏅':'medal','🚨':'siren','🥇':'gold','🥈':'silver','🥉':'bronze','💢':'anger','💨':'dash','🔥':'fire','🪵':'plank','🔨':'hammer','🧱':'brick','💌':'loveletter','👛':'purse','🎭':'masks','⚡':'bolt','🆕':'new','🌸':'flower','📥':'inbox','📤':'outbox','🎪':'circus','💡':'idea2','🐞':'bug2','🌠':'shooting','😆':'lol','😢':'cry','🎊':'popper','🍅':'assets/item_c_tomato.webp','🎃':'assets/item_c_pumpkin.webp','🍎':'assets/item_c_apple.webp','🐟':'assets/item_fish.webp','🍪':'assets/item_cookie.webp','🎄':'assets/item_xmastree.webp','🌱':'assets/item_seed_tomato.webp','🛋':'assets/item_sofa.webp','😈':'assets/demon_head.webp','📹':'assets/pet_cam.webp','🦹':'assets/thief_sneak.webp','🔍':'search','🏆':'assets/icon_rank.webp','👗':'assets/icon_closet.webp','📣':'megaphone','🔒':'lock','🌐':'globe','♂':'male','♀':'female','🎒':'bag','✅':'check','⚠':'warn','🏷':'tag','🎴':'pack','⏳':'hourglass','🛏':'bed','🌙':'moon','☀':'sun','🏥':'clinic','⏰':'alarm','☁':'cloud','🧧':'redpacket','📌':'pin','💧':'drop','🌡':'thermo','💉':'syringe','💊':'pill','🪥':'toothbrush','👁':'eye','🪮':'comb','🚶':'walk','💦':'pee','🤢':'vomit','🛁':'bath','✂':'scissors','🏃':'shoes','😴':'sleep','🔢':'number','🔁':'repeat','🐕':'dog','🐈':'cat','🐇':'rabbit','🐹':'hamster','🐦':'bird',
   '✨':'assets/fx_star.webp','⭐':'assets/fx_star.webp','★':'assets/fx_star.webp','🎉':'assets/fx_firework.webp','💕':'assets/fx_heart.webp','💖':'assets/fx_heart.webp','❤':'assets/fx_heart.webp','💤':'assets/fx_z.webp','🎵':'assets/fx_notes.webp','💰':'assets/money_bag.webp','💩':'assets/poop.webp','🍤':'assets/item_cookie.webp','🍚':'bowl','🦴':'assets/item_bone.webp','🏡':'home','🙋':'family','👥':'family','🐾':'paws','🏠':'home','←':'back','＋':'add','🙂':'me','📲':'install','🔗':'link','🔊':'sound','🔇':'mute','📅':'calendar','📋':'tasks','🔑':'key','👑':'crown','💬':'chat','💛':'mood','✏':'pencil','⚖':'scale','🩺':'medical','🧾':'wallet','🎂':'cake','🍖':'bowl','📝':'note','🎁':'gift','🦮':'leash','🧹':'broom','📒':'book','🧸':'toy','📷':'camera','🔔':'bell','🎟':'ticket','🪙':'coin','💗':'heart','🏪':'shop','⚙':'gear','🛍':'buy2','👔':'staff','🤚':'hand','🪪':'id',
   '✉':'letter','😊':'me','📮':'mail','📢':'megaphone','📜':'note','🗓':'calendar','📆':'calendar','⏱':'alarm','🛠':'gear','🏗':'hammer','🚧':'hammer','👉':'next','👆':'hand','✋':'hand','👏':'hand','✌':'hand','❌':'no','🌏':'globe','🌍':'globe','👤':'me','🧭':'globe','📖':'book','🙈':'eye','⛄':'assets/xm_snowman.webp','🦌':'assets/acc_reindeer.webp','💪':'bolt','🎯':'pinball','🔵':'assets/token5.webp','🟣':'assets/token.webp','🏛':'home','🖼':'deco','🪄':'idea','🛒':'buy2','🎲':'renew','🗑':'broom',
-  '🥫':'assets/item_meat.webp','🍗':'assets/item_chicken.webp','🧀':'assets/item_cheese.webp','🥕':'assets/item_carrot.webp','🌻':'assets/item_seeds.webp','💎':'assets/item_crystal.webp','😭':'cry','🥺':'cry','🏝':'home'};
+  '🥫':'assets/item_meat.webp','🍗':'assets/item_chicken.webp','🧀':'assets/item_cheese.webp','🥕':'assets/item_carrot.webp','🌻':'assets/item_seeds.webp','💎':'assets/item_crystal.webp','😭':'cry','🥺':'cry','🏝':'island','❔':'question','❓':'question','🍬':'candy','🚪':'door','🏁':'flag','🔴':'chip10'};
 const ICRE=new RegExp('('+Object.keys(ICMAP).sort((a,b)=>b.length-a.length).join('|')+')️?','gu');
 function iconizeNode(t){const v=t.nodeValue;if(!v||!ICRE.test(v))return;ICRE.lastIndex=0;const pa=t.parentNode;if(!pa||pa.closest('.ii,textarea,script,style,.noic,option,title'))return;
   const f=document.createDocumentFragment();let last=0;v.replace(ICRE,(m,k,i)=>{if(i>last)f.appendChild(document.createTextNode(v.slice(last,i)));const sp=document.createElement('span');sp.className='ii ic';const v0=ICMAP[k];sp.innerHTML=`<img src="${v0.includes('/')?v0:'assets/icon_'+v0+'.webp'}" alt="" onerror="this.remove()"><b>${m}</b>`;f.appendChild(sp);last=i+m.length;return m});
@@ -6197,7 +6197,7 @@ function announceLetters(){if(!DB.me)return;let seen=[];try{seen=JSON.parse(loca
     sfx('gift');$('#lgopen').onclick=()=>openLetter(nw[0].id,()=>$('#bell').click())};
   setTimeout(go,1800)}
 // ================= 自動更新：發現新版本就重新載入 =================
-const APP_VER='v2.46';
+const APP_VER='v2.47';
 function checkUpdate(){
   if(!/^https?:/.test(location.protocol)||!API_URL)return;
   if(!$('#modal').classList.contains('hidden'))return; // 正在填表單時不打斷
