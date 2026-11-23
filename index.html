@@ -1207,6 +1207,8 @@ img{-webkit-user-drag:none}
 .arcmach.shake{animation:bbshake .3s}
 .mlbar{width:min(84vw,380px);height:10px;border-radius:6px;background:rgba(255,255,255,.2);overflow:hidden;margin-top:6px}.mlbar i{display:block;height:100%;width:100%;background:linear-gradient(90deg,#ffd23f,#ff8fb1);transition:width .15s linear}
 
+.tcats{display:flex;gap:6px;overflow-x:auto;padding:2px 2px 10px;margin:0 -2px;scrollbar-width:none}.tcats::-webkit-scrollbar{display:none}
+.tcats button{flex:none;border:0;border-radius:999px;padding:6px 12px;background:#f3e6d2;color:#7a5a40;font-size:13px;white-space:nowrap}.tcats button.on{background:#e8915a;color:#fff;font-weight:700}
 /* v2.31 線上留言通知 */
 .notepop{position:fixed;left:50%;top:calc(env(safe-area-inset-top,0px) + 12px);transform:translateX(-50%);z-index:2147483000;width:min(92vw,420px);text-align:left;border:0;border-radius:18px;padding:12px 16px;background:#fffaf0;color:#6b3f1d;box-shadow:0 8px 24px rgba(60,35,15,.3);font-size:15px;line-height:1.5;animation:npin .35s ease-out}
 .notepop small{display:block;font-size:12px;color:#a07a5a}
@@ -3029,11 +3031,18 @@ function notices(){
   (DB.medical||[]).forEach(m=>{if(m.next){const d=(new Date(m.next)-new Date(todayTW()))/86400e3;const p=pet(m.petId);if(p&&d>=0&&d<=7)out.push({ic:'🩺',t:`${p.name} ${d?d+' 天後':'今天'}要回診（${m.type}${m.title?'・'+m.title:''}）`,go:'home'})}});
   return out;
 }
+// v2.33：畫面上方的通知條（便利貼、公仔交換共用）
+function topPop(text,go){const b=document.createElement('button');b.className='notepop noic';b.innerHTML=`<b>${esc(text)}</b>${go?'<small>點一下去看看 👉</small>':''}`;document.querySelectorAll('.notepop').forEach(o=>o.remove());document.body.appendChild(b);sfx&&sfx('gift');
+  b.onclick=()=>{b.remove();if(go){closeModal();go()}};setTimeout(()=>{if(b.isConnected)b.classList.add('out');setTimeout(()=>b.remove(),500)},9000)}
+// 2) 鈴鐺：公仔交換的結果、收到的邀請
+function tradeNews(){const me=DB.me;if(!me)return [];const old=Date.now()-3*86400e3,out=[];(DB.trades||[]).forEach(t=>{
+  if(t.from===me.id&&t.st!=='wait'&&+t.doneAt>old)out.push({t:t.st==='ok'?`🔄 ${t.toNick} 答應交換了！你拿到「${xcName(t.want)}」`:`🔄 跟 ${t.toNick} 的交換${({no:'被婉拒了',cancel:'取消了',exp:'過期了'})[t.st]||'結束了'}，「${xcName(t.give)}」退回背包`,at:+t.doneAt});
+  if(t.to===me.id&&t.st==='wait'&&+t.at>old)out.push({t:`🔄 ${t.fromNick} 想用「${xcName(t.give)}」換你的「${xcName(t.want)}」`,at:+t.at})});return out}
 // v2.31：便利貼、回覆直接從便利貼資料算，不會被島上其他動態洗掉
 function noteNews(){const h=myHouse(),me=DB.me;if(!h||!me)return [];const out=[],old=Date.now()-3*86400e3;
   (DB.notes||[]).forEach(n=>{if(n.houseId===h.id&&n.byId!==me.id&&+n.createdAt>old)out.push({t:`📝 ${n.by} 在你家貼了${n.secret?'秘密便條 🔒':'便利貼'}${n.text?`：「${n.text}」`:''}`,at:+n.createdAt,hid:n.houseId});
     if(n.byId===me.id||n.houseId===h.id)(n.replies||[]).forEach(r=>{if(r.byId!==me.id&&+r.at>old)out.push({t:`💬 ${r.by} 回覆了${n.byId===me.id?'你':'你家'}的便利貼：「${r.text}」`,at:+r.at,hid:n.houseId})})});return out}
-function bellItems(){let seen=0;try{seen=+(localStorage.getItem('mhd_bellseen')||0)}catch(e){}return DB.feed.filter(f=>aboutMe(f.t)&&!/貼了(便利貼|一張秘密便條)/.test(f.t)&&Date.now()-f.at<3*86400e3).concat(noteNews()).sort((a,b)=>b.at-a.at).map(f=>({...f,isNew:f.at>seen}))}
+function bellItems(){let seen=0;try{seen=+(localStorage.getItem('mhd_bellseen')||0)}catch(e){}return DB.feed.filter(f=>aboutMe(f.t)&&!/貼了(便利貼|一張秘密便條)/.test(f.t)&&Date.now()-f.at<3*86400e3).concat(noteNews()).concat(typeof xcName==='function'?tradeNews():[]).sort((a,b)=>b.at-a.at).map(f=>({...f,isNew:f.at>seen}))}
 // 線上時有人留言、回覆 → 馬上跳出來（每次同步檢查，最多約 45 秒）
 function notePop(){let last=0;try{last=+(localStorage.getItem('mhd_notepop')||0)}catch(e){}const L=noteNews(),now=Date.now();if(!last){try{localStorage.setItem('mhd_notepop',now)}catch(e){}return}
   const nw=L.filter(x=>x.at>last).sort((a,b)=>a.at-b.at);if(!nw.length)return;try{localStorage.setItem('mhd_notepop',Math.max(...nw.map(x=>x.at)))}catch(e){}
@@ -3210,8 +3219,8 @@ function shopSheet(tab){
   if(shopTab==='ticket')shopTab='kuji';const tabs=[['treat','🍤','零食'],['toy','🧸','玩具'],['kuji','<img class="tabic" src="assets/kuji_icon.webp" alt="">','一番賞'],['acc','👗','服飾'],['seed','🌱','種子'],['bag','🎒','背包']];
   let body='';
   if(shopTab==='treat'||shopTab==='toy'||shopTab==='seed'){
-    const list=Object.entries(ITEMS).filter(([id,it])=>it.kind===shopTab&&!it.limited&&!it.off&&(!it.bday||bd));
-    body=`<div class="shopgrid">${list.map(([id,it])=>`<div class="si">${itemIcon(id,'big')}<div class="sn">${it.name}</div>
+    const list=Object.entries(ITEMS).filter(([id,it])=>it.kind===shopTab&&!it.limited&&!it.off&&(!it.bday||bd)&&(shopTab!=='toy'||toyCatOk(it,toyCat)));
+    body=`${shopTab==='toy'?toyCatBar(toyCat,'data-tc'):''}<div class="shopgrid">${list.map(([id,it])=>`<div class="si">${itemIcon(id,'big')}<div class="sn">${it.name}</div>
       ${it.fav&&it.fav.length?`<div class="sf">${it.fav.join('、')}最愛</div>`:it.bday?'<div class="sf">今天有毛孩生日限定</div>':'<div class="sf">&nbsp;</div>'}
       <button data-buy="${id}" ${coins>=it.price?'':'disabled'}>🪙 ${it.price}</button><small>${bag()[id]?`背包裡有 ${bag()[id]}`:''}</small></div>`).join('')}</div>
       <div class="hint">${shopTab==='seed'?'種子要種在農田裡（在島民中心申請擴建農田），小番茄 4 小時、南瓜和金蘋果 8 小時成熟，收成拿去毛二街賣':shopTab==='treat'?`零食可以去任何人家餵毛孩，每隻毛孩一天最多吃 ${TREAT_MAX} 個；也可以包成禮物送人`:'玩具可以擺在自己家，也可以送給朋友，會放在他們家的地上'}</div>`}
@@ -3221,7 +3230,7 @@ function shopSheet(tab){
     <div class="tabs3 tabs6">${tabs.map(([k,ic,n])=>`<button data-tab="${k}" class="${k===shopTab?'on':''}"><span class="tbi">${ic}</span><span class="tbn">${n}</span></button>`).join('')}</div>${body}
     <div class="row2" style="margin-top:12px"><button data-close>關閉</button></div>`);
   const S=$('#sheet');
-  S.querySelectorAll('[data-tab]').forEach(b=>b.onclick=()=>b.dataset.tab==='acc'?shopCloset():shopSheet(b.dataset.tab));
+  S.querySelectorAll('[data-tab]').forEach(b=>b.onclick=()=>b.dataset.tab==='acc'?shopCloset():shopSheet(b.dataset.tab));$('#sheet').querySelectorAll('[data-tc]').forEach(b=>b.onclick=()=>{toyCat=b.dataset.tc;keepScroll?keepScroll(()=>shopSheet('toy')):shopSheet('toy')});
   S.querySelectorAll('[data-buy]').forEach(b=>b.onclick=()=>{const it=ITEMS[b.dataset.buy];if((g.coins||0)<it.price)return;g.coins-=it.price;sfx('coin');bagAdd(b.dataset.buy,1);dmTick('buy');toast(`買了 ${it.emo} ${it.name}，放進背包了`);const st=S.scrollTop;shopSheet();$('#sheet').scrollTop=st});
   if(shopTab==='kuji')kujiBind(S);
 }
@@ -4521,7 +4530,7 @@ function showRoomShop(tabs){const hid=shHid(),h=house(hid),s=showNorm(h.show),g=
     $('#shno').onclick=()=>showRoomShop(tabs);
     $('#shyes').onclick=()=>{if((g.coins||0)<R.p)return toast('金幣不夠');g.coins-=R.p;save();updTix&&updTix();
       if(showDo(hid,{op:'buyRoom',id},()=>{g.coins+=R.p;save();updTix&&updTix()})){sfx('coin');toast(`換上 ${R.n} 了！`);closeModal()}else{g.coins+=R.p;save()}}})}
-const BB_SERIES=[{"id":1,"n":"喵星派對","en":"","c":"#7f9671","f":["太空橘貓","青蛙外星貓","潮流耳機貓","星星魔法師","天使奶油貓","鯊魚橘貓","冰淇淋黑貓","恐龍貓","蛋殼小貓","UFO 貓"],"h":[9],"t":[0,1,2]},{"id":2,"n":"甜點喵咪烘焙所","en":"","c":"#d97a8a","f":["草莓蛋糕貓","奶油泡芙貓","草莓甜甜圈貓","蜂蜜鬆餅貓","可頌貓","藍莓塔貓","櫻桃卷貓","葡萄馬卡龍貓","吐司小貓","草莓烘焙師"],"h":[9],"t":[0,1,2]},{"id":3,"n":"夜行少年團","en":"NIGHT CREW","c":"#3e3a33","f":["ACE PILOT","SHADOW CAT","NIGHT RIDER","STREET DJ","MOON WIZARD","ANGEL ZERO","SLIME X","LITTLE DEMON","ROBOT KID","UNKNOWN"],"h":[6,9],"t":[0,1,2]},{"id":4,"n":"怪咖小鎮","en":"SNOWTOWN","c":"#2f3e64","f":["ZIPP","PUFF","BLAZE","PAWBOY","PINKY","SNOWBALL","MOOSE","GOTH","UFO KID","DINO BUD"],"h":[8,9],"t":[0,1,2]},{"id":5,"n":"潮熊俱樂部","en":"BEAR CLUB","c":"#38362f","f":["AVIATOR","BEAT BEAR","HOOD","LILAC","PANDA CLUB","UFO BEAR","PINK PUFF","SKATER","STAR KING","ANGEL JELLY"],"h":[5,9],"t":[0,1,2]},{"id":6,"n":"毛茸茸俱樂部","en":"MIMI MONSTERS","c":"#6b4a36","f":["Momo Pilot","Teddy Punk","Midnight","Witchy","Space Baby","Berry","Dino Boo","Moo Moo","Cookie Chef","Angel Puff"],"h":[7,9],"t":[0,1,2],"off":1},{"id":7,"n":"招財喵俱樂部","en":"LUCKY NEKO CLUB","c":"#b8453a","f":["招財喵","黑曜喵","櫻花喵","宇宙喵","舞獅喵","森林喵","電玩喵","鯛魚燒喵","福氣喵","財神喵"],"h":[8,9],"t":[0,2,3]},{"id":8,"n":"胖胖豬俱樂部","en":"PIGGY CLUB","c":"#d27f7a","f":["BUBBLE","KITTY","FROGGY","CHEF P","COSMO","STRAWBY","SHARKY","HIP-HOP","SWEETIE","MAGIC"],"h":[7,9],"t":[0,1,2]},{"id":9,"n":"陽光小鎮","en":"SUNNY TOWN","c":"#6b4f8f","f":["ZAP","BUBBLES","DINER DOT","DOC","CHILL","ARTSY","STARRY","SCOUT","NEKO GAMER","ROCKY"],"h":[6,9],"t":[0,1,2]},{"id":10,"n":"吉娃娃暴走團","en":"CHIHUAHUA CHAOS","c":"#2d2a26","f":["ALOHA","MONDAY","SPA DAY","QUACK","PUNK","CHOMP","HOWDY","CLOWNY","DINO PUP","SPACE PUP"],"h":[7,9],"t":[0,1,2]},{"id":11,"n":"厭世男孩","en":"SLEEPY BOYS","c":"#3d3129","f":["SKATE","BUBBLE","INK","MONSTER","NO.23","LEO","BONES","FLUFF","BEATS","JUICE"],"h":[7,9],"t":[0,1,2]},{"id":12,"n":"厭世女孩","en":"SLEEPY GIRLS","c":"#b77d7d","f":["SUNNY","NOISE","LOLLI","LEOPARD","KITTEN","POP","ANGEL","BOW","FLUFFY","CAMO"],"h":[6,9],"t":[0,1,3]}];
+const BB_SERIES=[{"id":1,"n":"喵星派對","en":"","c":"#7f9671","f":["太空橘貓","青蛙外星貓","潮流耳機貓","星星魔法師","天使奶油貓","鯊魚橘貓","冰淇淋黑貓","恐龍貓","蛋殼小貓","UFO 貓"],"h":[9],"t":[0,1,2]},{"id":2,"n":"甜點喵咪烘焙所","en":"","c":"#d97a8a","f":["草莓蛋糕貓","奶油泡芙貓","草莓甜甜圈貓","蜂蜜鬆餅貓","可頌貓","藍莓塔貓","櫻桃卷貓","葡萄馬卡龍貓","吐司小貓","草莓烘焙師"],"h":[9],"t":[0,1,2]},{"id":3,"n":"夜行少年團","en":"NIGHT CREW","c":"#3e3a33","f":["ACE PILOT","SHADOW CAT","NIGHT RIDER","STREET DJ","MOON WIZARD","ANGEL ZERO","SLIME X","LITTLE DEMON","ROBOT KID","UNKNOWN"],"h":[6,9],"t":[0,1,2]},{"id":4,"n":"怪咖小鎮","en":"SNOWTOWN","c":"#2f3e64","f":["ZIPP","PUFF","BLAZE","PAWBOY","PINKY","SNOWBALL","MOOSE","GOTH","UFO KID","DINO BUD"],"h":[8,9],"t":[0,1,2]},{"id":5,"n":"潮熊俱樂部","en":"BEAR CLUB","c":"#38362f","f":["AVIATOR","BEAT BEAR","HOOD","LILAC","PANDA CLUB","UFO BEAR","PINK PUFF","SKATER","STAR KING","ANGEL JELLY"],"h":[5,9],"t":[0,1,2]},{"id":6,"n":"毛茸茸俱樂部","en":"MIMI MONSTERS","c":"#6b4a36","f":["Momo Pilot","Teddy Punk","Midnight","Witchy","Space Baby","Berry","Dino Boo","Moo Moo","Cookie Chef","Angel Puff"],"h":[7,9],"t":[0,1,2],"off":1},{"id":7,"n":"招財喵俱樂部","en":"LUCKY NEKO CLUB","c":"#b8453a","f":["招財喵","黑曜喵","櫻花喵","宇宙喵","舞獅喵","森林喵","電玩喵","鯛魚燒喵","福氣喵","財神喵"],"h":[8,9],"t":[0,2,3]},{"id":8,"n":"胖胖豬俱樂部","en":"PIGGY CLUB","c":"#d27f7a","f":["BUBBLE","KITTY","FROGGY","CHEF P","COSMO","STRAWBY","SHARKY","HIP-HOP","SWEETIE","MAGIC"],"h":[7,9],"t":[0,1,2]},{"id":9,"n":"陽光小鎮","en":"SUNNY TOWN","c":"#6b4f8f","f":["ZAP","BUBBLES","DINER DOT","DOC","CHILL","ARTSY","STARRY","SCOUT","NEKO GAMER","ROCKY"],"h":[6,9],"t":[0,1,2]},{"id":10,"n":"吉娃娃暴走團","en":"CHIHUAHUA CHAOS","c":"#2d2a26","f":["ALOHA","MONDAY","SPA DAY","QUACK","PUNK","CHOMP","HOWDY","CLOWNY","DINO PUP","SPACE PUP"],"h":[7,9],"t":[0,1,2]},{"id":11,"n":"厭世男孩","en":"SLEEPY BOYS","c":"#3d3129","f":["SKATE","BUBBLE","INK","MONSTER","NO.23","LEO","BONES","FLUFF","BEATS","JUICE"],"h":[7,9],"t":[0,1,2]},{"id":12,"n":"厭世女孩","en":"SLEEPY GIRLS","c":"#b77d7d","f":["SUNNY","NOISE","LOLLI","LEOPARD","KITTEN","POP","ANGEL","BOW","FLUFFY","CAMO"],"h":[6,9],"t":[0,1,3]},{"id":13,"n":"瑪爾濟斯散步團","en":"MALTESE WALK","c":"#5c6146","f":["領巾寶寶","飛行員","小青蛙","藝術家","耳機控","小精靈","萬聖小幽靈","小天使","太空人","小巫師"],"h":[7,9],"t":[0,2,3]},{"id":14,"n":"大眼女孩團","en":"BIG EYES GIRLS","c":"#9a6aa0","f":["泡泡妹","星星酷妹","草莓甜心","貓耳電音","飛行少女","天使藍藍","黑貓雙馬尾","黑兔帽T","信差貝蕾","小惡魔"],"h":[5,9],"t":[0,2,3]},{"id":15,"n":"魔法小屋","en":"MAGIC COTTAGE","c":"#8a6a9e","f":["莓果魔女","月光學霸","葉子魔女","兔兔魔女","精靈飛行員","瞌睡銀髮","蘋果魔女","星星糖","水晶法師","黑貓魔女"],"h":[8,9],"t":[0,1,3]},{"id":16,"n":"冒險森林","en":"FOREST QUEST","c":"#4d6b8a","f":["熊熊背包客","飛行員小粉","恐龍探險家","草帽嚮導","觸角電波妹","企鵝飛行員","電視機器人","捲角綿羊","蘑菇小子","小樹人"],"h":[6,9],"t":[0,2,3]},{"id":17,"n":"蘑菇村","en":"MUSHROOM VILLAGE","c":"#a0523d","f":["紅帽菇菇","花花菇妹","飛行菇菇","書蟲菇菇","背包菇菇","魔法師爺爺","樹墩爺爺","麵包師傅","雲朵菇菇","夜光菇"],"h":[5,9],"t":[0,1,2]},{"id":18,"n":"潮鞋實驗室","en":"SNEAKER LAB","c":"#3b342e","f":["紅星高筒","粉紅愛心","軍綠老爹鞋","紫色波浪","黑星魔鬼氈","火焰板鞋","骷髏黑鞋","天使翅膀","小花雛菊","貓耳肉球"],"h":[7,9],"t":[0,1,4]},{"id":19,"n":"豹紋辣妹","en":"LEOPARD GIRLS","c":"#c78a8f","f":["豹紋貓耳","護目鏡辣妹","豹紋漁夫帽","星星包包頭","泡泡糖耳機","紫髮遮陽帽","豹紋髮帶","白貓毛毛帽","粉紅墨鏡","星星棒球帽"],"h":[7,9],"t":[0,2,4]},{"id":20,"n":"小惡魔俱樂部","en":"LITTLE DEVILS","c":"#4a2c33","f":["白髮小惡魔","黑帽T惡魔","紫髮惡魔","尖刺頭帶","紅髮蝙蝠翼","耳機惡魔","金髮十字","毛毛帽惡魔","熊熊惡魔","天使惡魔"],"h":[7,9],"t":[0,1,4]},{"id":21,"n":"厭世橘貓","en":"LAZY TABBY","c":"#b8752e","f":["吐舌頭","金項鍊大哥","頭頂魚","紙箱貓","鯊魚裝","吐司貓","趴趴貓","耳機貓","抱魚驚嚇","獅子裝"],"h":[5,9],"t":[0,3,4]},{"id":22,"n":"馬戲團小丑","en":"CLOWN CIRCUS","c":"#5a3328","f":["小丑帽寶寶","高帽紳士","蝴蝶結妹妹","氣球狗小丑","紫髮厭世丑","皇冠小丑王","派對帽妹妹","兔耳小丑","撲克魔術師","星星眼鏡"],"h":[5,8],"t":[0,2,3]},{"id":23,"n":"像素小隊","en":"PIXEL PALS","c":"#3d3350","f":["貓耳耳機","愛心墨鏡","外星帽小子","護目鏡綠髮","星星小巫師","太空貓耳","骷髏帽T","狐狸裝","天使小白","像素惡魔"],"h":[7,9],"t":[0,1,2]},{"id":24,"n":"滑板俱樂部","en":"SKATE CLUB","c":"#2f2a3a","f":["棋盤笑臉","粉紅火焰","像素貓咪","雲朵星星","豹紋愛心","銀色閃光","塗鴉皇冠","鐳射幻彩","星球宇宙","像素蘑菇"],"h":[7,9],"t":[0,1,2]},{"id":25,"n":"像素貓咪","en":"PIXEL CATS","c":"#3a3028","f":["橘虎斑","灰白貓","三花貓","小黑","蝴蝶結白貓","暹羅貓","瞇眼虎斑","賓士貓","長毛三花","玳瑁貓"],"h":[7,9],"t":[0,2,4]},{"id":26,"n":"奶嘴寶寶","en":"PACIFIER BABIES","c":"#5a4a63","f":["兔兔寶寶","熊熊寶寶","綿羊寶寶","虎斑貓寶寶","草莓寶寶","恐龍寶寶","企鵝寶寶","耳機寶寶","星星寶寶","月亮寶寶"],"h":[7,9],"t":[0,1,4]},{"id":27,"n":"太空小隊","en":"SPACE CREW","c":"#3f3756","f":["天線隊長","貓耳隊員","星星隊員","護目鏡隊員","土星隊員","橘貓太空人","機器人","熊熊太空人","熊貓太空人","兔兔太空人"],"h":[7,9],"t":[0,1,2]},{"id":28,"n":"外星人派對","en":"ALIEN PARTY","c":"#3a2f52","f":["綠色小外星","粉紅章魚","三眼怪","翅膀外星人","飛碟寶寶","水母","雲朵怪","豆芽太空人","星空法師","獨眼惡魔"],"h":[7,9],"t":[0,1,4]}];
 
 // ================= 🎄 小麋鹿豆豆的聖誕禮物（v2.02）=================
 // 島主在後台按「開始」到 12/25；禮物一天 4 個時段（紅／綠）＋晚上 8～10 點金色，每人每天最多撿 3 個、手上最多拿 3 個
@@ -4668,9 +4677,11 @@ const XCDONE=new Set(),XCSEEN=new Set((()=>{try{return JSON.parse(localStorage.g
 function xcSync(){if(!DB.me||!ONLINE)return;
   xcMine().filter(t=>t.st!=='wait'&&!t.fromDone&&!XCDONE.has(t.id)).forEach(t=>{XCDONE.add(t.id);
     call('tradeClaim',Object.assign(cred(),{id:t.id}),true).then(r=>{if(!r||r.already||!r.item)return;bagAdd(r.item,1);t.fromDone=1;
-      toast(t.st==='ok'?`🔄 ${t.toNick} 答應交換了！拿到「${xcName(r.item)}」`:`🔄 「${xcName(r.item)}」退回背包了（${XC_ST[t.st]}）`);if(t.st==='ok')sfx('gift')}).catch(()=>XCDONE.delete(t.id))});
+      if(t.st==='ok'){sfx('gift');const show=()=>openModal(`<div style="text-align:center"><div class="giftopen"><img src="${xcImg(r.item)}" alt="" style="width:130px"></div><h3>🔄 交換成功！</h3><p class="lead">${esc(t.toNick)} 答應了！<br>你用「${esc(xcName(t.give))}」換到了「<b>${esc(xcName(r.item))}</b>」<br>已經放進背包了</p></div><div class="row2"><button data-close class="primary">太好了 🎉</button></div>`);
+        if($('#modal').classList.contains('hidden'))show();else topPop(`🔄 ${t.toNick} 答應交換了！你拿到「${xcName(r.item)}」`,show)}
+      else topPop(`🔄 ${t.toNick} 這次不想換，「${xcName(r.item)}」退回背包了`)}).catch(()=>XCDONE.delete(t.id))});
   const fresh=xcIn().filter(t=>!XCSEEN.has(t.id));if(fresh.length){fresh.forEach(t=>XCSEEN.add(t.id));try{localStorage.setItem('mhd_xcseen',JSON.stringify([...XCSEEN].slice(-60)))}catch(e){}
-    setTimeout(()=>toast(`🔄 ${fresh[0].fromNick} 想跟你交換公仔，到毛二街「交換」看看`),1200)}
+    setTimeout(()=>topPop(`🔄 ${fresh[0].fromNick} 想用「${xcName(fresh[0].give)}」換你的「${xcName(fresh[0].want)}」${fresh.length>1?`（還有 ${fresh.length-1} 個邀請）`:''}`,()=>xcSheet('in')),1200)}
   const b=$('#fsxc');if(b)b.innerHTML='🔄 交換'+(xcIn().length?`<span class="bdot">${xcIn().length}</span>`:'')}
 // 自己有沒有這隻（背包或自己家的展示櫃）
 function xcHave(id){if((bag()[id]||0)>0)return {bag:1};const h=myHouse();if(!h||!hasShow(h))return null;const s=showNorm(h.show);
@@ -4974,7 +4985,7 @@ const bbImg=(sid,i)=>{const S=bbSer(sid);return S&&Array.isArray(S.img)&&S.img[i
 const bbBox=sid=>{const S=bbSer(sid);return S&&S.box?S.box:`assets/bb${sid}_box.webp`};
 function bbRegister(){bbAll().filter(S=>!S.off).forEach(S=>S.f.forEach((n,i)=>{if((S.x||[]).includes(i))return;ITEMS[bbId(S.id,i)]={name:n,emo:'🎁',kind:'fig',price:0,img:bbImg(S.id,i),bb:S.id}}))}
 bbRegister();
-const bbOn=()=>bbAll().filter(S=>!S.off);
+const bbOn=()=>bbAll().filter(S=>!S.off).sort((a,b)=>b.id-a.id);   // v2.33：新的系列排前面
 const bbIdx=S=>S.f.map((n,i)=>i).filter(i=>!(S.x||[]).includes(i));
 function bbData(){const b=DB.bb&&typeof DB.bb==='object'?DB.bb:(DB.bb={});b.p=b.p||{};b.d=b.d||{};return b}
 const bbDex=sid=>{const d=bbData().d[sid];return Array.isArray(d)?d:[]};
@@ -5270,6 +5281,96 @@ function jobScene(st,place,host){if(!ONLINE||!st)return;st.querySelectorAll('.jo
     const el=walker(st,petBody(p),x,y,190,p.name,e=>{sayOn(e,jobSay(p));sfx('tap')},wearHTML(p));el.classList.add('jobw')});
   if(host&&!host.querySelector('.jobbtn')){const n=jobOpen(place).length,b=document.createElement('button');b.className='act jobbtn';b.innerHTML=`📋 徵才${n?`<i class="jdot">${n}</i>`:''}`;b.onclick=()=>jobBoard(place);host.appendChild(b)}}
 
+// ================= 🧸 v2.33 新玩具 85 個＋玩具分類（玩具、寵物用品、家電、家具、擺飾）=================
+Object.assign(ITEMS,{e_micro:{name:'微波爐',emo:'🏠',kind:'toy',price:120,sz:1.3,cat:'appl',nw:1},
+  e_fryer:{name:'氣炸鍋',emo:'🏠',kind:'toy',price:110,sz:1.2,cat:'appl',nw:1},
+  e_coffee:{name:'咖啡機',emo:'🏠',kind:'toy',price:130,sz:1.25,cat:'appl',nw:1},
+  e_toast:{name:'烤麵包機',emo:'🏠',kind:'toy',price:80,sz:1.1,cat:'appl',nw:1},
+  e_rice:{name:'電子鍋',emo:'🏠',kind:'toy',price:90,sz:1.15,cat:'appl',nw:1},
+  e_kettle:{name:'快煮壺',emo:'🏠',kind:'toy',price:60,sz:1.05,cat:'appl',nw:1},
+  e_blender:{name:'果汁機',emo:'🏠',kind:'toy',price:80,sz:1.15,cat:'appl',nw:1},
+  e_mixer:{name:'攪拌機',emo:'🏠',kind:'toy',price:120,sz:1.2,cat:'appl',nw:1},
+  e_pot:{name:'燉鍋',emo:'🏠',kind:'toy',price:70,sz:1.15,cat:'appl',nw:1},
+  e_ih:{name:'電磁爐',emo:'🏠',kind:'toy',price:70,sz:1.15,cat:'appl',nw:1},
+  e_waffle:{name:'鬆餅機',emo:'🏠',kind:'toy',price:80,sz:1.15,cat:'appl',nw:1},
+  e_steam:{name:'蒸籠',emo:'🏠',kind:'toy',price:90,sz:1.2,cat:'appl',nw:1},
+  e_juicer:{name:'榨汁機',emo:'🏠',kind:'toy',price:60,sz:1.05,cat:'appl',nw:1},
+  e_popcorn:{name:'爆米花機',emo:'🏠',kind:'toy',price:120,sz:1.25,cat:'appl',nw:1},
+  e_water:{name:'飲水機',emo:'🏠',kind:'toy',price:110,sz:1.35,cat:'appl',nw:1},
+  e_vacuum:{name:'吸塵器',emo:'🏠',kind:'toy',price:130,sz:1.35,cat:'appl',nw:1},
+  e_washer:{name:'洗衣機',emo:'🏠',kind:'toy',price:180,sz:1.6,cat:'appl',nw:1},
+  e_dryer:{name:'烘衣機',emo:'🏠',kind:'toy',price:170,sz:1.6,cat:'appl',nw:1},
+  e_hairdry:{name:'吹風機',emo:'🏠',kind:'toy',price:60,sz:1.05,cat:'appl',nw:1},
+  p_knot:{name:'繩結球',emo:'🧸',kind:'toy',price:35,sz:1.0,cat:'toy',nw:1},
+  p_drum:{name:'雞腿玩具',emo:'🧸',kind:'toy',price:40,sz:1.0,cat:'toy',nw:1},
+  p_lolli:{name:'肉球棒棒糖',emo:'🧸',kind:'toy',price:40,sz:1.0,cat:'toy',nw:1},
+  p_whale:{name:'鯨魚玩偶',emo:'🧸',kind:'toy',price:60,sz:1.15,cat:'toy',nw:1},
+  p_cow:{name:'乳牛玩偶',emo:'🧸',kind:'toy',price:60,sz:1.15,cat:'toy',nw:1},
+  p_shoe:{name:'啃咬布鞋',emo:'🧸',kind:'toy',price:45,sz:1.05,cat:'toy',nw:1},
+  p_sock:{name:'襪子玩具',emo:'🧸',kind:'toy',price:30,sz:0.95,cat:'toy',nw:1},
+  p_carrot:{name:'胡蘿蔔拉繩',emo:'🧸',kind:'toy',price:35,sz:1.0,cat:'toy',nw:1},
+  p_sheep:{name:'綿羊玩偶',emo:'🧸',kind:'toy',price:60,sz:1.15,cat:'toy',nw:1},
+  p_block:{name:'益智方塊',emo:'🧸',kind:'toy',price:50,sz:1.05,cat:'toy',nw:1},
+  p_bellring:{name:'鈴鐺甜甜圈',emo:'🧸',kind:'toy',price:40,sz:1.0,cat:'toy',nw:1},
+  p_cheese:{name:'起司玩具',emo:'🧸',kind:'toy',price:35,sz:1.0,cat:'toy',nw:1},
+  p_hydrant:{name:'消防栓',emo:'🧸',kind:'toy',price:80,sz:1.3,cat:'toy',nw:1},
+  p_moon:{name:'月亮抱枕',emo:'🧸',kind:'toy',price:50,sz:1.1,cat:'toy',nw:1},
+  p_bearbed:{name:'熊熊窩',emo:'🐾',kind:'toy',price:130,sz:1.5,cat:'pet',nw:1},
+  g_dhouse:{name:'狗屋',emo:'🐾',kind:'toy',price:180,sz:1.7,cat:'pet',nw:1},
+  g_bed:{name:'寵物睡墊',emo:'🐾',kind:'toy',price:100,sz:1.45,cat:'pet',nw:1},
+  g_brush:{name:'梳毛刷',emo:'🐾',kind:'toy',price:40,sz:1.0,cat:'pet',nw:1},
+  g_leash:{name:'伸縮牽繩',emo:'🐾',kind:'toy',price:50,sz:1.0,cat:'pet',nw:1},
+  g_harness:{name:'胸背帶',emo:'🐾',kind:'toy',price:60,sz:1.05,cat:'pet',nw:1},
+  g_collar:{name:'項圈',emo:'🐾',kind:'toy',price:40,sz:1.0,cat:'pet',nw:1},
+  g_bandana:{name:'小領巾',emo:'🐾',kind:'toy',price:35,sz:0.95,cat:'pet',nw:1},
+  g_poopbag:{name:'撿便袋',emo:'🐾',kind:'toy',price:30,sz:0.95,cat:'pet',nw:1},
+  g_stroller:{name:'寵物推車',emo:'🐾',kind:'toy',price:170,sz:1.6,cat:'pet',nw:1},
+  g_carseat:{name:'車用睡窩',emo:'🐾',kind:'toy',price:110,sz:1.4,cat:'pet',nw:1},
+  g_slowbowl:{name:'慢食碗',emo:'🐾',kind:'toy',price:45,sz:1.05,cat:'pet',nw:1},
+  g_autofeed:{name:'自動餵食器',emo:'🐾',kind:'toy',price:140,sz:1.35,cat:'pet',nw:1},
+  g_pawmat:{name:'肉球地墊',emo:'🐾',kind:'toy',price:60,sz:1.5,cat:'pet',nw:1,flat:true},
+  g_tissue:{name:'面紙盒',emo:'🐾',kind:'toy',price:30,sz:0.95,cat:'pet',nw:1},
+  g_shampoo:{name:'寵物洗毛精',emo:'🐾',kind:'toy',price:40,sz:0.95,cat:'pet',nw:1},
+  g_spray:{name:'除臭噴霧',emo:'🐾',kind:'toy',price:35,sz:0.95,cat:'pet',nw:1},
+  g_earclean:{name:'清耳液',emo:'🐾',kind:'toy',price:30,sz:0.9,cat:'pet',nw:1},
+  g_roller:{name:'黏毛滾輪',emo:'🐾',kind:'toy',price:30,sz:1.0,cat:'pet',nw:1},
+  b_ringswing:{name:'小鳥圓環鞦韆',emo:'🐾',kind:'toy',price:50,sz:1.15,cat:'pet',nw:1},
+  b_bellperch:{name:'鈴鐺棲木',emo:'🐾',kind:'toy',price:45,sz:1.1,cat:'pet',nw:1},
+  b_rattan:{name:'藤編球',emo:'🧸',kind:'toy',price:35,sz:1.0,cat:'toy',nw:1},
+  b_flower:{name:'花框鞦韆',emo:'🐾',kind:'toy',price:50,sz:1.15,cat:'pet',nw:1},
+  b_tassel:{name:'啃咬流蘇',emo:'🧸',kind:'toy',price:35,sz:1.05,cat:'toy',nw:1},
+  b_beads:{name:'串珠蛇',emo:'🧸',kind:'toy',price:35,sz:1.05,cat:'toy',nw:1},
+  b_house:{name:'小鳥屋',emo:'🐾',kind:'toy',price:90,sz:1.25,cat:'pet',nw:1},
+  b_ladder:{name:'小梯子',emo:'🐾',kind:'toy',price:40,sz:1.15,cat:'pet',nw:1},
+  b_corn:{name:'玉米編織',emo:'🧸',kind:'toy',price:35,sz:1.05,cat:'toy',nw:1},
+  b_star:{name:'星星鈴鐺',emo:'🧸',kind:'toy',price:35,sz:1.05,cat:'toy',nw:1},
+  b_hearts:{name:'愛心積木串',emo:'🧸',kind:'toy',price:40,sz:1.05,cat:'toy',nw:1},
+  b_tunnel:{name:'草編隧道',emo:'🐾',kind:'toy',price:60,sz:1.2,cat:'pet',nw:1},
+  b_basket:{name:'吊籃',emo:'🐾',kind:'toy',price:60,sz:1.15,cat:'pet',nw:1},
+  b_daisy:{name:'小花磨牙板',emo:'🧸',kind:'toy',price:30,sz:1.0,cat:'toy',nw:1},
+  b_cockatiel:{name:'玄鳳棲木',emo:'🐾',kind:'toy',price:70,sz:1.2,cat:'pet',nw:1},
+  b_shred:{name:'撕撕紙籃',emo:'🧸',kind:'toy',price:40,sz:1.05,cat:'toy',nw:1},
+  b_sponge:{name:'浮石花疊疊',emo:'🧸',kind:'toy',price:35,sz:1.05,cat:'toy',nw:1},
+  b_rainbow:{name:'彩虹鈴鐺',emo:'🧸',kind:'toy',price:45,sz:1.1,cat:'toy',nw:1},
+  b_leaf:{name:'葉子磨牙片',emo:'🧸',kind:'toy',price:30,sz:1.0,cat:'toy',nw:1},
+  b_tree:{name:'棲木小樹',emo:'🐾',kind:'toy',price:80,sz:1.3,cat:'pet',nw:1},
+  c_bellball:{name:'鈴鐺洞洞球',emo:'🧸',kind:'toy',price:35,sz:1.0,cat:'toy',nw:1},
+  c_fishbone:{name:'魚骨玩具',emo:'🧸',kind:'toy',price:35,sz:1.0,cat:'toy',nw:1},
+  c_pawpad:{name:'肉球坐墊',emo:'🐾',kind:'toy',price:50,sz:1.15,cat:'pet',nw:1},
+  c_kicker:{name:'踢踢魚',emo:'🧸',kind:'toy',price:45,sz:1.05,cat:'toy',nw:1},
+  c_catnip:{name:'貓草袋',emo:'🧸',kind:'toy',price:35,sz:1.0,cat:'toy',nw:1},
+  c_feather:{name:'羽毛鈴鐺',emo:'🧸',kind:'toy',price:40,sz:1.05,cat:'toy',nw:1},
+  c_furball:{name:'貓耳毛球',emo:'🧸',kind:'toy',price:45,sz:1.05,cat:'toy',nw:1},
+  c_cubehouse:{name:'洞洞紙箱屋',emo:'🐾',kind:'toy',price:80,sz:1.3,cat:'pet',nw:1},
+  c_donut:{name:'甜甜圈窩',emo:'🐾',kind:'toy',price:90,sz:1.4,cat:'pet',nw:1},
+  c_cageball:{name:'草編籠球',emo:'🧸',kind:'toy',price:40,sz:1.0,cat:'toy',nw:1},
+  c_post:{name:'貓抓柱',emo:'🐾',kind:'toy',price:90,sz:1.35,cat:'pet',nw:1},
+  c_sushi:{name:'鮭魚壽司抱枕',emo:'🧸',kind:'toy',price:45,sz:1.05,cat:'toy',nw:1},
+  c_bird:{name:'小鳥玩偶',emo:'🧸',kind:'toy',price:40,sz:1.0,cat:'toy',nw:1}});
+{const OC={ball:'toy',yarn:'toy',wand:'toy',bone:'toy',fishdoll:'toy',duck:'toy',t_snake:'toy',t_trike:'toy',t_axolotl:'toy',t_shark:'toy',t_penguin:'toy',t_duck:'toy',t_astro:'toy',t_ufo:'toy',rainbow:'toy',teddy:'toy',tumbler:'toy',rings:'toy',squeaky:'toy',n_fishrope:'toy',n_dogplush:'toy',n_spikyball:'toy',n_puzzleball:'toy',n_teether:'toy',n_frisbee:'toy',n_mouse:'toy',n_balltower:'toy',n_ringrope:'toy',n_feeder:'toy',n_springstar:'toy',n_bonepillow:'toy',n_ropeknot:'toy',n_catpillow:'toy',rainbowball:'toy',piggy:'toy',train:'toy',t_skate:'toy',unicorn:'toy',gacha:'toy',box:'pet',cushion:'pet',t_cattent:'pet',t_fishbed:'pet',t_cattower:'pet',t_catsofa:'pet',t_swing:'pet',fountain:'pet',cattree:'pet',scratch:'pet',blanket:'pet',n_bowl:'pet',n_catbed:'pet',n_cattree:'pet',n_carrier:'pet',n_treatjar:'pet',n_litter:'pet',n_spacepack:'pet',n_cavebed:'pet',n_groom:'pet',n_tunnel:'pet',dinerbowl:'pet',t_fishdisp:'pet',crown:'pet',castle:'pet',t_backpack:'pet',t_fridge:'appl',t_claw:'appl',t_arcade:'appl',t_cattv:'appl',t_record:'appl',t_dj:'appl',t_pc:'appl',t_fan:'appl',robot:'appl',bubble:'appl',purifier:'appl',dehumid:'appl',n_humid:'appl',record:'appl',heater:'appl',fan:'appl',t_polaroid:'appl',t_suitcase:'furn',sofa:'furn',n_bonecab:'furn',n_armchair:'furn',n_bookshelf:'furn',clock:'furn',coatrack:'furn',cocoa:'furn',piano:'furn',plantshelf:'furn',slide:'furn',teepee:'furn',t_teepee:'furn',swing:'furn',t_vinyls:'furn',t_cart:'furn',t_lamp:'deco',t_globe:'deco',t_bookcat:'deco',t_scope:'deco',starlamp:'deco',xmastree:'deco',crystal:'deco',n_pawlamp:'deco',n_lava:'deco',n_diffuser:'deco',n_memoboard:'deco',globe:'deco',mushlamp:'deco',monstera:'deco',yarnbasket:'deco',pumpkin:'deco',fishbowl:'deco',books:'deco',balloons:'deco',balloonair:'deco',trash:'deco'};for(const k in OC)if(ITEMS[k]&&!ITEMS[k].cat)ITEMS[k].cat=OC[k]}
+const TOY_CATS=[['all','全部'],['new','🆕 新品'],['toy','🧸 玩具'],['pet','🐾 寵物用品'],['appl','🏠 家電'],['furn','🛋️ 家具'],['deco','🌸 擺飾']];let toyCat='all';
+const toyCatOk=(it,c)=>c==='all'||(c==='new'?!!it.nw:(it.cat||'toy')===c);
+function toyCatBar(cur,attr){return `<div class="tcats">${TOY_CATS.map(([k,n])=>`<button ${attr}="${k}" class="${k===cur?'on':''}">${n}</button>`).join('')}</div>`}
 // ================= 💼 毛孩打工（v1.90） =================
 // 毛二街「賣萌」、毛毛公園「撿垃圾」：徵才單隨機時間貼在公布欄（1～2 小時就撕掉）→ 投履歷 → 隔天早上 4 點抽籤、寄信公布
 // 臨時工讀 1 班、短期工讀 3～7 天（每天同一時段）；急徵先搶先贏。時間到毛孩自己去上班，下班回家把薪水交給家人
@@ -5382,7 +5483,7 @@ if(ONLINE){
 else setTimeout(dailyLogin,800);
 
 // ================= 圖示：自動把 emoji 換成素材 =================
-const ICMAP={'🔍':'search','🏆':'assets/icon_rank.webp','👗':'assets/icon_closet.webp','📣':'megaphone','🔒':'lock','🌐':'globe','♂':'male','♀':'female','🎒':'bag','✅':'check','⚠':'warn','🏷':'tag','🎴':'pack','⏳':'hourglass','🛏':'bed','🌙':'moon','☀':'sun','🏥':'clinic','⏰':'alarm','☁':'cloud','🧧':'redpacket','📌':'pin','💧':'drop','🌡':'thermo','💉':'syringe','💊':'pill','🪥':'toothbrush','👁':'eye','🪮':'comb','🚶':'walk','💦':'pee','🤢':'vomit','🛁':'bath','✂':'scissors','🏃':'shoes','😴':'sleep','🔢':'number','🔁':'repeat','🐕':'dog','🐈':'cat','🐇':'rabbit','🐹':'hamster','🐦':'bird',
+const ICMAP={'🔄':'sync','🗄':'showcase','🎨':'palette','🌟':'sparkle','💼':'briefcase','👋':'wave','🔕':'mute2','👀':'eyes','🟢':'online','🙏':'pray','🏅':'medal','🚨':'siren','🥇':'gold','🥈':'silver','🥉':'bronze','💢':'anger','💨':'dash','🔥':'fire','🪵':'plank','🔨':'hammer','🧱':'brick','💌':'loveletter','👛':'purse','🎭':'masks','⚡':'bolt','🆕':'new','🌸':'flower','📥':'inbox','📤':'outbox','🎪':'circus','💡':'idea2','🐞':'bug2','🌠':'shooting','😆':'lol','😢':'cry','🎊':'popper','🍅':'assets/item_c_tomato.webp','🎃':'assets/item_c_pumpkin.webp','🍎':'assets/item_c_apple.webp','🐟':'assets/item_fish.webp','🍪':'assets/item_cookie.webp','🎄':'assets/item_xmastree.webp','🌱':'assets/item_seed_tomato.webp','🛋':'assets/item_sofa.webp','😈':'assets/demon_head.webp','📹':'assets/pet_cam.webp','🦹':'assets/thief_sneak.webp','🔍':'search','🏆':'assets/icon_rank.webp','👗':'assets/icon_closet.webp','📣':'megaphone','🔒':'lock','🌐':'globe','♂':'male','♀':'female','🎒':'bag','✅':'check','⚠':'warn','🏷':'tag','🎴':'pack','⏳':'hourglass','🛏':'bed','🌙':'moon','☀':'sun','🏥':'clinic','⏰':'alarm','☁':'cloud','🧧':'redpacket','📌':'pin','💧':'drop','🌡':'thermo','💉':'syringe','💊':'pill','🪥':'toothbrush','👁':'eye','🪮':'comb','🚶':'walk','💦':'pee','🤢':'vomit','🛁':'bath','✂':'scissors','🏃':'shoes','😴':'sleep','🔢':'number','🔁':'repeat','🐕':'dog','🐈':'cat','🐇':'rabbit','🐹':'hamster','🐦':'bird',
   '✨':'assets/fx_star.webp','⭐':'assets/fx_star.webp','★':'assets/fx_star.webp','🎉':'assets/fx_firework.webp','💕':'assets/fx_heart.webp','💖':'assets/fx_heart.webp','❤':'assets/fx_heart.webp','💤':'assets/fx_z.webp','🎵':'assets/fx_notes.webp','💰':'assets/money_bag.webp','💩':'assets/poop.webp','🍤':'assets/item_cookie.webp','🍚':'bowl','🦴':'assets/item_bone.webp','🏡':'home','🙋':'family','👥':'family','🐾':'paws','🏠':'home','←':'back','＋':'add','🙂':'me','📲':'install','🔗':'link','🔊':'sound','🔇':'mute','📅':'calendar','📋':'tasks','🔑':'key','👑':'crown','💬':'chat','💛':'mood','✏':'pencil','⚖':'scale','🩺':'medical','🧾':'wallet','🎂':'cake','🍖':'bowl','📝':'note','🎁':'gift','🦮':'leash','🧹':'broom','📒':'book','🧸':'toy','📷':'camera','🔔':'bell','🎟':'ticket','🪙':'coin','💗':'heart','🏪':'shop','⚙':'gear','🛍':'buy2','👔':'staff','🤚':'hand','🪪':'id'};
 const ICRE=new RegExp('('+Object.keys(ICMAP).sort((a,b)=>b.length-a.length).join('|')+')️?','gu');
 function iconizeNode(t){const v=t.nodeValue;if(!v||!ICRE.test(v))return;ICRE.lastIndex=0;const pa=t.parentNode;if(!pa||pa.closest('.ii,textarea,script,style,.noic,option,title'))return;
@@ -5844,7 +5945,7 @@ function announceLetters(){if(!DB.me)return;let seen=[];try{seen=JSON.parse(loca
     sfx('gift');$('#lgopen').onclick=()=>openLetter(nw[0].id,()=>$('#bell').click())};
   setTimeout(go,1800)}
 // ================= 自動更新：發現新版本就重新載入 =================
-const APP_VER='v2.32';
+const APP_VER='v2.33';
 function checkUpdate(){
   if(!/^https?:/.test(location.protocol)||!API_URL)return;
   if(!$('#modal').classList.contains('hidden'))return; // 正在填表單時不打斷
