@@ -1165,6 +1165,7 @@ img{-webkit-user-drag:none}
 .arcov .ah{display:flex;width:100%;max-width:440px;align-items:center;justify-content:space-between;padding:max(12px,env(safe-area-inset-top)) 14px 6px;font-weight:800}
 .arcov .ah .apill{background:rgba(255,255,255,.15);border-radius:999px;padding:4px 10px;display:flex;gap:4px;align-items:center;white-space:nowrap}
 .arcov .ah .apill img{width:20px;height:20px}
+.arcov .ah{gap:6px}.arcov .ah>button{white-space:nowrap;flex:none}.arcov .ah>b{flex:1;min-width:0;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:15px}.arcov .ah .apill{flex:none;font-size:14px;padding:4px 8px;gap:3px}.arcov .ah .apill .abuy{margin-left:4px;padding:3px 7px}.arcov .ah>b .mic{display:none}
 .arcov .ah button{border:0;border-radius:14px;background:#ffe9c9;color:#3b2c22;padding:6px 12px;font-weight:800}
 .arcmach{position:relative;width:min(84vw,380px,calc(62vh * var(--a)));aspect-ratio:var(--a);margin-top:6px}
 .arcmach>img.bg{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
@@ -4956,7 +4957,7 @@ function arcBuy(){const g=DB.game,a=arcG();openModal(`<h3>${tokIcon} 買代幣</
   $('#sheet').querySelectorAll('[data-tk]').forEach(b=>b.onclick=()=>{const [n,c]=TOK_P[+b.dataset.tk];if((g.coins||0)<c)return toast(`金幣不夠，要 🪙${c}`);g.coins-=c;a.tok+=n;save();updTix&&updTix();sfx('coin');toast(`買了 ${n} 枚代幣！`);renderArcade();document.querySelectorAll('.arcov .atk').forEach(e=>e.textContent=a.tok);if(document.querySelector('.arcov'))closeModal();else arcBuy()})}
 function arcPay(n){n=n||1;const a=arcG();if(a.tok<n){arcBuy();toast(`代幣不夠，要 ${n} 枚`);return false}a.tok-=n;save();renderArcade();return true}
 function arcOv(title,a){const ov=document.createElement('div');ov.className='arcov';const A=arcG();
-  ov.innerHTML=`<div class="ah"><button class="x">← 離開</button><b>${title}</b><span class="apill">🪙 <b class="acn">${(DB.game.coins||0).toLocaleString()}</b>${a&&a.tok?`　<img src="assets/token.webp?v=3" alt=""><b class="atk">${A.tok}</b><button class="abuy">＋買</button>`:''}</span></div>`;
+  ov.innerHTML=`<div class="ah"><button class="x">← 離開</button><b>${title}</b><span class="apill">🪙 <b class="acn">${(DB.game.coins||0).toLocaleString()}</b>${a&&a.tok?`<img style="margin-left:6px" src="assets/token.webp?v=3" alt=""><b class="atk">${A.tok}</b><button class="abuy">＋買</button>`:''}</span></div>`;
   document.body.appendChild(ov);ov.querySelector('.x').onclick=()=>{ov.remove();renderArcade()};if(ov.querySelector('.abuy'))ov.querySelector('.abuy').onclick=arcBuy;const upd=()=>{ov.querySelector('.acn').textContent=(DB.game.coins||0).toLocaleString();const t=ov.querySelector('.atk');if(t)t.textContent=arcG().tok};return {ov,upd}}
 // ---------- 🧸 娃娃機 ----------
 // ================= v2.36 玩個毛：娃娃機、推幣機改成真的物理（自己操作、自己瞄準）=================
@@ -6194,7 +6195,7 @@ function announceLetters(){if(!DB.me)return;let seen=[];try{seen=JSON.parse(loca
     sfx('gift');$('#lgopen').onclick=()=>openLetter(nw[0].id,()=>$('#bell').click())};
   setTimeout(go,1800)}
 // ================= 自動更新：發現新版本就重新載入 =================
-const APP_VER='v2.42';
+const APP_VER='v2.43';
 function checkUpdate(){
   if(!/^https?:/.test(location.protocol)||!API_URL)return;
   if(!$('#modal').classList.contains('hidden'))return; // 正在填表單時不打斷
