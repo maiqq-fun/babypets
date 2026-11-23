@@ -1,0 +1,852 @@
+[
+{
+"s": "e",
+"r": 0,
+"c": 1,
+"id": "e_micro",
+"name": "微波爐",
+"price": 120,
+"sz": 1.3,
+"cat": "appl"
+},
+{
+"s": "e",
+"r": 0,
+"c": 2,
+"id": "e_fryer",
+"name": "氣炸鍋",
+"price": 110,
+"sz": 1.2,
+"cat": "appl"
+},
+{
+"s": "e",
+"r": 0,
+"c": 3,
+"id": "e_coffee",
+"name": "咖啡機",
+"price": 130,
+"sz": 1.25,
+"cat": "appl"
+},
+{
+"s": "e",
+"r": 0,
+"c": 4,
+"id": "e_toast",
+"name": "烤麵包機",
+"price": 80,
+"sz": 1.1,
+"cat": "appl"
+},
+{
+"s": "e",
+"r": 1,
+"c": 0,
+"id": "e_rice",
+"name": "電子鍋",
+"price": 90,
+"sz": 1.15,
+"cat": "appl"
+},
+{
+"s": "e",
+"r": 1,
+"c": 1,
+"id": "e_kettle",
+"name": "快煮壺",
+"price": 60,
+"sz": 1.05,
+"cat": "appl"
+},
+{
+"s": "e",
+"r": 1,
+"c": 2,
+"id": "e_blender",
+"name": "果汁機",
+"price": 80,
+"sz": 1.15,
+"cat": "appl"
+},
+{
+"s": "e",
+"r": 1,
+"c": 3,
+"id": "e_mixer",
+"name": "攪拌機",
+"price": 120,
+"sz": 1.2,
+"cat": "appl"
+},
+{
+"s": "e",
+"r": 1,
+"c": 4,
+"id": "e_pot",
+"name": "燉鍋",
+"price": 70,
+"sz": 1.15,
+"cat": "appl"
+},
+{
+"s": "e",
+"r": 2,
+"c": 0,
+"id": "e_ih",
+"name": "電磁爐",
+"price": 70,
+"sz": 1.15,
+"cat": "appl"
+},
+{
+"s": "e",
+"r": 2,
+"c": 1,
+"id": "e_waffle",
+"name": "鬆餅機",
+"price": 80,
+"sz": 1.15,
+"cat": "appl"
+},
+{
+"s": "e",
+"r": 2,
+"c": 2,
+"id": "e_steam",
+"name": "蒸籠",
+"price": 90,
+"sz": 1.2,
+"cat": "appl"
+},
+{
+"s": "e",
+"r": 2,
+"c": 3,
+"id": "e_juicer",
+"name": "榨汁機",
+"price": 60,
+"sz": 1.05,
+"cat": "appl"
+},
+{
+"s": "e",
+"r": 2,
+"c": 4,
+"id": "e_popcorn",
+"name": "爆米花機",
+"price": 120,
+"sz": 1.25,
+"cat": "appl"
+},
+{
+"s": "e",
+"r": 3,
+"c": 0,
+"id": "e_water",
+"name": "飲水機",
+"price": 110,
+"sz": 1.35,
+"cat": "appl"
+},
+{
+"s": "e",
+"r": 4,
+"c": 1,
+"id": "e_vacuum",
+"name": "吸塵器",
+"price": 130,
+"sz": 1.35,
+"cat": "appl"
+},
+{
+"s": "e",
+"r": 4,
+"c": 2,
+"id": "e_washer",
+"name": "洗衣機",
+"price": 180,
+"sz": 1.6,
+"cat": "appl"
+},
+{
+"s": "e",
+"r": 4,
+"c": 3,
+"id": "e_dryer",
+"name": "烘衣機",
+"price": 170,
+"sz": 1.6,
+"cat": "appl"
+},
+{
+"s": "e",
+"r": 4,
+"c": 4,
+"id": "e_hairdry",
+"name": "吹風機",
+"price": 60,
+"sz": 1.05,
+"cat": "appl"
+},
+{
+"s": "p",
+"r": 0,
+"c": 1,
+"id": "p_knot",
+"name": "繩結球",
+"price": 35,
+"sz": 1.0,
+"cat": "play"
+},
+{
+"s": "p",
+"r": 0,
+"c": 2,
+"id": "p_drum",
+"name": "雞腿玩具",
+"price": 40,
+"sz": 1.0,
+"cat": "play"
+},
+{
+"s": "p",
+"r": 0,
+"c": 3,
+"id": "p_lolli",
+"name": "肉球棒棒糖",
+"price": 40,
+"sz": 1.0,
+"cat": "play"
+},
+{
+"s": "p",
+"r": 0,
+"c": 4,
+"id": "p_whale",
+"name": "鯨魚玩偶",
+"price": 60,
+"sz": 1.15,
+"cat": "play"
+},
+{
+"s": "p",
+"r": 1,
+"c": 0,
+"id": "p_cow",
+"name": "乳牛玩偶",
+"price": 60,
+"sz": 1.15,
+"cat": "play"
+},
+{
+"s": "p",
+"r": 1,
+"c": 2,
+"id": "p_shoe",
+"name": "啃咬布鞋",
+"price": 45,
+"sz": 1.05,
+"cat": "play"
+},
+{
+"s": "p",
+"r": 1,
+"c": 4,
+"id": "p_sock",
+"name": "襪子玩具",
+"price": 30,
+"sz": 0.95,
+"cat": "play"
+},
+{
+"s": "p",
+"r": 2,
+"c": 3,
+"id": "p_carrot",
+"name": "胡蘿蔔拉繩",
+"price": 35,
+"sz": 1.0,
+"cat": "play"
+},
+{
+"s": "p",
+"r": 2,
+"c": 4,
+"id": "p_sheep",
+"name": "綿羊玩偶",
+"price": 60,
+"sz": 1.15,
+"cat": "play"
+},
+{
+"s": "p",
+"r": 3,
+"c": 0,
+"id": "p_block",
+"name": "益智方塊",
+"price": 50,
+"sz": 1.05,
+"cat": "play"
+},
+{
+"s": "p",
+"r": 3,
+"c": 1,
+"id": "p_bellring",
+"name": "鈴鐺甜甜圈",
+"price": 40,
+"sz": 1.0,
+"cat": "play"
+},
+{
+"s": "p",
+"r": 3,
+"c": 4,
+"id": "p_cheese",
+"name": "起司玩具",
+"price": 35,
+"sz": 1.0,
+"cat": "play"
+},
+{
+"s": "p",
+"r": 4,
+"c": 0,
+"id": "p_hydrant",
+"name": "消防栓",
+"price": 80,
+"sz": 1.3,
+"cat": "play"
+},
+{
+"s": "p",
+"r": 4,
+"c": 1,
+"id": "p_moon",
+"name": "月亮抱枕",
+"price": 50,
+"sz": 1.1,
+"cat": "play"
+},
+{
+"s": "p",
+"r": 4,
+"c": 2,
+"id": "p_bearbed",
+"name": "熊熊窩",
+"price": 130,
+"sz": 1.5,
+"cat": "play"
+},
+{
+"s": "g",
+"r": 0,
+"c": 0,
+"id": "g_dhouse",
+"name": "狗屋",
+"price": 180,
+"sz": 1.7,
+"cat": "pet"
+},
+{
+"s": "g",
+"r": 0,
+"c": 1,
+"id": "g_bed",
+"name": "寵物睡墊",
+"price": 100,
+"sz": 1.45,
+"cat": "pet"
+},
+{
+"s": "g",
+"r": 0,
+"c": 4,
+"id": "g_brush",
+"name": "梳毛刷",
+"price": 40,
+"sz": 1.0,
+"cat": "pet"
+},
+{
+"s": "g",
+"r": 1,
+"c": 0,
+"id": "g_leash",
+"name": "伸縮牽繩",
+"price": 50,
+"sz": 1.0,
+"cat": "pet"
+},
+{
+"s": "g",
+"r": 1,
+"c": 1,
+"id": "g_harness",
+"name": "胸背帶",
+"price": 60,
+"sz": 1.05,
+"cat": "pet"
+},
+{
+"s": "g",
+"r": 1,
+"c": 2,
+"id": "g_collar",
+"name": "項圈",
+"price": 40,
+"sz": 1.0,
+"cat": "pet"
+},
+{
+"s": "g",
+"r": 1,
+"c": 3,
+"id": "g_bandana",
+"name": "小領巾",
+"price": 35,
+"sz": 0.95,
+"cat": "pet"
+},
+{
+"s": "g",
+"r": 1,
+"c": 4,
+"id": "g_poopbag",
+"name": "撿便袋",
+"price": 30,
+"sz": 0.95,
+"cat": "pet"
+},
+{
+"s": "g",
+"r": 2,
+"c": 1,
+"id": "g_stroller",
+"name": "寵物推車",
+"price": 170,
+"sz": 1.6,
+"cat": "pet"
+},
+{
+"s": "g",
+"r": 2,
+"c": 4,
+"id": "g_carseat",
+"name": "車用睡窩",
+"price": 110,
+"sz": 1.4,
+"cat": "pet"
+},
+{
+"s": "g",
+"r": 3,
+"c": 0,
+"id": "g_slowbowl",
+"name": "慢食碗",
+"price": 45,
+"sz": 1.05,
+"cat": "pet"
+},
+{
+"s": "g",
+"r": 3,
+"c": 3,
+"id": "g_autofeed",
+"name": "自動餵食器",
+"price": 140,
+"sz": 1.35,
+"cat": "pet"
+},
+{
+"s": "g",
+"r": 3,
+"c": 4,
+"id": "g_pawmat",
+"name": "肉球地墊",
+"price": 60,
+"sz": 1.5,
+"cat": "pet"
+},
+{
+"s": "g",
+"r": 4,
+"c": 0,
+"id": "g_tissue",
+"name": "面紙盒",
+"price": 30,
+"sz": 0.95,
+"cat": "pet"
+},
+{
+"s": "g",
+"r": 4,
+"c": 1,
+"id": "g_shampoo",
+"name": "寵物洗毛精",
+"price": 40,
+"sz": 0.95,
+"cat": "pet"
+},
+{
+"s": "g",
+"r": 4,
+"c": 2,
+"id": "g_spray",
+"name": "除臭噴霧",
+"price": 35,
+"sz": 0.95,
+"cat": "pet"
+},
+{
+"s": "g",
+"r": 4,
+"c": 3,
+"id": "g_earclean",
+"name": "清耳液",
+"price": 30,
+"sz": 0.9,
+"cat": "pet"
+},
+{
+"s": "g",
+"r": 4,
+"c": 4,
+"id": "g_roller",
+"name": "黏毛滾輪",
+"price": 30,
+"sz": 1.0,
+"cat": "pet"
+},
+{
+"s": "b",
+"r": 0,
+"c": 0,
+"id": "b_ringswing",
+"name": "小鳥圓環鞦韆",
+"price": 50,
+"sz": 1.15,
+"cat": "bird"
+},
+{
+"s": "b",
+"r": 0,
+"c": 1,
+"id": "b_bellperch",
+"name": "鈴鐺棲木",
+"price": 45,
+"sz": 1.1,
+"cat": "bird"
+},
+{
+"s": "b",
+"r": 0,
+"c": 2,
+"id": "b_rattan",
+"name": "藤編球",
+"price": 35,
+"sz": 1.0,
+"cat": "bird"
+},
+{
+"s": "b",
+"r": 0,
+"c": 4,
+"id": "b_flower",
+"name": "花框鞦韆",
+"price": 50,
+"sz": 1.15,
+"cat": "bird"
+},
+{
+"s": "b",
+"r": 1,
+"c": 0,
+"id": "b_tassel",
+"name": "啃咬流蘇",
+"price": 35,
+"sz": 1.05,
+"cat": "bird"
+},
+{
+"s": "b",
+"r": 1,
+"c": 1,
+"id": "b_beads",
+"name": "串珠蛇",
+"price": 35,
+"sz": 1.05,
+"cat": "bird"
+},
+{
+"s": "b",
+"r": 1,
+"c": 2,
+"id": "b_house",
+"name": "小鳥屋",
+"price": 90,
+"sz": 1.25,
+"cat": "bird"
+},
+{
+"s": "b",
+"r": 1,
+"c": 4,
+"id": "b_ladder",
+"name": "小梯子",
+"price": 40,
+"sz": 1.15,
+"cat": "bird"
+},
+{
+"s": "b",
+"r": 2,
+"c": 1,
+"id": "b_corn",
+"name": "玉米編織",
+"price": 35,
+"sz": 1.05,
+"cat": "bird"
+},
+{
+"s": "b",
+"r": 2,
+"c": 2,
+"id": "b_star",
+"name": "星星鈴鐺",
+"price": 35,
+"sz": 1.05,
+"cat": "bird"
+},
+{
+"s": "b",
+"r": 2,
+"c": 3,
+"id": "b_hearts",
+"name": "愛心積木串",
+"price": 40,
+"sz": 1.05,
+"cat": "bird"
+},
+{
+"s": "b",
+"r": 2,
+"c": 4,
+"id": "b_tunnel",
+"name": "草編隧道",
+"price": 60,
+"sz": 1.2,
+"cat": "bird"
+},
+{
+"s": "b",
+"r": 3,
+"c": 0,
+"id": "b_basket",
+"name": "吊籃",
+"price": 60,
+"sz": 1.15,
+"cat": "bird"
+},
+{
+"s": "b",
+"r": 3,
+"c": 1,
+"id": "b_daisy",
+"name": "小花磨牙板",
+"price": 30,
+"sz": 1.0,
+"cat": "bird"
+},
+{
+"s": "b",
+"r": 3,
+"c": 2,
+"id": "b_cockatiel",
+"name": "玄鳳棲木",
+"price": 70,
+"sz": 1.2,
+"cat": "bird"
+},
+{
+"s": "b",
+"r": 4,
+"c": 0,
+"id": "b_shred",
+"name": "撕撕紙籃",
+"price": 40,
+"sz": 1.05,
+"cat": "bird"
+},
+{
+"s": "b",
+"r": 4,
+"c": 1,
+"id": "b_sponge",
+"name": "浮石花疊疊",
+"price": 35,
+"sz": 1.05,
+"cat": "bird"
+},
+{
+"s": "b",
+"r": 4,
+"c": 2,
+"id": "b_rainbow",
+"name": "彩虹鈴鐺",
+"price": 45,
+"sz": 1.1,
+"cat": "bird"
+},
+{
+"s": "b",
+"r": 4,
+"c": 3,
+"id": "b_leaf",
+"name": "葉子磨牙片",
+"price": 30,
+"sz": 1.0,
+"cat": "bird"
+},
+{
+"s": "b",
+"r": 4,
+"c": 4,
+"id": "b_tree",
+"name": "棲木小樹",
+"price": 80,
+"sz": 1.3,
+"cat": "bird"
+},
+{
+"s": "c",
+"r": 0,
+"c": 3,
+"id": "c_bellball",
+"name": "鈴鐺洞洞球",
+"price": 35,
+"sz": 1.0,
+"cat": "play"
+},
+{
+"s": "c",
+"r": 0,
+"c": 4,
+"id": "c_fishbone",
+"name": "魚骨玩具",
+"price": 35,
+"sz": 1.0,
+"cat": "play"
+},
+{
+"s": "c",
+"r": 1,
+"c": 1,
+"id": "c_pawpad",
+"name": "肉球坐墊",
+"price": 50,
+"sz": 1.15,
+"cat": "play"
+},
+{
+"s": "c",
+"r": 1,
+"c": 4,
+"id": "c_kicker",
+"name": "踢踢魚",
+"price": 45,
+"sz": 1.05,
+"cat": "play"
+},
+{
+"s": "c",
+"r": 2,
+"c": 1,
+"id": "c_catnip",
+"name": "貓草袋",
+"price": 35,
+"sz": 1.0,
+"cat": "play"
+},
+{
+"s": "c",
+"r": 2,
+"c": 2,
+"id": "c_feather",
+"name": "羽毛鈴鐺",
+"price": 40,
+"sz": 1.05,
+"cat": "play"
+},
+{
+"s": "c",
+"r": 2,
+"c": 3,
+"id": "c_furball",
+"name": "貓耳毛球",
+"price": 45,
+"sz": 1.05,
+"cat": "play"
+},
+{
+"s": "c",
+"r": 3,
+"c": 0,
+"id": "c_cubehouse",
+"name": "洞洞紙箱屋",
+"price": 80,
+"sz": 1.3,
+"cat": "play"
+},
+{
+"s": "c",
+"r": 3,
+"c": 1,
+"id": "c_donut",
+"name": "甜甜圈窩",
+"price": 90,
+"sz": 1.4,
+"cat": "play"
+},
+{
+"s": "c",
+"r": 3,
+"c": 3,
+"id": "c_cageball",
+"name": "草編籠球",
+"price": 40,
+"sz": 1.0,
+"cat": "play"
+},
+{
+"s": "c",
+"r": 3,
+"c": 4,
+"id": "c_post",
+"name": "貓抓柱",
+"price": 90,
+"sz": 1.35,
+"cat": "play"
+},
+{
+"s": "c",
+"r": 4,
+"c": 0,
+"id": "c_sushi",
+"name": "鮭魚壽司抱枕",
+"price": 45,
+"sz": 1.05,
+"cat": "play"
+},
+{
+"s": "c",
+"r": 4,
+"c": 1,
+"id": "c_bird",
+"name": "小鳥玩偶",
+"price": 40,
+"sz": 1.0,
+"cat": "play"
+}
+]
