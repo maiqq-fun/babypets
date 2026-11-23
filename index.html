@@ -1051,11 +1051,11 @@ img{-webkit-user-drag:none}
 .bbcard .mr{font-size:11px;background:rgba(0,0,0,.25);border-radius:10px;padding:2px 8px;margin-left:6px;font-weight:600}
 .bbcard .buy{position:relative;z-index:1;border:0;border-radius:16px;background:#fff;color:#3b2c22;font-weight:800;font-size:14px;padding:9px 10px;box-shadow:0 3px 0 rgba(0,0,0,.2);white-space:nowrap}
 .bbcard .buy small{display:block;font-size:11px;font-weight:600;opacity:.7}
-.bbov{position:fixed;inset:0;z-index:99995;background:radial-gradient(circle at 50% 35%,#4a3a5a,#1a1420 75%);display:flex;flex-direction:column;align-items:center;color:#fff;overflow:hidden}
+.bbov{position:fixed;inset:0;z-index:99995;background:radial-gradient(circle at 50% 35%,#4a3a5a,#1a1420 75%);display:flex;flex-direction:column;align-items:center;justify-content:center;color:#fff;overflow:hidden}
 .bbov .rays{position:absolute;left:50%;top:32%;width:900px;height:900px;margin:-450px 0 0 -450px;background:repeating-conic-gradient(rgba(255,255,255,.07) 0 8deg,transparent 8deg 20deg);animation:bbspin 18s linear infinite;opacity:0;transition:opacity .6s;pointer-events:none}
 .bbov.gold .rays{background:repeating-conic-gradient(rgba(255,214,90,.28) 0 8deg,transparent 8deg 20deg);opacity:1}.bbov.reveal .rays{opacity:1}
 @keyframes bbspin{to{transform:rotate(360deg)}}
-.bbov .ot{margin-top:max(22px,env(safe-area-inset-top));font-size:15px;opacity:.85;position:relative}
+.bbov .ot{position:absolute;left:0;right:0;text-align:center;top:max(22px,env(safe-area-inset-top));font-size:15px;opacity:.85}
 .bbov .stg{position:relative;height:min(320px,38vh);width:100%;display:flex;align-items:center;justify-content:center}
 .bbov .big{width:min(170px,40vw);filter:drop-shadow(0 8px 10px rgba(0,0,0,.4));cursor:pointer}
 .bbov .big.shake{animation:bbshake .5s ease-in-out infinite}
@@ -6101,7 +6101,7 @@ function announceLetters(){if(!DB.me)return;let seen=[];try{seen=JSON.parse(loca
     sfx('gift');$('#lgopen').onclick=()=>openLetter(nw[0].id,()=>$('#bell').click())};
   setTimeout(go,1800)}
 // ================= 自動更新：發現新版本就重新載入 =================
-const APP_VER='v2.40';
+const APP_VER='v2.41';
 function checkUpdate(){
   if(!/^https?:/.test(location.protocol)||!API_URL)return;
   if(!$('#modal').classList.contains('hidden'))return; // 正在填表單時不打斷
