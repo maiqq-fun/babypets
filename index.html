@@ -5106,7 +5106,7 @@ function moleGame(){const {ov,upd}=arcOv('🔨 打地鼠');const M=document.crea
     try{const r=await call('arcadeScore',Object.assign(cred(),{score:sc}),true);if(r&&r.best)msg.innerHTML+=`<br>${r.newBest?'🎉 本週新紀錄！':'本週最高'} ${r.best} 分・第 ${r.rank} 名`}catch(e){}};
   ov.querySelector('.x').addEventListener('click',()=>{on=false;clearTimeout(timer);clearInterval(tick)})}
 async function arcRank(){let r;try{r=await call('arcadeTop',cred(),true)}catch(e){return toast(e.message)}const L=r&&r.top||[];
-  openModal(`<h3>🏆 打地鼠排行榜</h3><p class="lead" style="font-size:12px">每週一早上重新計算・第一名得到 🪙500</p><div class="arcrank">${L.map((x,i)=>`<div><b>${['🥇','🥈','🥉'][i]||i+1}</b><span>${esc(x.nick)}</span><i>${x.v} 分</i></div>`).join('')||'<div class="locked">這週還沒有人玩</div>'}</div>
+  openModal(`<h3>🏆 打地鼠排行榜</h3><p class="lead" style="font-size:12px">每週一早上重新計算・第一名得到 🪙3600</p><div class="arcrank">${L.map((x,i)=>`<div><b>${['🥇','🥈','🥉'][i]||i+1}</b><span>${esc(x.nick)}</span><i>${x.v} 分</i></div>`).join('')||'<div class="locked">這週還沒有人玩</div>'}</div>
     ${r&&r.last?`<p class="lead" style="font-size:12px">上週冠軍：${esc(r.last.nick)}（${r.last.v} 分）</p>`:''}<div class="row2"><button data-close class="primary">好</button></div>`)}
 // ================= 🎁 盲盒店（v1.95）=================
 // 機率和保底在後端抽，前端只知道名字和哪幾格是隱藏版（開箱時顯示金框「?」）
