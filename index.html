@@ -4957,7 +4957,7 @@ function arcBuy(){const g=DB.game,a=arcG();openModal(`<h3>${tokIcon} 買代幣</
   $('#sheet').querySelectorAll('[data-tk]').forEach(b=>b.onclick=()=>{const [n,c]=TOK_P[+b.dataset.tk];if((g.coins||0)<c)return toast(`金幣不夠，要 🪙${c}`);g.coins-=c;a.tok+=n;save();updTix&&updTix();sfx('coin');toast(`買了 ${n} 枚代幣！`);renderArcade();document.querySelectorAll('.arcov .atk').forEach(e=>e.textContent=a.tok);if(document.querySelector('.arcov'))closeModal();else arcBuy()})}
 function arcPay(n){n=n||1;const a=arcG();if(a.tok<n){arcBuy();toast(`代幣不夠，要 ${n} 枚`);return false}a.tok-=n;save();renderArcade();return true}
 function arcOv(title,a){const ov=document.createElement('div');ov.className='arcov';const A=arcG();
-  ov.innerHTML=`<div class="ah"><button class="x">← 離開</button><b>${title}</b><span class="apill">🪙 <b class="acn">${(DB.game.coins||0).toLocaleString()}</b>${a&&a.tok?`<img style="margin-left:6px" src="assets/token.webp?v=3" alt=""><b class="atk">${A.tok}</b><button class="abuy">＋買</button>`:''}</span></div>`;
+  ov.innerHTML=`<div class="ah"><button class="x">← 離開</button><b>${title}</b><span class="apill">🪙 <b class="acn">${(DB.game.coins||0).toLocaleString()}</b>${a&&a.tok?`<img style="margin-left:6px" src="assets/token.webp?v=3" alt=""><b class="atk">${A.tok}</b><button class="abuy noic">＋ 買</button>`:''}</span></div>`;
   document.body.appendChild(ov);ov.querySelector('.x').onclick=()=>{ov.remove();renderArcade()};if(ov.querySelector('.abuy'))ov.querySelector('.abuy').onclick=arcBuy;const upd=()=>{ov.querySelector('.acn').textContent=(DB.game.coins||0).toLocaleString();const t=ov.querySelector('.atk');if(t)t.textContent=arcG().tok};return {ov,upd}}
 // ---------- 🧸 娃娃機 ----------
 // ================= v2.36 玩個毛：娃娃機、推幣機改成真的物理（自己操作、自己瞄準）=================
@@ -6195,7 +6195,7 @@ function announceLetters(){if(!DB.me)return;let seen=[];try{seen=JSON.parse(loca
     sfx('gift');$('#lgopen').onclick=()=>openLetter(nw[0].id,()=>$('#bell').click())};
   setTimeout(go,1800)}
 // ================= 自動更新：發現新版本就重新載入 =================
-const APP_VER='v2.43';
+const APP_VER='v2.44';
 function checkUpdate(){
   if(!/^https?:/.test(location.protocol)||!API_URL)return;
   if(!$('#modal').classList.contains('hidden'))return; // 正在填表單時不打斷
