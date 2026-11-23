@@ -2537,7 +2537,7 @@ function renderFloor(){
     const im=el.querySelector('img');r.ar=r.ar||1;im.onload=()=>{r.ar=im.naturalHeight/im.naturalWidth;placePet(r)};im.onerror=()=>{if(!im.dataset.fb&&!r.demon){im.dataset.fb=1;im.src=defBody(p.species)}};
     el.onclick=e=>{e.stopPropagation();if(!r.demon||isFamily(home.id))doPat(r,p);petMenu(r,p)};r.el=el;f.appendChild(el);   // v1.83：點毛孩就直接摸摸，連點一直摸
     const sp=tentSpot(p,i),tw=230*petScale(sp.y),te=document.createElement('div');te.className='tent';
-    te.innerHTML=`<img src="assets/tent_${(p.card||'#ff9a6b').slice(1)}.webp" alt="" onerror="this.src='assets/tent.webp'"><span class="zz">${[0,1,2].map(()=>`<i><img src="assets/fx_z.webp" alt="" onerror="this.replaceWith('Z')"></i>`).join('')}</span><span class="flag"><img src="${petHead(p)}" alt=""></span><span class="nm" id="tl_${r.id}"></span>`;
+    te.innerHTML=`<img src="assets/bed_${(Math.floor(hash01((p.houseId||'')+'bed')*6)+i)%6+1}.webp" alt="" onerror="this.src='assets/tent.webp'"><span class="zz">${[0,1,2].map(()=>`<i><img src="assets/fx_z.webp" alt="" onerror="this.replaceWith('Z')"></i>`).join('')}</span><span class="flag"><img src="${petHead(p)}" alt=""></span><span class="nm" id="tl_${r.id}"></span>`;
     Object.assign(te.style,hp(sp.x-tw/2,sp.y-tw*0.98),{width:(tw/RW*100)+'%',zIndex:Math.round(sp.y)});
     te.onclick=e=>{e.stopPropagation();sleepMenu(r,p)};
     r.tentEl=te;r.tent=sp;f.appendChild(te);r.sleep=undefined;petLook(r);placePet(r)});
@@ -6205,7 +6205,7 @@ function announceLetters(){if(!DB.me)return;let seen=[];try{seen=JSON.parse(loca
     sfx('gift');$('#lgopen').onclick=()=>openLetter(nw[0].id,()=>$('#bell').click())};
   setTimeout(go,1800)}
 // ================= 自動更新：發現新版本就重新載入 =================
-const APP_VER='v2.56';
+const APP_VER='v2.57';
 function checkUpdate(){
   if(!/^https?:/.test(location.protocol)||!API_URL)return;
   if(!$('#modal').classList.contains('hidden'))return; // 正在填表單時不打斷
