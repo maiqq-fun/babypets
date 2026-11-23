@@ -445,7 +445,7 @@ html,body{height:100%;overflow:hidden;overscroll-behavior:none}
 #homewrap .hudH{margin-top:8px}
 #homewrap #foot{padding:8px 16px 0;font-size:12px;line-height:1.5;text-align:center;max-width:520px;margin:0 auto}
 #home.hidden~#foot{display:none}
-.xclose{position:sticky;top:0;float:right;margin:-6px -4px -34px 0;width:34px;height:34px;border-radius:50%;border:1.5px solid #e6d3bd;background:#fff;color:#8a6a50;font-size:16px;line-height:1;z-index:5;box-shadow:0 2px 6px rgba(0,0,0,.08)}
+.xclose .ii.ic{width:18px;height:18px;vertical-align:-3px;margin:0}.xclose{position:sticky;top:0;float:right;margin:-6px -4px -34px 0;width:34px;height:34px;border-radius:50%;border:1.5px solid #e6d3bd;background:#fff;color:#8a6a50;font-size:16px;line-height:1;z-index:5;box-shadow:0 2px 6px rgba(0,0,0,.08)}
 
 .irows{position:absolute;left:0;right:0;top:75.5%;display:flex;flex-direction:column;align-items:center;gap:8px;padding:0 14px;z-index:3000}
 .irows .trow{max-width:330px;justify-content:center}
@@ -543,7 +543,7 @@ html,body,button,.island,.imap,.logo{touch-action:manipulation}
 .ci7 div{border:2px solid #f0dcc0;border-radius:12px;padding:6px 2px 5px;text-align:center;background:#fff;font-size:11px;color:#8a6a50;position:relative;min-height:66px;display:flex;flex-direction:column;align-items:center;justify-content:space-between}
 .ci7 div b{font-weight:normal;font-size:11px}.ci7 div .rw{font-size:18px;line-height:1}.ci7 div .rw img{width:24px;height:24px;object-fit:contain;display:block}
 .ci7 div small{font-size:10px;color:#a08870}
-.ci7 .done{background:#fff3d6;border-color:#ffd36e}.ci7 .done::after{content:'✓';position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:30px;color:rgba(230,150,40,.75);background:rgba(255,243,214,.55);border-radius:10px}
+.ci7 .done{background:#fff3d6;border-color:#ffd36e}.ci7 .done::after{content:'';position:absolute;inset:18%;background:url(assets/icon_tick.webp) center/contain no-repeat;opacity:.85;background:rgba(255,243,214,.55);border-radius:10px}
 .ci7 .today{border-color:#ff9a6b;box-shadow:0 0 0 2px rgba(255,154,107,.35);animation:hbump 1.6s ease-in-out infinite}
 .ci7 .big{background:linear-gradient(#fff6e0,#ffe3ef)}
 #homewrap .top.hbar .gohome{margin-left:-4px;padding:6px 10px}
@@ -1594,7 +1594,7 @@ const $=s=>document.querySelector(s);
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 let tt;function toast(m){const t=$('#toast');t.textContent=m;t.classList.add('show');clearTimeout(tt);tt=setTimeout(()=>t.classList.remove('show'),2000)}
 let modalLocked=false;
-function openModal(html,locked,theme){if(typeof CDRAFT!=='undefined'&&CDRAFT&&!closetOpening)draftCancel();const sh=$('#sheet');sh.classList.toggle('themed',!!theme);if(theme)sh.style.setProperty('--cc',theme);else sh.style.removeProperty('--cc');sh.innerHTML=(locked?'':'<button class="xclose noic" data-close aria-label="關閉">✕</button>')+html;$('#modal').classList.remove('hidden');modalLocked=!!locked;$('#sheet').scrollTop=0}
+function openModal(html,locked,theme){if(typeof CDRAFT!=='undefined'&&CDRAFT&&!closetOpening)draftCancel();const sh=$('#sheet');sh.classList.toggle('themed',!!theme);if(theme)sh.style.setProperty('--cc',theme);else sh.style.removeProperty('--cc');sh.innerHTML=(locked?'':'<button class="xclose" data-close aria-label="關閉">✕</button>')+html;$('#modal').classList.remove('hidden');modalLocked=!!locked;$('#sheet').scrollTop=0}
 function closeModal(){if(typeof CDRAFT!=='undefined'&&CDRAFT)draftCancel();$('#modal').classList.add('hidden');$('#sheet').innerHTML='';$('#sheet').classList.remove('themed');modalLocked=false}
 $('#modal').addEventListener('click',e=>{if((e.target.id==='modal'&&!modalLocked)||e.target.closest('[data-close]')){if(typeof draftDirty==='function'&&draftDirty())return draftAsk();closeModal()}});
 const house=id=>DB.houses.find(h=>h.id===id);
@@ -5093,7 +5093,7 @@ function pusherGame(){const {ov,upd}=arcOv('<img class="mic" src="assets/icon_pu
       else{const k=Math.min(1,f.t/.5);dr(f.k,f.x+(f.lost?(f.x<180?-1:1)*k*20:0),f.y+k*40,1-k*.6,1-k);if(k>=1)f.done=1}}
     for(let i=fx.length-1;i>=0;i--)if(fx[i].done)fx.splice(i,1);
     if(aim!=null){c.strokeStyle='rgba(255,90,140,.5)';c.setLineDash([4,6]);c.lineWidth=2;c.beginPath();c.moveTo(aim,X.pt-28);c.lineTo(aim,X.pt+40);c.stroke();c.setLineDash([])}
-    c.fillStyle='#3b2433';rrect(c,X.W/2-60,12,120,26,12);c.fill();c.fillStyle='#ffd23f';c.font='bold 13px sans-serif';c.fillText('▼ 點這排投幣 ▼',X.W/2,30)}
+    c.fillStyle='#3b2433';rrect(c,X.W/2-60,12,120,26,12);c.fill();c.fillStyle='#ffd23f';c.font='bold 13px sans-serif';c.fillText('點這排投幣',X.W/2,30);const td=arcLoad('assets/icon_tri_d.webp');if(td.complete&&td.naturalWidth){c.drawImage(td,X.W/2-54,19,13,13);c.drawImage(td,X.W/2+41,19,13,13)}}
   function loop(t){if(!document.body.contains(ov)){persist();return}const n=Math.min(3,Math.round((t-tLast)/16.7)||1);tLast=t;for(let i=0;i<n;i++)step();draw();requestAnimationFrame(loop)}
   requestAnimationFrame(loop)}
 // ---------- 🎯 彈珠台（v2.42）：一局 🪙30、90 秒，珠子掉了會補但倍率歸零；100 分 = 🪙1，大獎洞 +1000 ----------
@@ -5735,7 +5735,7 @@ else setTimeout(dailyLogin,800);
 const ICMAP={'🔄':'sync','🗄':'showcase','🎨':'palette','🌟':'sparkle','💼':'briefcase','👋':'wave','🔕':'mute2','👀':'eyes','🟢':'online','🙏':'pray','🏅':'medal','🚨':'siren','🥇':'gold','🥈':'silver','🥉':'bronze','💢':'anger','💨':'dash','🔥':'fire','🪵':'plank','🔨':'hammer','🧱':'brick','💌':'loveletter','👛':'purse','🎭':'masks','⚡':'bolt','🆕':'new','🌸':'flower','📥':'inbox','📤':'outbox','🎪':'circus','💡':'idea2','🐞':'bug2','🌠':'shooting','😆':'lol','😢':'cry','🎊':'popper','🍅':'assets/item_c_tomato.webp','🎃':'assets/item_c_pumpkin.webp','🍎':'assets/item_c_apple.webp','🐟':'assets/item_fish.webp','🍪':'assets/item_cookie.webp','🎄':'assets/item_xmastree.webp','🌱':'assets/item_seed_tomato.webp','🛋':'assets/item_sofa.webp','😈':'assets/demon_head.webp','📹':'assets/pet_cam.webp','🦹':'assets/thief_sneak.webp','🔍':'search','🏆':'assets/icon_rank.webp','👗':'assets/icon_closet.webp','📣':'megaphone','🔒':'lock','🌐':'globe','♂':'male','♀':'female','🎒':'bag','✅':'check','⚠':'warn','🏷':'tag','🎴':'pack','⏳':'hourglass','🛏':'bed','🌙':'moon','☀':'sun','🏥':'clinic','⏰':'alarm','☁':'cloud','🧧':'redpacket','📌':'pin','💧':'drop','🌡':'thermo','💉':'syringe','💊':'pill','🪥':'toothbrush','👁':'eye','🪮':'comb','🚶':'walk','💦':'pee','🤢':'vomit','🛁':'bath','✂':'scissors','🏃':'shoes','😴':'sleep','🔢':'number','🔁':'repeat','🐕':'dog','🐈':'cat','🐇':'rabbit','🐹':'hamster','🐦':'bird',
   '✨':'assets/fx_star.webp','⭐':'assets/fx_star.webp','★':'assets/fx_star.webp','🎉':'assets/fx_firework.webp','💕':'assets/fx_heart.webp','💖':'assets/fx_heart.webp','❤':'assets/fx_heart.webp','💤':'assets/fx_z.webp','🎵':'assets/fx_notes.webp','💰':'assets/money_bag.webp','💩':'assets/poop.webp','🍤':'assets/item_cookie.webp','🍚':'bowl','🦴':'assets/item_bone.webp','🏡':'home','🙋':'family','👥':'family','🐾':'paws','🏠':'home','←':'back','＋':'add','🙂':'me','📲':'install','🔗':'link','🔊':'sound','🔇':'mute','📅':'calendar','📋':'tasks','🔑':'key','👑':'crown','💬':'chat','💛':'mood','✏':'pencil','⚖':'scale','🩺':'medical','🧾':'wallet','🎂':'cake','🍖':'bowl','📝':'note','🎁':'gift','🦮':'leash','🧹':'broom','📒':'book','🧸':'toy','📷':'camera','🔔':'bell','🎟':'ticket','🪙':'coin','💗':'heart','🏪':'shop','⚙':'gear','🛍':'buy2','👔':'staff','🤚':'hand','🪪':'id',
   '✉':'letter','😊':'me','📮':'mail','📢':'megaphone','📜':'note','🗓':'calendar','📆':'calendar','⏱':'alarm','🛠':'gear','🏗':'hammer','🚧':'hammer','👉':'next','👆':'hand','✋':'hand','👏':'hand','✌':'hand','❌':'no','🌏':'globe','🌍':'globe','👤':'me','🧭':'globe','📖':'book','🙈':'eye','⛄':'assets/xm_snowman.webp','🦌':'assets/acc_reindeer.webp','💪':'bolt','🎯':'pinball','🔵':'assets/token5.webp','🟣':'assets/token.webp','🏛':'home','🖼':'deco','🪄':'idea','🛒':'buy2','🎲':'renew','🗑':'broom',
-  '🥫':'assets/item_meat.webp','🍗':'assets/item_chicken.webp','🧀':'assets/item_cheese.webp','🥕':'assets/item_carrot.webp','🌻':'assets/item_seeds.webp','💎':'assets/item_crystal.webp','😭':'cry','🥺':'cry','🏝':'island','❔':'question','❓':'question','🍬':'candy','🚪':'door','🏁':'flag','🔴':'chip10'};
+  '🥫':'assets/item_meat.webp','🍗':'assets/item_chicken.webp','🧀':'assets/item_cheese.webp','🥕':'assets/item_carrot.webp','🌻':'assets/item_seeds.webp','💎':'assets/item_crystal.webp','😭':'cry','🥺':'cry','🏝':'island','❔':'question','❓':'question','🍬':'candy','🚪':'door','🏁':'flag','🔴':'chip10','✕':'close','✓':'tick','☐':'box','➜':'arrow_r','◀':'tri_l','▶':'tri_r','▼':'tri_d','⇄':'swap','↺':'undo','↔':'flip'};
 const ICRE=new RegExp('('+Object.keys(ICMAP).sort((a,b)=>b.length-a.length).join('|')+')️?','gu');
 function iconizeNode(t){const v=t.nodeValue;if(!v||!ICRE.test(v))return;ICRE.lastIndex=0;const pa=t.parentNode;if(!pa||pa.closest('.ii,textarea,script,style,.noic,option,title'))return;
   const f=document.createDocumentFragment();let last=0;v.replace(ICRE,(m,k,i)=>{if(i>last)f.appendChild(document.createTextNode(v.slice(last,i)));const sp=document.createElement('span');sp.className='ii ic';const v0=ICMAP[k];sp.innerHTML=`<img src="${v0.includes('/')?v0:'assets/icon_'+v0+'.webp'}" alt="" onerror="this.remove()"><b>${m}</b>`;f.appendChild(sp);last=i+m.length;return m});
@@ -6167,7 +6167,7 @@ function unreadLetters(){return (DB.letters||[]).filter(l=>!l.read).length}
 function lgIcon(l){return `<img class="lgi" src="assets/${l.read?'icon_mail_open':'icon_mail'}.webp" alt="" onerror="this.replaceWith('✉️')">`}
 function lgGift(l){const a=[];if(l.room)a.push(`🏠 ${esc(l.roomName||rName(l.room))}`);if(+l.coins)a.push(`🪙 ${l.coins}`);if(+l.tickets)a.push(`🎟️ ${l.tickets}`);if(l.item&&ITEMS[l.item]&&+l.n)a.push(`${ITEMS[l.item].name} ×${l.n}`);return a}
 function lettersSec(){const L=DB.letters||[];if(!L.length)return '';const u=unreadLetters();
-  return `<div class="sec lgsec"><h4><span class="noic">✉️</span> 信箱${u?`<b class="lgu">${u} 封未讀</b>`:''}<span>${L.length} 封</span></h4>
+  return `<div class="sec lgsec"><h4>✉️ 信箱${u?`<b class="lgu">${u} 封未讀</b>`:''}<span>${L.length} 封</span></h4>
     ${L.slice(0,3).map(l=>`<button class="lgrow${l.read?'':' unread'}" data-lg="${l.id}">${lgIcon(l)}<span class="t"><b>👑 島主｜${esc(l.title)}</b><small>${ago(l.at)}${lgGift(l).length&&!l.claimed?'・附禮物 🎁':''}</small></span>${l.read?'':'<i class="dot"></i>'}</button>`).join('')}
     ${L.length>3?'<button class="lgmore" id="lgall">▸ 看全部信件</button>':''}</div>`}
 function bindLetters(back){const S=$('#sheet');S.querySelectorAll('[data-lg]').forEach(b=>b.onclick=()=>openLetter(b.dataset.lg,back));if($('#lgall'))$('#lgall').onclick=()=>allLetters(back)}
@@ -6197,7 +6197,7 @@ function announceLetters(){if(!DB.me)return;let seen=[];try{seen=JSON.parse(loca
     sfx('gift');$('#lgopen').onclick=()=>openLetter(nw[0].id,()=>$('#bell').click())};
   setTimeout(go,1800)}
 // ================= 自動更新：發現新版本就重新載入 =================
-const APP_VER='v2.47';
+const APP_VER='v2.49';
 function checkUpdate(){
   if(!/^https?:/.test(location.protocol)||!API_URL)return;
   if(!$('#modal').classList.contains('hidden'))return; // 正在填表單時不打斷
