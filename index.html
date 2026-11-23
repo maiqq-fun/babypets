@@ -1061,7 +1061,7 @@ img{-webkit-user-drag:none}
 .bbov .big.shake{animation:bbshake .5s ease-in-out infinite}
 @keyframes bbshake{0%,100%{transform:rotate(0)}20%{transform:rotate(-7deg) translateY(-4px)}40%{transform:rotate(6deg)}60%{transform:rotate(-4deg) translateY(-2px)}80%{transform:rotate(3deg)}}
 .bbov .big.pop{animation:bbpop .45s ease-in forwards}@keyframes bbpop{to{transform:scale(1.6);opacity:0;filter:brightness(3)}}
-.bbov .tap{position:absolute;bottom:8px;left:0;right:0;text-align:center;font-size:14px;opacity:.85;animation:bbblink 1.2s infinite}@keyframes bbblink{50%{opacity:.35}}
+.bbov .tap{position:absolute;bottom:2px;left:50%;transform:translateX(-50%);white-space:nowrap;font-size:15px;font-weight:800;background:rgba(255,255,255,.18);border:2px solid rgba(255,255,255,.55);border-radius:999px;padding:6px 16px;animation:bbblink 1.2s infinite}.bbov:has(.big.shake){cursor:pointer}@keyframes bbblink{50%{opacity:.35}}
 .bbflash{position:fixed;inset:0;background:#fff;opacity:0;pointer-events:none;z-index:99997}.bbflash.go{animation:bbfl .5s ease-out}@keyframes bbfl{0%{opacity:.95}100%{opacity:0}}
 .bbov .hero{position:absolute;display:flex;flex-direction:column;align-items:center;opacity:0;transform:scale(.3)}
 .bbov .hero.on{opacity:1;transform:scale(1);transition:transform .55s cubic-bezier(.2,1.6,.4,1),opacity .2s}
@@ -5156,9 +5156,9 @@ async function bbDraw(sid){const S=bbSer(sid),g=DB.game;if(!S||S.off||bbBusy)ret
   bbBusy=true;g.coins-=BB_PRICE;save();updTix&&updTix();bbShopRender();sfx&&sfx('coin');
   const own=S.f.map((x,i)=>bbHas(sid,i));let res=null,err=null;
   const pr=call('bbDraw',{playerId:DB.me.id,sid},true).then(r=>res=r).catch(e=>err=e);
-  const ov=document.createElement('div');ov.className='bbov';ov.innerHTML=`<div class="rays"></div><div class="ot">${S.en?esc(S.en)+'・':''}${esc(S.n)}</div><div class="stg"><img class="big shake" src="${bbBox(sid)}" alt=""><div class="tap">點一下打開</div></div><div class="grid"></div><div class="pity"></div><div class="bts"><button class="s">🗄️ 收進背包</button><button class="p">再抽一盒 🪙${BB_PRICE}</button></div>`;
+  const ov=document.createElement('div');ov.className='bbov';ov.innerHTML=`<div class="rays"></div><div class="ot">${S.en?esc(S.en)+'・':''}${esc(S.n)}</div><div class="stg"><img class="big shake" src="${bbBox(sid)}" alt=""><div class="tap">👆 點畫面任何地方打開</div></div><div class="grid"></div><div class="pity"></div><div class="bts"><button class="s">🗄️ 收進背包</button><button class="p">再抽一盒 🪙${BB_PRICE}</button></div>`;
   document.body.appendChild(ov);const W=ms=>new Promise(r=>setTimeout(r,ms));
-  let tapped=false;ov.querySelector('.big').onclick=()=>tapped=true;const t0=Date.now();
+  let tapped=false;ov.onclick=()=>tapped=true;const t0=Date.now();
   while(!tapped&&Date.now()-t0<8000)await W(80);await pr;
   if(err||!res||res.i==null){ov.remove();g.coins+=BB_PRICE;save();updTix&&updTix();bbShopRender();bbBusy=false;return toast((err&&err.message)||'盲盒店有點忙，錢退給你了，再試一次')}
   const fid=bbId(sid,res.i);bagAdd(fid,1);const b=bbData();b.p[sid]=res.pity;const d=bbDex(sid).slice();while(d.length<10)d.push(0);d[res.i]=(+d[res.i]||0)+1;b.d[sid]=d;save();
@@ -6101,7 +6101,7 @@ function announceLetters(){if(!DB.me)return;let seen=[];try{seen=JSON.parse(loca
     sfx('gift');$('#lgopen').onclick=()=>openLetter(nw[0].id,()=>$('#bell').click())};
   setTimeout(go,1800)}
 // ================= 自動更新：發現新版本就重新載入 =================
-const APP_VER='v2.39';
+const APP_VER='v2.40';
 function checkUpdate(){
   if(!/^https?:/.test(location.protocol)||!API_URL)return;
   if(!$('#modal').classList.contains('hidden'))return; // 正在填表單時不打斷
