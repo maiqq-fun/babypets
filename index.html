@@ -3984,7 +3984,7 @@ function tradeSheet(tab,sub){if(!needMe())return;if(tab)tradeTab=tab;if(sub)sell
     body=L.length||WL.length?`<div class="shopgrid">${L.map(id=>{const fr=showFree(sv,id,-1);return `<div class="si"><span class="ii big"><img src="${showCabImg(id)}" alt=""></span><div class="sn">${esc(SHOW_CABS[id].n)}</div><div class="sf">倉庫 ${fr} 個${fr<(+sv.cabs[id]||0)?`・擺出去 ${(+sv.cabs[id]||0)-fr} 個`:''}</div><button data-sc="${id}" ${fr>0?'':'disabled'}>賣 🪙 ${Math.round(SHOW_CABS[id].p/2)}</button></div>`}).join('')}${WL.map(k=>{const d=wDef(k),fr=wFree(sv,d.k,d.id,-1);return `<div class="si">${shopIcon('w',k)}<div class="sn">${esc(shopName('w',k))}</div><div class="sf">倉庫 ${fr} 個${fr<(+sv.wo[k]||0)?`・掛出去 ${(+sv.wo[k]||0)-fr} 個`:''}</div><button data-sw="${k}" ${fr>0?'':'disabled'}>賣 🪙 ${Math.round(d.p/2)}</button></div>`}).join('')}</div>`:'<div class="locked">展示間裡沒有可以賣的東西</div>';
     body+='<div class="hint">擺出去、掛出去的要先收起來才能賣・賣掉的會放上二手架，別人可以半價買</div>'}
   else if(sellSub==='bag'){const L=bagList().filter(([id])=>!['seed','crop','fig'].includes(ITEMS[id].kind));
-    body=L.length?`<div class="shopgrid">${L.map(([id,n])=>`<div class="si">${itemIcon(id,'big')}<div class="sn">${esc(ITEMS[id].name)}</div><div class="sf">× ${n}${ITEMS[id].limited?' ✨限定':''}</div><button data-ss="${id}">賣 🪙 ${shopPrice('item',id)}</button></div>`).join('')}</div>`:'<div class="locked">背包是空的</div>';
+    body=L.length?`<div class="shopgrid">${L.map(([id,n])=>`<div class="si">${mkBtn(id)}${itemIcon(id,'big')}<div class="sn">${esc(ITEMS[id].name)}</div><div class="sf">× ${n}${ITEMS[id].limited?' ✨限定':''}</div><button data-ss="${id}">賣 🪙 ${shopPrice('item',id)}</button></div>`).join('')}</div>`:'<div class="locked">背包是空的</div>';
     body+='<div class="hint">按一次會問你確定，再按一次才會賣・擺在家裡的玩具要先「收回背包」才能賣</div>'}
   else{const L=[...own].filter(id=>ACC[id]);
     body=!mh?'<div class="locked">有家之後才能賣配件</div>':L.length?`<div class="shopgrid">${L.map(id=>{const on=petsOf(mh.id).filter(p=>Object.values(p.wear||{}).includes(id)).map(p=>p.name);
@@ -6205,7 +6205,7 @@ function announceLetters(){if(!DB.me)return;let seen=[];try{seen=JSON.parse(loca
     sfx('gift');$('#lgopen').onclick=()=>openLetter(nw[0].id,()=>$('#bell').click())};
   setTimeout(go,1800)}
 // ================= 自動更新：發現新版本就重新載入 =================
-const APP_VER='v2.55';
+const APP_VER='v2.56';
 function checkUpdate(){
   if(!/^https?:/.test(location.protocol)||!API_URL)return;
   if(!$('#modal').classList.contains('hidden'))return; // 正在填表單時不打斷
