@@ -4990,7 +4990,9 @@ bbRegister();
 const bbOn=()=>bbAll().filter(S=>!S.off).sort((a,b)=>b.id-a.id);   // v2.33：新的系列排前面
 const bbIdx=S=>S.f.map((n,i)=>i).filter(i=>!(S.x||[]).includes(i));
 function bbData(){const b=DB.bb&&typeof DB.bb==='object'?DB.bb:(DB.bb={});b.p=b.p||{};b.d=b.d||{};return b}
-const bbDex=sid=>{const d=bbData().d[sid];return Array.isArray(d)?d:[]};
+// v2.34：收集紀錄＝後端紀錄＋背包、展示櫃裡有的公仔（後端紀錄不見時也算得回來）
+const bbDex=sid=>{const d=bbData().d[sid],out=Array.isArray(d)?d.slice():[],S=bbSer(sid),n=S?S.f.length:10,b=bag(),h=myHouse(),sv=h&&hasShow(h)?showNorm(h.show):null,inShow=id=>!!(sv&&sv.it.some(a=>a.includes(id)));
+  for(let i=0;i<n;i++){const id=bbId(sid,i);if(!(+out[i]>0)&&((b[id]||0)>0||inShow(id)))out[i]=1}return out};
 const bbHas=(sid,i)=>+(bbDex(sid)[i]||0)>0;
 function bbShop(){if(!needMe())return;const v=document.createElement('div');v.className='bbv';v.id='bbv';document.body.appendChild(v);bbShopRender()}
 function bbShopRender(){const v=$('#bbv');if(!v)return;const g=DB.game;
