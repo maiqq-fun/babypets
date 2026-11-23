@@ -1207,6 +1207,11 @@ img{-webkit-user-drag:none}
 .arcmach.shake{animation:bbshake .3s}
 .mlbar{width:min(84vw,380px);height:10px;border-radius:6px;background:rgba(255,255,255,.2);overflow:hidden;margin-top:6px}.mlbar i{display:block;height:100%;width:100%;background:linear-gradient(90deg,#ffd23f,#ff8fb1);transition:width .15s linear}
 
+/* v2.31 線上留言通知 */
+.notepop{position:fixed;left:50%;top:calc(env(safe-area-inset-top,0px) + 12px);transform:translateX(-50%);z-index:9500;width:min(92vw,420px);text-align:left;border:0;border-radius:18px;padding:12px 16px;background:#fffaf0;color:#6b3f1d;box-shadow:0 8px 24px rgba(60,35,15,.3);font-size:15px;line-height:1.5;animation:npin .35s ease-out}
+.notepop small{display:block;font-size:12px;color:#a07a5a}
+.notepop.out{opacity:0;transition:opacity .4s}
+@keyframes npin{from{transform:translate(-50%,-30px);opacity:0}}
 /* v2.26 展示間：編輯模式 */
 .shedtag{position:absolute;left:50%;top:1.2%;transform:translateX(-50%);z-index:60;background:rgba(60,40,25,.82);color:#fff;font-size:clamp(11px,3.1cqw,14px);padding:5px 12px;border-radius:999px;white-space:nowrap;pointer-events:none}
 .cstage.shediting{outline:3px dashed rgba(255,210,63,.85);outline-offset:-6px}
@@ -1425,7 +1430,7 @@ async function sync(quiet){
     DB.houses.forEach(h=>{if(!Array.isArray(h.poops))h.poops=[]});
     keepPending();DB.letters=(d.letters||[]).filter(l=>!LGONE[l.id]).map(l=>Object.assign(l,LSTATE[l.id]||{},CLAIMED['l:'+l.id]?{claimed:true}:{}));DB.drops=(d.drops||[]).filter(x=>!PICKED.has(x.id));DB.notice=d.notice&&d.notice.t&&!(+d.notice.until&&Date.now()>+d.notice.until)?d.notice:null;DB.center=d.center||DB.center||null;DB.applies=d.applies||[];DB.rooms=d.rooms||DB.rooms||[];if(Array.isArray(d.bbx)){DB.bbx=d.bbx;bbRegister()}applyRooms();DB.amail=+d.amail||0;setTimeout(updAdminBadge,0);DB.kuji=d.kuji||DB.kuji||null;DB.online=d.online||[];setTimeout(checkAdminGifts,600);DB.rank=d.rank||DB.rank||null;osLogin();pushCheckLater();setTimeout(noticePop,1200);DB.dbl=d.dbl||'';DB.adminId=d.adminId||'';DB.star=d.star||null;DB.xmas=d.xmas||null;DB.trades=Array.isArray(d.trades)?d.trades:(DB.trades||[]);if(typeof xcSync==='function')setTimeout(xcSync,0);if(typeof bgmSync==='function')setTimeout(bgmSync,0);DB.jobs=d.jobs||null;DB.thief=d.thief||null;setTimeout(jobPayCheck,1500);if(d.player){DB.starDone=+d.player.starDone||0;DB.xmasDone=+d.player.xmasDone||0}   // v2.29：後端找不到玩家（無痕、資料被換掉）時不要整個卡住
     if(!d.player&&DB.me&&DB.me.houseId&&!d.houses.some(h=>h.id===DB.me.houseId))DB.me.houseId=null;   // 家不在島上了 → 可以重新蓋／加入
-    setTimeout(announceLetters,0);setTimeout(updGuestBar,0);
+    setTimeout(announceLetters,0);setTimeout(updGuestBar,0);setTimeout(notePop,500);
     if(d.player&&DB.me){DB.me.code=d.player.code||DB.me.code;if(d.player.pin)DB.me.pin=d.player.pin;const ml=Array.isArray(d.player.mail)?d.player.mail:[];if(ml.length)claimMail(ml)}
     DB.owned={};d.houses.forEach(h=>DB.owned[h.id]=Array.isArray(h.owned)?h.owned:[]);
     if(d.player&&d.player.bb&&typeof d.player.bb==='object'&&!bbBusy)DB.bb=d.player.bb;
@@ -3016,7 +3021,16 @@ function notices(){
   (DB.medical||[]).forEach(m=>{if(m.next){const d=(new Date(m.next)-new Date(todayTW()))/86400e3;const p=pet(m.petId);if(p&&d>=0&&d<=7)out.push({ic:'🩺',t:`${p.name} ${d?d+' 天後':'今天'}要回診（${m.type}${m.title?'・'+m.title:''}）`,go:'home'})}});
   return out;
 }
-function bellItems(){const seen=+(localStorage.getItem('mhd_bellseen')||0);return DB.feed.filter(f=>aboutMe(f.t)&&Date.now()-f.at<3*86400e3).map(f=>({...f,isNew:f.at>seen}))}
+// v2.31：便利貼、回覆直接從便利貼資料算，不會被島上其他動態洗掉
+function noteNews(){const h=myHouse(),me=DB.me;if(!h||!me)return [];const out=[],old=Date.now()-3*86400e3;
+  (DB.notes||[]).forEach(n=>{if(n.houseId===h.id&&n.byId!==me.id&&+n.createdAt>old)out.push({t:`📝 ${n.by} 在你家貼了${n.secret?'秘密便條 🔒':'便利貼'}${n.text?`：「${n.text}」`:''}`,at:+n.createdAt,hid:n.houseId});
+    if(n.byId===me.id||n.houseId===h.id)(n.replies||[]).forEach(r=>{if(r.byId!==me.id&&+r.at>old)out.push({t:`💬 ${r.by} 回覆了${n.byId===me.id?'你':'你家'}的便利貼：「${r.text}」`,at:+r.at,hid:n.houseId})})});return out}
+function bellItems(){let seen=0;try{seen=+(localStorage.getItem('mhd_bellseen')||0)}catch(e){}return DB.feed.filter(f=>aboutMe(f.t)&&!/貼了(便利貼|一張秘密便條)/.test(f.t)&&Date.now()-f.at<3*86400e3).concat(noteNews()).sort((a,b)=>b.at-a.at).map(f=>({...f,isNew:f.at>seen}))}
+// 線上時有人留言、回覆 → 馬上跳出來（每次同步檢查，最多約 45 秒）
+function notePop(){let last=0;try{last=+(localStorage.getItem('mhd_notepop')||0)}catch(e){}const L=noteNews(),now=Date.now();if(!last){try{localStorage.setItem('mhd_notepop',now)}catch(e){}return}
+  const nw=L.filter(x=>x.at>last).sort((a,b)=>a.at-b.at);if(!nw.length)return;try{localStorage.setItem('mhd_notepop',Math.max(...nw.map(x=>x.at)))}catch(e){}
+  const x=nw[nw.length-1],b=document.createElement('button');b.className='notepop noic';b.innerHTML=`<b>${esc(x.t)}</b>${nw.length>1?`<small>還有 ${nw.length-1} 則新留言</small>`:''}<small>點一下去看看 👉</small>`;
+  document.querySelectorAll('.notepop').forEach(o=>o.remove());document.body.appendChild(b);sfx&&sfx('gift');b.onclick=()=>{b.remove();closeModal();openHome(x.hid);setTimeout(()=>{if(typeof noteBook==='function')noteBook()},700)};setTimeout(()=>{if(b.isConnected)b.classList.add('out');setTimeout(()=>b.remove(),500)},9000)}
 function noticeSig(){return notices().map(x=>x.t.replace(/\d+/g,'#')).join('|')}
 function updBell(){let sig='';try{sig=localStorage.getItem('mhd_bellsig')||''}catch(e){}const n=bellItems().filter(x=>x.isNew).length+unreadLetters(),st=notices().length&&noticeSig()!==sig?1:0,b=$('#belln');b.textContent=n?(n>99?'99+':n):st?'•':'';b.style.display=n||st?'flex':'none'}
 $('#bell').onclick=()=>{
@@ -3029,9 +3043,9 @@ $('#bell').onclick=()=>{
     ${st.length?`<div class="sec" style="margin-top:0"><h4>📌 現在</h4>${st.map(x=>`<div class="frow"><span>${x.ic} ${esc(x.t)}</span></div>`).join('')}</div>`:''}
     ${lettersSec()}
     ${myHouse()&&ONLINE?'<div class="row2" style="margin-top:8px"><button id="bmail" class="mbtn"><img class="mic" src="assets/icon_mail.webp" alt="">寫信給島主（建議、回報、許願）</button></div>':''}
-    <div class="sec"><h4>🏠 你家的新鮮事<span>最近 3 天</span></h4>${it.length?it.map(f=>`<div class="frow${f.isNew?' mine':''}"><span>${f.isNew?'<b class="dot"></b>':''}${esc(f.t)}</span><span class="ago">${ago(f.at)}</span></div>`).join(''):'<div class="locked">還沒有新鮮事</div>'}</div>
+    <div class="sec"><h4>🏠 你家的新鮮事<span>最近 3 天</span></h4>${it.length?it.map(f=>`<div class="frow${f.isNew?' mine':''}"${f.hid?` data-bh="${f.hid}" style="cursor:pointer"`:''}><span>${f.isNew?'<b class="dot"></b>':''}${esc(f.t)}</span><span class="ago">${ago(f.at)}</span></div>`).join(''):'<div class="locked">還沒有新鮮事</div>'}</div>
     <div class="row2" style="margin-top:14px">${myHouse()?'<button id="bhome">🏠 回我家</button>':''}<button data-close>關閉</button></div>`);
-  if($('#bhome'))$('#bhome').onclick=()=>{closeModal();openHome(myHouse().id)};if($('#bmail'))$('#bmail').onclick=()=>mailAdminSheet();
+  if($('#bhome'))$('#bhome').onclick=()=>{closeModal();openHome(myHouse().id)};if($('#bmail'))$('#bmail').onclick=()=>mailAdminSheet();$('#sheet').querySelectorAll('[data-bh]').forEach(r=>r.onclick=()=>{const hid=r.dataset.bh;closeModal();openHome(hid);setTimeout(()=>{if(typeof noteBook==='function')noteBook()},700)});
   bindLetters(()=>$('#bell').click());
   updBell();
 };
@@ -3192,7 +3206,7 @@ function shopSheet(tab){
     body=`<div class="shopgrid">${list.map(([id,it])=>`<div class="si">${itemIcon(id,'big')}<div class="sn">${it.name}</div>
       ${it.fav&&it.fav.length?`<div class="sf">${it.fav.join('、')}最愛</div>`:it.bday?'<div class="sf">今天有毛孩生日限定</div>':'<div class="sf">&nbsp;</div>'}
       <button data-buy="${id}" ${coins>=it.price?'':'disabled'}>🪙 ${it.price}</button><small>${bag()[id]?`背包裡有 ${bag()[id]}`:''}</small></div>`).join('')}</div>
-      <div class="hint">${shopTab==='seed'?'種子要種在農田裡（在島民中心申請擴建農田），8 小時成熟，收成拿去毛二街賣':shopTab==='treat'?`零食可以去任何人家餵毛孩，每隻毛孩一天最多吃 ${TREAT_MAX} 個；也可以包成禮物送人`:'玩具可以擺在自己家，也可以送給朋友，會放在他們家的地上'}</div>`}
+      <div class="hint">${shopTab==='seed'?'種子要種在農田裡（在島民中心申請擴建農田），小番茄 4 小時、南瓜和金蘋果 8 小時成熟，收成拿去毛二街賣':shopTab==='treat'?`零食可以去任何人家餵毛孩，每隻毛孩一天最多吃 ${TREAT_MAX} 個；也可以包成禮物送人`:'玩具可以擺在自己家，也可以送給朋友，會放在他們家的地上'}</div>`}
   if(shopTab==='kuji')body=kujiBody(coins);
   if(shopTab==='bag'){const L=bagList(),SB=starEv()&&starG().n&&!starDone()?`<div class="sbbag"><img src="assets/sb_happy.webp" alt=""><div><b>⭐ 星寶 × ${starG().n}</b><small>毛球的好朋友，不能送也不能賣・集滿 ${STAR_GOAL} 次去找毛球</small></div></div>`:'';body=SB+(L.length?`<div class="shopgrid">${L.map(([id,n])=>`<div class="si">${itemIcon(id,'big')}<div class="sn">${ITEMS[id].name}</div><div class="sf">× ${n}</div></div>`).join('')}</div><div class="hint">零食：在別人家點毛孩 →「🍤 零食」。玩具：自己家點「🧸 玩具」擺出來，或在朋友家點「🎁 送禮」</div>`:(SB?'':'<div class="locked">背包是空的，買點東西吧</div>'))}
   openModal(`<h3>🏪 毛毛商店</h3><p class="lead">我的金幣：<b class="coinv">🪙 ${coins}</b></p>
@@ -4273,7 +4287,7 @@ function farmOf(h){const f=h.farm&&typeof h.farm==='object'?h.farm:{n:FARM_N0,p:
 const fmLeft=ms=>{const m=Math.max(0,Math.ceil(ms/60000)),h=Math.floor(m/60);return h?`${h} 小時 ${m%60} 分`:`${m} 分`};
 let FM=null,fmTick=0;
 function openFarm(hid){const h=house(hid);if(!hasFarm(h))return;sfx&&sfx('tap');
-  const v=sceneOpen('farmv',esc(h.name),'🌱 農田・8 小時成熟','assets/room_farm.webp','← 回家');FM={hid};renderFarm();
+  const v=sceneOpen('farmv',esc(h.name),'🌱 農田・番茄 4 小時、其他 8 小時','assets/room_farm.webp','← 回家');FM={hid};renderFarm();
   clearInterval(fmTick);fmTick=setInterval(()=>{if(!$('#farmv'))return clearInterval(fmTick);renderFarm()},30000)}
 function renderFarm(){const v=$('#farmv');if(!v||!FM)return;const h=house(FM.hid),f=farmOf(h),st=v.querySelector('.cstage'),fam=isFamily(h.id),now=Date.now();
   st.querySelectorAll('.plot,.plab').forEach(x=>x.remove());
@@ -4285,7 +4299,7 @@ function renderFarm(){const v=$('#farmv');if(!v||!FM)return;const h=house(FM.hid
     const wet=c&&now-lastW(c)<HOUR;
     el.innerHTML=`<img class="soil" src="assets/plot_${lock?'lock':wet?'wet':'dry'}.webp" alt="">${crop}`;
     Object.assign(el.style,hp(x,y),{zIndex:y});el.onclick=e=>{e.stopPropagation();plotTap(i)};st.appendChild(el);
-    const lb=document.createElement('span');lb.className='plab'+(c&&now>=ripeAt(c)?' ripe':'');lb.innerHTML=lab;Object.assign(lb.style,hp(x,y+6),{zIndex:3000});lb.onclick=e=>{e.stopPropagation();plotTap(i)};st.appendChild(lb)});
+    const lb=document.createElement('span');lb.className='plab'+(c&&now>=ripeAt(c)?' ripe':'');lb.innerHTML=lab;Object.assign(lb.style,hp(x,y-34),{zIndex:3000});lb.onclick=e=>{e.stopPropagation();plotTap(i)};st.appendChild(lb)});
   v.querySelector('.cbtns').innerHTML=`<button class="act" id="fmseed">${fam?'🌱 買種子':'💧 幫忙澆水'}</button><button class="act" id="fmsell"><img class="mic" src="assets/icon_harvest.webp" alt="">${fam?'作物拿去賣':'怎麼玩'}</button>`;
   $('#fmseed').onclick=()=>fam?shopSheet('seed'):toast('點有作物的田就能幫忙澆水，一格每小時可以澆一次');
   $('#fmsell').onclick=()=>fam?(house(SHOP_ID)?tradeSheet('sell','crop'):toast('毛二街還沒開')):farmHelp()}
@@ -4312,7 +4326,7 @@ async function plotTap(i){if(!needMe())return;const h=house(FM.hid),f=farmOf(h),
 function seedPick(i){const g=DB.game;
   openModal(`<h3>🌱 要種什麼？</h3><div class="shopgrid">${Object.entries(CROP).map(([k,c])=>{const s=ITEMS[c.seed],n=bag()[c.seed]||0;return `<div class="si">${itemIcon(c.seed,'big')}<div class="sn">${c.n}</div><div class="sf">賣 🪙${ITEMS[c.item].price}${k==='apple'?'・可能有錢袋':''}</div>
     ${n?`<button data-pl="${k}">種下（有 ${n}）</button>`:`<button data-pb="${k}" ${(g.coins||0)>=s.price?'':'disabled'}>🪙${s.price} 買來種</button>`}</div>`}).join('')}</div>
-    <div class="hint">8 小時成熟，澆水可以更快</div><div class="row2"><button data-close>取消</button></div>`);
+    <div class="hint">小番茄 4 小時、南瓜和金蘋果 8 小時成熟，澆水可以更快</div><div class="row2"><button data-close>取消</button></div>`);
   // v1.82：先種下去（畫面馬上看到），小島在背後確認；失敗才把種子還你
   const plant=async k=>{const h=house(FM.hid),f=farmOf(h);if(f.p[i])return;f.p[i]={c:k,at:Date.now(),w:[]};farmPend(h.id,i,f.p[i]);bagAdd(CROP[k].seed,-1);closeModal();sfx('pat');renderFarm();toast(`種下${CROP[k].n}了 🌱`);
     try{const r=await call('farmPlant',Object.assign(cred(),{houseId:h.id,i,c:k}),true);farmDone(h.id,i);farmOf(house(h.id)).p[i]=r;renderFarm()}catch(e){farmDone(h.id,i);if(!/已經種/.test(e.message)){farmOf(house(h.id)).p[i]=null;bagAdd(CROP[k].seed,1);renderFarm()}toast(e.message)}};
@@ -5822,7 +5836,7 @@ function announceLetters(){if(!DB.me)return;let seen=[];try{seen=JSON.parse(loca
     sfx('gift');$('#lgopen').onclick=()=>openLetter(nw[0].id,()=>$('#bell').click())};
   setTimeout(go,1800)}
 // ================= 自動更新：發現新版本就重新載入 =================
-const APP_VER='v2.30';
+const APP_VER='v2.31';
 function checkUpdate(){
   if(!/^https?:/.test(location.protocol)||!API_URL)return;
   if(!$('#modal').classList.contains('hidden'))return; // 正在填表單時不打斷
