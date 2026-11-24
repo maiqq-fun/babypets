@@ -3122,7 +3122,7 @@ function notices(){
   return out;
 }
 // v2.33：畫面上方的通知條（便利貼、公仔交換共用）
-function topPop(text,go){const b=document.createElement('button');b.className='notepop noic';b.innerHTML=`<b>${esc(text)}</b>${go?'<small>點一下去看看 👉</small>':''}`;document.querySelectorAll('.notepop').forEach(o=>o.remove());document.body.appendChild(b);sfx&&sfx('gift');
+function topPop(text,go){const b=document.createElement('button');b.className='notepop';b.innerHTML=`<b>${esc(text)}</b>${go?'<small>點一下去看看 👉</small>':''}`;document.querySelectorAll('.notepop').forEach(o=>o.remove());document.body.appendChild(b);sfx&&sfx('gift');
   b.onclick=()=>{b.remove();if(go){closeModal();go()}};setTimeout(()=>{if(b.isConnected)b.classList.add('out');setTimeout(()=>b.remove(),500)},9000)}
 // 2) 鈴鐺：公仔交換的結果、收到的邀請
 function tradeNews(){const me=DB.me;if(!me)return [];const old=Date.now()-3*86400e3,out=[];(DB.trades||[]).forEach(t=>{
@@ -3136,7 +3136,7 @@ function bellItems(){let seen=0;try{seen=+(localStorage.getItem('mhd_bellseen')|
 // 線上時有人留言、回覆 → 馬上跳出來（每次同步檢查，最多約 45 秒）
 function notePop(){let last=0;try{last=+(localStorage.getItem('mhd_notepop')||0)}catch(e){}const L=noteNews(),now=Date.now();if(!last){try{localStorage.setItem('mhd_notepop',now)}catch(e){}return}
   const nw=L.filter(x=>x.at>last).sort((a,b)=>a.at-b.at);if(!nw.length)return;try{localStorage.setItem('mhd_notepop',Math.max(...nw.map(x=>x.at)))}catch(e){}
-  const x=nw[nw.length-1],b=document.createElement('button');b.className='notepop noic';b.innerHTML=`<b>${esc(x.t)}</b>${nw.length>1?`<small>還有 ${nw.length-1} 則新留言</small>`:''}<small>點一下去看看 👉</small>`;
+  const x=nw[nw.length-1],b=document.createElement('button');b.className='notepop';b.innerHTML=`<b>${esc(x.t)}</b>${nw.length>1?`<small>還有 ${nw.length-1} 則新留言</small>`:''}<small>點一下去看看 👉</small>`;
   document.querySelectorAll('.notepop').forEach(o=>o.remove());document.body.appendChild(b);sfx&&sfx('gift');b.onclick=()=>{b.remove();closeModal();openHome(x.hid);setTimeout(()=>{if(typeof noteBook==='function')noteBook()},700)};setTimeout(()=>{if(b.isConnected)b.classList.add('out');setTimeout(()=>b.remove(),500)},9000)}
 function noticeSig(){return notices().map(x=>x.t.replace(/\d+/g,'#')).join('|')}
 function updBell(){let sig='';try{sig=localStorage.getItem('mhd_bellsig')||''}catch(e){}const n=bellItems().filter(x=>x.isNew).length+unreadLetters(),st=notices().length&&noticeSig()!==sig?1:0,b=$('#belln');b.textContent=n?(n>99?'99+':n):st?'•':'';b.style.display=n||st?'flex':'none'}
@@ -6208,7 +6208,7 @@ function announceLetters(){if(!DB.me)return;let seen=[];try{seen=JSON.parse(loca
     sfx('gift');$('#lgopen').onclick=()=>openLetter(nw[0].id,()=>$('#bell').click())};
   setTimeout(go,1800)}
 // ================= 自動更新：發現新版本就重新載入 =================
-const APP_VER='v2.62';
+const APP_VER='v2.63';
 function checkUpdate(){
   if(!/^https?:/.test(location.protocol)||!API_URL)return;
   if(!$('#modal').classList.contains('hidden'))return; // 正在填表單時不打斷
