@@ -5048,9 +5048,9 @@ function clawGame(){const {ov,upd}=arcOv('<img class="mic" src="assets/icon_claw
 
 // ---------- 🪙 推幣機：點檯面任何位置投下代幣，推板會一直推，從前緣掉下來的是你的、從兩邊掉下去就沒了 ----------
 const PSX={W:360,H:520,L:34,R:326,front:470,pt:60,pl:120,pmin:88,pmax:150,r:15};
-const PSK={c:{img:'assets/icon_coin.webp',r:15},t:{img:'assets/token.webp?v=3',r:16},t5:{img:'assets/token5.webp',r:17},t10:{img:'assets/icon_chip10.webp',r:18,n:10},t20:{r:19,col:'#f2b51c',n:20},bag:{img:'assets/luckybag.webp',r:28}};
+const PSK={c:{img:'assets/icon_coin.webp',r:15},t:{img:'assets/token.webp?v=3',r:16},t5:{img:'assets/token5.webp',r:17},t10:{img:'assets/icon_chip10.webp',r:18,n:10},t20:{r:19,col:'#f2b51c',n:20},bag:{img:'assets/luckybag.webp',r:28},stk:{img:'assets/icon_stack50.webp',r:21}};
 // v2.36：籌碼多了紅色 ×10、金色 ×20（拿藍綠籌碼的圖重新上色）；機率調過，平均回收還是約 9 成
-function pushKind(){const r=Math.random();return r<.0045?'t10':r<.0165?'t5':r<.167?'t':'c'}   // v2.42：拿掉金色 ×20，紅色 ×10 變多一點，平均回收不變
+function pushKind(){const r=Math.random();return r<.0045?'t10':r<.0085?'t5':r<.0165?'stk':r<.167?'t':'c'}   // v2.64：一疊金幣 🪙50（從藍籌碼分出來，平均回收不變）   // v2.42：拿掉金色 ×20，紅色 ×10 變多一點，平均回收不變
 // 紅色 ×10、金色 ×20 籌碼：用畫的（賭場籌碼的樣子：邊緣白色色塊、中間圓圈寫數字）
 const chipCv={};function chipImg(k){const K=PSK[k];if(!K.col)return arcLoad(K.img);if(chipCv[k])return chipCv[k];
   const c=document.createElement('canvas');c.width=c.height=120;const x=c.getContext('2d');x.fillStyle='rgba(0,0,0,.18)';x.beginPath();x.arc(62,64,56,0,7);x.fill();
@@ -5059,7 +5059,7 @@ const chipCv={};function chipImg(k){const K=PSK[k];if(!K.col)return arcLoad(K.im
   x.fillStyle='rgba(255,255,255,.25)';x.beginPath();x.ellipse(48,40,22,12,-.5,0,7);x.fill();x.fillStyle='#fff';x.strokeStyle='rgba(80,20,30,.6)';x.lineWidth=5;x.font='900 34px sans-serif';x.textAlign='center';x.textBaseline='middle';x.strokeText('×'+K.n,60,62);x.fillText('×'+K.n,60,62);
   c.complete=true;c.naturalWidth=120;return chipCv[k]=c}
 function pusherGame(){const {ov,upd}=arcOv('<img class="mic" src="assets/icon_pusher.webp" alt="">推幣機',{tok:1});const {box,cv,ctx,toXY}=arcCanvas(ov,PSX.W,PSX.H,'psh');const X=PSX;
-  const msg=document.createElement('div');msg.className='arcmsg';msg.className='arcmsg pshmsg';msg.innerHTML='點檯面投下代幣・1 枚 = 🪙10<div class="pshlg"><span><img src="assets/icon_coin.webp" alt="">金幣<b>🪙10</b></span><span><img src="assets/token.webp?v=3" alt="">代幣<b>+1 枚</b></span><span><img src="assets/token5.webp" alt="">藍籌碼<b>+5 枚</b></span><span><img src="assets/icon_chip10.webp" alt="">紅籌碼<b>+10 枚</b></span><span class="w"><img src="assets/luckybag.webp" alt="">錢袋<b>🪙60～500</b></span></div>';ov.appendChild(msg);
+  const msg=document.createElement('div');msg.className='arcmsg';msg.className='arcmsg pshmsg';msg.innerHTML='點檯面投下代幣・1 枚 = 🪙10<div class="pshlg"><span><img src="assets/icon_coin.webp" alt="">金幣<b>🪙10</b></span><span><img src="assets/icon_stack50.webp" alt="">一疊金幣<b>🪙50</b></span><span><img src="assets/token.webp?v=3" alt="">代幣<b>+1 枚</b></span><span><img src="assets/token5.webp" alt="">藍籌碼<b>+5 枚</b></span><span><img src="assets/icon_chip10.webp" alt="">紅籌碼<b>+10 枚</b></span><span class="w"><img src="assets/luckybag.webp" alt="">錢袋<b>🪙60～500</b></span></div>';ov.appendChild(msg);
   const sum=document.createElement('div');sum.className='pshsum';ov.appendChild(sum);let got={c:0,t:0,n:0};const updSum=()=>{if(!got.n&&!got.c&&!got.t){sum.textContent='';return}const net=got.c+got.t*10-got.n*10;sum.innerHTML=`<span>投入<b>${got.n} 枚</b></span><span>拿回<b>🪙${got.c}${got.t?` + ${got.t} 枚`:''}</b></span><span class="${net>=0?'up':'dn'}">${net>=0?'賺':'少'}<b>🪙${Math.abs(net)}</b></span>`};
   Object.values(PSK).forEach(k=>arcLoad(k.img));
   // 檯面上的東西會記住（下次打開還在，不會每次都是滿的）
@@ -5077,7 +5077,7 @@ function pusherGame(){const {ov,upd}=arcOv('<img class="mic" src="assets/icon_pu
     for(const c of L){const r=R(c);if(c.y-r*.2>X.front){c.out='win';award(c)}else if(c.x<X.L-r*.2||c.x>X.R+r*.2){c.out='lost';award(c)}}
     if(cs.length>140)cs=cs.filter(c=>!c.out)}
   function award(c){if(c.out!=='win'){fx.push({x:c.x,y:c.y,k:c.k,t:0,lost:1});return}fx.push({x:c.x,y:c.y,k:c.k,t:0});const A=arcG();
-    if(c.k==='c'){grant(0,10);got.c+=10;sfx('coin');lab(c.x,'+10',1)}else if(c.k==='t'){A.tok+=1;got.t+=1;sfx('coin');lab(c.x,'代幣 +1')}else if(c.k==='t5'||c.k==='t10'||c.k==='t20'){const v=c.k==='t5'?5:PSK[c.k].n;A.tok+=v;got.t+=v;sfx('levelup');lab(c.x,`代幣 +${v}`,0,1);if(v>=20)bbSpark(box,18,['✨','🎉','💰'])}
+    if(c.k==='c'){grant(0,10);got.c+=10;sfx('coin');lab(c.x,'+10',1)}else if(c.k==='stk'){grant(0,50);got.c+=50;sfx('levelup');lab(c.x,'+50',1,1)}else if(c.k==='t'){A.tok+=1;got.t+=1;sfx('coin');lab(c.x,'代幣 +1')}else if(c.k==='t5'||c.k==='t10'||c.k==='t20'){const v=c.k==='t5'?5:PSK[c.k].n;A.tok+=v;got.t+=v;sfx('levelup');lab(c.x,`代幣 +${v}`,0,1);if(v>=20)bbSpark(box,18,['✨','🎉','💰'])}
     else if(c.k==='bag'){const v=Math.random()<.15?300+Math.floor(Math.random()*5)*50:60+Math.floor(Math.random()*10)*10;grant(0,v);got.c+=v;sfx('levelup');lab(c.x,'+'+v,1,1);arcFloat(box,`💰 錢袋！🪙${v}`,1);bbSpark(box,22,['💰','✨','🎉']);if(ONLINE)feedPush(`🪙 ${DB.me.nick} 在玩個毛的推幣機推出錢袋，拿到 🪙${v}！`)}
     updSum();upd();clearTimeout(award.t);award.t=setTimeout(persist,800)}
   function drop(x){if(!arcPay(1))return;got.n++;updSum();upd();sfx&&sfx('tap');x=Math.max(X.L+X.r,Math.min(X.R-X.r,x));
@@ -6208,7 +6208,7 @@ function announceLetters(){if(!DB.me)return;let seen=[];try{seen=JSON.parse(loca
     sfx('gift');$('#lgopen').onclick=()=>openLetter(nw[0].id,()=>$('#bell').click())};
   setTimeout(go,1800)}
 // ================= 自動更新：發現新版本就重新載入 =================
-const APP_VER='v2.63';
+const APP_VER='v2.64';
 function checkUpdate(){
   if(!/^https?:/.test(location.protocol)||!API_URL)return;
   if(!$('#modal').classList.contains('hidden'))return; // 正在填表單時不打斷
