@@ -5223,7 +5223,8 @@ function moleGame(){const {ov,upd}=arcOv('<img class="mic" src="assets/icon_mole
     try{const r=await call('arcadeScore',Object.assign(cred(),{score:sc}),true);if(r&&r.best)msg.innerHTML+=`<br>${r.newBest?'🎉 本週新紀錄！':'本週最高'} ${r.best} 分・第 ${r.rank} 名`}catch(e){}};
   ov.querySelector('.x').addEventListener('click',()=>{on=false;clearTimeout(timer);clearInterval(tick)})}
 function moleRules(){openModal(`<h3>📜 打地鼠遊戲規則</h3><ul class="mlrules"><li>一局 <b>🪙10</b>，<b>30 秒</b></li><li>毛孩冒出來就點牠：打中 <b>+1 分</b></li><li>連續打中 5 隻以上，每隻 <b>+2 分</b></li><li>⛄ 搗蛋小雪人不要打，打到 <b>−2 分</b></li><li>每週比<b>每個人最高的一局</b></li><li>每週一凌晨 0 點結算，前三名寄獎金：<br>🥇 <b>🪙1000</b>　🥈 <b>🪙750</b>　🥉 <b>🪙500</b></li></ul><div class="row2"><button data-close class="primary">知道了</button></div>`)}
-async function arcRank(){let r;try{r=await call('arcadeTop',cred(),true)}catch(e){return toast(e.message)}const L=r&&r.top||[];
+let arcRkBusy=0;async function arcRank(){if(arcRkBusy)return;arcRkBusy=1;openModal(`<h3>🏆 打地鼠排行榜</h3><div class="locked">排行榜讀取中…</div><div class="row2"><button data-close>關閉</button></div>`);let r;
+  try{r=await call('arcadeTop',cred(),true)}catch(e){arcRkBusy=0;return openModal(`<h3>🏆 打地鼠排行榜</h3><div class="locked">讀不到排行榜：${esc(e.message||'網路有點慢')}<br>等一下再試試</div><div class="row2"><button data-close>關閉</button><button class="primary" id="rkre">再試一次</button></div>`),$('#rkre').onclick=arcRank}arcRkBusy=0;const L=r&&r.top||[];
   openModal(`<h3>🏆 打地鼠排行榜</h3><p class="lead" style="font-size:12px">每週一凌晨 0 點結算・🥇🪙1000　🥈🪙750　🥉🪙500</p><div class="arcrank">${L.map((x,i)=>`<div><b>${['🥇','🥈','🥉'][i]||i+1}</b><span>${esc(x.nick)}</span><i>${x.v} 分</i></div>`).join('')||'<div class="locked">這週還沒有人玩</div>'}</div>
     ${r&&r.last?`<p class="lead" style="font-size:12px">上週冠軍：${esc(r.last.nick)}（${r.last.v} 分）</p>`:''}<div class="row2"><button data-close class="primary">好</button></div>`)}
 // ================= 🎁 盲盒店（v1.95）=================
@@ -6205,7 +6206,7 @@ function announceLetters(){if(!DB.me)return;let seen=[];try{seen=JSON.parse(loca
     sfx('gift');$('#lgopen').onclick=()=>openLetter(nw[0].id,()=>$('#bell').click())};
   setTimeout(go,1800)}
 // ================= 自動更新：發現新版本就重新載入 =================
-const APP_VER='v2.58';
+const APP_VER='v2.59';
 function checkUpdate(){
   if(!/^https?:/.test(location.protocol)||!API_URL)return;
   if(!$('#modal').classList.contains('hidden'))return; // 正在填表單時不打斷
