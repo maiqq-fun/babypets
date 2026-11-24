@@ -703,6 +703,9 @@ html,body,button,.island,.imap,.logo{touch-action:manipulation}
 .acci.buy img{opacity:.55}.acci.buy em{color:#8a5a10}.acci.armed{border-color:#f0a33a;background:#fff6e2}.acci.armed em{color:#c46a00;font-weight:bold}
 .irow2{position:absolute;left:14px;display:flex;align-items:center;gap:8px;z-index:3001;pointer-events:auto}
 .irow2.hidden{display:none}
+.islebtn{position:absolute;transform:translate(-50%,-50%);display:flex;align-items:center;gap:6px;border:2px solid #fff;border-radius:999px;background:#fff6e6;color:#7a4a2a;font-weight:900;font-size:clamp(13px,3.6vw,16px);padding:6px 14px 6px 8px;box-shadow:0 4px 0 rgba(122,74,42,.25);cursor:pointer;white-space:nowrap}.islebtn img{width:1.8em;height:1.8em;object-fit:contain}
+.islelist .frow{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:6px 0;border-bottom:1px dashed var(--line)}.islelist .frow button{flex:none}.islet{font-style:normal;font-size:11px;background:#9fd8f0;color:#fff;border-radius:8px;padding:0 6px}
+.islenote{position:absolute;transform:translate(-50%,-50%);background:rgba(255,250,240,.92);border-radius:16px;padding:8px 14px;font-weight:800;color:#7a4a2a;font-size:clamp(12px,3.4vw,15px);white-space:nowrap}
 .rankb img{width:72%;height:72%;object-fit:contain}
 .onpill{display:inline-flex;align-items:center;gap:6px;border:2px solid var(--wood);background:rgba(255,250,238,.94);border-radius:999px;padding:5px 11px;font-size:13px;color:#4f7a3a;font-weight:bold;box-shadow:0 2px 0 rgba(0,0,0,.12)}
 .ondot{display:inline-block;width:9px;height:9px;border-radius:50%;border:1.5px solid #b9a58c;background:transparent;vertical-align:1px;flex:none}
@@ -1804,8 +1807,8 @@ function onlineSheet(){const L=(DB.online||[]).slice();if(DB.me&&myHouse()&&!L.s
   openModal(`<h3>🟢 ${L.length} 人在島上</h3><p class="lead">3 分鐘內有打開毛很多的人</p>
     ${L.map(o=>`<div class="frow"><span>${onDot(o.id)} ${esc(nickOf(o.id))}${o.id===(DB.me&&DB.me.id)?'（我）':''} ${lvTag(o.id)}</span><span class="ago">${esc(o.id===(DB.me&&DB.me.id)?(curWhere()==='island'?'在島上逛逛':whereText({id:o.id,where:curWhere()})):whereText(o))}</span></div>`).join('')}
     <div class="row2"><button data-close>關閉</button></div>`)}
-function updOnline(){let r=$('#irow2');if(!r){r=document.createElement('div');r.id='irow2';r.className='irow2';r.innerHTML=`<button class="circle rankb noic" id="rankb" aria-label="排行榜"><img src="assets/icon_rank.webp" alt="" onerror="this.replaceWith('🏆')"></button><button class="onpill noic" id="onpill"></button>`;$('#icol').appendChild(r);
-    $('#rankb').onclick=()=>{sfx&&sfx('tap');rankSheet()};$('#onpill').onclick=onlineSheet}
+function updOnline(){let r=$('#irow2');if(!r){r=document.createElement('div');r.id='irow2';r.className='irow2';r.innerHTML=`<button class="circle rankb noic" id="rankb" aria-label="排行榜"><img src="assets/icon_rank.webp" alt="" onerror="this.replaceWith('🏆')"></button><button class="circle rankb noic" id="isleb" aria-label="外島"><img src="assets/icon_island.webp" alt=""></button><button class="onpill noic" id="onpill"></button>`;$('#icol').appendChild(r);
+    $('#rankb').onclick=()=>{sfx&&sfx('tap');rankSheet()};$('#isleb').onclick=()=>goIsle(ISLE==='out'?'main':'out');$('#onpill').onclick=onlineSheet}
   const n=ONSET().size,pl=$('#onpill');pl.style.display=ONLINE&&n?'':'none';pl.innerHTML=`<i class="ondot on"></i>${n} 人在島上`;r.classList.toggle('hidden',picking);updStarBtn();updAdminBadge()}
 // ---------- 🔑 改轉移碼 ----------
 function codeSheet(){const cur=String(DB.me.code||'').replace(/^MH-/,'');
@@ -2038,16 +2041,44 @@ function taipeiHour(){try{return +new Intl.DateTimeFormat('en-US',{timeZone:'Asi
 function autoPeriod(){const h=taipeiHour();return h>=5&&h<7?'dawn':h>=7&&h<17?'day':h>=17&&h<19?'sunset':'night'}
 const period=()=>mode==='auto'?autoPeriod():mode;
 const ipct=(x,y)=>({left:(x/1024*100)+'%',top:(y/1536*100)+'%'});
+
+
+// v2.65：🏝️ 島主管理：照最後上線排，搬到外島／搬回主島
+function adminIsleSec(d){const H=(d.houses||[]).filter(h=>!isSpecialH(h)),P=d.players||[],now=Date.now();
+  const L=H.map(h=>{const M=P.filter(p=>p.houseId===h.id),s=Math.max(0,...M.map(p=>+p.seen||0));return {h,s,M}}).sort((a,b)=>a.s-b.s);
+  const usedS=new Set(H.map(h=>+h.slot)),freeMain=SLOTS.map((s,i)=>i).filter(i=>i!==SHOP_SLOT&&i!==CENTER_SLOT&&!usedS.has(i)),freeOut=OSLOTS.map((s,i)=>OUT_BASE+i).filter(i=>!usedS.has(i));
+  const ago2=t=>!t?'很久以前':(()=>{const d2=Math.floor((now-t)/86400e3);return d2<1?'今天':d2+' 天前'})();
+  return `<div class="sec adm"><h4>🏝️ 外島<span>主島空地 ${freeMain.length}・外島空地 ${freeOut.length}</span></h4><p class="lead" style="font-size:12px">照「全家最後一次上線」排，最久沒來的在最上面。外島的家會冬眠（不會餓、不長便便、小偷不去），只有島主能搬回主島。</p>
+    <div class="islelist">${L.map(({h,s,M})=>{const out=+h.slot>=OUT_BASE;return `<div class="frow"><span><b>${esc(h.name)}</b>${out?' <i class="islet">外島</i>':''}<small style="display:block;color:var(--soft)">${M.length} 人・最後上線：${ago2(s)}</small></span>${out?`<button data-imain="${h.id}">搬回主島</button>`:`<button data-iout="${h.id}">搬到外島</button>`}</div>`}).join('')}</div></div>`}
+function adminIsleBind(d){const S=$('#sheet'),H=(d.houses||[]).filter(h=>!isSpecialH(h)),used=()=>new Set(H.map(h=>+h.slot));
+  const mv=async(id,slot,btn,msg)=>{btn.disabled=true;try{await adminCall('adminMoveHouse',{houseId:id,slot});const h=H.find(x=>x.id===id);if(h)h.slot=slot;const hh=house(id);if(hh)hh.slot=slot;toast(msg);sync(true);adminSheet()}catch(e){btn.disabled=false;toast(e.message)}};
+  S.querySelectorAll('[data-iout]').forEach(b=>b.onclick=()=>{const h=H.find(x=>x.id===b.dataset.iout),u=used(),f=OSLOTS.map((s,i)=>OUT_BASE+i).find(i=>!u.has(i));if(f==null)return toast('外島滿了');if(!armBtn(b,`確定把「${h.name}」搬到外島？`))return;mv(h.id,f,b,`「${h.name}」搬到外島了 🏝️`)});
+  S.querySelectorAll('[data-imain]').forEach(b=>b.onclick=()=>{const h=H.find(x=>x.id===b.dataset.imain),u=used(),F=SLOTS.map((s,i)=>i).filter(i=>i!==SHOP_SLOT&&i!==CENTER_SLOT&&!u.has(i));if(!F.length)return toast('主島沒有空地了，先把別家搬到外島');
+    openModal(`<h3>🏡 「${esc(h.name)}」搬回主島</h3><p class="lead">選一塊空地（號碼是主島上由上往下的順序）</p><div class="xcpl">${F.sort((a,c)=>SLOTS[a][1]-SLOTS[c][1]).map(i=>`<button data-ito="${i}">第 ${i+1} 塊地</button>`).join('')}</div><div class="row2"><button id="ibk">← 回去</button></div>`);
+    $('#ibk').onclick=adminSheet;$('#sheet').querySelectorAll('[data-ito]').forEach(x=>x.onclick=()=>mv(h.id,+x.dataset.ito,x,`「${h.name}」搬回主島了 🏡`))})}
+// ================= 🏝️ 外島（v2.65）：島主把沒在玩的家搬過來，冬眠中（不會餓、不長便便、小偷不來），只有島主能搬回主島 =================
+const OUT_BASE=100,OSLOTS=[[320,398],[543,330],[750,428],[240,562],[530,583],[800,570],[278,750],[757,760],[505,825],[220,922],[797,922],[362,1047],[657,1020]];
+let ISLE='main';
+const isOutH=h=>!!h&&+h.slot>=OUT_BASE,outPets=p=>isOutH(house(p&&p.houseId));
+function goIsle(w){ISLE=w;sfx&&sfx('tap');renderIsland();const z=$('#izoom');if(z&&z.style)z.style.transform='';}
+function renderOuter(box,p){const OH=DB.houses.filter(h=>!isSpecialH(h)&&isOutH(h)&&OSLOTS[+h.slot-OUT_BASE]);
+  OH.sort((a,b)=>OSLOTS[a.slot-OUT_BASE][1]-OSLOTS[b.slot-OUT_BASE][1]).forEach(h=>{const [x,y]=OSLOTS[+h.slot-OUT_BASE];
+    const el=document.createElement('div');el.className='thing';el.setAttribute('role','button');el.tabIndex=0;el.setAttribute('aria-label',h.name);
+    Object.assign(el.style,ipct(x,y),{width:(HOUSE_W/1024*100)+'%',zIndex:y});el.innerHTML=`<img src="${hsrc(h.style,p)}" alt="">`;el.onclick=()=>openHome(h.id);box.appendChild(el);
+    box.appendChild(signEl(h.name,x,y,isFamily(h.id)?'mine':''));
+    const z=document.createElement('div');z.className='bubble';z.textContent='💤';Object.assign(z.style,ipct(x+42,y-150),{zIndex:2001});box.appendChild(z)});
+  const bt=document.createElement('button');bt.className='islebtn';bt.innerHTML='<img src="assets/icon_home.webp" alt="">回主島';Object.assign(bt.style,ipct(780,1265),{zIndex:3000});bt.onclick=e=>{e.stopPropagation();goIsle('main')};box.appendChild(bt);
+  if(!OH.length){const n=document.createElement('div');n.className='islenote';n.textContent='外島現在沒有人住，大家都在主島玩 🏝️';Object.assign(n.style,ipct(512,700),{zIndex:2500});box.appendChild(n)}}
 function hungryOnIsland(){
   const th=taipeiHour(),quiet=th>=23||th<8,L=[];
   DB.houses.forEach(h=>{if(isSpecialH(h)||demonShown(h))return;const ps=petsOf(h.id).filter(isHungry);if(!ps.length)return;ps.sort((a,b)=>hungerH(b)-hungerH(a));L.push({h,p:ps[0],mine:isFamily(h.id)})});
   const mine=L.filter(o=>o.mine),oth=quiet?[]:L.filter(o=>!o.mine).sort((a,b)=>hungerH(b.p)-hungerH(a.p)).slice(0,Math.max(0,HUNGRY_ISLAND_MAX-mine.length));
   return new Map(mine.concat(oth).map(o=>[o.h.id,o.p]))}
 function renderIsland(){
-  const p=period();
-  document.querySelectorAll('#island .bg').forEach(b=>b.classList.toggle('on',b.dataset.p===p));$('#iback').style.backgroundImage=`url(assets/island2_${p}.webp)`;$('#isea').style.backgroundImage=`url(assets/island2_${p}.webp)`;
+  const p=period(),IB=ISLE==='out'?'isle2':'island2';
+  document.querySelectorAll('#island .bg').forEach(b=>{const s=`assets/${IB}_${b.dataset.p}.webp`;if(b.getAttribute('src')!==s)b.setAttribute('src',s);b.classList.toggle('on',b.dataset.p===p)});$('#iback').style.backgroundImage=`url(assets/${IB}_${p}.webp)`;$('#isea').style.backgroundImage=`url(assets/${IB}_${p}.webp)`;
   document.querySelectorAll('#bar button').forEach(b=>b.classList.toggle('on',b.dataset.p===mode));
-  const box=$('#things');box.innerHTML='';const used=new Map(DB.houses.filter(h=>!isSpecialH(h)).map(h=>[h.slot,h]));const hungry=hungryOnIsland();
+  const box=$('#things');box.innerHTML='';if(ISLE==='out')renderOuter(box,p);else{const used=new Map(DB.houses.filter(h=>!isSpecialH(h)).map(h=>[h.slot,h]));const hungry=hungryOnIsland();
   SLOTS.map((s,i)=>({s,i})).filter(o=>(o.i!==SHOP_SLOT&&o.i!==CENTER_SLOT)||used.has(o.i)).sort((a,b)=>a.s[1]-b.s[1]).forEach(({s:[x,y],i})=>{
     const h=used.get(i);const el=document.createElement('div');el.className='thing'+(!h&&picking?' pick':'');
     el.setAttribute('role','button');el.tabIndex=0;el.setAttribute('aria-label',h?h.name:'空地，可以蓋房子');
@@ -2084,7 +2115,9 @@ function renderIsland(){
     Object.assign(el.style,ipct(sp.x,sp.y),{width:(HOUSE_W*SHOP_SC/1024*100)+'%',zIndex:sp.y});el.innerHTML=`<img src="assets/center_${p}.webp" alt="" onerror="this.src='assets/center_day.webp'">`;el.onclick=openCenter;box.appendChild(el);
     box.appendChild(signEl('島民中心',sp.x,sp.y,'center'));jobBubbles(box,'center',sp,160);
     if(false){const gb=document.createElement('div');gb.className='bubble';gb.textContent='📌';Object.assign(gb.style,ipct(sp.x+45,sp.y-165),{zIndex:2001});box.appendChild(gb)}}
+  }
   $('#pickbar').classList.toggle('hidden',!picking);$('#ticker').classList.toggle('hidden',picking);
+  {const ib=$('#isleb');if(ib){ib.innerHTML=ISLE==='out'?'<img src="assets/icon_home.webp" alt="">':'<img src="assets/icon_island.webp" alt="">';ib.setAttribute('aria-label',ISLE==='out'?'回主島':'外島')}}
   renderMe();updTix();if(typeof updBell==='function')updBell();updOnline();
 }
 // 🪧 木頭名牌：插在房子前面，名字寫在牌子上（太長會自動縮小、最多兩行）
@@ -2375,10 +2408,10 @@ const guestHere=(pid,now)=>DB.houses.some(h=>(h.guests||[]).some(g=>g.petId===pi
 function canEat(p){return fullness(p)>=80?'full':''}
 // ---------- 肚子餓・餓魔（v1.36） ----------
 function hungerH(p,now){return p.lastFed?((now||Date.now())-p.lastFed)/HOUR:5.4}
-function isHungry(p){return hungerH(p)>=HUNGRY_H}
+function isHungry(p){return !outPets(p)&&hungerH(p)>=HUNGRY_H}
 function hungerScale(p){const h=hungerH(p);return h<=HUNGRY_H?1:1-0.3*Math.min(1,(h-HUNGRY_H)/4)}
 const DEMON_GOAL=1,DEMON_PTS={feed:3,pat:1,toy:2,treat:2},DEMON_CD=10*60000,DEMONEND={},DCD={},DPEND={};
-function demonOf(h){if(!h||DEMONEND[h.id])return null;const d=h.demon;return d&&typeof d==='object'?d:null}
+function demonOf(h){if(!h||DEMONEND[h.id]||isOutH(h))return null;const d=h.demon;return d&&typeof d==='object'?d:null}
 function demonShown(h){const d=demonOf(h);if(!d)return false;if(isFamily(h.id))return true;return !(+d.until>Date.now())}
 function petDemon(p){const h=p&&house(p.houseId);return !!(h&&demonShown(h))}
 const DEMON_IMG=['assets/demon1.webp','assets/demon2.webp'],DEMON_WALK=['assets/demon3.webp','assets/demon4.webp'];
@@ -5883,6 +5916,7 @@ function adminRender(d){
   <div class="sec adm"><h4>🏠 家的管理</h4><div class="row2"><select id="ahh">${hs}</select></div>
     <p class="lead" id="ahkey" style="font-size:13px"></p><div class="row2"><input id="ahp" maxlength="6" autocapitalize="characters" placeholder="新的家庭鑰匙碼（6 碼英數）"><button id="ahpb">改鑰匙碼</button></div>
     <div class="row2"><button id="ahrb" class="danger">收回成空地</button></div><p class="lead">收回會刪掉這個家的毛孩和紀錄，不能復原</p></div>
+  ${adminIsleSec(d)}
   ${adminUploadSec(d)}
   <div class="sec adm"><h4>🙋 玩家列表<span>${d.players.length} 人・🔔 ${d.players.filter(p=>p.pushSt==='on').length} 人有開通知・全島 🪙${d.players.reduce((a,p)=>a+(+p.coins||0),0).toLocaleString()}</span></h4><p class="lead">照金幣多到少排，點 ⚙️ 可以改金幣、轉移碼<br>🔔 收得到通知・🔕 沒開・📲 還沒加主畫面・❔ 還沒更新到新版</p><div class="plist">${d.players.slice().sort((a,b)=>(+b.coins||0)-(+a.coins||0)).map(p=>`<div class="frow"><span>${pushIc(p)}${esc(p.nick)}<small>${p.house?esc(p.house):'沒有家'}・Lv.${p.lv}・🪙${p.coins}${p.createdAt?'・'+new Date(p.createdAt).toLocaleDateString('zh-TW',{month:'numeric',day:'numeric'})+' 加入':''}</small></span><span>${p.house?'':`<button class="mini danger" data-dpl="${p.id}">刪除</button> `}<button class="mini" data-code="${esc(p.code)}">${esc(p.code)||'—'}</button> <button class="mini" data-apl="${p.id}" aria-label="管理">⚙️</button></span></div>`).join('')}</div><p class="lead">點轉移碼可以複製，傳給換手機的朋友</p></div>
   ${adminGiftStatus()}
@@ -5915,6 +5949,7 @@ function adminRender(d){
   S.querySelectorAll('[data-code]').forEach(b=>b.onclick=async()=>{const c=b.dataset.code;if(!c)return;try{await navigator.clipboard.writeText(c);toast('轉移碼已複製：'+c)}catch(e){toast(c)}});
   const ahk=()=>{const x=(d.houses||[]).find(y=>y.id===$('#ahh').value);$('#ahkey').textContent=x?`🔑 「${x.name}」的家庭鑰匙碼：${x.key||'（還沒產生）'}`:''};$('#ahh').addEventListener('change',ahk);ahk();
   $('#ahpb').onclick=async()=>{const v=normKey($('#ahp').value);if(!keyValid(v))return toast('要 6 個英文或數字，英文和數字都要有');try{await adminCall('adminResetPw',{houseId:$('#ahh').value,key:v});const x=(d.houses||[]).find(y=>y.id===$('#ahh').value);if(x)x.key=v;ahk();toast('鑰匙碼改好了，記得告訴他們家 🔑')}catch(e){toast(e.message)}};
+  adminIsleBind(d);
   $('#ahrb').onclick=async()=>{const h=house($('#ahh').value);if(!h||!window.confirm(`確定要把「${h.name}」收回成空地嗎？毛孩和紀錄都會刪掉，不能復原。`))return;try{await adminCall('adminRemoveHouse',{houseId:h.id});closeModal();ok('收回了')}catch(e){toast(e.message)}};
   $('#ainb').onclick=async()=>{try{const r=await adminCall('adminInviteNew',{n:1,note:$('#ainn').value.trim()});const c=r&&r[0];try{await navigator.clipboard.writeText(c)}catch(e){}toast(`邀請碼 ${c} 已複製 🔑`);adminSheet()}catch(e){toast(e.message)}};
   S.querySelectorAll('[data-icp]').forEach(b=>b.onclick=async()=>{try{await navigator.clipboard.writeText(b.dataset.icp);toast('已複製 '+b.dataset.icp)}catch(e){toast(b.dataset.icp)}});
@@ -6208,7 +6243,7 @@ function announceLetters(){if(!DB.me)return;let seen=[];try{seen=JSON.parse(loca
     sfx('gift');$('#lgopen').onclick=()=>openLetter(nw[0].id,()=>$('#bell').click())};
   setTimeout(go,1800)}
 // ================= 自動更新：發現新版本就重新載入 =================
-const APP_VER='v2.64';
+const APP_VER='v2.65';
 function checkUpdate(){
   if(!/^https?:/.test(location.protocol)||!API_URL)return;
   if(!$('#modal').classList.contains('hidden'))return; // 正在填表單時不打斷
