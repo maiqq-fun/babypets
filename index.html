@@ -1166,7 +1166,7 @@ img{-webkit-user-drag:none}
 .arcov .ah{display:flex;width:100%;max-width:440px;align-items:center;justify-content:space-between;padding:max(12px,env(safe-area-inset-top)) 14px 6px;font-weight:800}
 .arcov .ah .apill{background:rgba(255,255,255,.15);border-radius:999px;padding:4px 10px;display:flex;gap:4px;align-items:center;white-space:nowrap}
 .arcov .ah .apill img{width:20px;height:20px}
-.arcov .ah{gap:6px}.arcov .ah>button{white-space:nowrap;flex:none}.arcov .ah>b{flex:1;min-width:0;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:15px}.arcov .ah .apill{flex:none;font-size:14px;padding:4px 8px;gap:3px}.arcov .ah .apill .abuy{margin-left:4px;padding:3px 7px}.arcov .ah>b .mic{width:1.4em;height:1.4em;vertical-align:-.35em;margin-right:3px}
+.arcov .ah{gap:6px;box-sizing:border-box}.arcov .ah>button{white-space:nowrap;flex:none}.arcov .ah>b{flex:1;min-width:0;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:15px}.arcov .ah .apill{flex:none;font-size:14px;padding:4px 8px;gap:3px}.arcov .ah .apill .abuy{margin-left:4px;padding:3px 7px}.arcov .ah>b .mic{width:1.4em;height:1.4em;vertical-align:-.35em;margin-right:3px}
 .arcov .ah button{border:0;border-radius:14px;background:#ffe9c9;color:#3b2c22;padding:6px 12px;font-weight:800}
 .arcmach{position:relative;width:min(84vw,380px,calc(62vh * var(--a)));aspect-ratio:var(--a);margin-top:6px}
 .arcmach>img.bg{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
@@ -1203,7 +1203,7 @@ body:has(.arcov) .modal{z-index:100000}   /* v2.36：遊戲畫面裡買代幣，
 .pbover{position:absolute;inset:6px;border-radius:18px;background:rgba(42,26,51,.86);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:8px;padding:14px}.pbover[hidden]{display:none}
 .pbsign{width:72%;max-width:240px;margin-bottom:-4px}.pbover h2{margin:0;color:#ffd23f}.pbover p{margin:0}.pbover .pbwin{font-size:30px;font-weight:900;color:#ffd23f}.pbover .pbnet{font-size:16px;font-weight:900;border-radius:999px;padding:4px 14px}.pbover .pbnet.up{background:#3fbf7f;color:#fff}.pbover .pbnet.dn{background:rgba(255,255,255,.18);color:#ffd6e0}.pbover .arcbig{margin-top:6px}
 .pbrules{list-style:none;margin:0;padding:0;display:grid;gap:5px;text-align:left;font-size:14px;line-height:1.4}.pbrules li{white-space:nowrap}.pbrules li::before{content:'';display:inline-block;width:1.1em;height:1.1em;margin-right:4px;vertical-align:-.15em;background:url(assets/icon_paws.webp) center/contain no-repeat}.pbrules b{color:#ffd23f}
-.pbbtns{display:flex;gap:10px;margin-top:10px;width:min(94vw,420px)}.pbbtns button{flex:1;height:56px;border:0;border-radius:18px;font-weight:900;font-size:18px;color:#3b2433;background:#ff9ec0;box-shadow:0 5px 0 #c96a8e;touch-action:none;user-select:none;-webkit-user-select:none}.pbbtns .pbp{flex:.8;background:#ffd23f;box-shadow:0 5px 0 #b8860b}.pbbtns .pbr{background:#d4b5ef;box-shadow:0 5px 0 #9a7bbf}.pbbtns button.on{transform:translateY(3px);box-shadow:none}
+.pbbtns{display:flex;gap:8px;margin-top:10px;width:min(94vw,420px,calc((100dvh - 220px) * .6));box-sizing:border-box}.pbbtns button{flex:1;height:56px;border:0;border-radius:18px;font-weight:900;font-size:18px;color:#3b2433;background:#ff9ec0;box-shadow:0 5px 0 #c96a8e;touch-action:none;user-select:none;-webkit-user-select:none}.pbbtns .pbp{flex:none;width:16%;font-size:14px;margin-left:6px;padding:0;background:#ffd23f;box-shadow:0 5px 0 #b8860b}.pbbtns .pbr{background:#d4b5ef;box-shadow:0 5px 0 #9a7bbf}.pbbtns button.on{transform:translateY(3px);box-shadow:none}
 .arcrank{display:flex;flex-direction:column;gap:6px;margin:8px 0}.arcrank div{display:flex;gap:8px;align-items:center;background:#fffaf0;border:2px solid var(--wood);border-radius:12px;padding:6px 10px}
 .arcrank b{width:24px}.arcrank span{flex:1}.arcrank i{font-style:normal;font-weight:800;color:#c2477a}
 
@@ -5114,7 +5114,7 @@ function pinballGame(){const g=DB.game;const {ov,upd}=arcOv('<img class="mic" sr
   ov.insertAdjacentHTML('beforeend',`<div class="pbhud"><span>分數 <b class="pbsc">0</b></span><span>時間 <b class="pbtm">1:30</b></span><span>倍率 <b class="pbmu">×1</b></span><span>🪙 <b class="pbcn">0</b></span></div>`);
   const {box,cv,ctx}=arcCanvas(ov,W,H,'pbcab');
   box.insertAdjacentHTML('beforeend',`<div class="pbover"><img class="pbsign" src="assets/pb_sign.webp" alt=""><ul class="pbrules"><li>按住<b>發射</b>拉彈簧，放開射出</li><li>按<b>左、右</b>拍擋板</li><li>打亮 <b>M・A・O</b>，倍率 +1（最多 ×3）</li><li>掉進<b>大獎洞</b> +1000 分</li><li>每局 <b>90 秒</b>，珠子掉了會補，倍率歸零</li><li><b>100 分 = 🪙1</b>，結束自動入帳</li></ul><button class="arcbig pbgo">開始（🪙${P.cost}）</button></div>`);
-  ov.insertAdjacentHTML('beforeend',`<div class="pbbtns"><button class="pbl" aria-label="左擋板">◀ 左</button><button class="pbp" aria-label="發射">發射</button><button class="pbr" aria-label="右擋板">右 ▶</button></div>`);
+  ov.insertAdjacentHTML('beforeend',`<div class="pbbtns"><button class="pbl" aria-label="左擋板">◀ 左</button><button class="pbr" aria-label="右擋板">右 ▶</button><button class="pbp" aria-label="發射">發射</button></div>`);
   const q=s=>ov.querySelector(s),over=q('.pbover'),bl=q('.pbl'),br=q('.pbr'),bp=q('.pbp');
   // 台面
   const walls=[],seg=(a,b,c,d,o)=>walls.push(Object.assign({x1:a,y1:b,x2:c,y2:d,e:.45},o||{}));
@@ -6208,7 +6208,7 @@ function announceLetters(){if(!DB.me)return;let seen=[];try{seen=JSON.parse(loca
     sfx('gift');$('#lgopen').onclick=()=>openLetter(nw[0].id,()=>$('#bell').click())};
   setTimeout(go,1800)}
 // ================= 自動更新：發現新版本就重新載入 =================
-const APP_VER='v2.61';
+const APP_VER='v2.62';
 function checkUpdate(){
   if(!/^https?:/.test(location.protocol)||!API_URL)return;
   if(!$('#modal').classList.contains('hidden'))return; // 正在填表單時不打斷
