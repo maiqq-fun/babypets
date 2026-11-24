@@ -705,6 +705,7 @@ html,body,button,.island,.imap,.logo{touch-action:manipulation}
 .irow2.hidden{display:none}
 .islebtn{position:absolute;transform:translate(-50%,-50%);display:flex;align-items:center;gap:6px;border:2px solid #fff;border-radius:999px;background:#fff6e6;color:#7a4a2a;font-weight:900;font-size:clamp(13px,3.6vw,16px);padding:6px 14px 6px 8px;box-shadow:0 4px 0 rgba(122,74,42,.25);cursor:pointer;white-space:nowrap}.islebtn img{width:1.8em;height:1.8em;object-fit:contain}
 .islelist .frow{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:6px 0;border-bottom:1px dashed var(--line)}.islelist .frow button{flex:none}.islet{font-style:normal;font-size:11px;background:#9fd8f0;color:#fff;border-radius:8px;padding:0 6px}
+.xchave{display:block;margin-top:3px;font-size:11px;font-weight:800;color:#3d9a5b}.xchave.none{color:#c0506e}
 .islenote{position:absolute;transform:translate(-50%,-50%);background:rgba(255,250,240,.92);border-radius:16px;padding:8px 14px;font-weight:800;color:#7a4a2a;font-size:clamp(12px,3.4vw,15px);white-space:nowrap}
 .rankb img{width:72%;height:72%;object-fit:contain}
 .onpill{display:inline-flex;align-items:center;gap:6px;border:2px solid var(--wood);background:rgba(255,250,238,.94);border-radius:999px;padding:5px 11px;font-size:13px;color:#4f7a3a;font-weight:bold;box-shadow:0 2px 0 rgba(0,0,0,.12)}
@@ -4814,9 +4815,11 @@ function xcSync(){if(!DB.me||!ONLINE)return;
 // 自己有沒有這隻（背包或自己家的展示櫃）
 function xcHave(id){if((bag()[id]||0)>0)return {bag:1};const h=myHouse();if(!h||!hasShow(h))return null;const s=showNorm(h.show);
   for(let p=0;p<s.it.length;p++){const i=s.it[p].indexOf(id);if(i>=0)return {pos:p,i}}return null}
+// v2.66：交換卡片上直接寫「你有幾隻」（背包＋展示櫃）
+function xcHave(id){const b=+(bag()[id]||0),s=xcShowN(myHouse(),id),n=b+s;return `<small class="xchave${n?'':' none'}">${n?`你有 ×${n}${s?`（櫃子 ${s}）`:''}`:'你還沒有'}</small>`}
 function xcCard(t,mine){const other=mine?t.toNick:t.fromNick,a=mine?t.give:t.want,b=mine?t.want:t.give;
-  return `<div class="xcrow" style="flex-wrap:wrap"><div class="xcfig"><img src="${xcImg(a)}" alt="">${mine?'你給':'他要'}<br><b>${esc(xcName(a))}</b></div><div class="xcarr">⇄</div>
-    <div class="xcfig"><img src="${xcImg(b)}" alt="">${mine?'你要':'他給'}<br><b>${esc(xcName(b))}</b></div>
+  return `<div class="xcrow" style="flex-wrap:wrap"><div class="xcfig"><img src="${xcImg(a)}" alt="">${mine?'你給':'他要'}<br><b>${esc(xcName(a))}</b>${t.st==='wait'?xcHave(a):''}</div><div class="xcarr">⇄</div>
+    <div class="xcfig"><img src="${xcImg(b)}" alt="">${mine?'你要':'他給'}<br><b>${esc(xcName(b))}</b>${t.st==='wait'?xcHave(b):''}</div>
     <div style="width:100%"><div class="xcmeta">${mine?'跟':'來自'} ${esc(other)}・${ago(t.at)}・${XC_ST[t.st]||''}</div>
     ${t.st==='wait'?`<div class="xcbtns">${mine?`<button data-xcc="${t.id}">取消</button>`:`<button data-xcn="${t.id}">婉拒</button><button class="primary" data-xcy="${t.id}">答應交換</button>`}</div>`:''}</div></div>`}
 function xcSheet(tab){if(!needMe())return;tab=tab||(xcIn().length?'in':'new');const nIn=xcIn().length;
@@ -6243,7 +6246,7 @@ function announceLetters(){if(!DB.me)return;let seen=[];try{seen=JSON.parse(loca
     sfx('gift');$('#lgopen').onclick=()=>openLetter(nw[0].id,()=>$('#bell').click())};
   setTimeout(go,1800)}
 // ================= 自動更新：發現新版本就重新載入 =================
-const APP_VER='v2.65';
+const APP_VER='v2.66';
 function checkUpdate(){
   if(!/^https?:/.test(location.protocol)||!API_URL)return;
   if(!$('#modal').classList.contains('hidden'))return; // 正在填表單時不打斷
