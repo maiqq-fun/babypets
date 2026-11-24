@@ -1084,7 +1084,7 @@ img{-webkit-user-drag:none}
 .bbov .slot.hid::after{content:'隱藏';position:absolute;top:-7px;left:50%;transform:translateX(-50%);font-size:9px;background:#f7c948;color:#5a3a00;border-radius:6px;padding:0 5px;font-weight:800}
 .bbov .slot.cur{background:rgba(255,255,255,.35);transform:scale(1.08)}
 .bbov .slot.got{background:rgba(255,255,255,.95);transform:scale(1.12)}
-.bbov .slot.got img,.bbov .slot.own img{filter:none;opacity:1}.bbov .slot.got.hid::before,.bbov .slot.own.hid::before{display:none}.bbov .slot.own{background:rgba(255,255,255,.25)}
+.bbov .slot.got img,.bbov .slot.own img{filter:none;opacity:1}.bbov .slot.got.hid::before,.bbov .slot.own.hid::before{display:none}.bbov .slot.own{background:rgba(255,255,255,.25)}.bbov .slot.fam:not(.got) img{filter:none;opacity:.38}.bbov .slot.fam.hid::before{display:none}
 .bbov .bts{display:flex;gap:10px;margin-top:16px;opacity:0;transition:opacity .4s;pointer-events:none}.bbov .bts.on{opacity:1;pointer-events:auto}
 .bbov .bts button{border:0;border-radius:16px;padding:10px 16px;font-size:14px;font-weight:800}
 .bbov .bts .p{background:#ffb3c7;color:#5a2030}.bbov .bts .s{background:rgba(255,255,255,.9);color:#3b2c22}
@@ -4816,7 +4816,7 @@ function xcSync(){if(!DB.me||!ONLINE)return;
 function xcHave(id){if((bag()[id]||0)>0)return {bag:1};const h=myHouse();if(!h||!hasShow(h))return null;const s=showNorm(h.show);
   for(let p=0;p<s.it.length;p++){const i=s.it[p].indexOf(id);if(i>=0)return {pos:p,i}}return null}
 // v2.66：交換卡片上直接寫「你有幾隻」（背包＋展示櫃）
-function xcHave(id){const b=+(bag()[id]||0),s=xcShowN(myHouse(),id),n=b+s;return `<small class="xchave${n?'':' none'}">${n?`你有 ×${n}${s?`（櫃子 ${s}）`:''}`:'你還沒有'}</small>`}
+function xcHave(id){const b=+(bag()[id]||0),s=xcShowN(myHouse(),id),n=b+s;return `<small class="xchave${n?'':' none'}">${n?`背包 ${b}・家裡櫃子 ${s}`:'你家還沒有'}</small>`}
 function xcCard(t,mine){const other=mine?t.toNick:t.fromNick,a=mine?t.give:t.want,b=mine?t.want:t.give;
   return `<div class="xcrow" style="flex-wrap:wrap"><div class="xcfig"><img src="${xcImg(a)}" alt="">${mine?'你給':'他要'}<br><b>${esc(xcName(a))}</b>${t.st==='wait'?xcHave(a):''}</div><div class="xcarr">⇄</div>
     <div class="xcfig"><img src="${xcImg(b)}" alt="">${mine?'你要':'他給'}<br><b>${esc(xcName(b))}</b>${t.st==='wait'?xcHave(b):''}</div>
@@ -5283,6 +5283,9 @@ function bbData(){const b=DB.bb&&typeof DB.bb==='object'?DB.bb:(DB.bb={});b.p=b.
 const bbDex=sid=>{const d=bbData().d[sid],out=Array.isArray(d)?d.slice():[],S=bbSer(sid),n=S?S.f.length:10,b=bag(),h=myHouse(),sv=h&&hasShow(h)?showNorm(h.show):null,inShow=id=>!!(sv&&sv.it.some(a=>a.includes(id)));
   for(let i=0;i<n;i++){const id=bbId(sid,i);if(!(+out[i]>0)&&((b[id]||0)>0||inShow(id)))out[i]=1}return out};
 const bbHas=(sid,i)=>+(bbDex(sid)[i]||0)>0;
+// v2.67：自己的（抽過的紀錄、自己背包）vs 只有家人有（家裡展示櫃、家人背包）
+const bbMine=(sid,i)=>{const d=bbData().d[sid];return (Array.isArray(d)&&+d[i]>0)||(bag()[bbId(sid,i)]||0)>0};
+const bbFam=(sid,i)=>{const id=bbId(sid,i),h=myHouse();if(!h)return false;if(hasShow(h)&&showNorm(h.show).it.some(a=>a.includes(id)))return true;return (DB.players||[]).some(p=>p.houseId===h.id&&p.id!==(DB.me&&DB.me.id)&&(p.figs||[]).includes(id))};
 function bbShop(){if(!needMe())return;const v=document.createElement('div');v.className='bbv';v.id='bbv';document.body.appendChild(v);bbShopRender()}
 function bbShopRender(){const v=$('#bbv');if(!v)return;const g=DB.game;
   v.innerHTML=`<div class="bbh"><b>🎁 MAIMINE 盲盒店<small>一盒 🪙${BB_PRICE}・每個系列 ${BB_PITY} 盒內必出隱藏版</small></b><span class="bbc">🪙 ${(g.coins||0).toLocaleString()}</span><button class="x">關閉</button></div>
@@ -5295,7 +5298,7 @@ let bbBusy=false;
 async function bbDraw(sid){const S=bbSer(sid),g=DB.game;if(!S||S.off||bbBusy)return;
   if((g.coins||0)<BB_PRICE)return toast(`金幣不夠，要 🪙${BB_PRICE}`);
   bbBusy=true;g.coins-=BB_PRICE;save();updTix&&updTix();bbShopRender();sfx&&sfx('coin');
-  const own=S.f.map((x,i)=>bbHas(sid,i));let res=null,err=null;
+  const own=S.f.map((x,i)=>bbMine(sid,i)),fam=S.f.map((x,i)=>!own[i]&&bbFam(sid,i));let res=null,err=null;
   const pr=call('bbDraw',{playerId:DB.me.id,sid},true).then(r=>res=r).catch(e=>err=e);
   const ov=document.createElement('div');ov.className='bbov';ov.innerHTML=`<div class="rays"></div><div class="ot">${S.en?esc(S.en)+'・':''}${esc(S.n)}</div><div class="stg"><img class="big shake" src="${bbBox(sid)}" alt=""><div class="tap">👆 點畫面任何地方打開</div></div><div class="grid"></div><div class="pity"></div><div class="bts"><button class="s">🗄️ 收進背包</button><button class="p">再抽一盒 🪙${BB_PRICE}</button></div>`;
   document.body.appendChild(ov);const W=ms=>new Promise(r=>setTimeout(r,ms));
@@ -5305,7 +5308,7 @@ async function bbDraw(sid){const S=bbSer(sid),g=DB.game;if(!S||S.off||bbBusy)ret
   const fid=bbId(sid,res.i);bagAdd(fid,1);const b=bbData();b.p[sid]=res.pity;const d=bbDex(sid).slice();while(d.length<10)d.push(0);d[res.i]=(+d[res.i]||0)+1;b.d[sid]=d;save();
   const big=ov.querySelector('.big');big.classList.remove('shake');big.classList.add('pop');const tp=ov.querySelector('.tap');if(tp)tp.remove();
   await W(380);let fl=document.createElement('div');fl.className='bbflash go';document.body.appendChild(fl);setTimeout(()=>fl.remove(),600);ov.querySelector('.stg').innerHTML='';
-  const IX=bbIdx(S),G=ov.querySelector('.grid');G.innerHTML=IX.map(i=>`<div class="slot${S.h.includes(i)?' hid':''}${own[i]?' own':''}"><img src="${bbImg(sid,i)}" alt=""></div>`).join('');
+  const IX=bbIdx(S),G=ov.querySelector('.grid');G.innerHTML=IX.map(i=>`<div class="slot${S.h.includes(i)?' hid':''}${own[i]?' own':fam[i]?' fam':''}"><img src="${bbImg(sid,i)}" alt=""></div>`).join('');
   const slots=[...G.querySelectorAll('.slot')],pos=Math.max(0,IX.indexOf(res.i));await W(450);
   let delay=55;const steps=2*slots.length+pos;for(let k=0;k<=steps;k++){slots.forEach(x=>x.classList.remove('cur'));slots[k%slots.length].classList.add('cur');await W(delay);if(k>steps-8)delay*=1.28}
   slots.forEach(x=>x.classList.remove('cur'));const H=res.r==='H';ov.classList.add(H?'gold':'reveal');slots[pos].classList.add('got');
@@ -6246,7 +6249,7 @@ function announceLetters(){if(!DB.me)return;let seen=[];try{seen=JSON.parse(loca
     sfx('gift');$('#lgopen').onclick=()=>openLetter(nw[0].id,()=>$('#bell').click())};
   setTimeout(go,1800)}
 // ================= 自動更新：發現新版本就重新載入 =================
-const APP_VER='v2.66';
+const APP_VER='v2.67';
 function checkUpdate(){
   if(!/^https?:/.test(location.protocol)||!API_URL)return;
   if(!$('#modal').classList.contains('hidden'))return; // 正在填表單時不打斷
