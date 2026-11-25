@@ -311,8 +311,9 @@ b.dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:#ff
   display:flex;align-items:center;justify-content:center;font-size:11px;transform:rotate(-14deg);text-align:center;line-height:1.2}
 .idbottom{position:relative;padding:0 80px 14px 14px;font-size:14px;color:#7a6050;min-height:64px}
 .idcard.idimg{background:none;border-style:solid;border-width:62px 18px 18px;border-image:var(--idf) 128 36 36 fill / 62px 18px 18px stretch;box-shadow:none;border-radius:0;overflow:visible;filter:drop-shadow(0 3px 3px rgba(90,60,30,.18))}
-.idcard.idimg .idhead{position:absolute;left:18px;right:18px;top:-62px;height:62px;background:none;padding:0;display:grid;grid-template-columns:1fr 1fr;column-gap:26%;align-items:center;padding-top:14px;box-sizing:border-box}
-.idcard.idimg{position:relative}.idl{justify-self:center;width:72%;text-align:center;background:#fbe9cf;color:#6b4a30;border-radius:999px;font-size:clamp(9px,2.6vw,11px);line-height:1.6;letter-spacing:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-variant-numeric:tabular-nums;box-shadow:inset 0 1px 1px rgba(0,0,0,.08)}
+.idcard.idimg .idhead{position:absolute;left:-18px;right:-18px;top:-62px;height:62px;background:none;padding:0;display:block}
+.idcard.idimg{position:relative}.idcard.idimg .idl{position:absolute;top:36px;transform:translate(-50%,-50%);width:25%;padding:3px 0;font-size:clamp(10px,2.9vw,12px)!important}.idcard.idimg .idl:first-child{left:29.5%}.idcard.idimg .idl:last-child{left:70.5%}
+.idl{justify-self:center;width:72%;text-align:center;background:#fbe9cf;color:#6b4a30;border-radius:999px;font-size:clamp(9px,2.6vw,11px);line-height:1.6;letter-spacing:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-variant-numeric:tabular-nums;box-shadow:inset 0 1px 1px rgba(0,0,0,.08)}
 .idcard.idimg .idbody{padding:12px 10px 8px}.idcard.idimg .idbottom{padding:0 70px 6px 10px}
 .idsp{position:absolute;right:2px;bottom:-4px;width:68px;pointer-events:none;opacity:.95}
 .idstat{display:flex;align-items:center;gap:6px;font-size:12px;margin-top:6px;max-width:220px}
@@ -6759,7 +6760,7 @@ function announceLetters(){if(!DB.me)return;let seen=[];try{seen=JSON.parse(loca
     sfx('gift');$('#lgopen').onclick=()=>openLetter(nw[0].id,()=>$('#bell').click())};
   setTimeout(go,1800)}
 // ================= 自動更新：發現新版本就重新載入 =================
-const APP_VER='v3.07';
+const APP_VER='v3.08';
 function checkUpdate(){
   if(!/^https?:/.test(location.protocol)||!API_URL)return;
   if(!$('#modal').classList.contains('hidden'))return; // 正在填表單時不打斷
