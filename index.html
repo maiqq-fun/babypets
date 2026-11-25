@@ -3577,7 +3577,8 @@ const gPoly=(r,c,n)=>{const y0=gRowY(r),y1=gRowY(r+1);return [[gX(y0,c/GC),y0],[
 function drawGrid(){const f=$('#floor');if(!f||!placing||!home)return;const h=house(home.id),occ=gOcc(h,placing.toy);let p='';
   const blk=gBlocked();for(let r=0;r<GR;r++)for(let c=0;c<GC;c++)p+=`<polygon points="${gPoly(r,c,1)}" class="${blk.has(r+','+c)?'blk':occ.has(r+','+c)?'occ':''}"/>`;
   const g=document.createElement('div');g.className='ggrid';g.innerHTML=`<svg viewBox="0 0 ${RW} ${RH}" preserveAspectRatio="none">${p}<polygon id="gfl" points="" class="bad"/></svg>`;f.appendChild(g);
-  if(!$('#gcancel')){const b=document.createElement('button');b.id='gcancel';b.className='gcancel';b.textContent='✕ 取消擺放';b.onclick=e=>{e.stopPropagation();placing=null;b.remove();renderFloor()};$('#home').appendChild(b)}}
+  if(!$('#gcancel')){const b=document.createElement('button');b.id='gcancel';b.className='gcancel';b.textContent='✕ 取消擺放';b.onclick=e=>{e.stopPropagation();placing=null;b.remove();renderFloor()};document.body.appendChild(b)}
+  {const b=$('#gcancel'),bar=document.querySelector('#homewrap .actions.hbar');if(b&&bar){const r=bar.getBoundingClientRect();Object.assign(b.style,{position:'fixed',bottom:'auto',top:(r.top+4)+'px',height:Math.max(44,Math.min(r.height-8,56))+'px',minWidth:'60%',fontSize:'16px',zIndex:9000})}}}   // v2.82：蓋在下面那排按鈕上（擺放時用不到），不擋格子
 function gFlash(r,c,n){const p=$('#gfl');if(!p)return;p.setAttribute('points',gPoly(r,c,n));p.classList.remove('on');void p.getBoundingClientRect();p.classList.add('on')}
 function startPlacing(P){placing=P;renderFloor();toast(gSpan(P.toy?P.toy.item:P.item)===2?'點格子放下（這個比較大，會占 2 格）':'點格子放下（紅色有東西、灰色不能放）')}
 function toyMenu(t){
@@ -6571,7 +6572,7 @@ function announceLetters(){if(!DB.me)return;let seen=[];try{seen=JSON.parse(loca
     sfx('gift');$('#lgopen').onclick=()=>openLetter(nw[0].id,()=>$('#bell').click())};
   setTimeout(go,1800)}
 // ================= 自動更新：發現新版本就重新載入 =================
-const APP_VER='v2.81';
+const APP_VER='v2.82';
 function checkUpdate(){
   if(!/^https?:/.test(location.protocol)||!API_URL)return;
   if(!$('#modal').classList.contains('hidden'))return; // 正在填表單時不打斷
