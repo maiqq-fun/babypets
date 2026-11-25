@@ -3377,7 +3377,8 @@ const KUJI_POOL={
   B:['ocean','star','space','ufobase','pearl','spacecat','crystalstar'],
   C:['sakura','forest','cloud','xmas','arcade','washitsu','circus','pinkroom','street','nightmkt','hiphop','calibeach','magicattic','clouddream','catbakery','monsterroom','starcircus'],
   D:['study','garden','cafe','beach','dessert','library','cabin','surf','mushroomstudy','sunnypet','cattreehouse']};
-const KUJI_PRICE=200,KUJI_SELL=100,CARD_PRICE=100;
+const KUJI_PRICE=200,KUJI_PRICE2=1200,KUJI_SELL=100,CARD_PRICE=100;
+const kujiPrice=()=>+(DB.kuji&&DB.kuji.price)||KUJI_PRICE;   // v2.71：一番賞不下架了，抽完開新箱，新箱一抽 🪙1200（價錢跟著箱子，小島說了算）
 const KG={A:{n:'A 賞',img:'assets/badge_a.webp'},B:{n:'B 賞',img:'assets/badge_b.webp'},C:{n:'C 賞',img:'assets/badge_c.webp'},D:{n:'D 賞',img:'assets/badge_d.webp'},L:{n:'最後賞',img:'assets/badge_last.webp'}};
 const KUJI_IMGS=['assets/kuji_booth.webp','assets/kuji_closed.webp','assets/kuji_open.webp'].concat(Object.values(KG).map(x=>x.img));
 let kujiPre=false;function preloadKuji(){if(kujiPre)return;kujiPre=true;KUJI_IMGS.forEach(src=>{const i=new Image();i.src=src})}
@@ -3389,11 +3390,11 @@ function kujiBody(coins){preloadKuji();const k=DB.kuji,h=myHouse();
   if(k&&k.closed)return top+'<div class="locked">🎊 房間一番賞已經圓滿下架囉！<br><small>謝謝大家的支持，卡包可以用抽卡券抽</small></div>';
   if(!k||!Array.isArray(k.items))return top+'<div class="locked">房間一番賞準備中，等一下再來看看</div>';
   const left=k.items.filter(x=>!x.t).length;
-  return top+`<div class="kopt hot"><div class="kot"><b>🏠 房間一番賞</b><small>全島共用一箱・第 ${k.no} 箱・剩 <em class="kleft">${left}</em> / ${k.items.length} 張</small></div><button data-kuji ${coins>=KUJI_PRICE&&h?'':'disabled'}>🪙 ${KUJI_PRICE}</button></div>
+  return top+`<div class="kopt hot"><div class="kot"><b>🏠 房間一番賞</b><small>全島共用一箱・第 ${k.no} 箱・剩 <em class="kleft">${left}</em> / ${k.items.length} 張</small></div><button data-kuji ${coins>=kujiPrice()&&h?'':'disabled'}>🪙 ${kujiPrice()}</button></div>
   <div class="kboard">${['A','B','C','D'].map(g=>{const L=k.items.filter(x=>x.g===g);return `<div class="krow"><img src="${KG[g].img}" alt="${KG[g].n}"><div class="krooms">${L.map(x=>`<span class="${x.t?'gone':''}">${cardById(x.room).r==='H'?'隱藏版':esc(rName(x.room))}</span>`).join('')}</div><em>${L.filter(x=>!x.t).length}/${L.length}</em></div>`}).join('')}
     <div class="krow"><img src="${KG.L.img}" alt="最後賞"><div class="krooms"><span>抽到最後一張的人，再送 1 次卡牌</span></div></div></div>
   ${(k.log||[]).length?`<div class="sec"><h4>🎊 最近抽到</h4>${k.log.slice().reverse().slice(0,5).map(l=>`<div class="frow"><span>${esc(l.nick)} 抽到 ${KG[l.g]?KG[l.g].n:''}「${esc(rName(l.room))}」${l.last?' 🏁':''}</span><span class="ago">${ago(+l.at)}</span></div>`).join('')}</div>`:''}
-  <div class="hint">${h?`抽到已經有的房間，可以送給還沒有的家、賣掉換 ${KUJI_SELL} 金幣，或放棄`:'有家之後才能抽喔'}<br>⚠️ 這箱抽完一番賞就下架囉</div>`}
+  <div class="hint">${h?`抽到已經有的房間，可以送給還沒有的家、賣掉換 ${KUJI_SELL} 金幣，或放棄`:'有家之後才能抽喔'}${kujiPrice()<KUJI_PRICE2?`<br>⚠️ 這箱抽完就漲價囉，下一箱開始一抽 🪙${KUJI_PRICE2}`:''}</div>`}
 function kujiBind(S){
   const c=S.querySelector('[data-card]');if(c)c.onclick=()=>{const h=myHouse(),g=DB.game;if(!h||(g.coins||0)<CARD_PRICE)return;
     const go=()=>{g.coins-=CARD_PRICE;sfx('coin');save();updHud();closeModal();openPack({free:1,ok:1})};
@@ -3401,18 +3402,18 @@ function kujiBind(S){
   const k=S.querySelector('[data-kuji]');if(k)k.onclick=()=>kujiDraw();
 }
 function kujiDraw(ok){
-  const h=myHouse(),g=DB.game;if(!h)return toast('有家之後才能抽一番賞');if(DB.kuji&&DB.kuji.closed)return toast('一番賞已經下架了 🙏');if((g.coins||0)<KUJI_PRICE)return toast('金幣不夠喔');
+  const h=myHouse(),g=DB.game;if(!h)return toast('有家之後才能抽一番賞');if(DB.kuji&&DB.kuji.closed)return toast('一番賞已經下架了 🙏');const kp=kujiPrice();if((g.coins||0)<kp)return toast('金幣不夠喔');
   if(!ok&&CARDS.every(c=>owned(h.id).has(c.id))){openModal(`<div style="text-align:center"><img src="${KG.A.img}" alt="" style="width:80px"><h3>房間都收集完了！</h3><p class="lead">一番賞抽到的都會是重複的房間，可以送給還沒有的家，或賣掉換 ${KUJI_SELL} 金幣</p></div><div class="row2"><button data-close>先不要</button><button class="primary" id="kgo">還是要抽</button></div>`);$('#kgo').onclick=()=>{closeModal();kujiDraw(1)};return}
-  g.coins-=KUJI_PRICE;sfx('coin');save();updHud();closeModal();preloadKuji();
+  g.coins-=kp;sfx('coin');save();updHud();closeModal();preloadKuji();
   const ov=document.createElement('div');ov.className='gacha kujiov';
   ov.innerHTML=`<div class="rays" id="rays"></div><div class="hint2" id="kh">點籤紙撕開</div><div class="kstage" id="kst"><img class="ktc" id="ktc" src="assets/kuji_closed.webp" alt="籤紙"></div><div class="gbtns" id="kb"></div>`;
   document.body.appendChild(ov);
   let res=null,err=null,anim=false,shown=false;
-  call('kujiDraw',Object.assign(cred(),{kpool:KUJI_POOL}),true).then(r=>{res=r;if(r&&r.kuji)DB.kuji=r.kuji;show()}).catch(e=>{err=e;show()});
+  call('kujiDraw',Object.assign(cred(),{kpool:KUJI_POOL,pay:kp}),true).then(r=>{res=r;if(r&&r.kuji)DB.kuji=r.kuji;show()}).catch(e=>{err=e;show()});
   ov.querySelector('#ktc').onclick=()=>{if(anim)return;anim=true;sfx('flip');ov.querySelector('#ktc').classList.add('tear');ov.querySelector('#kh').textContent='';
     setTimeout(()=>{anim=2;if(!res&&!err)ov.querySelector('#kh').textContent='籤紙打開中…';show()},700)};
   function show(){if(shown||anim!==2||(!res&&!err))return;shown=true;
-    if(err||!res||!res.room){g.coins+=KUJI_PRICE;save();updHud();ov.remove();return toast((err&&err.message)||'抽籤失敗，金幣退回給你了')}
+    if(err||!res||!res.room){g.coins+=kp;save();updHud();ov.remove();return toast((err&&err.message)||'抽籤失敗，金幣退回給你了')}
     const c=cardById(res.room),gi=KG[res.g]||KG.D;
     if(!res.dup){const own=owned(h.id);own.add(res.room);DB.owned[h.id]=[...own]}
     ov.querySelector('#kst').innerHTML=`<img class="kbadge" src="${gi.img}" alt="${gi.n}"><div class="kopen"><img class="kt" src="assets/kuji_open.webp" alt=""><div class="kl"><img src="${c.img}" alt=""></div><div class="kr"><b>${gi.n}</b><span>${esc(rName(res.room))}</span><small>${res.dup?'你已經有這間了':'新房間！'}</small></div></div>${res.last?`<div class="klast"><img src="${KG.L.img}" alt="">最後賞！再送你 1 次卡牌</div>`:''}`;
@@ -6254,7 +6255,7 @@ function announceLetters(){if(!DB.me)return;let seen=[];try{seen=JSON.parse(loca
     sfx('gift');$('#lgopen').onclick=()=>openLetter(nw[0].id,()=>$('#bell').click())};
   setTimeout(go,1800)}
 // ================= 自動更新：發現新版本就重新載入 =================
-const APP_VER='v2.70';
+const APP_VER='v2.71';
 function checkUpdate(){
   if(!/^https?:/.test(location.protocol)||!API_URL)return;
   if(!$('#modal').classList.contains('hidden'))return; // 正在填表單時不打斷

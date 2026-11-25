@@ -1,5 +1,6 @@
 /*
- * 毛很多 babypets 後端・整理版 v68
+ * 毛很多 babypets 後端・整理版 v69
+ * v69：🎫 一番賞不下架了：這箱抽完自動開下一箱，新箱一抽 🪙1200（price 跟著箱子；前端帶 pay，付不夠就擋下來）
  * v68：🌱 修「澆水、收成會跳回去」：寫進試算表的資料要先真的存好（flush）才讓下一個人排進來；以前偶爾會被別人讀到舊的那份再整列蓋回去
  * v67：🏝️ 外島（adminMoveHouse）：島主把沒在玩的家搬到外島（slot 100～112）；外島的家冬眠：不長便便、不掉錢、不變餓魔、小偷不去、不推播肚子餓；搬回主島時重新計時
  * v66：🎪 玩個毛：打地鼠每週前三名都有獎金（🪙1000／750／500）
@@ -81,7 +82,7 @@ const DROP_P_ = 0.65, DROP_DAY_MAX_ = 3300, DROP_GOLD_ = 200;              // v5
 const DEMON_AFTER_ = 5 * DAY_, DEMON_FREE_ = 3 * HOUR_, DEMON_GOAL_ = 10, DEMON_CD_ = 10 * 60000;
 const DEMON_PTS_ = { feed: 3, pat: 1, toy: 2, treat: 2 };   // v48：任何一種互動都直接解救
 const ONLINE_MS_ = 3 * 60000;
-const KUJI_PLAN_ = { A: 1, B: 2, C: 3, D: 4 };            // 一箱 10 張
+const KUJI_PLAN_ = { A: 1, B: 2, C: 3, D: 4 }, KUJI_PRICE0_ = 200, KUJI_PRICE_NEW_ = 1200;            // 一箱 10 張
 const KUJI_ROOMS_ = {                                    // 前端抽籤時會帶最新清單上來覆蓋
   A: ['party','princess'],
   B: ['ocean','star','space','sweetdevil','ufobase','pearl'],
@@ -603,15 +604,17 @@ function kujiSync_(req) {
 function kujiNewBox_(no) {
   const items = [];
   Object.keys(KUJI_PLAN_).forEach(g => shuffle_(KUJI_ROOMS_[g]).slice(0, KUJI_PLAN_[g]).forEach(room => items.push({ g: g, room: room, by: '' })));
-  return { id: 'kuji', no: no, items: items, log: [] };
+  return { id: 'kuji', no: no, items: items, log: [], price: KUJI_PRICE_NEW_ };
 }
-// v57：一番賞這箱抽完就下架（closed），不再開新箱
+// v69：抽完（或以前被下架的）就開下一箱
 function kuji_() {
   let k = get_('meta', 'kuji');
   if (!k || !Array.isArray(k.items) || !k.items.length) { k = kujiNewBox_(1); put_('meta', k); }
+  else if (k.closed || k.items.every(x => x.by)) { const nk = kujiNewBox_((Number(k.no) || 1) + 1); nk.log = Array.isArray(k.log) ? k.log : []; k = nk; put_('meta', k); }
   return k;
 }
-function kujiView_(k) { return { closed: !!k.closed, no: Number(k.no) || 1, items: k.items.map(x => ({ g: x.g, room: x.room, t: !!x.by })), log: (k.log || []).slice(-6) }; }
+function kujiPrice_(k) { return Number(k && k.price) || KUJI_PRICE0_; }
+function kujiView_(k) { return { price: kujiPrice_(k), closed: !!k.closed, no: Number(k.no) || 1, items: k.items.map(x => ({ g: x.g, room: x.room, t: !!x.by })), log: (k.log || []).slice(-6) }; }
 
 // ================= 推播（OneSignal） =================
 function pushKey_() {
@@ -1330,17 +1333,19 @@ const ACTIONS = {
     const h = mustFam_(req), me = get_('players', req.playerId);
     if (!me || me.houseId !== h.id) throw new Error('要先住進這個家才能抽');
     let k = kuji_();
-    if (k.closed || !k.items.some(x => !x.by)) throw new Error('一番賞已經下架了，謝謝大家 🙏');
+    if (k.closed || !k.items.some(x => !x.by)) throw new Error('一番賞正在換新箱，等一下再試 🙏');
+    const price = kujiPrice_(k);
+    if ((Number(req.pay) || KUJI_PRICE0_) < price) throw new Error(`一番賞漲價了，現在一抽 🪙${price}，金幣退回給你，重新整理再抽`);
     const pool = k.items.filter(x => !x.by), t = pool[Math.floor(Math.random() * pool.length)];
     t.by = me.nick; t.at = Date.now();
     const last = k.items.every(x => x.by), owned = ownedOf_(h), dup = owned.indexOf(t.room) >= 0;
     if (!dup) { owned.push(t.room); h.owned = owned; put_('houses', h); }
     k.log = (Array.isArray(k.log) ? k.log : []).concat([{ nick: me.nick, g: t.g, room: t.room, at: t.at, last: last }]).slice(-20);
     const no = Number(k.no) || 1;
-    if (last) k.closed = 1;
     put_('meta', k);
+    if (last) k = kuji_();   // 這箱抽完 → 馬上開下一箱
     if (t.g === 'A') feed_(`🎉 ${me.nick} 抽中一番賞 A 賞！`);
-    if (last) feed_(`🏁 ${me.nick} 抽到第 ${no} 箱最後一張，拿到最後賞！一番賞到這裡圓滿下架囉 🎊`);
+    if (last) feed_(`🏁 ${me.nick} 抽到第 ${no} 箱最後一張，拿到最後賞！第 ${no + 1} 箱開箱囉，一抽 🪙${kujiPrice_(k)} 🎊`);
     return { g: t.g, room: t.room, dup: dup, last: last, no: no, kuji: kujiView_(k) };
   },
   kujiGiftRoom(req) {
