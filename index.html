@@ -79,6 +79,7 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
 .fx{position:absolute;pointer-events:none;font-size:clamp(16px,5vw,24px);animation:float 1.3s ease-out forwards;z-index:2500}
 @keyframes float{0%{opacity:0;transform:translate(-50%,0) scale(.6)}20%{opacity:1}100%{opacity:0;transform:translate(-50%,-70px) scale(1.15)}}
 .board{position:absolute;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));grid-template-rows:repeat(2,minmax(0,1fr));gap:4%;padding:3%}.board .note{aspect-ratio:auto;min-height:0;min-width:0}
+.board.one .note{aspect-ratio:1/1;height:auto;align-self:center}
 .note{aspect-ratio:1;border:0;padding:6%;font-size:clamp(8px,2.2vw,11px);line-height:1.25;text-align:left;overflow:hidden;
   box-shadow:0 2px 3px rgba(0,0,0,.18);color:#5a4030;display:flex;flex-direction:column;justify-content:space-between}
 .note small{font-size:.85em;opacity:.7;text-align:right}
@@ -2504,7 +2505,7 @@ function famTog(){const ft=$('#famtools');if(!ft)return;const n=ft.querySelector
 function renderBoard(){if(home&&FT.hid!==home.id){FT.hid=home.id;FT.fold=false}famTog();
   const h=house(home.id),B=BOARDS[h.room]||BOARDS.basic1,ins=10;
   const b=$('#board');Object.assign(b.style,hp(B[0]+ins,B[1]+ins),{width:((B[2]-B[0]-2*ins)/RW*100)+'%',height:((B[3]-B[1]-2*ins)/RH*100)+'%'});
-  const all=DB.notes.filter(n=>n.houseId===home.id).sort((a,c)=>a.createdAt-c.createdAt),list=all.slice(-6);
+  const all=DB.notes.filter(n=>n.houseId===home.id).sort((a,c)=>a.createdAt-c.createdAt),list=all.slice(-6);b.style.gridTemplateRows=list.length<=3?'repeat(1,minmax(0,1fr))':'';b.classList.toggle('one',list.length<=3);   // v2.83：3 張以下排一排，便條不會被壓扁
   b.innerHTML=list.map((n,i)=>{const rc=(n.replies||[]).length;return n.hidden?`<button class="note fold" data-id="${n.id}" style="background:${n.color};transform:rotate(${[-4,3,-2,5,-3,2][i%6]}deg)"><span>🔒<br>秘密便條</span><small>— ${esc(n.by)}</small></button>`
     :`<button class="note" data-id="${n.id}" style="background:${n.color};transform:rotate(${[-4,3,-2,5,-3,2][i%6]}deg)">
     <span>${n.secret?'🔒':''}${esc([...n.text].slice(0,12).join(''))}${[...n.text].length>12?'…':''}</span><small>${rc?`💬${rc} `:''}— ${esc(n.by)}</small></button>`}).join('')
@@ -6572,7 +6573,7 @@ function announceLetters(){if(!DB.me)return;let seen=[];try{seen=JSON.parse(loca
     sfx('gift');$('#lgopen').onclick=()=>openLetter(nw[0].id,()=>$('#bell').click())};
   setTimeout(go,1800)}
 // ================= 自動更新：發現新版本就重新載入 =================
-const APP_VER='v2.82';
+const APP_VER='v2.83';
 function checkUpdate(){
   if(!/^https?:/.test(location.protocol)||!API_URL)return;
   if(!$('#modal').classList.contains('hidden'))return; // 正在填表單時不打斷
