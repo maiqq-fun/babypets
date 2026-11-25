@@ -1,5 +1,6 @@
 /*
- * 毛很多 babypets 後端・整理版 v67
+ * 毛很多 babypets 後端・整理版 v68
+ * v68：🌱 修「澆水、收成會跳回去」：寫進試算表的資料要先真的存好（flush）才讓下一個人排進來；以前偶爾會被別人讀到舊的那份再整列蓋回去
  * v67：🏝️ 外島（adminMoveHouse）：島主把沒在玩的家搬到外島（slot 100～112）；外島的家冬眠：不長便便、不掉錢、不變餓魔、小偷不去、不推播肚子餓；搬回主島時重新計時
  * v66：🎪 玩個毛：打地鼠每週前三名都有獎金（🪙1000／750／500）
  * v57：🗄️ 新增 12 款展示櫃、12 款相框、6 款層板
@@ -116,7 +117,7 @@ function doPost(e) {
       //      讀資料、組畫面的大段不佔排隊，其他人的動作就不會被卡住
       const now = Date.now();
       try { got = lock.tryLock(3000); } catch (x) { got = false; }
-      if (got) { try { stateTick_(req, now); } finally { try { lock.releaseLock(); } catch (x) {} got = false; } }
+      if (got) { try { stateTick_(req, now); } finally { flushSafe_(); try { lock.releaseLock(); } catch (x) {} got = false; } }
       out = { ok: true, data: stateView_(req, now) };
     } else if (LOCK_FREE_[req.action]) {
       // v44：只讀資料的動作不排隊（島主後台、型錄、家人名單）
@@ -136,7 +137,7 @@ function doPost(e) {
   } catch (err) {
     out = { ok: false, error: String(err && err.message || err) };
   } finally {
-    if (got) try { lock.releaseLock(); } catch (x) {}
+    if (got) { flushSafe_(); try { lock.releaseLock(); } catch (x) {} }
   }
   return ContentService.createTextOutput(JSON.stringify(out)).setMimeType(ContentService.MimeType.JSON);
 }
@@ -226,6 +227,8 @@ function stateView_(req, now) {
 // 同一次請求裡，每個分頁只讀一次，之後都從記憶體拿；寫入時同時更新記憶體
 let SS_ = null, C_ = {};
 function resetCache_() { C_ = {}; }
+// v68：放掉排隊鎖之前，先把這次寫的東西真的存進試算表（不然下一個人可能讀到舊的，再整列蓋回去）
+function flushSafe_() { try { SpreadsheetApp.flush(); } catch (x) {} }
 function ss_() {
   if (SS_) return SS_;
   try { SS_ = SpreadsheetApp.getActiveSpreadsheet(); } catch (e) {}
@@ -2341,7 +2344,7 @@ function cronTick() {
     try { jobTick_(now); } catch (e) {}
     try { thiefTick_(now); } catch (e) {}
     pushChecks_(now);
-  } finally { try { lock.releaseLock(); } catch (x) {} }
+  } finally { flushSafe_(); try { lock.releaseLock(); } catch (x) {} }
 }
 // ★ 換成這份之後執行一次：上方函式選「setupPush」→ 執行
 function setupPush() {
