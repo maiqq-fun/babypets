@@ -4670,7 +4670,7 @@ const WALL2={f2shop_pig:[],f2shop_xmas:[],f2shop_ghost:[],f2shop_space:[],f2shop
   f2shop_princess2:[[245,270,605,420],[245,440,605,590],[245,605,605,745]],f2shop_crystal2:[[245,270,605,420],[245,440,605,590],[245,605,605,745]],
   f2shop_mine:[[260,250,700,420],[260,440,700,610],[260,630,700,790]]};
 // 沒特別設定的背景：有佈告欄就在佈告欄上排 1～2 排層板（手機上舞台左右會被裁掉，兩邊留 62）
-function f2Spots(room){if(WALL2[room])return WALL2[room].slice(0,F2_N);const B0=BOARDS[room];if(!B0)return [];const x0=Math.max(B0[0],62)+8,x1=Math.min(B0[2],786)-8,y0=B0[1]+8,y1=B0[3]-8,n=y1-y0>300?2:1,h=(y1-y0)/n;return Array.from({length:n},(_,i)=>[x0,Math.round(y0+h*i),x1,Math.round(y0+h*(i+1))])}   // 手機上舞台左右會被裁掉，兩邊留 62 不要掛出畫面
+function f2Spots(room){if(WALL2[room])return WALL2[room].slice(0,F2_N);const cr=typeof customRoom==='function'&&customRoom(room),B0=BOARDS[room]||(cr&&cr.f2?[254,330,594,700]:null);if(!B0)return [];const x0=Math.max(B0[0],62)+8,x1=Math.min(B0[2],786)-8,y0=B0[1]+8,y1=B0[3]-8,n=y1-y0>300?2:1,h=(y1-y0)/n;return Array.from({length:n},(_,i)=>[x0,Math.round(y0+h*i),x1,Math.round(y0+h*(i+1))])}   // 手機上舞台左右會被裁掉，兩邊留 62 不要掛出畫面
 const NEON_C={pink:'#ff5fa2',blue:'#4fc3ff',yellow:'#ffd23f',purple:'#b46bff',mint:'#3ee8b5',white:'#ffffff'},NEON_P=1500;
 // f：牆和地板交界的高度（原圖 1536 高裡的位置）
 const SHOW_ROOMS={basic:{n:'溫馨木地板',p:0,f:1040},lilac:{n:'薰衣草',p:800,f:1050},mint:{n:'薄荷條紋',p:800,f:1075},
@@ -5700,11 +5700,13 @@ function decoForm(){const h=myHouse();if(!h)return toast('要有家才能申請�
       openModal(`<div style="text-align:center"><img src="assets/icon_deco.webp" alt="" style="width:96px"><h3>申請送出了！</h3><p class="lead">島主會照你的描述幫你裝潢<br>完成後會寄信給你，請留意信箱 💌</p></div><div class="row2"><button data-close class="primary">好</button></div>`)}
     catch(x){$('#derr').textContent=x.message;b.disabled=false;b.textContent=$('#dcode').value.trim()?'用折扣碼送出':`送出（🪙${DECO_COST}）`}}}
 // ---------- 👑 島主：處理訂製申請 ----------
-const decoPrompt=t=>`請幫我畫一張遊戲的房間背景圖：3D 黏土風、可愛粉嫩、柔和打光的室內房間，正面視角，直式 2:3。上半部是牆面和窗戶等裝飾（右上方的牆留一塊可以貼便利貼的軟木板），下半部是寬敞、空曠、平整的地板（之後要放家具和毛孩，地板上不要有東西）。畫面裡不要有人物、動物，也不要有任何文字。\n\n房間主人的需求：「${t}」`;
+// v2.97：二樓用的申請 → 牆中間留一大塊空牆放層板（不要軟木板）
+const decoPrompt=(t,f2)=>f2?`請幫我畫一張遊戲的房間背景圖：3D 黏土風、可愛粉嫩、柔和打光的室內房間，正面視角，直式 2:3。上半部是牆面，牆的正中間留一大塊乾淨的空牆（大約畫面寬度的 4 成、從畫面高度 1/4 到 3/5 左右），上面什麼都不要放（不要軟木板、層架、相框、海報、窗戶），之後要掛層板；窗戶、植物、燈和小擺設放在左右兩側。下半部是寬敞、空曠、平整的地板（之後要放家具和毛孩，地板上不要有東西）。畫面裡不要有人物、動物，也不要有任何文字。\n\n房間主人的需求：「${t}」`
+  :`請幫我畫一張遊戲的房間背景圖：3D 黏土風、可愛粉嫩、柔和打光的室內房間，正面視角，直式 2:3。上半部是牆面和窗戶等裝飾（右上方的牆留一塊可以貼便利貼的軟木板），下半部是寬敞、空曠、平整的地板（之後要放家具和毛孩，地板上不要有東西）。畫面裡不要有人物、動物，也不要有任何文字。\n\n房間主人的需求：「${t}」`;
 function adminDecoOne(m){const st=m.st||'wait',done=st==='done',no=st==='no';let img='';
   openModal(`<h3 class="mh3"><img class="mic" src="assets/icon_deco.webp" alt="" style="width:34px;height:34px">訂製裝潢</h3><p class="lead">${esc(m.nick)}${m.house?'・'+esc(m.house):''}・${ago(m.at)}・${m.free?'折扣碼（免費）':'已付 🪙'+(m.cost||DECO_COST)}${m.f2?'<br><b>🛏️ 二樓用</b>（做好會是二樓專用）':''}<br>${done?'<img class="mic" src="assets/icon_ok.webp" alt="">已經完成、寄出了':no?'<img class="mic" src="assets/icon_no.webp" alt="">已經退回、退款了':'⏳ 等你處理'}</p>
     <div class="mbody">${esc(m.text)}</div>${m.img?`<img class="mshot" src="${m.img}" alt="參考圖">`:''}
-    <div class="sec adm"><h4>🪄 生圖指令<span>貼給 AI 就好</span></h4><div class="prompt" id="dpr">${esc(decoPrompt(m.text))}</div><div class="row2"><button id="dcp">📋 複製指令</button></div></div>
+    <div class="sec adm"><h4>🪄 生圖指令<span>貼給 AI 就好</span></h4><div class="prompt" id="dpr">${esc(decoPrompt(m.text,m.f2))}</div><div class="row2"><button id="dcp">📋 複製指令</button></div></div>
     ${!done&&!no?`<div class="sec adm"><h4><img class="mic" src="assets/icon_custom.webp" alt="">上傳做好的房間</h4>
       <input id="drn" maxlength="12" placeholder="房間名字（例如：小橘的星空房）">
       <div class="photo" style="margin-top:8px"><div class="pv" id="drp" style="aspect-ratio:848/1264;width:90px">🖼️</div><div class="info" id="dri">直的房間圖（會自動裁成 2:3）<div class="btns"><label>⬆️ 選圖<input type="file" accept="image/*" id="drf" hidden></label></div></div></div>
@@ -5713,7 +5715,7 @@ function adminDecoOne(m){const st=m.st||'wait',done=st==='done',no=st==='no';let
       <div class="row2"><button id="drno"><img class="mic" src="assets/icon_no.webp" alt="">做不出來，退回並退款</button></div></div>`:''}
     <div class="row2"><button id="amb2">← 島民來信</button></div>`);
   $('#amb2').onclick=adminMailSheet;
-  $('#dcp').onclick=async()=>{try{await navigator.clipboard.writeText(decoPrompt(m.text));toast('指令已複製 📋')}catch(e){const r=document.createRange();r.selectNodeContents($('#dpr'));const s=getSelection();s.removeAllRanges();s.addRange(r);toast('已幫你選取，長按複製')}};
+  $('#dcp').onclick=async()=>{try{await navigator.clipboard.writeText(decoPrompt(m.text,m.f2));toast('指令已複製 📋')}catch(e){const r=document.createRange();r.selectNodeContents($('#dpr'));const s=getSelection();s.removeAllRanges();s.addRange(r);toast('已幫你選取，長按複製')}};
   if(done||no)return;
   $('#drf').onchange=async e=>{const f=e.target.files[0];if(!f)return;$('#dri').firstChild.textContent='處理中…';try{img=await roomCrop(f);$('#drp').innerHTML=`<img src="${img}" alt="" style="width:100%;height:100%;object-fit:cover">`;$('#dri').firstChild.textContent='✅ 裁好了（848×1264）'}catch(x){$('#dri').firstChild.textContent='這張圖讀不了，換一張'}};
   $('#drok').onclick=async e=>{const name=$('#drn').value.trim();if(!name)return $('#drerr').textContent='幫房間取個名字';if(!img)return $('#drerr').textContent='先選房間的圖';const b=e.currentTarget;b.disabled=true;
@@ -6706,7 +6708,7 @@ function announceLetters(){if(!DB.me)return;let seen=[];try{seen=JSON.parse(loca
     sfx('gift');$('#lgopen').onclick=()=>openLetter(nw[0].id,()=>$('#bell').click())};
   setTimeout(go,1800)}
 // ================= 自動更新：發現新版本就重新載入 =================
-const APP_VER='v2.96';
+const APP_VER='v2.97';
 function checkUpdate(){
   if(!/^https?:/.test(location.protocol)||!API_URL)return;
   if(!$('#modal').classList.contains('hidden'))return; // 正在填表單時不打斷
