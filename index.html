@@ -310,6 +310,11 @@ b.dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:#ff
 .stamp{position:absolute;right:16px;bottom:12px;width:58px;height:58px;border:2.5px solid var(--cc);opacity:.6;border-radius:50%;color:var(--cc);
   display:flex;align-items:center;justify-content:center;font-size:11px;transform:rotate(-14deg);text-align:center;line-height:1.2}
 .idbottom{position:relative;padding:0 80px 14px 14px;font-size:14px;color:#7a6050;min-height:64px}
+.idcard.idimg{background:none;border-style:solid;border-width:62px 18px 18px;border-image:var(--idf) 128 36 36 fill / 62px 18px 18px stretch;box-shadow:none;border-radius:0;overflow:visible;filter:drop-shadow(0 3px 3px rgba(90,60,30,.18))}
+.idcard.idimg .idhead{position:absolute;left:18px;right:18px;top:-62px;height:62px;background:none;padding:0;display:grid;grid-template-columns:1fr 1fr;column-gap:26%;align-items:center;padding-top:14px;box-sizing:border-box}
+.idcard.idimg{position:relative}.idl{justify-self:center;width:72%;text-align:center;background:#fbe9cf;color:#6b4a30;border-radius:999px;font-size:clamp(9px,2.6vw,11px);line-height:1.6;letter-spacing:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-variant-numeric:tabular-nums;box-shadow:inset 0 1px 1px rgba(0,0,0,.08)}
+.idcard.idimg .idbody{padding:12px 10px 8px}.idcard.idimg .idbottom{padding:0 70px 6px 10px}
+.idsp{position:absolute;right:2px;bottom:-4px;width:68px;pointer-events:none;opacity:.95}
 .idstat{display:flex;align-items:center;gap:6px;font-size:12px;margin-top:6px;max-width:220px}
 .trt{font-size:12px;background:color-mix(in srgb,var(--cc) 18%,#fff);color:color-mix(in srgb,var(--cc) 75%,#2a1a10);border-radius:8px;padding:1px 7px}
 .sec{margin-top:14px;background:#fff;border:2px solid var(--line);border-radius:16px;padding:10px 12px}
@@ -1361,6 +1366,8 @@ const CARD_COLORS=[['焦糖','#ff9a6b'],['玫瑰奶茶','#f48fb1'],['霧藍','#6
 const CC_SHOW={'#ff9a6b':'#e3ad7e','#f48fb1':'#dfa39d','#64b5f6':'#a7bccb','#5fbf95':'#b0c49a','#9b8cff':'#bcadd4','#b98d62':'#b38b6a'},ccShow=c=>CC_SHOW[String(c||'').toLowerCase()]||c;
 // v3.02：佈告欄上的便條用島主做的便條紙圖（膠帶、花、圖釘、肉球、星星）
 const NOTE_IMG={'#ffe98a':0,'#ffc7d4':1,'#bfe3ff':2,'#c9f0c0':3,'#ffd6a8':4},noteBg=c=>{const i=NOTE_IMG[String(c||'').toLowerCase()];return i==null?`background:${ncShow(c)}`:`background:url(assets/note_${i}.webp) center/100% 100% no-repeat`};
+// v3.07：身分證外框用島主做的圖（idf_ 外框九宮格拉伸、ids_ 右下角郵戳）
+const idKey=c=>{c=String(c||'#ff9a6b').toLowerCase().replace('#','');return ['ff9a6b','64b5f6','5fbf95','9b8cff','b98d62','f48fb1'].includes(c)?c:'ff9a6b'};
 const NC_SHOW={'#ffe98a':'#f5e6c4','#ffc7d4':'#f1d3c9','#bfe3ff':'#d8e2e6','#c9f0c0':'#dde6cc','#ffd6a8':'#efd8bb'},ncShow=c=>NC_SHOW[String(c||'').toLowerCase()]||c;
 const NOTE_COLORS=['#ffe98a','#ffc7d4','#bfe3ff','#c9f0c0','#ffd6a8'];
 const MED_TYPES=['看診','疫苗','驅蟲','健檢','手術','用藥','其他'];
@@ -3005,8 +3012,8 @@ function idCard(pid){
   const ym=todayTW().slice(0,7),month=ex.filter(e=>e.date.startsWith(ym)).reduce((s,e)=>s+(+e.amount||0),0);
   const trs=trackersOf(p).filter(t=>!t.hidden&&(fam||t.vis!=='family')),ph=photosOf(p);
   openModal(`${sibs.length>1?`<div class="sibs">${sibs.map(s=>`<button data-sib="${s.id}" class="${s.id===pid?'on':''}"><img src="${petHead(s)}" alt=""><span>${esc(s.name)}</span></button>`).join('')}</div>`:''}
-  <div class="idcard" style="--cc:${ccShow(p.card||'#ff9a6b')}">
-    <div class="idhead">🐾 毛很多島 居民證<span>No.${String(p.no).padStart(4,'0')}</span></div>
+  <div class="idcard idimg" style="--cc:${ccShow(p.card||'#ff9a6b')};--idf:url(assets/idf_${idKey(p.card)}.webp)">
+    <div class="idhead"><b class="idl noic">毛很多島 居民證</b><b class="idl noic">No.${String(p.no).padStart(4,'0')}</b></div>
     <div class="idbody"><div class="idphoto"><img src="${petHead(p)}" alt="${esc(p.name)}"></div>
       <dl class="idfields"><div class="idname">${esc(p.name)} ${p.sex?`<span style="color:${p.sex==='♀'?'#e86a92':'#5b9bd5'}">${p.sex}</span>`:''}</div>
         <dt>種類</dt><dd>${esc(p.species)}${p.breed?'・'+esc(p.breed):''}</dd>
@@ -3023,7 +3030,7 @@ function idCard(pid){
       ${(()=>{const fr=(Array.isArray(p.friends)?p.friends:[]).map(pet).filter(Boolean);return fr.length?`<div class="idstat">🐾 毛孩朋友：${fr.slice(0,6).map(f=>esc(f.name)).join('、')}</div>`:''})()}
       ${(()=>{const o=outAt(p.id);return o&&o.id!==p.houseId?`<div class="idstat">🐾 正在 ${esc(o.name)} 玩</div>`:''})()}
       ${(()=>{const s=sleepState(p);return s?`<div class="idstat">${s.icon} 現在${s.label==='賴床中'?'賴床中':'在睡'+(s.label==='晚安'?'覺':s.label)}</div>`:''})()}
-      <div class="stamp">毛很多<br>認證</div></div>
+      <img class="idsp" src="assets/ids_${idKey(p.card)}.webp" alt=""></div>
   </div>
   ${fam?`<div class="row2"><button id="ied">✏️ 編輯資料</button><button id="itm">⚙️ 紀錄項目</button></div><div class="row2"><button id="icl">👗 衣櫃・換裝</button></div>`:''}
   ${ph.length||fam?`<div class="sec"><h4>📷 生活照 <span>${ph.length} / 5</span></h4><div class="photos">${ph.map((u,i)=>`<button data-ph="${i}"><img src="${u}" alt=""></button>`).join('')}
@@ -6752,7 +6759,7 @@ function announceLetters(){if(!DB.me)return;let seen=[];try{seen=JSON.parse(loca
     sfx('gift');$('#lgopen').onclick=()=>openLetter(nw[0].id,()=>$('#bell').click())};
   setTimeout(go,1800)}
 // ================= 自動更新：發現新版本就重新載入 =================
-const APP_VER='v3.06';
+const APP_VER='v3.07';
 function checkUpdate(){
   if(!/^https?:/.test(location.protocol)||!API_URL)return;
   if(!$('#modal').classList.contains('hidden'))return; // 正在填表單時不打斷
