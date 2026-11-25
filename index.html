@@ -262,7 +262,8 @@ b.dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:#ff
 .si.locked2{opacity:.35;filter:grayscale(1)}
 .tent.tuck>img{animation:tuck .8s ease-in-out}
 @keyframes tuck{0%,100%{transform:none}30%{transform:scale(1.06,.94)}60%{transform:scale(.97,1.04)}}
-.petheads{position:absolute;right:12px;top:142px;z-index:2900;display:flex;flex-direction:column;gap:6px}
+.petheads{position:absolute;left:12px;top:142px;z-index:2900;display:flex;flex-direction:column;gap:6px;align-items:flex-start}.petheads.fold>:not(.phtog){display:none}
+.phtog{border:0;border-radius:12px;padding:3px 10px;background:rgba(255,250,238,.92);box-shadow:0 1px 0 rgba(0,0,0,.1);display:flex;align-items:center;gap:4px;font-size:12px;font-weight:700;color:var(--ink)}.phtog img{width:16px;height:16px;transform:rotate(180deg);transition:transform .2s}.petheads.fold .phtog img{transform:none}
 .ph1{position:relative;width:38px;height:38px;border-radius:50%;padding:0;border:2.5px solid #fff;box-shadow:0 1px 3px rgba(0,0,0,.25);background:#fff1dc;overflow:visible}
 .ph1 img{width:100%;height:100%;object-fit:cover;border-radius:50%}
 .ph1 i{position:absolute;right:-6px;bottom:-4px;font-style:normal;font-size:13px}
@@ -1476,7 +1477,7 @@ async function sync(quiet){
     if(d.player&&DB.me){DB.me.code=d.player.code||DB.me.code;if(d.player.pin)DB.me.pin=d.player.pin;const ml=Array.isArray(d.player.mail)?d.player.mail:[];if(ml.length)claimMail(ml)}
     DB.owned={};d.houses.forEach(h=>DB.owned[h.id]=Array.isArray(h.owned)?h.owned:[]);
     if(d.player&&d.player.bb&&typeof d.player.bb==='object'&&!bbBusy)DB.bb=d.player.bb;
-    if(d.player&&DB.me){DB.me.houseId=d.player.houseId||null;if(!DB.gameSynced&&d.player.game&&d.player.game.prog&&!localStorage.getItem(OKEY+'_g')){DB.game=fixGame(d.player.game)}}
+    if(d.player&&DB.me){DB.me.houseId=d.player.houseId||null;if(!DB.gameSynced&&d.player.game&&d.player.game.prog&&!localStorage.getItem(OKEY+'_g')){DB.game=fixGame(d.player.game);sndOn=avPref('snd');musOn=avPref('mus');updSndBtns();updMusBtns&&updMusBtns()}}
     if(d.player&&d.player.inbox&&+d.player.inbox.n>0){const ib=d.player.inbox;let k=0;for(let i=0;i<+ib.n;i++)if(reward('guest'))k++;if(k)toast(`你的毛孩在朋友家被照顧了 ${k} 次 💕`);api('claimInbox',{playerId:DB.me.id}).catch(()=>{})}
     if(d.catVer!=null&&+d.catVer!==+CAT.ver)loadCatalog(d.catVer);
     DB.gameSynced=true;DB.synced=true;DB.fromCache=false;syncFail=0;setTimeout(dailyLogin,800);try{localStorage.setItem(OKEY+'_g','1')}catch(e){}
@@ -2443,8 +2444,9 @@ function openHome(hid,keep){
   window.scrollTo(0,0);
 }
 // v1.91：毛孩頭像列排在右上按鈕（毛孩、家、二樓、農田、徵才…）下面，不會被擋住
-function placeHeads(){const f=$('#famtools'),p=$('#petheads');if(!f||!p)return;p.style.removeProperty('top');if(!f.children.length)return;
-  const t=f.offsetTop+f.offsetHeight+10;if(t>p.offsetTop)p.style.setProperty('top',t+'px','important')}
+// v2.77：毛孩頭像在左邊，排在家人列下面
+function placeHeads(){const v=$('#visits'),p=$('#petheads');if(!p)return;const on=v&&v.style.display!=='none'&&v.offsetHeight;p.style.setProperty('top',(on?v.offsetTop+v.offsetHeight+8:12)+'px','important')}
+const PH={fold:false,hid:null};
 function renderFoot2(){
   const h=house(home.id),L=h.visits&&h.visits.day===todayTW()?h.visits.list||[]:[];
   const SH=isShopH(h),M=SH?shopMgrs().map(id=>({id,nick:nickOf(id)})):membersOf(h.id);
@@ -2452,7 +2454,7 @@ function renderFoot2(){
   $('#visits').onclick=()=>peopleSheet(h.id);
   const own=petsOf(h.id),gs=guestsOf(h.id).map(g=>pet(g.petId)).filter(p=>p.houseId!==h.id&&!jobNow(p.id)).concat(workersAt(h.id).map(w=>pet(w.petId)).filter(p=>p&&p.houseId!==h.id));
   const heads=own.concat(gs).map(p=>{const o=outAt(p.id),away=o&&o.id!==h.id,sl=!away&&sleepState(p);return `<button class="ph1${away?' away':''}" data-pid="${p.id}" title="${esc(p.name)}"><img src="${!away&&petDemon(p)?'assets/demon_head.webp':petHead(p)}" alt="">${away?(jobNow(p.id)?'<i>💼</i>':'<i>🐾</i>'):sl?'<i>💤</i>':p.houseId!==h.id?'<i>🏠</i>':''}</button>`}).join('');
-  $('#petheads').innerHTML=heads;placeHeads();setTimeout(placeHeads,400);$('#petheads').querySelectorAll('[data-pid]').forEach(b=>b.onclick=()=>{const pid=b.dataset.pid,pp=pet(pid),o=outAt(pid),jw=jobNow(pid);if(jw&&o&&o.id!==h.id)return toast(`${pp.name} 在${JOB_PLACE[jw.place]}打工中 💼 ${JOB_SLOTS[jw.slot][1]}:00 下班`);if(o&&o.id!==h.id){if(pp.houseId===h.id&&isFamily(h.id))return recallSheet(pp,o);toast(`${pp.name} 出門去 ${o.name} 玩了 🐾`)}idCard(pid)});
+  if(PH.hid!==home.id){PH.hid=home.id;PH.fold=false}$('#petheads').innerHTML=heads?`<button class="phtog noic" aria-label="收起毛孩頭像"><img src="assets/icon_tri_d.webp" alt=""><span>${PH.fold?'毛孩':''}</span></button>`+heads:'';$('#petheads').classList.toggle('fold',PH.fold);{const t=$('#petheads .phtog');if(t)t.onclick=e=>{e.stopPropagation();PH.fold=!PH.fold;$('#petheads').classList.toggle('fold',PH.fold);t.querySelector('span').textContent=PH.fold?'毛孩':''}}placeHeads();setTimeout(placeHeads,400);$('#petheads').querySelectorAll('[data-pid]').forEach(b=>b.onclick=()=>{const pid=b.dataset.pid,pp=pet(pid),o=outAt(pid),jw=jobNow(pid);if(jw&&o&&o.id!==h.id)return toast(`${pp.name} 在${JOB_PLACE[jw.place]}打工中 💼 ${JOB_SLOTS[jw.slot][1]}:00 下班`);if(o&&o.id!==h.id){if(pp.houseId===h.id&&isFamily(h.id))return recallSheet(pp,o);toast(`${pp.name} 出門去 ${o.name} 玩了 🐾`)}idCard(pid)});
   const dm=!SH&&!isFamily(h.id)&&demonOf(h);
   if(dm&&+dm.until>Date.now()){const mins=Math.ceil((+dm.until-Date.now())/60000);$('#visits').insertAdjacentHTML('beforeend',`<div>餓魔被救回來了，${mins>=60?Math.floor(mins/60)+' 小時 '+(mins%60)+' 分':mins+' 分鐘'}後又會變回餓魔（主人回家才會真的好）</div>`)}
   $('#visits').style.display=M.length||L.length||(dm&&+dm.until>Date.now())?'':'none';
@@ -3064,7 +3066,7 @@ $('#me').onclick=()=>{
     ${ONLINE?'<p class="lead" style="font-size:12px;text-align:center;margin:4px 0">兩組都可以隨時改，忘記的話問島主</p><div class="row2" style="margin-top:4px"><button id="mrec">🔑 登入其他帳號</button></div>':''}
     ${adminPw()?'<div class="row2" style="margin-top:10px"><button id="madmin">👑 島主後台'+(DB.amail?' <b class="mbadge">📮 '+DB.amail+'</b>':'')+'</button></div>':''}
     <div class="row2" style="margin-top:10px"><button data-close>關閉</button></div>`);
-  $('#mguide').onclick=()=>homeGuide(false);if($('#mmail'))$('#mmail').onclick=()=>mailAdminSheet();$('#msnd').onclick=()=>{sndOn=!sndOn;try{localStorage.setItem('mhd_snd',sndOn?'1':'0')}catch(e){}$('#msnd').textContent=sndOn?'🔊 音效：開':'🔇 音效：關';updSndBtns();if(sndOn)sfx('tap')};if($('#madmin'))$('#madmin').onclick=adminSheet;$('#mci').onclick=checkinSheet;$('#mdm').onclick=missionsSheet;if($('#mrec'))$('#mrec').onclick=()=>{closeModal();loginFlow((myHouse()||{}).id)};
+  $('#mguide').onclick=()=>homeGuide(false);if($('#mmail'))$('#mmail').onclick=()=>mailAdminSheet();$('#msnd').onclick=()=>{sndOn=!sndOn;avSave('snd',sndOn);$('#msnd').textContent=sndOn?'🔊 音效：開':'🔇 音效：關';updSndBtns();if(sndOn)sfx('tap')};if($('#madmin'))$('#madmin').onclick=adminSheet;$('#mci').onclick=checkinSheet;$('#mdm').onclick=missionsSheet;if($('#mrec'))$('#mrec').onclick=()=>{closeModal();loginFlow((myHouse()||{}).id)};
   if($('#mpine'))$('#mpine').onclick=pinSheet;if($('#mkeye'))$('#mkeye').onclick=keySheet;if($('#mkey'))$('#mkey').onclick=async()=>{const k=(myHouse()||{}).key;if(!k)return;try{await navigator.clipboard.writeText(k);toast('家庭鑰匙碼已複製 🔑')}catch(e){toast(k)}};if($('#mpush')){$('#mpush').onclick=pushSheet;refreshPushBtn()}
   if($('#mcode'))$('#mcode').onclick=async()=>{const c=DB.me.code;if(!c)return;try{await navigator.clipboard.writeText(c);toast('轉移碼已複製 🔑')}catch(e){toast(c)}};
   $('#minv').onclick=async()=>{const u=inviteUrl();try{await navigator.clipboard.writeText(u);toast('邀請連結已複製，貼到 LINE 給朋友吧 🔗')}catch(e){toast(u)}};
@@ -6266,7 +6268,10 @@ document.addEventListener('dblclick',e=>e.preventDefault(),{passive:false});['ge
 let lastTouchEnd=0;document.addEventListener('touchend',e=>{const n=Date.now();if(n-lastTouchEnd<350&&!e.target.closest('input,textarea,select'))e.preventDefault();lastTouchEnd=n},{passive:false});
 
 // ================= 🔊 音效 =================
-let sndOn=(()=>{try{return localStorage.getItem('mhd_snd')!=='0'}catch(e){return true}})(),actx=null;const SBUF={},SRAW={},SVOL={tap:.35,coin:.6,bag:.8,levelup:.7,eat:.6,pat:.6,gift:.6,flip:.7,ssr:.8,sweep:.7};
+// v2.77：音效、音樂開關除了存在這支手機，也存進帳號（DB.game.av），換手機、重裝、清掉暫存都會記得；預設還是開
+function avPref(k){try{const v=localStorage.getItem(k==='snd'?'mhd_snd':'mhd_mus');if(v!=null)return v!=='0'}catch(e){}const a=DB&&DB.game&&DB.game.av;return !(a&&a[k]===0)}
+function avSave(k,on){try{localStorage.setItem(k==='snd'?'mhd_snd':'mhd_mus',on?'1':'0')}catch(e){}if(DB&&DB.game){DB.game.av=Object.assign({},DB.game.av,{[k]:on?1:0});save()}}
+let sndOn=avPref('snd'),actx=null;const SBUF={},SRAW={},SVOL={tap:.35,coin:.6,bag:.8,levelup:.7,eat:.6,pat:.6,gift:.6,flip:.7,ssr:.8,sweep:.7};
 // 一打開就先把音效檔下載好（只下載，不需要使用者點擊）
 Object.keys(SVOL).forEach(n=>fetch(`assets/sfx_${n}.mp3`).then(r=>r.ok?r.arrayBuffer():null).then(b=>{if(b){SRAW[n]=b;decodeOne(n)}}).catch(()=>{}));
 const SQ={};// 還沒準備好的音效先排隊（0.8 秒內準備好就補播）
@@ -6450,7 +6455,7 @@ function peopleSheet(hid){const h=house(hid),M=isShopH(h)?shopMgrs().map(id=>({i
 
 // ================= 🔊 音效開關（首頁、房間） =================
 function updSndBtns(){document.querySelectorAll('.sndb').forEach(b=>{b.innerHTML=`<img src="assets/icon_${sndOn?'sound':'mute'}.webp" alt="" onerror="this.replaceWith('${sndOn?'🔊':'🔇'}')">`;b.classList.toggle('off',!sndOn);b.setAttribute('aria-label',sndOn?'音效：開（點一下關掉）':'音效：關（點一下打開）')})}
-document.querySelectorAll('.sndb').forEach(b=>b.onclick=e=>{e.stopPropagation();sndOn=!sndOn;try{localStorage.setItem('mhd_snd',sndOn?'1':'0')}catch(x){}updSndBtns();toast(sndOn?'音效打開了 🔊':'音效關掉了 🔇');if(sndOn)sfx('tap')});
+document.querySelectorAll('.sndb').forEach(b=>b.onclick=e=>{e.stopPropagation();sndOn=!sndOn;avSave('snd',sndOn);updSndBtns();toast(sndOn?'音效打開了 🔊':'音效關掉了 🔇');if(sndOn)sfx('tap')});
 updSndBtns();
 
 
@@ -6459,7 +6464,7 @@ updSndBtns();
 // 瀏覽器規定要使用者先點一下畫面才能出聲，所以第一次點擊時才開始播
 // 平常：三首隨機輪播（播完換下一首，不會連續同一首）；聖誕活動期間：聖誕歌一直重複
 const BGM={normal:['assets/bgm_n1.mp3','assets/bgm_n2.mp3','assets/bgm_n3.mp3'],xmas:['assets/bgm_xmas.mp3']};let bgmList='',bgmCur='';
-let musOn=true;try{musOn=localStorage.getItem('mhd_mus')!=='0'}catch(e){}
+let musOn=avPref('mus');
 const bgm=new Audio();bgm.loop=false;bgm.preload='none';bgm.volume=.45;let bgmUnlocked=false,bgmFade=0;
 function bgmWant(){const E=typeof xmEv==='function'&&xmEv();return E&&E.on&&BGM.xmas.length?'xmas':BGM.normal.length?'normal':''}
 function bgmNext(){const L=BGM[bgmList]||[];if(!L.length)return '';const C=L.length>1?L.filter(x=>x!==bgmCur):L;return C[Math.floor(Math.random()*C.length)]}
@@ -6469,7 +6474,7 @@ function bgmSync(){const want=bgmWant();document.querySelectorAll('.musb').forEa
   if(bgmList!==want){bgmList=want;bgmCur=bgmNext();bgm.src=bgmCur}
   if(bgm.paused){bgm.volume=0;bgm.play().then(()=>{clearInterval(bgmFade);bgmFade=setInterval(()=>{bgm.volume=Math.min(.45,bgm.volume+.03);if(bgm.volume>=.45)clearInterval(bgmFade)},80)}).catch(()=>{})}}
 function updMusBtns(){document.querySelectorAll('.musb').forEach(b=>{b.innerHTML=`<img src="assets/icon_${musOn?'music':'music_off'}.webp?v=2" alt="" onerror="this.replaceWith('${musOn?'🎵':'🔕'}')">`;b.classList.toggle('off',!musOn);b.setAttribute('aria-label',musOn?'音樂：開（點一下關掉）':'音樂：關（點一下打開）')});bgmSync()}
-document.querySelectorAll('.musb').forEach(b=>b.onclick=e=>{e.stopPropagation();musOn=!musOn;bgmUnlocked=true;try{localStorage.setItem('mhd_mus',musOn?'1':'0')}catch(x){}updMusBtns();toast(musOn?'音樂打開了 🎵':'音樂關掉了 🔕')});
+document.querySelectorAll('.musb').forEach(b=>b.onclick=e=>{e.stopPropagation();musOn=!musOn;bgmUnlocked=true;avSave('mus',musOn);updMusBtns();toast(musOn?'音樂打開了 🎵':'音樂關掉了 🔕')});
 ['pointerdown','keydown','touchstart'].forEach(ev=>document.addEventListener(ev,()=>{if(bgmUnlocked)return;bgmUnlocked=true;bgmSync()},{once:true,capture:true,passive:true}));
 document.addEventListener('visibilitychange',bgmSync);
 setInterval(bgmSync,30000);   // 活動開始或結束時自動換音樂
@@ -6526,7 +6531,7 @@ function announceLetters(){if(!DB.me)return;let seen=[];try{seen=JSON.parse(loca
     sfx('gift');$('#lgopen').onclick=()=>openLetter(nw[0].id,()=>$('#bell').click())};
   setTimeout(go,1800)}
 // ================= 自動更新：發現新版本就重新載入 =================
-const APP_VER='v2.76';
+const APP_VER='v2.77';
 function checkUpdate(){
   if(!/^https?:/.test(location.protocol)||!API_URL)return;
   if(!$('#modal').classList.contains('hidden'))return; // 正在填表單時不打斷
