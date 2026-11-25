@@ -31,7 +31,8 @@
 - commit 訊息結尾加 Co-Authored-By 與 Claude-Session 行；不要在 commit / PR 寫模型名稱。
 
 ## 目前狀態（2026-11）
-- 前端 v3.05（分支上，等 v75 部署後上線）、後端 v75（**等島主部署**）。v3.03／v74 已上線。
+- 前端 v3.06（分支上，等 v75 部署後上線）、後端 v75（**等島主部署**）。v3.03／v74 已上線。
+- v75／v3.06：都更・外牆整修 🪙500（`RENEW_COST`／`RENEW_COST_`）；島民中心「訂製裝潢」價格改讀 `DECO_COST`（之前寫死 500）。
 - v75／v3.04：島主後台「📐 調整內建背景」（`roomPosPick`／`roomPosEdit`，用 `posEditor`）：拉佈告欄（二樓＝層板）框和地板線，存 `meta.roompos.pos[房間id]={board,floor:{y0,t}}`（`adminRoomPos`，可恢復原本），getState 帶 `roompos`，前端 `applyRoomPos` 蓋過 BOARDS／RFLOOR（x 擋住的格子保留）。
 - v3.05：180 個民宿用品不再分民宿類，改進 家具／家電／🧴 盥洗保養（新分類 `bath`）／擺飾／寵物用品，`ser` 記原本色系（m/k/v/r）。
 - v3.03：便條紙圖擺正（`.board .note.nimg{transform:none}`），島主說轉角度看起來歪。

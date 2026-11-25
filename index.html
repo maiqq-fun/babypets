@@ -4389,7 +4389,7 @@ function centerMenu(s){openModal(`<div class="mqd"><img src="${esc(s.img2||s.img
   <div class="cmenu"><button id="cm1">${mic('mail',30)}<span><b>寫信給島主</b><small>回報問題、建議、許願</small></span></button>
     <button id="cm2"><img class="mic" src="assets/icon_renew.webp" alt=""><span><b>申請都更・外牆整修</b><small>換房子的外觀（Lv${RENEW_LV}・🪙${RENEW_COST}・一個月一次）</small></span></button>
     <button id="cm3"><img class="mic" src="assets/icon_expand.webp" alt=""><span><b>申請擴建</b><small>二樓民宿、農田（Lv${EXP_LV}・🪙${EXP_COST}）</small></span></button>
-    <button id="cm5"><img class="mic" src="assets/icon_deco.webp" alt=""><span><b>訂製裝潢</b><small>照你的描述做一間專屬房間（🪙500・一個月一次）</small></span></button>
+    <button id="cm5"><img class="mic" src="assets/icon_deco.webp" alt=""><span><b>訂製裝潢</b><small>照你的描述做一間專屬房間（🪙${DECO_COST}・一個月一次）</small></span></button>
     <button id="cm6"><span class="mic">📖</span><span><b>新手說明</b><small>這座島可以玩什麼？</small></span></button>
     <button id="cm4"><span class="mic">📌</span><span><b>看公告</b><small>${DB.notice&&DB.notice.t?'島主有新公告喔':'目前沒有公告'}</small></span></button></div>
   <div class="row2"><button data-close>掰掰</button></div>`);
@@ -4441,7 +4441,7 @@ setInterval(()=>{const n=DB.notice;if(n&&+n.until&&Date.now()>+n.until){DB.notic
 const EXP_COST=1000,EXP_LV=7,INN_CAP_H=12,FARM_N0=4,FARM_MAX=6,FARM_GROW_H=8,FARM_WMAX=3,PLOT_COST=500;
 const EXPN={floor2:'二樓民宿',farm:'農田',show:'展示間',renew:'都更・外牆整修'};
 const expCostOf=k=>k==='show'?SHOW_COST:k==='renew'?RENEW_COST:EXP_COST;
-const RENEW_COST=300,RENEW_LV=7,RENEW_DAYS=30;
+const RENEW_COST=500,RENEW_LV=7,RENEW_DAYS=30;
 const CROP={tomato:{n:'小番茄',seed:'seed_tomato',item:'c_tomato'},pumpkin:{n:'南瓜',seed:'seed_pumpkin',item:'c_pumpkin'},apple:{n:'金蘋果',seed:'seed_apple',item:'c_apple'}};
 Object.assign(ITEMS,{
   seed_tomato:{name:'小番茄種子',emo:'🌱',kind:'seed',price:30,crop:'tomato'},     // v2.22：利潤 +50（長得快）
@@ -6752,7 +6752,7 @@ function announceLetters(){if(!DB.me)return;let seen=[];try{seen=JSON.parse(loca
     sfx('gift');$('#lgopen').onclick=()=>openLetter(nw[0].id,()=>$('#bell').click())};
   setTimeout(go,1800)}
 // ================= 自動更新：發現新版本就重新載入 =================
-const APP_VER='v3.05';
+const APP_VER='v3.06';
 function checkUpdate(){
   if(!/^https?:/.test(location.protocol)||!API_URL)return;
   if(!$('#modal').classList.contains('hidden'))return; // 正在填表單時不打斷

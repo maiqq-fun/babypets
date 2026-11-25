@@ -1,6 +1,6 @@
 /*
  * 毛很多 babypets 後端・整理版 v75
- * v75：📐 島主可以調整內建背景的佈告欄／層板位置和地板範圍（meta roompos，adminRoomPos）
+ * v75：🏠 都更・外牆整修 🪙500；📐 島主可以調整內建背景的佈告欄／層板位置和地板範圍（meta roompos，adminRoomPos）
  * v74：🎨 訂製裝潢一次 🪙1000（以前申請的照當時付的退）；申請分三種（kind：b 通用佈告欄版／w 二樓空牆版／d 二樓裝潢設計版），完成時一起存佈告欄（層板）位置和地板線；一個家一個月一次（折扣碼也算）
  * v73：🎫 一番賞改成一抽 🪙800（現在這箱也是，之後每一箱都是）；🏷️ 毛二街高價收購公仔（shop.want：每天 3 款、🪙1200～6000，賣出一隻那款就結束）
  * v72：🏷️ 毛二街出清：二手架超過 40 樣被擠下來的貨進出清候補（clrq，最多 30），每天換一批 6 樣到出清籃（clr），價錢是二手價的 1/4，沒賣掉的隔天刪掉
@@ -2045,7 +2045,7 @@ const EXP_COST_ = 1000, EXP_LV_ = 7, INN_CAP_H_ = 12, FARM_N0_ = 4, FARM_MAX_ = 
 const CROPS_ = { tomato: 1, pumpkin: 1, apple: 1 };
 const EXP_NAME_ = { floor2: '二樓民宿', farm: '農田', show: '展示間', renew: '都更・外牆整修' };
 const SHOW_COST_ = 1500;
-const RENEW_COST_ = 300, RENEW_LV_ = 7, RENEW_DAYS_ = 30;
+const RENEW_COST_ = 500, RENEW_LV_ = 7, RENEW_DAYS_ = 30;
 const expCost_ = k => k === 'renew' ? RENEW_COST_ : k === 'show' ? SHOW_COST_ : EXP_COST_;
 const expLv_ = k => k === 'renew' ? RENEW_LV_ : EXP_LV_;
 // 都更要換的款式：1～42、不是現在的、島上沒人用、也沒有別家正在申請
