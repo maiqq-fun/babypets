@@ -1,5 +1,6 @@
 /*
- * 毛很多 babypets 後端・整理版 v73
+ * 毛很多 babypets 後端・整理版 v74
+ * v74：🎨 訂製裝潢一次 🪙1000（以前申請的照當時付的退）
  * v73：🎫 一番賞改成一抽 🪙800（現在這箱也是，之後每一箱都是）；🏷️ 毛二街高價收購公仔（shop.want：每天 3 款、🪙1200～6000，賣出一隻那款就結束）
  * v72：🏷️ 毛二街出清：二手架超過 40 樣被擠下來的貨進出清候補（clrq，最多 30），每天換一批 6 樣到出清籃（clr），價錢是二手價的 1/4，沒賣掉的隔天刪掉
  * v71：🌱 農田紀錄（farm.log：誰在什麼時候種、澆、收，最近 30 筆）；🪵 新增 13 款層板
@@ -314,7 +315,7 @@ function centerView_() { const m = get_('meta', 'center'); return m && Array.isA
 function catalog_() { const m = meta_('catalog'); if (!Array.isArray(m.styles)) m.styles = []; if (!Array.isArray(m.items)) m.items = []; m.ver = Number(m.ver) || 0; return m; }
 function styleOk_(n) { n = Number(n); if (n >= 1 && n <= STYLE_COUNT_) return true; return catalog_().styles.some(x => Number(x.n) === n && !x.off); }
 function roomsView_() { const m = get_('meta', 'rooms'); return m && Array.isArray(m.list) ? m.list : []; }
-const DECO_COST_ = 500, DECO_DAYS_ = 30, DECO_QUEUE_ = 3;
+const DECO_COST_ = 1000, DECO_DAYS_ = 30, DECO_QUEUE_ = 3;
 function starView_() { const m = get_('meta', 'star'); return m && Number(m.start) ? { start: Number(m.start), end: Number(m.end) || Number(m.start) + STAR_DAYS_ * DAY_ } : null; }
 function starOn_() { const v = starView_(), t = Date.now(); return !!(v && t >= v.start && t < v.end); }
 function twDay_(t) { return Utilities.formatDate(t ? new Date(t) : new Date(), 'Asia/Taipei', 'yyyy-MM-dd'); }

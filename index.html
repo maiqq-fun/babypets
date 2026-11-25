@@ -4670,7 +4670,7 @@ const WALL2={f2shop_pig:[],f2shop_xmas:[],f2shop_ghost:[],f2shop_space:[],f2shop
   f2shop_princess2:[[245,270,605,420],[245,440,605,590],[245,605,605,745]],f2shop_crystal2:[[245,270,605,420],[245,440,605,590],[245,605,605,745]],
   f2shop_mine:[[260,250,700,420],[260,440,700,610],[260,630,700,790]]};
 // 沒特別設定的背景：有佈告欄就在佈告欄上排 1～2 排層板（手機上舞台左右會被裁掉，兩邊留 62）
-function f2Spots(room){if(WALL2[room])return WALL2[room].slice(0,F2_N);const cr=typeof customRoom==='function'&&customRoom(room),B0=BOARDS[room]||(cr&&cr.f2?[254,330,594,700]:null);if(!B0)return [];const x0=Math.max(B0[0],62)+8,x1=Math.min(B0[2],786)-8,y0=B0[1]+8,y1=B0[3]-8,n=y1-y0>300?2:1,h=(y1-y0)/n;return Array.from({length:n},(_,i)=>[x0,Math.round(y0+h*i),x1,Math.round(y0+h*(i+1))])}   // 手機上舞台左右會被裁掉，兩邊留 62 不要掛出畫面
+function f2Spots(room){if(WALL2[room])return WALL2[room].slice(0,F2_N);const B0=BOARDS[room];if(!B0)return [];const x0=Math.max(B0[0],62)+8,x1=Math.min(B0[2],786)-8,y0=B0[1]+8,y1=B0[3]-8,n=y1-y0>300?2:1,h=(y1-y0)/n;return Array.from({length:n},(_,i)=>[x0,Math.round(y0+h*i),x1,Math.round(y0+h*(i+1))])}   // 手機上舞台左右會被裁掉，兩邊留 62 不要掛出畫面
 const NEON_C={pink:'#ff5fa2',blue:'#4fc3ff',yellow:'#ffd23f',purple:'#b46bff',mint:'#3ee8b5',white:'#ffffff'},NEON_P=1500;
 // f：牆和地板交界的高度（原圖 1536 高裡的位置）
 const SHOW_ROOMS={basic:{n:'溫馨木地板',p:0,f:1040},lilac:{n:'薰衣草',p:800,f:1050},mint:{n:'薄荷條紋',p:800,f:1075},
@@ -5175,8 +5175,8 @@ function renderArcade(){const v=$('#arcv');if(!v)return;const st=v.querySelector
   put('pusher',655,1195,185,'<img class="mic" src="assets/icon_pusher.webp" alt="">推幣機',pusherGame);   // 手機上舞台左右會被裁掉，三台往中間靠
   const d=document.createElement('button');d.className='arcdoor';d.innerHTML='<img src="assets/dance_door.webp" alt="">';Object.assign(d.style,hp(250,732),{width:(250/RW*100)+'%',height:(250*520/412/RH*100)+'%',zIndex:700});   // 門底貼著牆和地板的交界，看起來像牆後面的房間
   d.onclick=e=>{e.stopPropagation();openModal(`<div style="text-align:center"><div style="font-size:56px">🚧</div><h3>練舞室還在蓋</h3><p class="lead">工人正在趕工中……<br>之後這裡會有跟朋友 PK 的遊戲，敬請期待！</p></div><div class="row2"><button data-close class="primary">好期待</button></div>`)};st.appendChild(d);
-  v.querySelector('.cbtns').innerHTML=`<button class="act" id="arctok">${tokIcon} ${a.tok}</button><button class="act" id="arcbuy">買代幣</button><button class="act" id="arcrk">🏆 排行</button><button class="act" id="arcpp"><img class="mic" src="assets/icon_pinball.webp" alt="">珠珠台</button>`;
-  $('#arctok').onclick=$('#arcbuy').onclick=arcBuy;$('#arcrk').onclick=arcRank;$('#arcpp').onclick=ppGame;jobScene(st,'arcade',v.querySelector('.cbtns'))}
+  v.querySelector('.cbtns').innerHTML=`<button class="act" id="arctok">${tokIcon} ${a.tok}</button><button class="act" id="arcbuy">買代幣</button><button class="act" id="arcrk">🏆 排行</button>`;
+  $('#arctok').onclick=$('#arcbuy').onclick=arcBuy;$('#arcrk').onclick=arcRank;if($('#arcpp'))$('#arcpp').onclick=ppGame;jobScene(st,'arcade',v.querySelector('.cbtns'))}
 function arcBuy(){const g=DB.game,a=arcG();openModal(`<h3>${tokIcon} 買代幣</h3><p class="lead">你有 🪙${g.coins||0}・代幣 ${a.tok} 枚<br>代幣只有<b>推幣機</b>用（1 枚 = 🪙10）<br>娃娃機、打地鼠、彈珠台直接付金幣</p>
   <div class="xcpl">${TOK_P.map(([n,c],i)=>`<button data-tk="${i}">${tokIcon} 代幣 ×${n}<small style="color:var(--soft)">　🪙${c}${n*10>c?`（省 ${n*10-c}）`:''}</small></button>`).join('')}</div><div class="row2"><button data-close>關閉</button></div>`);
   $('#sheet').querySelectorAll('[data-tk]').forEach(b=>b.onclick=()=>{const [n,c]=TOK_P[+b.dataset.tk];if((g.coins||0)<c)return toast(`金幣不夠，要 🪙${c}`);g.coins-=c;a.tok+=n;a.paid+=c;save();updTix&&updTix();sfx('coin');toast(`買了 ${n} 枚代幣！`);renderArcade();document.querySelectorAll('.arcov .atk').forEach(e=>e.textContent=a.tok);if(document.querySelector('.arcov'))closeModal();else arcBuy()})}
@@ -5674,7 +5674,7 @@ function adminApplyBind(){const go=async(id,ok,b)=>{if(!armBtn(b,ok?'確定核�
 
 // ================= 🎨 訂製裝潢（v1.69） =================
 // 島民中心申請：🪙500、一個家 30 天一次、全島最多 3 件排隊；島主照描述生圖、上傳後寄信給申請人（只屬於那一家）
-const DECO_COST=500,DECO_DAYS=30;
+const DECO_COST=1000,DECO_DAYS=30;
 MAILN.deco='訂製裝潢';MAILT.deco='🎨 訂製裝潢';
 const customRoom=id=>(typeof DB!=='undefined'&&Array.isArray(DB.rooms)?DB.rooms:[]).find(r=>r.id===id);
 function decoForm(){const h=myHouse();if(!h)return toast('要有家才能申請訂製裝潢');if(!ONLINE)return toast('試做版沒有訂製裝潢');const g=DB.game,last=+h.decoAt||0,wait=last&&Date.now()-last<DECO_DAYS*864e5;let img='';
@@ -5720,7 +5720,8 @@ function adminDecoOne(m){const st=m.st||'wait',done=st==='done',no=st==='no';let
   $('#drf').onchange=async e=>{const f=e.target.files[0];if(!f)return;$('#dri').firstChild.textContent='處理中…';try{img=await roomCrop(f);$('#drp').innerHTML=`<img src="${img}" alt="" style="width:100%;height:100%;object-fit:cover">`;$('#dri').firstChild.textContent='✅ 裁好了（848×1264）'}catch(x){$('#dri').firstChild.textContent='這張圖讀不了，換一張'}};
   $('#drok').onclick=async e=>{const name=$('#drn').value.trim();if(!name)return $('#drerr').textContent='幫房間取個名字';if(!img)return $('#drerr').textContent='先選房間的圖';const b=e.currentTarget;b.disabled=true;
     try{b.textContent='上傳圖片中…';const up=await call('upload',Object.assign(cred(),{dataUrl:img}),true);b.textContent='寄信中…';
-      const r=await adminCall('adminDecoFinish',{id:m.id,name,img:up.url,reply:$('#drr').value.trim()});(DB.rooms=DB.rooms||[]).push({id:r.roomId,name,img:up.url,houseId:m.houseId,r:'CU',f2:m.f2?1:''});m.st='done';toast('完成了！已經寄信給他 🎨');adminDecoOne(m)}
+      const r=await adminCall('adminDecoFinish',{id:m.id,name,img:up.url,reply:$('#drr').value.trim()});const nr={id:r.roomId,name,img:up.url,houseId:m.houseId,r:'CU',f2:m.f2?1:''};(DB.rooms=DB.rooms||[]).push(nr);m.st='done';toast('完成了！已經寄信給他 🎨');
+      if(m.f2){nr.board=[254,330,594,700];setTimeout(()=>{roomEditor(nr);toast('把黃色框拉到空牆上，就是放層板的地方，拉好按儲存')},400)}else adminDecoOne(m)}
     catch(x){$('#drerr').textContent=x.message;b.disabled=false;b.innerHTML='<img class="mic" src="assets/icon_ok.webp" alt="">完成並寄給他'}};
   $('#drno').onclick=async e=>{if(!armBtn(e.currentTarget,'確定退回並退款？'))return;try{await adminCall('adminDecoRefund',{id:m.id,reply:$('#drr').value.trim()});m.st='no';toast('退回了，已經寄信退款');adminDecoOne(m)}catch(x){$('#drerr').textContent=x.message}}}
 // 房間圖：裁成 848×1264、壓成 jpg（上傳雲端用）
@@ -6708,7 +6709,7 @@ function announceLetters(){if(!DB.me)return;let seen=[];try{seen=JSON.parse(loca
     sfx('gift');$('#lgopen').onclick=()=>openLetter(nw[0].id,()=>$('#bell').click())};
   setTimeout(go,1800)}
 // ================= 自動更新：發現新版本就重新載入 =================
-const APP_VER='v2.97';
+const APP_VER='v2.98';
 function checkUpdate(){
   if(!/^https?:/.test(location.protocol)||!API_URL)return;
   if(!$('#modal').classList.contains('hidden'))return; // 正在填表單時不打斷
