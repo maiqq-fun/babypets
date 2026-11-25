@@ -31,7 +31,8 @@
 - commit 訊息結尾加 Co-Authored-By 與 Claude-Session 行；不要在 commit / PR 寫模型名稱。
 
 ## 目前狀態（2026-11）
-- 前端 v3.07、後端 v75（都已上線，2026-11-25）。
+- 前端 v3.08（分支，等島主確認）、後端 v75（已上線）。
+- v3.08：身分證上方「毛很多島 居民證」「No.」的奶油色底變大、用絕對位置蓋在外框圖的兩條色條上（`.idcard.idimg .idl` left 29.5%／70.5%、寬 25%）。
 - v3.07：毛孩身分證外框改用島主做的圖：`assets/idf_<色碼>.webp`（border-image 九宮格拉伸，上 128／左右下 36，原圖右下郵戳已用紙紋蓋掉）、`ids_<色碼>.webp` 郵戳另外放右下；上方兩條奶油色條上寫「毛很多島 居民證」和編號（`.idl`）。`idKey` 對應 6 個存的顏色碼。
 - v75／v3.06：都更・外牆整修 🪙500（`RENEW_COST`／`RENEW_COST_`）；島民中心「訂製裝潢」價格改讀 `DECO_COST`（之前寫死 500）。
 - v75／v3.04：島主後台「📐 調整內建背景」（`roomPosPick`／`roomPosEdit`，用 `posEditor`）：拉佈告欄（二樓＝層板）框和地板線，存 `meta.roompos.pos[房間id]={board,floor:{y0,t}}`（`adminRoomPos`，可恢復原本），getState 帶 `roompos`，前端 `applyRoomPos` 蓋過 BOARDS／RFLOOR（x 擋住的格子保留）。
