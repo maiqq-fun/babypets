@@ -83,7 +83,7 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
 .note{aspect-ratio:1;border:0;padding:6%;font-size:clamp(8px,2.2vw,11px);line-height:1.25;text-align:left;overflow:hidden;
   box-shadow:0 2px 3px rgba(0,0,0,.18);color:#5a4030;display:flex;flex-direction:column;justify-content:space-between}
 .note small{font-size:.85em;opacity:.7;text-align:right}
-.board.one .note.nimg,.note.nimg{aspect-ratio:240/268}.note.nimg{box-shadow:none;filter:drop-shadow(0 2px 2px rgba(0,0,0,.2));aspect-ratio:240/268;padding:24% 9% 14%;border-radius:0}
+.board.one .note.nimg,.note.nimg{aspect-ratio:240/268}.board .note.nimg{transform:none!important}   /* v3.03：便條紙圖本身就有膠帶、圖釘，擺正就好 */.note.nimg{box-shadow:none;filter:drop-shadow(0 2px 2px rgba(0,0,0,.2));aspect-ratio:240/268;padding:24% 9% 14%;border-radius:0}
 .board.wantb{grid-template-columns:repeat(3,minmax(0,1fr));grid-template-rows:minmax(0,1fr)!important;padding:16px 5px 3px!important;gap:6px;container-type:inline-size}.board.wantb::before{display:none}
 .board .wanttl{position:absolute!important;left:50%;top:-1%;transform:translateX(-50%);background:#d9302c;color:#fff;font-weight:900;font-size:clamp(10px,3cqw,15px);padding:1px 10px;border-radius:6px;white-space:nowrap;box-shadow:0 2px 0 rgba(0,0,0,.2);z-index:2}
 .board .wantc{height:100%;align-self:stretch;max-height:none}.wantc{position:relative;border:0;padding:4% 4% 0;background:#fffdf6;border-radius:4px;box-shadow:0 2px 3px rgba(0,0,0,.25);display:flex;flex-direction:column;align-items:center;justify-content:flex-end;min-height:0;overflow:hidden;transform:rotate(-2deg)}.wantc:nth-of-type(2){transform:rotate(2deg)}
@@ -6735,7 +6735,7 @@ function announceLetters(){if(!DB.me)return;let seen=[];try{seen=JSON.parse(loca
     sfx('gift');$('#lgopen').onclick=()=>openLetter(nw[0].id,()=>$('#bell').click())};
   setTimeout(go,1800)}
 // ================= 自動更新：發現新版本就重新載入 =================
-const APP_VER='v3.02';
+const APP_VER='v3.03';
 function checkUpdate(){
   if(!/^https?:/.test(location.protocol)||!API_URL)return;
   if(!$('#modal').classList.contains('hidden'))return; // 正在填表單時不打斷
