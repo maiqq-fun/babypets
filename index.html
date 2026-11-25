@@ -4093,9 +4093,11 @@ function tradeSheet(tab,sub){if(!needMe())return;if(tab)tradeTab=tab;if(sub)sell
     S2BUY[x.id]=Date.now();s.stock=(s.stock||[]).filter(y=>y.id!==x.id);g.coins=Math.max(0,(g.coins||0)-pr);sfx('coin');
     if(x.t==='acc'){const hid=myHouse().id,hh=house(hid);hh.acc=[...new Set([...(hh.acc||[]),x.item])];const a=APEND[hid]||(APEND[hid]={ids:[],t:0});a.ids=[...new Set(a.ids.concat([x.item]))];a.t=Date.now()}else if(x.t==='cab'||x.t==='w')showStore(myHouse().id,x,1);else bagAdd(x.item,1);
     save();updTix();dmTick('buy');toast(`撿到便宜！${nm} ${x.t==='acc'?'放進衣櫃了 👗':x.t==='cab'||x.t==='w'?'放進展示間的倉庫了 🗄️':'放進背包了 🎒'}`);keepScroll(()=>tradeSheet());shopBuyBg(x,pr,nm)});
-  S.querySelectorAll('[data-ss]').forEach(b=>b.onclick=async()=>{const id=b.dataset.ss,pr=shopPrice('item',id),nm=ITEMS[id].name;if(!(bag()[id]>0))return;if(!armBtn(b,`確定賣？🪙${pr}`))return;
-    let r;try{r=await call('shopSell',{playerId:DB.me.id,item:id,t:'item',name:nm})}catch(e){return toast(e.message)}
-    bagAdd(id,-1);pushStock(r&&r.it);const rc=b.getBoundingClientRect();sfx('coin');grant(0,pr,{x:rc.left+rc.width/2,y:rc.top});if(ONLINE)feedPush(`💰 ${DB.me.nick} 把 ${nm} 賣給毛二街`);toast(`賣掉 ${nm}，拿到 🪙${pr}`);keepScroll(()=>tradeSheet())});
+  // v2.85：賣背包裡的東西也先在畫面上賣好（不用等小島），小島在背後確認；真的失敗才把東西和金幣退回
+  S.querySelectorAll('[data-ss]').forEach(b=>b.onclick=()=>{const id=b.dataset.ss,pr=shopPrice('item',id),nm=ITEMS[id].name;if(!(bag()[id]>0))return;if(!armBtn(b,`確定賣？🪙${pr}`))return;
+    const tmp={id:'tmp'+uid(),item:id,t:'item',at:Date.now(),src:'p',by:DB.me.nick};bagAdd(id,-1);pushStock(tmp);const rc=b.getBoundingClientRect();sfx('coin');grant(0,pr,{x:rc.left+rc.width/2,y:rc.top});save();updTix&&updTix();toast(`賣掉 ${nm}，拿到 🪙${pr}`);keepScroll(()=>tradeSheet());
+    call('shopSell',{playerId:DB.me.id,item:id,t:'item',name:nm},true).then(r=>{if(r&&r.it)Object.assign(tmp,r.it);if(ONLINE)feedPush(`💰 ${DB.me.nick} 把 ${nm} 賣給毛二街`)}).catch(e=>{if(/太慢|連不上|Failed|Load failed|NetworkError/.test(e.message))return;
+      s.stock=(s.stock||[]).filter(y=>y!==tmp);bagAdd(id,1);g.coins=Math.max(0,(g.coins||0)-pr);save();updTix&&updTix();toast(`沒賣成功，${nm} 和金幣退回去了：${e.message}`);if($('#sheet')&&/毛二街/.test(($('#sheet h3')||{}).textContent||''))keepScroll(()=>tradeSheet())})});
   S.querySelectorAll('[data-sc]').forEach(b=>b.onclick=()=>{const id=b.dataset.sc,mh2=myHouse(),pr=Math.round(SHOW_CABS[id].p/2),nm=SHOW_CABS[id].n;if(!mh2||!isFamily(mh2.id))return toast('正在跟小島同步，等一下再試');if(!armBtn(b,`確定賣？🪙${pr}`))return;
     if(!showDo(mh2.id,{op:'sellCab',id},()=>{g.coins=Math.max(0,(g.coins||0)-pr);save();updTix()}))return;
     const rc=b.getBoundingClientRect();sfx('coin');grant(0,pr,{x:rc.left+rc.width/2,y:rc.top});if(ONLINE)feedPush(`💰 ${DB.me.nick} 把展示櫃「${nm}」賣給毛二街`);toast(`賣掉 ${nm}，拿到 🪙${pr}`);keepScroll(()=>tradeSheet('sell','cab'))});
@@ -6574,7 +6576,7 @@ function announceLetters(){if(!DB.me)return;let seen=[];try{seen=JSON.parse(loca
     sfx('gift');$('#lgopen').onclick=()=>openLetter(nw[0].id,()=>$('#bell').click())};
   setTimeout(go,1800)}
 // ================= 自動更新：發現新版本就重新載入 =================
-const APP_VER='v2.84';
+const APP_VER='v2.85';
 function checkUpdate(){
   if(!/^https?:/.test(location.protocol)||!API_URL)return;
   if(!$('#modal').classList.contains('hidden'))return; // 正在填表單時不打斷
