@@ -3995,15 +3995,16 @@ const shopIcon=(t,id)=>t==='cab'?`<span class="ii big"><img src="${showCabImg(id
 const keepScroll=fn=>{const st=$('#sheet').scrollTop;fn();$('#sheet').scrollTop=st};
 // ---------- v2.90：毛二街高價收購公仔（佈告欄改成收購板；後端 v73） ----------
 const WANT_N=3;
-function wantList(s){const w=s&&s.want;return w&&w.day===todayTW()&&Array.isArray(w.list)?w.list.filter(x=>x&&ITEMS[x.id]):[]}
+let WANTP=null;   // v2.92：剛拿到的收購單先記著，同步回來的舊資料（還沒有收購單）不會把它蓋掉
+function wantList(s){if(s&&WANTP&&WANTP.day===todayTW()&&!(s.want&&s.want.day===WANTP.day))s.want=WANTP;const w=s&&s.want;return w&&w.day===todayTW()&&Array.isArray(w.list)?w.list.filter(x=>x&&ITEMS[x.id]):[]}
 let wantRolling=false;
 async function wantRollMaybe(){const s=house(SHOP_ID);if(!s||!DB.me||wantRolling)return;if(s.want&&s.want.day===todayTW())return;if(ONLINE&&!myHouse())return;wantRolling=true;
   const P=[];bbOn().forEach(S=>bbIdx(S).forEach(i=>{const id=bbId(S.id,i);if(ITEMS[id])P.push({id,h:(S.h||[]).includes(i)})}));
   const pick=[];for(let k=0;k<WANT_N&&P.length;k++){const j=Math.floor(Math.random()*P.length);pick.push(P.splice(j,1)[0])}
   const items=pick.map(x=>({id:x.id,p:x.h?4000+Math.floor(Math.random()*21)*100:1200+Math.floor(Math.random()*19)*100}));   // 普通款 1200～3000、隱藏版 4000～6000
-  try{const r=await call('shopWantRoll',{playerId:DB.me.id,items},true);if(r&&r.want){s.want=r.want;if(home&&isShopH(house(home.id)))renderBoard()}}catch(e){}finally{wantRolling=false}}
+  try{const r=await call('shopWantRoll',{playerId:DB.me.id,items},true);if(r&&r.want){s.want=r.want;WANTP=r.want;if(home&&isShopH(house(home.id)))renderBoard()}}catch(e){}finally{wantRolling=false}}
 function wantBoard(b,h){const L=wantList(h);b.style.gridTemplateRows='repeat(1,minmax(0,1fr))';b.classList.add('one');
-  b.innerHTML=`<div class="wanttl noic">高價收購</div>`+(L.length?L.map((x,i)=>`<button class="wantc${x.by?' done':''}" data-wi="${i}"><img src="${itemSrc(x.id)}" alt="" onerror="imgRetry(this)"><b class="noic">${x.by?'已收購':'<img src="assets/icon_coin.webp" alt="">'+x.p}</b></button>`).join(''):'<div class="wantempty">今天的收購單還沒貼出來</div>');
+  b.innerHTML=`<div class="wanttl noic">高價收購</div>`+(L.length?L.map((x,i)=>`<button class="wantc${x.by?' done':''}" data-wi="${i}"><img src="${itemSrc(x.id)}" alt="" onerror="imgRetry(this)"><b class="noic">${x.by?'已收購':'<img src="assets/icon_coin.webp" alt="">'+x.p}</b></button>`).join(''):'<div class="wantempty">店長正在寫收購單…</div>');if(!L.length)setTimeout(wantRollMaybe,300);
   b.querySelectorAll('[data-wi]').forEach(el=>el.onclick=e=>{e.stopPropagation();wantSheet()})}
 function wantSheet(){if(!needMe())return;const s=house(SHOP_ID);if(!s)return;const L=wantList(s),bg=bag();
   openModal(`<h3>高價收購</h3><p class="lead">店長今天想收這幾隻公仔，每一款只收一隻，先賣先贏！<br><small>每天換新的收購單</small></p>
@@ -6607,7 +6608,7 @@ function announceLetters(){if(!DB.me)return;let seen=[];try{seen=JSON.parse(loca
     sfx('gift');$('#lgopen').onclick=()=>openLetter(nw[0].id,()=>$('#bell').click())};
   setTimeout(go,1800)}
 // ================= 自動更新：發現新版本就重新載入 =================
-const APP_VER='v2.91';
+const APP_VER='v2.92';
 function checkUpdate(){
   if(!/^https?:/.test(location.protocol)||!API_URL)return;
   if(!$('#modal').classList.contains('hidden'))return; // 正在填表單時不打斷
