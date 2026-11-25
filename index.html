@@ -1480,6 +1480,9 @@ function optFail(k,o){DB[k]=(DB[k]||[]).filter(x=>x!==o);ADDS[k]=ADDS[k].filter(
 // v2.80：網路太慢（請求可能其實成功了）時不要把畫面退回去，改成重新跟小島要一次真正的狀態
 const FARM_NET=e=>/太慢|連不上|Failed to fetch|Load failed|NetworkError|連線失敗/.test(String(e&&e.message||''));
 async function farmTruth(hid,i){const o=FARMP[hid];if(o)delete o[i];for(let k=0;k<30&&syncing;k++)await new Promise(r=>setTimeout(r,500));try{await sync(true)}catch(x){}try{renderFarm()}catch(x){}const h=house(hid);return h&&h.farm&&Array.isArray(h.farm.p)?h.farm.p[i]||null:null}
+// v3.09：同一格田的動作排隊一個一個送（種完馬上澆水時，澆水不會比種子先到小島）；舊的回應不蓋掉後來的動作
+const FQ={},FSEQ={};function farmQ(k,fn){const p=(FQ[k]||Promise.resolve()).catch(()=>{}).then(fn);FQ[k]=p;return p}
+const farmSeq=k=>FSEQ[k]=(FSEQ[k]||0)+1;
 const FARMP={};function farmPend(hid,i,cell){(FARMP[hid]=FARMP[hid]||{})[i]={c:cell?JSON.parse(JSON.stringify(cell)):null,t:Date.now()}}
 function farmDone(hid,i,cell){const o=FARMP[hid]&&FARMP[hid][i];if(!o)return;o.done=Date.now();if(cell!==undefined)o.c=cell?JSON.parse(JSON.stringify(cell)):null}   // 不馬上放掉，等同步回來的資料一樣才放
 const cellSig=c=>c?c.c+'|'+(+c.at)+'|'+((c.w||[]).length):'';
@@ -4652,24 +4655,24 @@ async function plotTap(i){if(!needMe())return;const h=house(FM.hid),f=farmOf(h),
   if(!c){if(!fam)return toast('這格還沒種東西');return seedPick(i)}
   if(now>=ripeAt(c)){if(!fam)return toast('成熟了！等主人來收成');
     // v1.82：先在畫面上收成（不用等小島），小島回來再補錢袋；失敗就放回去
-    const old=c,P=PLOTS[i],st=$('#farmv .cstage');f.p[i]=null;farmPend(h.id,i,null);bagAdd(CROP[old.c].item,1);sfx('gift');renderFarm();scenePop(st,`${itemIcon(CROP[old.c].item)} +1`,P[0],P[1]-200);
-    try{const r=await call('farmHarvest',Object.assign(cred(),{houseId:h.id,i}),true);farmDone(h.id,i,null);
+    const old=c,P=PLOTS[i],st=$('#farmv .cstage'),fk=h.id+':'+i,my=farmSeq(fk);f.p[i]=null;farmPend(h.id,i,null);bagAdd(CROP[old.c].item,1);sfx('gift');renderFarm();scenePop(st,`${itemIcon(CROP[old.c].item)} +1`,P[0],P[1]-200);
+    try{const r=await farmQ(fk,()=>call('farmHarvest',Object.assign(cred(),{houseId:h.id,i}),true));if(FSEQ[fk]===my)farmDone(h.id,i,null);
       if(r.bag){grant(0,r.bag);setTimeout(()=>{scenePop(st,`<img src="assets/icon_moneyburst.webp" alt="" style="width:60px"> +${r.bag}`,P[0],P[1]-280);toast(`💰 金蘋果樹上還掛著一個錢袋：${r.bag} 金幣！`)},300)}
       else toast(`收成了 ${CROP[old.c].n}！放進背包了`)}catch(e){if(FARM_NET(e)){const c2=await farmTruth(h.id,i);if(c2)bagAdd(CROP[old.c].item,-1);toast(c2?'網路太慢，沒收成到，再點一次':`收成了 ${CROP[old.c].n}！放進背包了`);return}
       if(!/空的/.test(e.message)){farmDone(h.id,i,old);farmOf(house(h.id)).p[i]=old;bagAdd(CROP[old.c].item,-1);renderFarm()}else farmDone(h.id,i,null);toast(e.message)}return}
   const wn=(c.w||[]).length;if(wn>=cropWMax(c))return toast(`這格已經澆滿 ${cropWMax(c)} 次了，還要 ${fmLeft(ripeAt(c)-now)}`);
   if(now-lastW(c)<HOUR)return toast(`剛剛才澆過，${fmLeft(HOUR-(now-lastW(c)))}後可以再澆`);
   // v1.82：先在畫面上澆水，小島在背後確認；失敗才退回
-  const old=JSON.parse(JSON.stringify(c)),P=PLOTS[i];c.w=(c.w||[]).concat({t:now,by:DB.me.id});farmPend(h.id,i,c);sfx('sweep');renderFarm();scenePop($('#farmv .cstage'),'<img src="assets/icon_water.webp" alt="" style="width:56px"> 快 1 小時！',P[0],P[1]-200);
-  try{const r=await call('farmWater',{playerId:DB.me.id,houseId:h.id,i},true);farmDone(h.id,i,r);farmOf(house(h.id)).p[i]=r;if(!fam)earn('water');renderFarm();
-    if(!fam&&ONLINE)feedPush(`${DB.me.nick} 幫「${h.name}」的田澆水 💧`)}catch(e){if(FARM_NET(e)){const c2=await farmTruth(h.id,i);toast(c2&&(c2.w||[]).length>(old.w||[]).length?'澆好了 💧':'網路太慢，沒澆到，再點一次');return}farmDone(h.id,i,old);farmOf(house(h.id)).p[i]=old;renderFarm();toast(e.message)}}
+  const old=JSON.parse(JSON.stringify(c)),P=PLOTS[i],fk=h.id+':'+i,my=farmSeq(fk);c.w=(c.w||[]).concat({t:now,by:DB.me.id});farmPend(h.id,i,c);sfx('sweep');renderFarm();scenePop($('#farmv .cstage'),'<img src="assets/icon_water.webp" alt="" style="width:56px"> 快 1 小時！',P[0],P[1]-200);
+  try{const r=await farmQ(fk,()=>call('farmWater',{playerId:DB.me.id,houseId:h.id,i},true));if(FSEQ[fk]===my){farmDone(h.id,i,r);farmOf(house(h.id)).p[i]=r}if(!fam)earn('water');renderFarm();
+    if(!fam&&ONLINE)feedPush(`${DB.me.nick} 幫「${h.name}」的田澆水 💧`)}catch(e){if(FARM_NET(e)){const c2=await farmTruth(h.id,i);toast(c2&&(c2.w||[]).length>(old.w||[]).length?'澆好了 💧':'網路太慢，沒澆到，再點一次');return}if(FSEQ[fk]===my){await farmTruth(h.id,i)}toast(e.message)}}
 function seedPick(i){const g=DB.game;
   openModal(`<h3>🌱 要種什麼？</h3><div class="shopgrid">${Object.entries(CROP).map(([k,c])=>{const s=ITEMS[c.seed],n=bag()[c.seed]||0;return `<div class="si">${itemIcon(c.seed,'big')}<div class="sn">${c.n}</div><div class="sf">賣 🪙${ITEMS[c.item].price}${k==='apple'?'・可能有錢袋':''}</div>
     ${n?`<button data-pl="${k}">種下（有 ${n}）</button>`:`<button data-pb="${k}" ${(g.coins||0)>=s.price?'':'disabled'}>🪙${s.price} 買來種</button>`}</div>`}).join('')}</div>
     <div class="hint">小番茄 4 小時、南瓜和金蘋果 8 小時成熟，澆水可以更快</div><div class="row2"><button data-close>取消</button></div>`);
   // v1.82：先種下去（畫面馬上看到），小島在背後確認；失敗才把種子還你
-  const plant=async k=>{const h=house(FM.hid),f=farmOf(h);if(f.p[i])return;f.p[i]={c:k,at:Date.now(),w:[]};farmPend(h.id,i,f.p[i]);bagAdd(CROP[k].seed,-1);closeModal();sfx('pat');renderFarm();toast(`種下${CROP[k].n}了 🌱`);
-    try{const r=await call('farmPlant',Object.assign(cred(),{houseId:h.id,i,c:k}),true);farmDone(h.id,i,r);farmOf(house(h.id)).p[i]=r;renderFarm()}catch(e){if(FARM_NET(e)){const c2=await farmTruth(h.id,i);if(!c2)bagAdd(CROP[k].seed,1);toast(c2?`種下${CROP[k].n}了 🌱`:'網路太慢，沒種到，種子還給你了');return}if(!/已經種/.test(e.message)){farmDone(h.id,i,null);farmOf(house(h.id)).p[i]=null;bagAdd(CROP[k].seed,1);renderFarm()}else{const o=FARMP[h.id];if(o)delete o[i];sync(true)}toast(e.message)}};
+  const plant=async k=>{const h=house(FM.hid),f=farmOf(h);if(f.p[i])return;const fk=h.id+':'+i,my=farmSeq(fk);f.p[i]={c:k,at:Date.now(),w:[]};farmPend(h.id,i,f.p[i]);bagAdd(CROP[k].seed,-1);closeModal();sfx('pat');renderFarm();toast(`種下${CROP[k].n}了 🌱`);
+    try{const r=await farmQ(fk,()=>call('farmPlant',Object.assign(cred(),{houseId:h.id,i,c:k}),true));if(FSEQ[fk]===my){farmDone(h.id,i,r);farmOf(house(h.id)).p[i]=r;renderFarm()}}catch(e){if(FARM_NET(e)){const c2=await farmTruth(h.id,i);if(!c2)bagAdd(CROP[k].seed,1);toast(c2?`種下${CROP[k].n}了 🌱`:'網路太慢，沒種到，種子還給你了');return}if(!/已經種/.test(e.message)){farmDone(h.id,i,null);farmOf(house(h.id)).p[i]=null;bagAdd(CROP[k].seed,1);renderFarm()}else{const o=FARMP[h.id];if(o)delete o[i];sync(true)}toast(e.message)}};
   $('#sheet').querySelectorAll('[data-pl]').forEach(b=>b.onclick=()=>plant(b.dataset.pl));
   $('#sheet').querySelectorAll('[data-pb]').forEach(b=>b.onclick=()=>{const s=ITEMS[CROP[b.dataset.pb].seed];if((g.coins||0)<s.price)return;g.coins-=s.price;sfx('coin');bagAdd(CROP[b.dataset.pb].seed,1);updTix&&updTix();plant(b.dataset.pb)})}
 // 毛二街：作物全價賣掉，或換零食（零食打 8 折，剩下的零頭換成金幣）
@@ -6760,7 +6763,7 @@ function announceLetters(){if(!DB.me)return;let seen=[];try{seen=JSON.parse(loca
     sfx('gift');$('#lgopen').onclick=()=>openLetter(nw[0].id,()=>$('#bell').click())};
   setTimeout(go,1800)}
 // ================= 自動更新：發現新版本就重新載入 =================
-const APP_VER='v3.08';
+const APP_VER='v3.09';
 function checkUpdate(){
   if(!/^https?:/.test(location.protocol)||!API_URL)return;
   if(!$('#modal').classList.contains('hidden'))return; // 正在填表單時不打斷
