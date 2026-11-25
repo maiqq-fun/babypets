@@ -1213,7 +1213,12 @@ body:has(.arcov) .modal{z-index:100000}   /* v2.36：遊戲畫面裡買代幣，
 .arcov .ah .apill .abuy{margin-left:6px;padding:3px 9px;border-radius:999px;font-size:12px}
 .arccv{position:relative;width:min(92vw,400px,calc(64vh * var(--a)));aspect-ratio:var(--a);margin-top:6px;border-radius:24px;padding:8px;background:linear-gradient(#ff9ec0,#f2709c);box-shadow:0 8px 0 #b84a74,0 12px 24px rgba(0,0,0,.35)}
 .arccv canvas{display:block;width:100%;height:100%;border-radius:18px;touch-action:none}
-.arccv .pshwin{top:40%}.pshwin.big{font-size:clamp(26px,9vw,40px)}
+.arccv .pshwin{top:40%}
+.ppcv{max-height:58dvh}.ppui{width:100%;max-width:400px;padding:6px 14px 14px;box-sizing:border-box;display:flex;flex-direction:column;gap:7px}.pprow{display:flex;gap:6px;align-items:center}
+.pprow button{border:0;border-radius:12px;padding:8px 10px;font-weight:800;background:rgba(255,255,255,.16);color:#fff;font-size:14px}.pprow button.on{background:#ff8fb8}
+.ppcnt{flex:1;display:flex;align-items:center;gap:5px;font-weight:800}.ppcnt b{font-size:20px;color:#ffd23f}.ppb{width:16px;height:16px;border-radius:50%;background:radial-gradient(circle at 35% 35%,#fff,#9aa3b5)}
+.ppnet{font-size:12px;font-weight:700}.ppnet.up{color:#7dffb2}.ppnet.dn{color:#ffb3c7}.pplab{font-size:13px;font-weight:800;white-space:nowrap}.pprow input[type=range]{flex:1;accent-color:#ff8fb8}
+.ppbets button{flex:1}.ppfire{flex:3;padding:14px!important;font-size:17px!important;background:#ff5f9a!important;box-shadow:0 4px 0 #b83a6b}.ppfire.on{transform:translateY(3px);box-shadow:0 1px 0 #b83a6b}.ppauto{flex:1}.ppauto.on{background:#ffd23f!important;color:#5a3a00!important}.pphint{font-size:11px;opacity:.75;text-align:center}.pshwin.big{font-size:clamp(26px,9vw,40px)}
 .clwpad{display:flex;align-items:center;gap:12px;margin-top:12px}.clwpad .mv{width:64px;height:64px;border-radius:50%;border:0;font-size:26px;background:#ffe9c9;color:#7a3b55;box-shadow:0 5px 0 #c99a6a;touch-action:none;user-select:none;-webkit-user-select:none}
 .clwpad .mv.on{transform:translateY(3px);box-shadow:0 2px 0 #c99a6a}.clwpad .arcbig{margin-top:0;padding:10px 26px;line-height:1.1}.clwpad .arcbig small{display:block;font-size:12px;font-weight:700;opacity:.85}
 .pshsum{margin-top:6px;display:flex;gap:6px;justify-content:center;min-height:1.3em}.pshsum span{display:flex;flex-direction:column;align-items:center;background:rgba(255,255,255,.12);border-radius:12px;padding:4px 12px;font-size:11px;font-weight:700;opacity:.95}.pshsum b{font-size:15px;color:#ffd23f}.pshsum .up{background:#3fbf7f}.pshsum .up b{color:#fff}.pshsum .dn b{color:#ffb3c7}.pshsum small{font-size:10px;font-weight:600;opacity:.85;white-space:nowrap;display:inline-flex;align-items:center;gap:2px}.pshsum small img{width:1.2em!important;height:1.2em!important;margin:0!important}
@@ -5165,8 +5170,8 @@ function renderArcade(){const v=$('#arcv');if(!v)return;const st=v.querySelector
   put('pusher',655,1195,185,'<img class="mic" src="assets/icon_pusher.webp" alt="">推幣機',pusherGame);   // 手機上舞台左右會被裁掉，三台往中間靠
   const d=document.createElement('button');d.className='arcdoor';d.innerHTML='<img src="assets/dance_door.webp" alt="">';Object.assign(d.style,hp(250,732),{width:(250/RW*100)+'%',height:(250*520/412/RH*100)+'%',zIndex:700});   // 門底貼著牆和地板的交界，看起來像牆後面的房間
   d.onclick=e=>{e.stopPropagation();openModal(`<div style="text-align:center"><div style="font-size:56px">🚧</div><h3>練舞室還在蓋</h3><p class="lead">工人正在趕工中……<br>之後這裡會有跟朋友 PK 的遊戲，敬請期待！</p></div><div class="row2"><button data-close class="primary">好期待</button></div>`)};st.appendChild(d);
-  v.querySelector('.cbtns').innerHTML=`<button class="act" id="arctok">${tokIcon} ${a.tok}</button><button class="act" id="arcbuy">買代幣</button><button class="act" id="arcrk">🏆 排行</button>`;
-  $('#arctok').onclick=$('#arcbuy').onclick=arcBuy;$('#arcrk').onclick=arcRank;jobScene(st,'arcade',v.querySelector('.cbtns'))}
+  v.querySelector('.cbtns').innerHTML=`<button class="act" id="arctok">${tokIcon} ${a.tok}</button><button class="act" id="arcbuy">買代幣</button><button class="act" id="arcrk">🏆 排行</button><button class="act" id="arcpp"><img class="mic" src="assets/icon_pinball.webp" alt="">珠珠台</button>`;
+  $('#arctok').onclick=$('#arcbuy').onclick=arcBuy;$('#arcrk').onclick=arcRank;$('#arcpp').onclick=ppGame;jobScene(st,'arcade',v.querySelector('.cbtns'))}
 function arcBuy(){const g=DB.game,a=arcG();openModal(`<h3>${tokIcon} 買代幣</h3><p class="lead">你有 🪙${g.coins||0}・代幣 ${a.tok} 枚<br>代幣只有<b>推幣機</b>用（1 枚 = 🪙10）<br>娃娃機、打地鼠、彈珠台直接付金幣</p>
   <div class="xcpl">${TOK_P.map(([n,c],i)=>`<button data-tk="${i}">${tokIcon} 代幣 ×${n}<small style="color:var(--soft)">　🪙${c}${n*10>c?`（省 ${n*10-c}）`:''}</small></button>`).join('')}</div><div class="row2"><button data-close>關閉</button></div>`);
   $('#sheet').querySelectorAll('[data-tk]').forEach(b=>b.onclick=()=>{const [n,c]=TOK_P[+b.dataset.tk];if((g.coins||0)<c)return toast(`金幣不夠，要 🪙${c}`);g.coins-=c;a.tok+=n;a.paid+=c;save();updTix&&updTix();sfx('coin');toast(`買了 ${n} 枚代幣！`);renderArcade();document.querySelectorAll('.arcov .atk').forEach(e=>e.textContent=a.tok);if(document.querySelector('.arcov'))closeModal();else arcBuy()})}
@@ -5174,6 +5179,94 @@ function arcPay(n){n=n||1;const a=arcG();if(a.tok<n){arcBuy();toast(`代幣不�
 function arcOv(title,a){const ov=document.createElement('div');ov.className='arcov';const A=arcG();
   ov.innerHTML=`<div class="ah"><button class="x">← 離開</button><b>${title}</b><span class="apill">🪙 <b class="acn">${(DB.game.coins||0).toLocaleString()}</b>${a&&a.tok?`<img style="margin-left:6px" src="assets/token.webp?v=3" alt=""><b class="atk">${A.tok}</b><button class="abuy noic">＋ 買</button>`:''}</span></div>`;
   document.body.appendChild(ov);ov.querySelector('.x').onclick=()=>{ov.remove();renderArcade()};if(ov.querySelector('.abuy'))ov.querySelector('.abuy').onclick=arcBuy;const upd=()=>{ov.querySelector('.acn').textContent=(DB.game.coins||0).toLocaleString();const t=ov.querySelector('.atk');if(t)t.textContent=arcG().tok};return {ov,upd}}
+
+// ================= 🎯 珠珠台（v2.93）：珠珠一路撞釘子往下掉，掉進洞吐珠珠；可以選倍數；珠珠 1 顆 = 🪙1，隨時換回金幣 =================
+// 珠珠台物理核心（遊戲和模擬共用）
+function ppMake(P){
+  const W=360,H=560,R=5.5,PR=3.2,G=900;
+  const pins=[];
+  // 釘子：交錯排列，中間留出風車通道
+  for(let r=0;r<13;r++){const y=120+r*28,off=r%2?0:17;for(let x=36+off;x<=W-36;x+=34){
+    if(r>=9&&Math.abs(x-W/2)<26)continue;   // 開花洞上方留空
+    pins.push({x,y})}}
+  // 開花洞旁邊的導引釘
+  pins.push({x:W/2-22,y:418},{x:W/2+22,y:418});
+  // 洞：x0..x1 在 y 那條線上接住
+  const pockets=[
+    {k:'side',x0:60-P.sw,x1:60+P.sw,y:300,pay:P.side},
+    {k:'side',x0:W-60-P.sw,x1:W-60+P.sw,y:300,pay:P.side},
+    {k:'tulip',x0:W/2-P.tw,x1:W/2+P.tw,y:440,pay:P.tulip},
+    {k:'low',x0:85-P.lw,x1:85+P.lw,y:476,pay:P.low},
+    {k:'low',x0:W-85-P.lw,x1:W-85+P.lw,y:476,pay:P.low},
+    {k:'jack',x0:W/2-P.jw,x1:W/2+P.jw,y:500,pay:0},
+  ];
+  return {W,H,R,PR,G,pins,pockets};
+}
+// 一顆珠：power 0..1 → 從頂部哪裡落下；回傳 {k,pay}
+function ppStep(M,b,dt,st){
+  b.vy+=M.G*dt;b.x+=b.vx*dt;b.y+=b.vy*dt;
+  if(b.x<M.R+8){b.x=M.R+8;b.vx=Math.abs(b.vx)*.6}
+  if(b.x>M.W-M.R-8){b.x=M.W-M.R-8;b.vx=-Math.abs(b.vx)*.6}
+  for(const p of M.pins){const dx=b.x-p.x,dy=b.y-p.y,d2=dx*dx+dy*dy,rr=M.R+M.PR;if(d2<rr*rr&&d2>0.01){const d=Math.sqrt(d2),nx=dx/d,ny=dy/d;b.x=p.x+nx*rr;b.y=p.y+ny*rr;
+    const vn=b.vx*nx+b.vy*ny;if(vn<0){b.vx-=1.55*vn*nx;b.vy-=1.55*vn*ny;b.vx+=(Math.random()-.5)*40}}}
+  const open=st&&st.tulipOpen>0,fever=st&&st.fever>0;
+  for(const q of M.pockets){const w=q.k==='tulip'&&open?14:0,x0=q.x0-w,x1=q.x1+w;
+    if(b.py<q.y&&b.y>=q.y&&b.x>x0&&b.x<x1)return q}
+  b.py=b.y;
+  if(b.y>M.H-20)return {k:'out',pay:0};
+  return null}
+function ppLaunch(M,power){const x=40+power*(M.W-80)+(Math.random()-.5)*24;return {x,y:60,vx:(Math.random()-.5)*60,vy:40,py:60}}
+
+const PP_P={sw:6,lw:5,side:3,tulip:4,low:3,tw:5,jw:1.2,jack:60,fx:2,fn:30,topen:3};   // 模擬過：瞄最好的地方長期拿回約 97%
+const PP_BUY=[100,300,1000],PP_BETS=[1,2,5,10];
+const ppG=()=>{const a=arcG();a.pb=Math.max(0,Math.floor(+a.pb||0));return a};
+function ppGame(){const {ov,upd}=arcOv('<img class="mic" src="assets/icon_pinball.webp" alt="">珠珠台');const M=ppMake(PP_P);const {box,cv,ctx}=arcCanvas(ov,M.W,M.H,'ppcv');
+  const ui=document.createElement('div');ui.className='ppui';ov.appendChild(ui);
+  let bet=1,power=.45,firing=false,auto=false,balls=[],st={tulipOpen:0,fever:0},net=0,lastShot=0,flash=[],raf=0,feverMsg=0;
+  const A=ppG(),save2=()=>{save();upd()};
+  ui.innerHTML=`<div class="pprow"><span class="ppcnt"><i class="ppb"></i><b id="ppn">0</b> 顆</span><span class="ppnet" id="ppnet"></span><button id="ppbuy">買珠珠</button><button id="ppex">換金幣</button></div>
+    <div class="pprow"><span class="pplab">力道</span><input type="range" id="pppow" min="0" max="100" value="45"></div>
+    <div class="pprow ppbets">${PP_BETS.map(b=>`<button data-bet="${b}" class="${b===1?'on':''}">×${b}</button>`).join('')}</div>
+    <div class="pprow"><button id="ppfire" class="ppfire">按住發射</button><button id="ppauto" class="ppauto">自動</button></div>
+    <div class="pphint">每打一顆扣 ${'1'} 顆珠珠（×倍數），掉進洞吐回珠珠（也×倍數）・中間星星洞是大放送</div>`;
+  const q=s=>ui.querySelector(s),refresh=()=>{q('#ppn').textContent=A.pb.toLocaleString();const e=q('#ppnet');e.textContent=net?`這次${net>0?'贏':'輸'} ${Math.abs(net)} 顆`:'';e.className='ppnet '+(net>0?'up':net<0?'dn':'');
+    q('.pphint').textContent=`每打一顆扣 ${bet} 顆珠珠，掉進洞吐回的也是 ×${bet}・中間星星洞是大放送`};refresh();
+  q('#pppow').oninput=e=>power=+e.target.value/100;
+  ui.querySelectorAll('[data-bet]').forEach(b=>b.onclick=()=>{bet=+b.dataset.bet;ui.querySelectorAll('[data-bet]').forEach(x=>x.classList.toggle('on',x===b));refresh()});
+  const fb=q('#ppfire'),start=e=>{e.preventDefault();firing=true;fb.classList.add('on')},stop=()=>{firing=false;fb.classList.remove('on')};
+  fb.addEventListener('pointerdown',start);['pointerup','pointerleave','pointercancel'].forEach(t=>fb.addEventListener(t,stop));
+  q('#ppauto').onclick=()=>{auto=!auto;q('#ppauto').classList.toggle('on',auto);q('#ppauto').textContent=auto?'停止':'自動'};
+  q('#ppbuy').onclick=()=>{const g=DB.game;openModal(`<h3>買珠珠</h3><p class="lead">1 顆珠珠 = 🪙1・你有 🪙${(g.coins||0).toLocaleString()}</p><div class="xcpl">${PP_BUY.map(n=>`<button data-pn="${n}" ${(g.coins||0)>=n?'':'disabled'}>珠珠 ×${n}<small style="color:var(--soft)">　🪙${n}</small></button>`).join('')}</div><div class="row2"><button data-close>關閉</button></div>`);
+    $('#sheet').querySelectorAll('[data-pn]').forEach(b=>b.onclick=()=>{const n=+b.dataset.pn;if((g.coins||0)<n)return toast('金幣不夠');g.coins-=n;A.pb+=n;save2();updTix&&updTix();sfx('coin');closeModal();refresh();toast(`買了 ${n} 顆珠珠`)})};
+  q('#ppex').onclick=()=>{if(!A.pb)return toast('沒有珠珠可以換');openModal(`<h3>珠珠換金幣</h3><p class="lead">你有 ${A.pb.toLocaleString()} 顆珠珠・1 顆 = 🪙1</p><div class="row2"><button data-close>先不要</button><button class="primary" id="ppexok">全部換成 🪙${A.pb.toLocaleString()}</button></div>`);
+    $('#ppexok').onclick=()=>{const n=A.pb;if(!n||balls.length)return toast(balls.length?'等珠珠都掉完再換':'沒有珠珠');A.pb=0;grant(0,n);save2();updTix&&updTix();sfx('levelup');closeModal();refresh();toast(`換到 🪙${n.toLocaleString()}！`)}};
+  const shoot=()=>{if(A.pb<bet){firing=false;auto=false;fb.classList.remove('on');q('#ppauto').classList.remove('on');q('#ppauto').textContent='自動';toast('珠珠不夠了，按「買珠珠」');return}
+    A.pb-=bet;net-=bet;const b=ppLaunch(M,power);b.bet=bet;b.t=0;balls.push(b);refresh()};
+  const land=(b,qk)=>{let pay=qk.pay;if(st.fever>0&&qk.k!=='out'){pay+=PP_P.fx}if(qk.k==='tulip')st.tulipOpen=PP_P.topen;else if(st.tulipOpen>0&&qk.k!=='out')st.tulipOpen--;
+    if(qk.k==='jack'){pay+=PP_P.jack;st.fever=PP_P.fn;feverMsg=performance.now();sfx('levelup');arcFloat(box,'大放送！',1);if(ONLINE)feedPush(`🎯 ${DB.me.nick} 在珠珠台打中大放送！`)}
+    if(st.fever>0&&qk.k!=='jack')st.fever--;
+    const w=pay*b.bet;if(w){A.pb+=w;net+=w;flash.push({x:b.x,y:b.y,t:0,w});sfx('coin');refresh()}};
+  let last=performance.now(),saveT=0;
+  const loop=now=>{if(!ov.isConnected){cancelAnimationFrame(raf);save();return}const dt=Math.min(.05,(now-last)/1000);last=now;
+    if((firing||auto)&&now-lastShot>260&&balls.length<30){lastShot=now;shoot()}
+    const sub=4,h=dt/sub;for(let s=0;s<sub;s++)balls=balls.filter(b=>{b.t+=h;const r=ppStep(M,b,h,st);if(r){land(b,r);return false}if(b.t>8)return false;return true});
+    if(now-saveT>3000){saveT=now;save();upd()}
+    draw(now);raf=requestAnimationFrame(loop)};
+  const draw=now=>{const c=ctx,W=M.W,H=M.H;c.clearRect(0,0,W,H);
+    const gr=c.createLinearGradient(0,0,0,H);gr.addColorStop(0,'#ffd9ec');gr.addColorStop(1,'#e9d6ff');c.fillStyle=gr;rrect(c,0,0,W,H,26);c.fill();
+    c.strokeStyle='#ff8fb8';c.lineWidth=8;rrect(c,4,4,W-8,H-8,24);c.stroke();
+    c.fillStyle='rgba(255,255,255,.55)';rrect(c,40,48,W-80,22,11);c.fill();c.fillStyle='#ff5f9a';const ax=40+power*(W-80);c.beginPath();c.arc(ax,59,8,0,7);c.fill();
+    c.fillStyle='#c9a227';M.pins.forEach(p=>{c.beginPath();c.arc(p.x,p.y,M.PR,0,7);c.fill()});
+    c.fillStyle='#fff6c2';M.pins.forEach(p=>{c.beginPath();c.arc(p.x-1,p.y-1,1.2,0,7);c.fill()});
+    M.pockets.forEach(qp=>{const open=qp.k==='tulip'&&st.tulipOpen>0,w=open?14:0,x0=qp.x0-w,x1=qp.x1+w,cx=(x0+x1)/2;
+      if(qp.k==='jack'){c.save();c.translate(cx,qp.y+4);c.fillStyle=st.fever>0?'#ffd23f':'#ff5f9a';c.beginPath();for(let i=0;i<10;i++){const r=i%2?6:13,a=-Math.PI/2+i*Math.PI/5;c.lineTo(Math.cos(a)*r,Math.sin(a)*r)}c.closePath();c.fill();c.restore();c.fillStyle='#7a2a5a';c.font='bold 10px sans-serif';c.textAlign='center';c.fillText('大放送',cx,qp.y+30);return}
+      c.fillStyle=qp.k==='tulip'?(open?'#ff5f9a':'#ff9cc4'):qp.k==='side'?'#7fc8ff':'#9be3b5';rrect(c,x0-4,qp.y-2,x1-x0+8,16,6);c.fill();
+      if(qp.k==='tulip'){c.fillStyle='#ff5f9a';c.beginPath();c.ellipse(x0-6-(open?6:0),qp.y-6,6,11,open?-.8:-.2,0,7);c.ellipse(x1+6+(open?6:0),qp.y-6,6,11,open?.8:.2,0,7);c.fill()}
+      c.fillStyle='#fff';c.font='bold 10px sans-serif';c.textAlign='center';c.fillText('+'+qp.pay*bet,cx,qp.y+11)});
+    balls.forEach(b=>{const g2=c.createRadialGradient(b.x-2,b.y-2,1,b.x,b.y,M.R);g2.addColorStop(0,'#ffffff');g2.addColorStop(1,'#9aa3b5');c.fillStyle=g2;c.beginPath();c.arc(b.x,b.y,M.R,0,7);c.fill()});
+    flash=flash.filter(f=>{f.t+=1/60;c.globalAlpha=Math.max(0,1-f.t);c.fillStyle='#ff3d7f';c.font='bold 16px sans-serif';c.textAlign='center';c.fillText('+'+f.w,f.x,f.y-f.t*40);c.globalAlpha=1;return f.t<1});
+    if(st.fever>0){c.fillStyle='rgba(255,210,63,.92)';rrect(c,W/2-80,84,160,26,13);c.fill();c.fillStyle='#7a2a00';c.font='bold 14px sans-serif';c.textAlign='center';c.fillText(`大放送中！剩 ${st.fever} 顆`,W/2,102)}};
+  raf=requestAnimationFrame(loop)}
 // ---------- 🧸 娃娃機 ----------
 // ================= v2.36 玩個毛：娃娃機、推幣機改成真的物理（自己操作、自己瞄準）=================
 // 共用：畫布機台（邏輯大小 W×H，依螢幕縮放；圖片先載好）
@@ -6608,7 +6701,7 @@ function announceLetters(){if(!DB.me)return;let seen=[];try{seen=JSON.parse(loca
     sfx('gift');$('#lgopen').onclick=()=>openLetter(nw[0].id,()=>$('#bell').click())};
   setTimeout(go,1800)}
 // ================= 自動更新：發現新版本就重新載入 =================
-const APP_VER='v2.92';
+const APP_VER='v2.93';
 function checkUpdate(){
   if(!/^https?:/.test(location.protocol)||!API_URL)return;
   if(!$('#modal').classList.contains('hidden'))return; // 正在填表單時不打斷
