@@ -1972,7 +1972,7 @@ function roomEditor(o){const E=o?JSON.parse(JSON.stringify(o)):{name:'',r:'N',bo
   openModal(`<h3>🖼️ ${o?'編輯背景':'上傳新背景'}</h3>
     ${o?'':`<label class="mimg" style="display:block;text-align:center"><input type="file" accept="image/*" id="refile" hidden><span id="rel">📷 選一張背景圖（848×1264）</span></label>`}
     <div class="redit" id="redit"><img id="reimg" src="${img||''}" alt="" style="${img?'':'opacity:.2'}"><div class="rebd" id="rebd"><i class="rh"></i><span>軟木板</span></div><div class="refl" id="refl"><i class="fl"></i><i class="fr"></i><span>地板從這裡開始（拉線上下、拉兩端圓點左右）</span></div></div>
-    <p class="lead" style="font-size:12px">拉黃色框對準軟木板（右下角圓點調大小）；藍線是毛孩可以走的地板最上緣</p>
+    <p class="lead" style="font-size:12px" id="rehint">拉黃色框對準軟木板（右下角圓點調大小）；藍線是毛孩可以走的地板最上緣</p>
     ${fld('rename','名字',`<input id="rename" maxlength="12" value="${esc(E.name)}" placeholder="例如：星空露營房">`)}
     ${fld('retype','類別',`<select id="retype">${ROOM_TYPES.map(([k,n])=>`<option value="${k}" ${E.r===k?'selected':''}>${n}</option>`).join('')}</select>`)}
     <div id="resh" style="display:${E.r==='SH'?'':'none'}">${fld('reprice','價錢（🪙）',`<input id="reprice" type="number" min="0" max="99999" value="${+E.p||1500}">`,'藍線拉到牆和地板交界的地方，展示櫃會站在這條線上')}</div>
@@ -1980,7 +1980,8 @@ function roomEditor(o){const E=o?JSON.parse(JSON.stringify(o)):{name:'',r:'N',bo
     ${o?`<label class="chk"><input type="checkbox" id="reoff" ${E.off?'checked':''}> 下架（抽卡、一番賞不會再出現；已經有的人保留）</label>`:''}
     <div class="err" id="reerr"></div><div class="row2 sticky"><button id="reback">← 後台</button><button class="primary" id="resave">${o?'儲存':'上傳'}</button></div>`);
   $('#reback').onclick=adminSheet;$('#retype').onchange=e=>{$('#recu').style.display=e.target.value==='CU'?'':'none';$('#resh').style.display=e.target.value==='SH'?'':'none'};
-  const f2Opts=()=>{const on=$('#ref2').checked;[...$('#rehouse').options].forEach(o=>{if(o.value)o.disabled=on&&!o.dataset.f2});if(on&&$('#rehouse').selectedOptions[0]&&$('#rehouse').selectedOptions[0].disabled)$('#rehouse').value=''};$('#ref2').onchange=f2Opts;f2Opts();
+  const f2Opts=()=>{const on=$('#ref2').checked;[...$('#rehouse').options].forEach(o=>{if(o.value)o.disabled=on&&!o.dataset.f2});if(on&&$('#rehouse').selectedOptions[0]&&$('#rehouse').selectedOptions[0].disabled)$('#rehouse').value=''};const f2Lab=()=>{const on=$('#retype').value==='CU'&&$('#ref2').checked;$('#rebd span').textContent=on?'層板位置':'軟木板';$('#rehint').textContent=on?'二樓背景：黃色框拉到空牆上，就是放層板的地方（框高一點會排 2 排）；藍線是毛孩可以走的地板最上緣':'拉黃色框對準軟木板（右下角圓點調大小）；藍線是毛孩可以走的地板最上緣'};   // v2.96
+  $('#ref2').onchange=()=>{f2Opts();f2Lab()};f2Opts();f2Lab();$('#retype').addEventListener('change',f2Lab);
   const box=$('#redit'),bd=$('#rebd'),fl=$('#refl'),W=848,H=1264;
   const draw=()=>{const b=E.board;Object.assign(bd.style,{left:b[0]/W*100+'%',top:b[1]/H*100+'%',width:(b[2]-b[0])/W*100+'%',height:(b[3]-b[1])/H*100+'%'});
     Object.assign(fl.style,{top:E.floor.y0/H*100+'%',left:E.floor.t[0]/W*100+'%',width:(E.floor.t[1]-E.floor.t[0])/W*100+'%'})};draw();
@@ -6705,7 +6706,7 @@ function announceLetters(){if(!DB.me)return;let seen=[];try{seen=JSON.parse(loca
     sfx('gift');$('#lgopen').onclick=()=>openLetter(nw[0].id,()=>$('#bell').click())};
   setTimeout(go,1800)}
 // ================= 自動更新：發現新版本就重新載入 =================
-const APP_VER='v2.95';
+const APP_VER='v2.96';
 function checkUpdate(){
   if(!/^https?:/.test(location.protocol)||!API_URL)return;
   if(!$('#modal').classList.contains('hidden'))return; // 正在填表單時不打斷
