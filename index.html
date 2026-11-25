@@ -4445,8 +4445,25 @@ function f2WallPick(i){const h=house(F2.hid);if(!h||!hasShow(h))return;const s=s
   openModal(`<h3>${cur?'換成哪一款層板？':'掛哪一款層板？'}</h3><p class="lead" style="font-size:12px">每個層板可以放 5 個玩具（算在二樓 ${TOY2_MAX} 個裡）・跟展示間共用倉庫</p>
     <div class="shgrid">${a||'<div class="locked" style="grid-column:1/-1">倉庫裡沒有層板，去裝潢目錄買一個吧</div>'}</div>
     <div class="row2">${cur?'<button id="f2wput">收起來</button>':''}<button id="f2wbuy">🛒 買層板</button><button data-close>關閉</button></div>`);
-  $('#f2wbuy').onclick=()=>decoShop('wall');if($('#f2wput'))$('#f2wput').onclick=()=>{if(f2ShBusy(h,i))return toast('層板上還有玩具，先收回背包');if(showDo(h.id,{op:'f2W',row:i,id:''}))closeModal()};
+  $('#f2wbuy').onclick=()=>f2ShelfShop(i);if($('#f2wput'))$('#f2wput').onclick=()=>{if(f2ShBusy(h,i))return toast('層板上還有玩具，先收回背包');if(showDo(h.id,{op:'f2W',row:i,id:''}))closeModal()};
   $('#sheet').querySelectorAll('[data-w]').forEach(x=>x.onclick=()=>{if(showDo(h.id,{op:'f2W',kind:'sh',row:i,id:x.dataset.w}))closeModal()})}
+// v2.76：二樓自己的層板商店（只有層板）。買了直接掛到點的那一排（展示間的「買了先掛空位」會先收回來）
+function f2ShelfShop(i){const h=house(F2.hid);if(!h||!hasShow(h))return toast('層板跟展示間共用，要先蓋展示間才買得到喔');const s=showNorm(h.show),g=DB.game;
+  openModal(`<h3>🛒 買層板</h3><p class="lead" style="font-size:12px">你有 🪙${g.coins||0}・二樓只能掛層板，買了直接掛到這一排；也可以掛在展示間（倉庫共用）</p>
+    <div class="shgrid">${Object.keys(WSH).map(id=>{const n=+s.wo['sh:'+id]||0,f=wFree(s,'sh',id,-1,i);return `<button class="si" data-sb="${id}"><img class="pv" src="assets/wsh_${id}.webp" alt="" style="aspect-ratio:1">${n?`<span class="tag">有 ${n}</span>`:''}<div class="sn">${esc(WSH[id].n)}</div><div class="sf">${f>0?'倉庫 '+f:'🪙'+WSH[id].p}</div></button>`}).join('')}</div>
+    <div class="row2"><button id="f2sbk">← 回去</button><button data-close>關閉</button></div>`);
+  $('#f2sbk').onclick=()=>f2WallPick(i);
+  $('#sheet').querySelectorAll('[data-sb]').forEach(b=>b.onclick=()=>{const id=b.dataset.sb,it=WSH[id],f=wFree(showNorm(h.show),'sh',id,-1,i);
+    openModal(`<div style="text-align:center"><img src="assets/wsh_${id}.webp" alt="" style="width:170px"><h3>${esc(it.n)}</h3><p class="lead">${f>0?`倉庫裡有 ${f} 個・`:''}🪙${it.p}</p></div>${f>0?'<div class="row2"><button class="primary" id="sbuse">拿出來掛上去</button></div>':''}<div class="row2"><button id="sbno">← 回去</button><button class="${f>0?'':'primary'}" id="sbyes" ${(g.coins||0)>=it.p?'':'disabled'}>${f>0?'再買一個':'買！'}（🪙${it.p}）</button></div>`);
+    $('#sbno').onclick=()=>f2ShelfShop(i);if($('#sbuse'))$('#sbuse').onclick=()=>{if(showDo(h.id,{op:'f2W',kind:'sh',row:i,id}))closeModal()};
+    $('#sbyes').onclick=async e=>{const bt=e.currentTarget;if((g.coins||0)<it.p)return toast('金幣不夠');bt.disabled=true;g.coins-=it.p;save();updTix&&updTix();
+      const ed=req=>call('showEdit',Object.assign(cred(),{houseId:h.id},req),true);
+      let bought=false;try{const before=showNorm(clone(h.show));let r=await ed({op:'buyW',kind:'sh',id});bought=true;
+        const ns=showNorm(clone(r.show)),hung=[0,1].find(k=>!before.wsh[k]&&ns.wsh[k]===id);   // 展示間有空排會自動掛上去 → 收回來
+        if(hung!=null)r=await ed({op:'setW',kind:'sh',row:hung,id:''});
+        if(!showNorm(clone(r.show)).f2.w[i])r=await ed({op:'f2W',kind:'sh',row:i,id});
+        h.show=r.show;SHOWP[h.id]={t:Date.now(),s:clone(r.show)};sfx('coin');closeModal();renderF2();toast(`買到了 ${it.n}，掛上去了！`)}
+      catch(x){if(!bought){g.coins+=it.p;save();updTix&&updTix()}bt.disabled=false;toast(bought?'買到了，但沒掛上去：'+x.message:x.message)}}})}
 // 層板：5 格放玩具
 function f2ShelfMenu(i){const h=house(F2.hid),s=showNorm(h.show),id=s.f2.w[i].split(':')[1],T=(h.toys2||[]).filter(t=>t.w===i),at=c=>T.find(t=>(+t.c||0)===c);
   openModal(`<h3>${esc((WSH[id]||{}).n||'層板')}</h3><p class="lead" style="font-size:12px">點空格放玩具，點玩具收回背包・二樓（地上＋層板）最多 ${TOY2_MAX} 個，現在 ${(h.toys2||[]).length} 個</p>
@@ -6509,7 +6526,7 @@ function announceLetters(){if(!DB.me)return;let seen=[];try{seen=JSON.parse(loca
     sfx('gift');$('#lgopen').onclick=()=>openLetter(nw[0].id,()=>$('#bell').click())};
   setTimeout(go,1800)}
 // ================= 自動更新：發現新版本就重新載入 =================
-const APP_VER='v2.75';
+const APP_VER='v2.76';
 function checkUpdate(){
   if(!/^https?:/.test(location.protocol)||!API_URL)return;
   if(!$('#modal').classList.contains('hidden'))return; // 正在填表單時不打斷
