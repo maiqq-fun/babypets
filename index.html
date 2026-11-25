@@ -1355,7 +1355,10 @@ const defHead=s=>`assets/pet_head_${SPK[s]||'other'}.webp`,defBody=s=>`assets/pe
 const petHead=p=>p.head||defHead(p.species),petBody=p=>p.body||defBody(p.species);
 const ROOMS=[['basic1','木質暖陽'],['basic2','復古木屋'],['basic3','森林小屋']];
 const roomImg=id=>/^f2shop_/.test(id)?`assets/room_${id}.webp?v=2`:(typeof customRoom==='function'&&customRoom(id))?customRoom(id).img:id==='park'?'assets/room_park.webp':id==='shop2'?'assets/room_shop2.webp':ROOMS.some(r=>r[0]===id)?`assets/room_${id}.webp`:(typeof CARDS!=='undefined'&&CARDS.some(c=>c.id===id))?`assets/room_card_${id}.webp`:'assets/room_basic1.webp';
-const CARD_COLORS=[['蜜桃橘','#ff9a6b'],['櫻花粉','#f48fb1'],['天空藍','#64b5f6'],['薄荷綠','#5fbf95'],['薰衣草','#9b8cff'],['奶茶棕','#b98d62']];
+const CARD_COLORS=[['焦糖','#ff9a6b'],['玫瑰奶茶','#f48fb1'],['霧藍','#64b5f6'],['抹茶拿鐵','#5fbf95'],['芋頭','#9b8cff'],['可可','#b98d62']];
+// v3.00：身分證、便條紙改成奶茶暖棕色系。存的顏色碼不變（睡窩圖、舊資料都靠它），只有畫出來時換成新顏色
+const CC_SHOW={'#ff9a6b':'#e3ad7e','#f48fb1':'#dfa39d','#64b5f6':'#a7bccb','#5fbf95':'#b0c49a','#9b8cff':'#bcadd4','#b98d62':'#b38b6a'},ccShow=c=>CC_SHOW[String(c||'').toLowerCase()]||c;
+const NC_SHOW={'#ffe98a':'#f5e6c4','#ffc7d4':'#f1d3c9','#bfe3ff':'#d8e2e6','#c9f0c0':'#dde6cc','#ffd6a8':'#efd8bb'},ncShow=c=>NC_SHOW[String(c||'').toLowerCase()]||c;
 const NOTE_COLORS=['#ffe98a','#ffc7d4','#bfe3ff','#c9f0c0','#ffd6a8'];
 const MED_TYPES=['看診','疫苗','驅蟲','健檢','手術','用藥','其他'];
 const EXP_CATS=['飼料','零食','用品','醫療','美容','保險','其他'];
@@ -1633,7 +1636,7 @@ const $=s=>document.querySelector(s);
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 let tt;function toast(m){const t=$('#toast');t.textContent=m;t.classList.add('show');clearTimeout(tt);tt=setTimeout(()=>t.classList.remove('show'),2000)}
 let modalLocked=false;
-function openModal(html,locked,theme){if(typeof CDRAFT!=='undefined'&&CDRAFT&&!closetOpening)draftCancel();const sh=$('#sheet');sh.classList.toggle('themed',!!theme);if(theme)sh.style.setProperty('--cc',theme);else sh.style.removeProperty('--cc');sh.innerHTML=(locked?'':'<button class="xclose" data-close aria-label="關閉">✕</button>')+html;$('#modal').classList.remove('hidden');modalLocked=!!locked;$('#sheet').scrollTop=0}
+function openModal(html,locked,theme){if(typeof CDRAFT!=='undefined'&&CDRAFT&&!closetOpening)draftCancel();const sh=$('#sheet');sh.classList.toggle('themed',!!theme);if(theme)sh.style.setProperty('--cc',ccShow(theme));else sh.style.removeProperty('--cc');sh.innerHTML=(locked?'':'<button class="xclose" data-close aria-label="關閉">✕</button>')+html;$('#modal').classList.remove('hidden');modalLocked=!!locked;$('#sheet').scrollTop=0}
 function closeModal(){if(typeof CDRAFT!=='undefined'&&CDRAFT)draftCancel();$('#modal').classList.add('hidden');$('#sheet').innerHTML='';$('#sheet').classList.remove('themed');modalLocked=false}
 $('#modal').addEventListener('click',e=>{if((e.target.id==='modal'&&!modalLocked)||e.target.closest('[data-close]')){if(typeof draftDirty==='function'&&draftDirty())return draftAsk();closeModal()}});
 const house=id=>DB.houses.find(h=>h.id===id);
@@ -2525,8 +2528,8 @@ function renderBoard(){if(home&&FT.hid!==home.id){FT.hid=home.id;FT.fold=false}f
   const b=$('#board');Object.assign(b.style,hp(B[0]+ins,B[1]+ins),{width:((B[2]-B[0]-2*ins)/RW*100)+'%',height:((B[3]-B[1]-2*ins)/RH*100)+'%'});
   b.classList.toggle('wantb',isShopH(h));$('#addnote').style.display=isShopH(h)?'none':'';if(isShopH(h)){$('#notebook').style.display='none';return wantBoard(b,h)}
   const all=DB.notes.filter(n=>n.houseId===home.id).sort((a,c)=>a.createdAt-c.createdAt),list=all.slice(-6);b.style.gridTemplateRows=list.length<=3?'repeat(1,minmax(0,1fr))':'';b.classList.toggle('one',list.length<=3);   // v2.83：3 張以下排一排，便條不會被壓扁
-  b.innerHTML=list.map((n,i)=>{const rc=(n.replies||[]).length;return n.hidden?`<button class="note fold" data-id="${n.id}" style="background:${n.color};transform:rotate(${[-4,3,-2,5,-3,2][i%6]}deg)"><span>🔒<br>秘密便條</span><small>— ${esc(n.by)}</small></button>`
-    :`<button class="note" data-id="${n.id}" style="background:${n.color};transform:rotate(${[-4,3,-2,5,-3,2][i%6]}deg)">
+  b.innerHTML=list.map((n,i)=>{const rc=(n.replies||[]).length;return n.hidden?`<button class="note fold" data-id="${n.id}" style="background:${ncShow(n.color)};transform:rotate(${[-4,3,-2,5,-3,2][i%6]}deg)"><span>🔒<br>秘密便條</span><small>— ${esc(n.by)}</small></button>`
+    :`<button class="note" data-id="${n.id}" style="background:${ncShow(n.color)};transform:rotate(${[-4,3,-2,5,-3,2][i%6]}deg)">
     <span>${n.secret?'🔒':''}${esc([...n.text].slice(0,12).join(''))}${[...n.text].length>12?'…':''}</span><small>${rc?`💬${rc} `:''}— ${esc(n.by)}</small></button>`}).join('')
     +(list.length?'':`<button class="note empty" id="boardadd" aria-label="貼便利貼">＋</button>`);
   b.querySelectorAll('.note[data-id]').forEach(el=>el.onclick=()=>noteView(el.dataset.id));
@@ -2536,7 +2539,7 @@ function renderBoard(){if(home&&FT.hid!==home.id){FT.hid=home.id;FT.fold=false}f
 function noteBook(){if(isParkH(house(home.id)))return;
   const all=DB.notes.filter(n=>n.houseId===home.id).sort((a,c)=>c.createdAt-a.createdAt);
   openModal(`<h3>📒 ${esc(house(home.id).name)} 的留言簿</h3><p class="lead">共 ${all.length} 張便利貼，軟木板上只貼最新的 6 張</p>
-    ${all.length?all.map(n=>{const rc=(n.replies||[]).length;return `<button class="nb${n.hidden?' fold':''}" data-id="${n.id}" style="background:${n.color}"><span>${n.hidden?'🔒 秘密便條（只有這家的家人看得到）':(n.secret?'🔒 ':'')+esc(n.text)}</span><small>— ${esc(n.by)}・${ago(n.createdAt)}${rc&&!n.hidden?`・💬 ${rc} 則回覆`:''}</small></button>`}).join(''):'<div class="locked">還沒有人留言</div>'}
+    ${all.length?all.map(n=>{const rc=(n.replies||[]).length;return `<button class="nb${n.hidden?' fold':''}" data-id="${n.id}" style="background:${ncShow(n.color)}"><span>${n.hidden?'🔒 秘密便條（只有這家的家人看得到）':(n.secret?'🔒 ':'')+esc(n.text)}</span><small>— ${esc(n.by)}・${ago(n.createdAt)}${rc&&!n.hidden?`・💬 ${rc} 則回覆`:''}</small></button>`}).join(''):'<div class="locked">還沒有人留言</div>'}
     <div class="row2 sticky"><button data-close>關閉</button><button class="primary" id="nbadd">📝 貼便利貼</button></div>`);
   $('#sheet').querySelectorAll('.nb').forEach(el=>el.onclick=()=>noteView(el.dataset.id,true));
   $('#nbadd').onclick=noteForm;
@@ -2546,7 +2549,7 @@ function noteView(id,fromBook){
   if(n.hidden){openModal(`<div style="text-align:center"><div class="giftopen">🔒</div><h3>${esc(n.by)} 的秘密便條</h3><p class="lead">這張便條摺起來了，只有「${esc(h.name)}」的家人和 ${esc(n.by)} 看得到</p></div>
     <div class="row2">${fromBook?'<button id="nbback">← 留言簿</button>':''}<button data-close>關閉</button></div>`);if($('#nbback'))$('#nbback').onclick=noteBook;return}
   const R=n.replies||[],me=DB.me&&DB.me.id;
-  openModal(`<h3>${n.secret?'🔒':'📝'} ${esc(n.by)} 的${n.secret?'秘密便條':'便利貼'}</h3><p class="lead">${ago(n.createdAt)}${n.secret?`・只有「${esc(h.name)}」的家人和 ${esc(n.by)} 看得到`:''}</p><div style="background:${n.color};padding:18px;border-radius:6px;font-size:18px;line-height:1.6;box-shadow:0 2px 4px rgba(0,0,0,.15);white-space:pre-wrap;user-select:text">${esc(n.text)}</div>
+  openModal(`<h3>${n.secret?'🔒':'📝'} ${esc(n.by)} 的${n.secret?'秘密便條':'便利貼'}</h3><p class="lead">${ago(n.createdAt)}${n.secret?`・只有「${esc(h.name)}」的家人和 ${esc(n.by)} 看得到`:''}</p><div style="background:${ncShow(n.color)};padding:18px;border-radius:6px;font-size:18px;line-height:1.6;box-shadow:0 2px 4px rgba(0,0,0,.15);white-space:pre-wrap;user-select:text">${esc(n.text)}</div>
     <div class="nreplies">${R.length?R.map(r=>`<div class="nrep"><b>${esc(r.by)}</b>${esc(r.text)}<small>${ago(r.at)}${!String(r.id).startsWith('tmp')&&(isFamily(n.houseId)||r.byId===me)?` <button class="mini" data-dr="${r.id}">刪除</button>`:''}</small></div>`).join(''):'<div class="nrep none">還沒有人回覆</div>'}</div>
     ${DB.me&&!String(n.id).startsWith('tmp')?`<div class="nrbox"><input id="nrin" maxlength="40" placeholder="回覆 ${esc(n.by)}…（40 字內）"><button class="primary" id="nrsend">回覆</button></div>`:''}
     ${canTear?'<button class="btn-d" id="tear">撕掉這張</button>':''}<div class="row2">${fromBook?'<button id="nbback">← 留言簿</button>':''}<button data-close>關閉</button></div>`);
@@ -2571,7 +2574,7 @@ function noteForm(){
   if(isParkH(house(home.id)))return;if(!needMe())return;let color=NOTE_COLORS[0];const h=house(home.id);
   openModal(`<h3>📝 在「${esc(h.name)}」貼便利貼</h3>
     ${fld('nt','想說的話（40 字以內）',`<textarea id="nt" maxlength="40" placeholder="例如：今天也好可愛！"></textarea>`)}<div class="count" id="ntc">0 / 40</div>
-    <div class="flabel">便利貼顏色</div><div class="swatches" id="ncol">${NOTE_COLORS.map((c,i)=>`<button style="background:${c}" data-c="${c}" class="${i?'':'on'}" aria-label="顏色 ${i+1}"></button>`).join('')}</div>
+    <div class="flabel">便利貼顏色</div><div class="swatches" id="ncol">${NOTE_COLORS.map((c,i)=>`<button style="background:${ncShow(c)}" data-c="${c}" class="${i?'':'on'}" aria-label="顏色 ${i+1}"></button>`).join('')}</div>
     ${!isFamily(h.id)&&!isShopH(h)?'<label class="chk"><input type="checkbox" id="nsec"> 🔒 秘密便條（只有這家的家人和你看得到，其他人只看到摺起來的便條）</label>':''}
     <div class="err" id="nerr"></div>
     <div class="row2"><button data-close>取消</button><button class="primary" id="nsave">貼上去</button></div>`);
@@ -2853,7 +2856,7 @@ function petForm(hid,pid){
     <div class="two">${fld('pchip','晶片號碼 🔒',`<input id="pchip" maxlength="20" inputmode="numeric" value="${esc(p.chip||'')}">`)}
       ${fld('pal','過敏／注意事項 🔒',`<input id="pal" maxlength="30" value="${esc(p.allergy||'')}">`)}</div>
     <div class="hint" style="margin:-6px 4px 12px">🔒 只有家人看得到</div>
-    <div class="field"><div class="flabel">身分證顏色</div><div class="swatches" id="pcc">${CARD_COLORS.map(([n,c])=>`<button style="background:${c}" data-c="${c}" class="${c===p.card?'on':''}" aria-label="${n}" title="${n}"></button>`).join('')}</div></div>
+    <div class="field"><div class="flabel">身分證顏色</div><div class="swatches" id="pcc">${CARD_COLORS.map(([n,c])=>`<button style="background:${ccShow(c)}" data-c="${c}" class="${c===p.card?'on':''}" aria-label="${n}" title="${n}"></button>`).join('')}</div></div>
     <div class="field"><div class="flabel">身分證大頭照</div>
       <div class="photo"><div class="pv round" id="hpv"><img src="${petHead(p)}" alt=""></div>
       <div class="info">一般照片就可以，會自動裁成正方形。沒放的話用預設圖<div class="btns"><label>選照片<input type="file" accept="image/*" id="hin" hidden></label>${p.head?'<button id="hdel">移除</button>':''}</div></div></div></div>
@@ -2872,7 +2875,7 @@ function petForm(hid,pid){
     <div class="row2 sticky"><button data-close>取消</button><button class="primary" id="psave">${isNew?'加入這個家':'儲存'}</button></div>`,false,p.card);
   const upd=()=>{$('#ptxt').textContent=PROMPT_BODY({species:choiceVal('psp'),breed:$('#pb').value.trim()})};upd();$('#pb').oninput=upd;
   bindChoice('psp',v=>{upd();if(!p.head)$('#hpv').innerHTML=`<img src="${defHead(v)}" alt="">`;if(!p.body)$('#bpv').innerHTML=`<img src="${defBody(v)}" alt="">`});bindChoice('psx');bindChoice('pfx');bindChoice('ptr');
-  $('#pcc').onclick=e=>{const b=e.target.closest('button');if(!b)return;p.card=b.dataset.c;$('#sheet').style.setProperty('--cc',p.card);$('#pcc').querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===b))};
+  $('#pcc').onclick=e=>{const b=e.target.closest('button');if(!b)return;p.card=b.dataset.c;$('#sheet').style.setProperty('--cc',ccShow(p.card));$('#pcc').querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===b))};
   $('#hin').onchange=async e=>{const f=e.target.files[0];if(!f)return;try{p.head=await makeHead(f);$('#hpv').innerHTML=`<img src="${p.head}" alt="">`;if(!isNew)setTimeout(()=>$('#psave')&&$('#psave').click(),250)}catch(err){toast('這張照片讀不了，換一張試試')}};
   $('#bin').onchange=async e=>{const f=e.target.files[0];if(!f)return;$('#binfo').firstChild.textContent='處理中…';
     try{const r=await makeBody(f);p.body=r.url;$('#bpv').innerHTML=`<img src="${p.body}" alt="">`;
@@ -2999,7 +3002,7 @@ function idCard(pid){
   const ym=todayTW().slice(0,7),month=ex.filter(e=>e.date.startsWith(ym)).reduce((s,e)=>s+(+e.amount||0),0);
   const trs=trackersOf(p).filter(t=>!t.hidden&&(fam||t.vis!=='family')),ph=photosOf(p);
   openModal(`${sibs.length>1?`<div class="sibs">${sibs.map(s=>`<button data-sib="${s.id}" class="${s.id===pid?'on':''}"><img src="${petHead(s)}" alt=""><span>${esc(s.name)}</span></button>`).join('')}</div>`:''}
-  <div class="idcard" style="--cc:${p.card||'#ff9a6b'}">
+  <div class="idcard" style="--cc:${ccShow(p.card||'#ff9a6b')}">
     <div class="idhead">🐾 毛很多島 居民證<span>No.${String(p.no).padStart(4,'0')}</span></div>
     <div class="idbody"><div class="idphoto"><img src="${petHead(p)}" alt="${esc(p.name)}"></div>
       <dl class="idfields"><div class="idname">${esc(p.name)} ${p.sex?`<span style="color:${p.sex==='♀'?'#e86a92':'#5b9bd5'}">${p.sex}</span>`:''}</div>
@@ -3935,7 +3938,7 @@ async function snapshot(){
     const h=house(home.id);title=h.name;
     const bg=await loadImg(roomImg(h.room));if(bg){const s=Math.max(W/bg.naturalWidth,H/bg.naturalHeight);x.drawImage(bg,(W-bg.naturalWidth*s)/2,(H-bg.naturalHeight*s)/2,bg.naturalWidth*s,bg.naturalHeight*s)}
     const B=BOARDS[h.room]||BOARDS.basic1,ns=DB.notes.filter(n=>n.houseId===h.id).sort((a,c)=>a.createdAt-c.createdAt).slice(-6),bw=(B[2]-B[0]-20)/3,bh=(B[3]-B[1]-20)/2;
-    ns.forEach((n,i)=>{const cx=B[0]+10+(i%3)*bw+bw/2,cy=B[1]+10+Math.floor(i/3)*bh+bh/2,s=Math.min(bw,bh)*0.86;x.save();x.translate(cx,cy);x.rotate([-4,3,-2,5,-3,2][i]*Math.PI/180);x.fillStyle=n.color;x.shadowColor='rgba(0,0,0,.2)';x.shadowBlur=4;x.fillRect(-s/2,-s/2,s,s);x.shadowBlur=0;x.fillStyle='#5a4030';x.font=`${Math.round(s/6)}px ${FONT}`;x.textAlign='left';x.textBaseline='top';x.fillText([...n.text].slice(0,6).join(''),-s/2+6,-s/2+6);x.restore()});
+    ns.forEach((n,i)=>{const cx=B[0]+10+(i%3)*bw+bw/2,cy=B[1]+10+Math.floor(i/3)*bh+bh/2,s=Math.min(bw,bh)*0.86;x.save();x.translate(cx,cy);x.rotate([-4,3,-2,5,-3,2][i]*Math.PI/180);x.fillStyle=ncShow(n.color);x.shadowColor='rgba(0,0,0,.2)';x.shadowBlur=4;x.fillRect(-s/2,-s/2,s,s);x.shadowBlur=0;x.fillStyle='#5a4030';x.font=`${Math.round(s/6)}px ${FONT}`;x.textAlign='left';x.textBaseline='top';x.fillText([...n.text].slice(0,6).join(''),-s/2+6,-s/2+6);x.restore()});
     const ents=[],rw=$('#home').clientWidth||390,K=W/rw,fsN=Math.min(13,Math.max(10,rw*0.026))*K,TB=Math.min(64,Math.max(40,rw*0.12))*848/rw;
     (h.toys||[]).forEach(t=>{const it=ITEMS[t.item]||{};ents.push({y:it.flat?-1e6:t.y-300,f:async()=>{const im=await loadImg((ITEMS[t.item]&&ITEMS[t.item].img)||`assets/item_${t.item}.webp`);if(im)drawFit(im,t.x,t.y+6,TB*(it.sz||1),t.flip);else{x.font=`52px ${FONT}`;x.textAlign='center';x.fillText(it.emo||'',t.x,t.y)}}})});
     (h.gifts||[]).filter(g=>giftVisible(g,h)).forEach(g=>ents.push({y:g.y,f:async()=>{const im=await loadImg(g.admin?'assets/gift_admin.webp':'assets/gift_box.webp');if(im){if(g.admin){x.save();x.shadowColor='rgba(255,210,90,.9)';x.shadowBlur=18}drawFit(im,g.x,g.y+6,TB*(g.admin?1.25:1));if(g.admin)x.restore()}else{x.font=`52px ${FONT}`;x.textAlign='center';x.fillText('🎁',g.x,g.y)}}}));
@@ -6729,7 +6732,7 @@ function announceLetters(){if(!DB.me)return;let seen=[];try{seen=JSON.parse(loca
     sfx('gift');$('#lgopen').onclick=()=>openLetter(nw[0].id,()=>$('#bell').click())};
   setTimeout(go,1800)}
 // ================= 自動更新：發現新版本就重新載入 =================
-const APP_VER='v2.99';
+const APP_VER='v3.00';
 function checkUpdate(){
   if(!/^https?:/.test(location.protocol)||!API_URL)return;
   if(!$('#modal').classList.contains('hidden'))return; // 正在填表單時不打斷
