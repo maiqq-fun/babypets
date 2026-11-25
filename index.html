@@ -5221,7 +5221,7 @@ function ppStep(M,b,dt,st){
   return null}
 function ppLaunch(M,power){const x=40+power*(M.W-80)+(Math.random()-.5)*24;return {x,y:60,vx:(Math.random()-.5)*60,vy:40,py:60}}
 
-const PP_P={sw:6,lw:5,side:3,tulip:4,low:3,tw:5,jw:1.2,jack:60,fx:2,fn:30,topen:3};   // 模擬過：瞄最好的地方長期拿回約 97%
+const PP_P={sw:14,lw:13,side:2,tulip:3,low:2,tw:10,jw:2,jack:20,fx:1,fn:20,topen:3};   // 模擬過：瞄最好的地方長期拿回約 97%
 const PP_BUY=[100,300,1000],PP_BETS=[1,2,5,10];
 const ppG=()=>{const a=arcG();a.pb=Math.max(0,Math.floor(+a.pb||0));return a};
 function ppGame(){const {ov,upd}=arcOv('<img class="mic" src="assets/icon_pinball.webp" alt="">珠珠台');const M=ppMake(PP_P);const {box,cv,ctx}=arcCanvas(ov,M.W,M.H,'ppcv');
@@ -5268,7 +5268,7 @@ function ppGame(){const {ov,upd}=arcOv('<img class="mic" src="assets/icon_pinbal
       if(qp.k==='tulip'){c.fillStyle='#ff5f9a';c.beginPath();c.ellipse(x0-6-(open?6:0),qp.y-6,6,11,open?-.8:-.2,0,7);c.ellipse(x1+6+(open?6:0),qp.y-6,6,11,open?.8:.2,0,7);c.fill()}
       c.fillStyle='#fff';c.font='bold 10px sans-serif';c.textAlign='center';c.fillText('+'+qp.pay*bet,cx,qp.y+11)});
     balls.forEach(b=>{const g2=c.createRadialGradient(b.x-2,b.y-2,1,b.x,b.y,M.R);g2.addColorStop(0,'#ffffff');g2.addColorStop(1,'#9aa3b5');c.fillStyle=g2;c.beginPath();c.arc(b.x,b.y,M.R,0,7);c.fill()});
-    flash=flash.filter(f=>{f.t+=1/60;c.globalAlpha=Math.max(0,1-f.t);c.fillStyle='#ff3d7f';c.font='bold 16px sans-serif';c.textAlign='center';c.fillText('+'+f.w,f.x,f.y-f.t*40);c.globalAlpha=1;return f.t<1});
+    flash=flash.filter(f=>{f.t+=1/60;c.globalAlpha=Math.max(0,1-f.t);c.fillStyle='#ff3d7f';c.strokeStyle='#fff';c.lineWidth=3;c.font='bold 22px sans-serif';c.textAlign='center';c.strokeText('+'+f.w,f.x,f.y-f.t*40);c.fillText('+'+f.w,f.x,f.y-f.t*40);c.globalAlpha=1;return f.t<1});
     if(st.fever>0){c.fillStyle='rgba(255,210,63,.92)';rrect(c,W/2-80,84,160,26,13);c.fill();c.fillStyle='#7a2a00';c.font='bold 14px sans-serif';c.textAlign='center';c.fillText(`大放送中！剩 ${st.fever} 顆`,W/2,102)}};
   raf=requestAnimationFrame(loop)}
 // ---------- 🧸 娃娃機 ----------
