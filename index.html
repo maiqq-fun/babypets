@@ -5414,6 +5414,8 @@ const BB_PRICE=200,BB_PITY=150,BB_RN={N:'普通',R:'稀有',S:'超稀有',H:'�
 const bbAll=()=>BB_SERIES.concat((Array.isArray(DB.bbx)?DB.bbx:[]).filter(S=>S&&S.id&&Array.isArray(S.f)));
 const bbSer=sid=>bbAll().find(x=>x.id===+sid);
 const bbId=(sid,i)=>`bb${sid}_${String(i+1).padStart(2,'0')}`;
+// v2.86：圖片偶爾沒載到（網路斷一下）會變成破圖：自動重抓兩次，還是不行就先藏起來，不顯示破圖
+function imgRetry(im){const n=+(im.dataset.rt||0);if(n>=2){im.style.visibility='hidden';return}im.dataset.rt=n+1;const u=im.src.replace(/([?&])rt=\d+/,'').replace(/[?&]$/,'');setTimeout(()=>{im.src=u+(u.includes('?')?'&':'?')+'rt='+(n+1)},600*(n+1))}
 const bbImg=(sid,i)=>{const S=bbSer(sid);return S&&Array.isArray(S.img)&&S.img[i]?S.img[i]:`assets/${bbId(sid,i)}.webp`};
 const bbBox=sid=>{const S=bbSer(sid);return S&&S.box?S.box:`assets/bb${sid}_box.webp`};
 function bbRegister(){bbAll().filter(S=>!S.off).forEach(S=>S.f.forEach((n,i)=>{if((S.x||[]).includes(i))return;ITEMS[bbId(S.id,i)]={name:n,emo:'🎁',kind:'fig',price:0,img:bbImg(S.id,i),bb:S.id}}))}
@@ -5432,7 +5434,7 @@ function bbShop(){if(!needMe())return;const v=document.createElement('div');v.cl
 function bbShopRender(){const v=$('#bbv');if(!v)return;const g=DB.game;
   v.innerHTML=`<div class="bbh"><b>🎁 MAIMINE 盲盒店<small>一盒 🪙${BB_PRICE}・每個系列 ${BB_PITY} 盒內必出隱藏版</small><small class="bblg"><i class="on"></i>你的<i class="fam"></i>只有家人有（含展示間）</small></b><span class="bbc">🪙 ${(g.coins||0).toLocaleString()}</span><button class="x">關閉</button></div>
   <div class="bbl">${bbOn().map(S=>{const n=bbIdx(S).filter(i=>bbMine(S.id,i)).length;return `<div class="bbcard" style="background:${S.c}"><img class="bx" src="${bbBox(S.id)}" alt=""><div class="inf">${S.en?`<span class="en">${esc(S.en)}</span>`:''}<b>${esc(S.n)}</b>
-    <div class="tz">${S.t.map(i=>`<img src="${bbImg(S.id,i)}" alt="">`).join('')}</div>
+    <div class="tz">${S.t.map(i=>`<img src="${bbImg(S.id,i)}" alt="" onerror="imgRetry(this)">`).join('')}</div>
     <div class="dx">${bbIdx(S).map(i=>`<i class="${bbMine(S.id,i)?'on':bbFam(S.id,i)?'fam':''}"></i>`).join('')}<span class="mr">${n?`收集 ${n}/${bbIdx(S).length}`:`＋${bbIdx(S).length-3} 款等你發現`}</span></div></div>
     <button class="buy" data-bb="${S.id}">抽一盒<small>🪙${BB_PRICE}</small></button></div>`}).join('')}</div>`;
   v.querySelector('.x').onclick=()=>v.remove();v.querySelectorAll('[data-bb]').forEach(b=>b.onclick=()=>bbDraw(+b.dataset.bb))}
@@ -6576,7 +6578,7 @@ function announceLetters(){if(!DB.me)return;let seen=[];try{seen=JSON.parse(loca
     sfx('gift');$('#lgopen').onclick=()=>openLetter(nw[0].id,()=>$('#bell').click())};
   setTimeout(go,1800)}
 // ================= 自動更新：發現新版本就重新載入 =================
-const APP_VER='v2.85';
+const APP_VER='v2.86';
 function checkUpdate(){
   if(!/^https?:/.test(location.protocol)||!API_URL)return;
   if(!$('#modal').classList.contains('hidden'))return; // 正在填表單時不打斷
