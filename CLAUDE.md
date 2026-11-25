@@ -31,7 +31,8 @@
 - commit 訊息結尾加 Co-Authored-By 與 Claude-Session 行；不要在 commit / PR 寫模型名稱。
 
 ## 目前狀態（2026-11）
-- 前端 v2.83、後端 v72（都已上線，2026-11-25）。
+- 前端 v2.84、後端 v72（都已上線，2026-11-25）。
+- v2.84：二樓玩具（搬、擺、翻面、收回、層板上放／收）也記 pending（`toyPend(hid+":2")`，`keepToys` 依 key 處理 toys／toys2），同步回來的舊資料不會把畫面蓋回去（島主回報「換玩具會跳回前一個版本」）。
 - v2.83：佈告欄便條 3 張以下排一排、正方形（`.board.one`），不會被壓扁（寬扁的佈告欄像 circus 最明顯）。二樓「玩具到上限」是同步延遲，島主說已經好了。
 - v2.82：一樓「取消擺放」按鈕（`#gcancel`）改放在 body、fixed 蓋在下面那排按鈕（`.actions.hbar`）上，不擋格子。
 - v72／v2.81：毛二街出清：`shopTrim_(stock, s)` 擠下來的貨進 `s.clrq`（最多 30），`clrRoll_` 每天（stateTick_）把最舊 6 樣放進 `s.clr`（舊的沒賣掉就丟），`shopBuy` 帶 `clr:1` 買出清（標 sold，空著到隔天）。價錢＝二手價 /4（`clrPrice`）。前端：右邊地上 `CLR_POS` 放出清籃（有貨 clr_basket_full、沒貨 empty），右邊選單多「出清」，`clrSheet`。毛二街佈告欄框改 [432,232,804,436]。

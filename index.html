@@ -1461,8 +1461,9 @@ function keepPending(){keepToys();keepShow();keepFarm();keepLists();keepReplies(
   for(const pid in PEND.walk){const w=PEND.walk[pid];if(now-w.t>T)continue;DB.houses.forEach(h=>{if(h.id!==w.hid)h.guests=(h.guests||[]).filter(g=>g.petId!==pid)});const h=house(w.hid);if(h&&!(h.guests||[]).some(g=>g.petId===pid))(h.guests=h.guests||[]).push(w.g)}
   for(const pid in PEND.home){const w=PEND.home[pid];if(now-w.t>T)continue;DB.houses.forEach(h=>h.guests=(h.guests||[]).filter(g=>g.petId!==pid))}}
 const TOYP={};function toyPend(hid){const o=TOYP[hid]||(TOYP[hid]={add:[],rm:{},mv:{},t:0});o.t=Date.now();return o}
-function keepToys(){for(const hid in TOYP){const o=TOYP[hid],h=house(hid);if(!h||Date.now()-o.t>120000)continue;let T=(h.toys||[]).filter(x=>!o.rm[x.id]);
-  o.add.forEach(a=>{if(!o.rm[a.id]&&!T.some(x=>x.id===a.id))T.push(a)});T.forEach(x=>{const m=o.mv[x.id];if(m)Object.assign(x,m)});h.toys=T}}
+// v2.84：二樓的玩具也一樣（key 是「家id:2」→ toys2），剛搬、剛擺、剛收的同步回來不會被舊資料蓋掉
+function keepToys(){for(const key in TOYP){const o=TOYP[key],[hid,fl]=key.split(':'),k=fl==='2'?'toys2':'toys',h=house(hid);if(!h||Date.now()-o.t>120000)continue;let T=(h[k]||[]).filter(x=>!o.rm[x.id]);
+  o.add.forEach(a=>{if(!o.rm[a.id]&&!T.some(x=>x.id===a.id))T.push(a)});T.forEach(x=>{const m=o.mv[x.id];if(m)Object.assign(x,m)});h[k]=T}}
 const MAILDONE=new Set();
 function claimMail(ml){const g=DB.game,ids=[];ml.forEach(m=>{ids.push(m.id);if(MAILDONE.has(m.id))return;MAILDONE.add(m.id);const msg=[];
     if(m.setCoins!=null){g.coins=Math.max(0,+m.setCoins||0);setTimeout(()=>{updHud();openModal(`<div style="text-align:center"><div class="giftopen">👑</div><h3>島主調整了你的金幣</h3><p class="lead">現在有 🪙 ${g.coins}</p></div><div class="row2"><button data-close>知道了</button></div>`)},900);return}
@@ -4459,9 +4460,9 @@ function f2Placer(){const h=house(F2.hid),L=bagList('toy');if((h.toys2||[]).leng
 function f2ToyMenu(t){const h=house(F2.hid);openModal(`<h3>${itemIcon(t.item)} ${esc((ITEMS[t.item]||{}).name||'玩具')}</h3>
   <div class="row2"><button id="tmv2">↔️ 移動</button><button id="tfl2">🔁 翻面</button></div><div class="row2"><button id="tbk2">🎒 收回背包</button><button data-close>取消</button></div>`);
   $('#tmv2').onclick=()=>{closeModal();F2.placing={toy:t};renderF2();toast('點格子，放到新的位置')};
-  $('#tfl2').onclick=()=>{t.flip=!t.flip;closeModal();renderF2();call('moveToy',Object.assign(cred(),{toyId:t.id,x:t.x,y:t.y,flip:t.flip,floor:2}),true).catch(e=>toast(e.message))};
+  $('#tfl2').onclick=()=>{t.flip=!t.flip;closeModal();renderF2();toyPend(h.id+':2').mv[t.id]={x:t.x,y:t.y,flip:t.flip};call('moveToy',Object.assign(cred(),{toyId:t.id,x:t.x,y:t.y,flip:t.flip,floor:2}),true).catch(e=>toast(e.message))};
   $('#tbk2').onclick=()=>{h.toys2=(h.toys2||[]).filter(x=>x!==t);bagAdd(t.item,1);closeModal();renderF2();toast('收回背包了');
-    call('removeToy',Object.assign(cred(),{toyId:t.id,floor:2}),true).catch(e=>{(h.toys2=h.toys2||[]).push(t);bagAdd(t.item,-1);renderF2();toast(e.message)})}}
+    toyPend(h.id+':2').rm[t.id]=1;call('removeToy',Object.assign(cred(),{toyId:t.id,floor:2}),true).catch(e=>{delete toyPend(h.id+':2').rm[t.id];(h.toys2=h.toys2||[]).push(t);bagAdd(t.item,-1);renderF2();toast(e.message)})}}
 // ---------- v2.75：二樓牆面（只掛層板，層板上放玩具） ----------
 const f2pc=(v,k)=>v/(k?RH:RW)*100+'%';
 function f2ShelfGeo(R,k){const S=WSH[k],rw=R[2]-R[0],rh=R[3]-R[1],w=Math.min(rw,Math.max(rh*S.a,rw*.9)),hh=w/S.a,x0=(R[0]+R[2])/2-w/2,top=R[3]-hh;return {w,hh,x0,top,line:top+hh*S.y/100,cw:w*.76/5}}
@@ -4509,13 +4510,13 @@ function f2ShelfMenu(i){const h=house(F2.hid),s=showNorm(h.show),id=s.f2.w[i].sp
     <div class="row2"><button id="f2shsw">換別的</button><button id="f2shput">收起來</button><button data-close class="primary">關閉</button></div>`);
   $('#f2shsw').onclick=()=>f2WallPick(i);$('#f2shput').onclick=()=>{if(T.length)return toast('層板上還有玩具，先收回背包');if(showDo(h.id,{op:'f2W',row:i,id:''}))closeModal()};
   $('#sheet').querySelectorAll('[data-c]').forEach(b=>b.onclick=()=>{const c=+b.dataset.c,t=at(c);
-    if(t){h.toys2=(h.toys2||[]).filter(x=>x!==t);bagAdd(t.item,1);renderF2();f2ShelfMenu(i);toast('收回背包了');call('removeToy',Object.assign(cred(),{toyId:t.id,floor:2}),true).catch(e=>{(h.toys2=h.toys2||[]).push(t);bagAdd(t.item,-1);renderF2();toast(e.message)});return}
+    if(t){h.toys2=(h.toys2||[]).filter(x=>x!==t);bagAdd(t.item,1);renderF2();f2ShelfMenu(i);toast('收回背包了');toyPend(h.id+':2').rm[t.id]=1;call('removeToy',Object.assign(cred(),{toyId:t.id,floor:2}),true).catch(e=>{delete toyPend(h.id+':2').rm[t.id];(h.toys2=h.toys2||[]).push(t);bagAdd(t.item,-1);renderF2();toast(e.message)});return}
     if((h.toys2||[]).length>=TOY2_MAX)return toast(`二樓最多放 ${TOY2_MAX} 個玩具`);const L=bagList('toy');
     openModal(`<h3>放哪一個玩具？</h3>${L.length?`<div class="shopgrid">${L.map(([iid,n])=>`<button class="si pick" data-p="${iid}">${itemIcon(iid,'big')}<div class="sn">${ITEMS[iid].name}</div><div class="sf">× ${n}</div></button>`).join('')}</div>`:'<div class="locked">背包裡沒有玩具</div>'}<div class="row2"><button id="f2shbk">← 回層板</button></div>`);
     $('#f2shbk').onclick=()=>f2ShelfMenu(i);
     $('#sheet').querySelectorAll('[data-p]').forEach(pb=>pb.onclick=()=>{const item=pb.dataset.p,R=f2Spots(h.room2||'basic1')[i]||[0,0,0,0],tmp={id:'tmp'+uid(),item,w:i,c,x:Math.round((R[0]+R[2])/2),y:Math.round(R[3])};
       bagAdd(item,-1);(h.toys2=h.toys2||[]).push(tmp);renderF2();f2ShelfMenu(i);sfx&&sfx('pat');
-      call('placeToy',Object.assign(cred(),{item,x:tmp.x,y:tmp.y,floor:2,w:i,c}),true).then(t=>{tmp.id=t.id}).catch(er=>{h.toys2=(h.toys2||[]).filter(x=>x!==tmp);bagAdd(item,1);renderF2();toast(er.message)})})})}
+      const tp2=toyPend(h.id+':2');tp2.add.push(tmp);call('placeToy',Object.assign(cred(),{item,x:tmp.x,y:tmp.y,floor:2,w:i,c}),true).then(t=>{tmp.id=t.id;toyPend(h.id+':2')}).catch(er=>{h.toys2=(h.toys2||[]).filter(x=>x!==tmp);bagAdd(item,1);renderF2();toast(er.message)})})})}
 // 換背景：新背景放不下的層板收回倉庫（層板上的玩具收回背包）
 async function f2WallFit(h){if(!hasShow(h))return;const n=f2Spots(h.room2||'basic1').length,s=showNorm(h.show);let moved=0;
   for(let i=n;i<F2_N;i++){if(!s.f2.w[i])continue;const T=(h.toys2||[]).filter(t=>t.w===i);
@@ -4533,9 +4534,9 @@ function f2Click(e){if(!F2||!F2.placing)return;const st=$('#f2v .cstage'),h=hous
     if([0,1].slice(0,n).some(i=>gBlocked().has(r+','+(c+i)))){bad='這裡被房間的家具擋住了，換一格吧';fl();return}
     if([0,1].slice(0,n).some(i=>f2Occ(h,P.toy).has(r+','+(c+i)))){bad='這格已經有家具了，換一格放吧';fl();return}spot=gSpot(r,c,n)});
   if(!spot)return toast(bad);({x,y}=spot);F2.placing=null;
-  if(P.toy){Object.assign(P.toy,{x,y});renderF2();call('moveToy',Object.assign(cred(),{toyId:P.toy.id,x,y,flip:!!P.toy.flip,floor:2}),true).catch(er=>toast(er.message));return}
+  if(P.toy){Object.assign(P.toy,{x,y});renderF2();toyPend(h.id+':2').mv[P.toy.id]={x,y,flip:!!P.toy.flip};call('moveToy',Object.assign(cred(),{toyId:P.toy.id,x,y,flip:!!P.toy.flip,floor:2}),true).catch(er=>toast(er.message));return}
   const tmp={id:'tmp'+uid(),item:P.item,x,y};bagAdd(P.item,-1);(h.toys2=h.toys2||[]).push(tmp);renderF2();toast('擺好了 🧸');
-  call('placeToy',Object.assign(cred(),{item:P.item,x,y,floor:2}),true).then(t=>{tmp.id=t.id}).catch(er=>{h.toys2=(h.toys2||[]).filter(z=>z!==tmp);bagAdd(P.item,1);renderF2();toast(er.message)})}
+  toyPend(h.id+':2').add.push(tmp);call('placeToy',Object.assign(cred(),{item:P.item,x,y,floor:2}),true).then(t=>{tmp.id=t.id;toyPend(h.id+':2')}).catch(er=>{h.toys2=(h.toys2||[]).filter(z=>z!==tmp);bagAdd(P.item,1);renderF2();toast(er.message)})}
 // ================= 🌱 農田 =================
 const PLOTS=[[255,650],[595,650],[255,895],[595,895],[255,1140],[595,1140]];
 // v2.22：小番茄 4 小時（澆水最多快 1 小時），南瓜、金蘋果 8 小時（澆 3 次快 3 小時）
@@ -6573,7 +6574,7 @@ function announceLetters(){if(!DB.me)return;let seen=[];try{seen=JSON.parse(loca
     sfx('gift');$('#lgopen').onclick=()=>openLetter(nw[0].id,()=>$('#bell').click())};
   setTimeout(go,1800)}
 // ================= 自動更新：發現新版本就重新載入 =================
-const APP_VER='v2.83';
+const APP_VER='v2.84';
 function checkUpdate(){
   if(!/^https?:/.test(location.protocol)||!API_URL)return;
   if(!$('#modal').classList.contains('hidden'))return; // 正在填表單時不打斷
