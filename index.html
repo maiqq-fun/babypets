@@ -161,7 +161,7 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
 details{margin-top:6px}
 details summary{font-size:13px;color:var(--accent-d);cursor:pointer}
 .visits{position:absolute;left:12px;top:60px;z-index:2900;background:rgba(255,250,238,.9);border-radius:12px;padding:3px 10px;font-size:12px;white-space:nowrap;max-width:58%;overflow:hidden;text-overflow:ellipsis;box-shadow:0 1px 0 rgba(0,0,0,.1)}
-.nightdim{position:absolute;inset:0;background:rgba(20,25,60,.38);opacity:0;transition:opacity 1s;pointer-events:none}
+.nightdim{position:absolute;inset:0;background:radial-gradient(ellipse at 50% 35%,rgba(255,214,140,.10),rgba(255,180,90,.20) 70%,rgba(150,95,40,.26));mix-blend-mode:multiply;opacity:0;transition:opacity 1s;pointer-events:none}   /* v3.01：晚上改成暖黃小夜燈（以前是深藍色，奶油色房間會變灰） */
 .nightdim.on{opacity:1}
 .poop{width:clamp(30px,9cqw,46px)}.poop img{width:100%;display:block;pointer-events:none}
 .bowl{width:clamp(56px,15cqw,80px)}.bowl img{width:100%;display:block}
@@ -6732,7 +6732,7 @@ function announceLetters(){if(!DB.me)return;let seen=[];try{seen=JSON.parse(loca
     sfx('gift');$('#lgopen').onclick=()=>openLetter(nw[0].id,()=>$('#bell').click())};
   setTimeout(go,1800)}
 // ================= 自動更新：發現新版本就重新載入 =================
-const APP_VER='v3.00';
+const APP_VER='v3.01';
 function checkUpdate(){
   if(!/^https?:/.test(location.protocol)||!API_URL)return;
   if(!$('#modal').classList.contains('hidden'))return; // 正在填表單時不打斷
