@@ -269,6 +269,9 @@ b.dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:#ff
 .tent.tuck>img{animation:tuck .8s ease-in-out}
 @keyframes tuck{0%,100%{transform:none}30%{transform:scale(1.06,.94)}60%{transform:scale(.97,1.04)}}
 .petheads{position:absolute;left:12px;top:142px;z-index:2900;display:flex;flex-direction:column;gap:6px;align-items:flex-start}.petheads.fold>:not(.phtog){display:none}
+.leftcol{position:absolute;left:12px;top:12px;z-index:2900;display:flex;flex-direction:column;align-items:flex-start;gap:8px;max-width:62%;pointer-events:none}.leftcol>*{pointer-events:auto}
+.leftcol .visits>div{height:1.5em;line-height:1.5em;white-space:nowrap}.leftcol .visits img{height:1.2em!important;width:auto!important;max-height:1.2em;vertical-align:-.25em!important}
+.leftcol .visits{position:relative!important}.leftcol .petheads{position:static!important}.leftcol .visits,.leftcol .petheads{top:auto!important;left:auto!important;max-width:100%}
 .phtog{border:0;border-radius:12px;padding:3px 10px;background:rgba(255,250,238,.92);box-shadow:0 1px 0 rgba(0,0,0,.1);display:flex;align-items:center;gap:4px;font-size:12px;font-weight:700;color:var(--ink)}.phtog img{width:16px;height:16px;transform:rotate(180deg);transition:transform .2s}.petheads.fold .phtog img{transform:none}
 .ph1{position:relative;width:38px;height:38px;border-radius:50%;padding:0;border:2.5px solid #fff;box-shadow:0 1px 3px rgba(0,0,0,.25);background:#fff1dc;overflow:visible}
 .ph1 img{width:100%;height:100%;object-fit:cover;border-radius:50%}
@@ -2471,7 +2474,8 @@ function openHome(hid,keep){
 }
 // v1.91：毛孩頭像列排在右上按鈕（毛孩、家、二樓、農田、徵才…）下面，不會被擋住
 // v2.77：毛孩頭像在左邊，排在家人列下面
-function placeHeads(){const v=$('#visits'),p=$('#petheads');if(!p)return;const on=v&&v.style.display!=='none'&&v.offsetHeight;p.style.setProperty('top',(on?v.offsetTop+v.offsetHeight+8:12)+'px','important')}
+// v2.94：家人列和毛孩頭像放進同一個直欄（.leftcol），頭像自然排在家人列下面，不用量位置，進房間不會上下跳
+function placeHeads(){const v=$('#visits'),p=$('#petheads');if(!v||!p||v.parentElement.classList.contains('leftcol'))return;const c=document.createElement('div');c.className='leftcol';v.parentElement.insertBefore(c,v);c.appendChild(v);c.appendChild(p)}
 // v2.79：毛孩頭像開／關會記住（跟音效一樣：存在手機，也存進帳號 DB.game.ph），換家、重開都照上次的
 const PH={get fold(){try{const v=localStorage.getItem('mhd_ph');if(v!=null)return v==='1'}catch(e){}return !!(DB&&DB.game&&DB.game.ph)},set fold(on){try{localStorage.setItem('mhd_ph',on?'1':'0')}catch(e){}if(DB&&DB.game){DB.game.ph=on?1:0;save()}}};
 function renderFoot2(){
@@ -6701,7 +6705,7 @@ function announceLetters(){if(!DB.me)return;let seen=[];try{seen=JSON.parse(loca
     sfx('gift');$('#lgopen').onclick=()=>openLetter(nw[0].id,()=>$('#bell').click())};
   setTimeout(go,1800)}
 // ================= 自動更新：發現新版本就重新載入 =================
-const APP_VER='v2.93';
+const APP_VER='v2.94';
 function checkUpdate(){
   if(!/^https?:/.test(location.protocol)||!API_URL)return;
   if(!$('#modal').classList.contains('hidden'))return; // 正在填表單時不打斷
