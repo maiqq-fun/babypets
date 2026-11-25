@@ -1,5 +1,6 @@
 /*
- * 毛很多 babypets 後端・整理版 v71
+ * 毛很多 babypets 後端・整理版 v72
+ * v72：🏷️ 毛二街出清：二手架超過 40 樣被擠下來的貨進出清候補（clrq，最多 30），每天換一批 6 樣到出清籃（clr），價錢是二手價的 1/4，沒賣掉的隔天刪掉
  * v71：🌱 農田紀錄（farm.log：誰在什麼時候種、澆、收，最近 30 筆）；🪵 新增 13 款層板
  * v70：🛏️ 二樓：玩具最多 25 個（地上＋層板）；二樓牆面掛層板（show.f2.w，跟展示間共用倉庫），層板上放玩具（toys2 的 w、c）；相框記掛上去的時間（wfa）；新增 10 款二樓背景
  * v69：🎫 一番賞不下架了：這箱抽完自動開下一箱，新箱一抽 🪙1200（price 跟著箱子；前端帶 pay，付不夠就擋下來）
@@ -148,7 +149,7 @@ function doPost(e) {
 // ================= 讀小島（v40 拆成兩段） =================
 // 第一段：要寫進試算表的小事（要排隊，最多等 3 秒，排不到就跳過）
 function stateTick_(req, now) {
-  shop_(); park_(); kujiSync_(null); kuji_(); rank_(); fixRankDup_();
+  { const sh = shop_(); if (clrRoll_(sh)) put_('houses', sh); } park_(); kujiSync_(null); kuji_(); rank_(); fixRankDup_();
   const me = req.playerId ? get_('players', req.playerId) : null;
   if (me) {
     let ch = false;
@@ -754,9 +755,21 @@ function shop_() {
 function isMgr_(pid) { const s = get_('houses', SHOP_ID_); return !!(s && pid && Array.isArray(s.mgr) && s.mgr.indexOf(String(pid)) >= 0); }
 function mustMgr_(req) { if (!isMgr_(req.playerId)) throw new Error('只有毛二街店長可以這樣做'); return shop_(); }
 function shopItemOk_(t, item) { return (t === 'acc' || t === 'item') && /^[a-z0-9_]{1,20}$/i.test(String(item || '')); }
-function shopTrim_(stock) {   // 架上最多 40 樣，滿了先移掉最舊的「店家補貨」
-  while (stock.length > SHOP_STOCK_MAX_) { const i = stock.findIndex(x => x.src !== 'p'); stock.splice(i >= 0 ? i : 0, 1); }
+const CLR_N_ = 6, CLR_Q_MAX_ = 30;
+function shopTrim_(stock, s) {   // 架上最多 40 樣，滿了先移掉最舊的「店家補貨」；v72：擠下來的放進出清候補
+  while (stock.length > SHOP_STOCK_MAX_) {
+    const i = stock.findIndex(x => x.src !== 'p'), out = stock.splice(i >= 0 ? i : 0, 1)[0];
+    if (s && out) { const q = Array.isArray(s.clrq) ? s.clrq : []; q.push(out); s.clrq = q.slice(-CLR_Q_MAX_); }
+  }
   return stock;
+}
+// v72：出清籃每天換一批（舊的沒賣掉就刪掉），候補沒東西就空著
+function clrRoll_(s) {
+  const day = twDay_();
+  if (s.clrDay === day) return false;
+  const q = Array.isArray(s.clrq) ? s.clrq : [];
+  s.clr = q.splice(0, CLR_N_).map(x => Object.assign({}, x, { sold: 0 })); s.clrq = q; s.clrDay = day;
+  return true;
 }
 
 // ================= 拆房子（家人自己拆、島主收回共用） =================
@@ -1410,7 +1423,8 @@ const ACTIONS = {
   // ---------- 🛍️ 毛二街 ----------
   // 買二手：金幣在前端扣，後端確保同一樣只會被一個人買走
   shopBuy(req) {
-    const me = resident_(req), s = shop_(), stock = Array.isArray(s.stock) ? s.stock : [], it = stock.find(x => x.id === req.stockId);
+    const me = resident_(req), s = shop_(), clr = !!req.clr, stock = Array.isArray(s.stock) ? s.stock : [], cl = Array.isArray(s.clr) ? s.clr : [];
+    const it = clr ? cl.find(x => x.id === req.stockId && !x.sold) : stock.find(x => x.id === req.stockId);
     const sm = meta_('sold'), sold = Array.isArray(sm.list) ? sm.list : [];
     if (!it) {
       const mine = sold.find(x => x.id === req.stockId && x.by === me.id);   // 自己剛剛買過（第一次回應沒收到）→ 照樣算買到
@@ -1435,7 +1449,8 @@ const ACTIONS = {
       if (acc.indexOf(it.item) >= 0) throw new Error('你家已經有這件配件了');
       acc.push(it.item); h.acc = acc; put_('houses', h);
     }
-    s.stock = stock.filter(x => x.id !== it.id); put_('houses', s);
+    if (clr) { it.sold = 1; s.clr = cl; } else s.stock = stock.filter(x => x.id !== it.id);
+    put_('houses', s);
     put_('meta', { id: 'sold', list: sold.concat({ id: it.id, by: me.id, item: it.item, t: it.t, at: Date.now() }).slice(-60) });
     feed_(`🛍️ ${me.nick} 在毛二街撿到便宜：${String(req.name || it.item).slice(0, 14)}`);
     return { item: it.item, t: it.t };
@@ -1457,7 +1472,7 @@ const ACTIONS = {
       });
     } else me = resident_(req);
     const s = shop_(), stock = Array.isArray(s.stock) ? s.stock : [], it = { id: uid_(), item: item, t: t, at: Date.now(), src: 'p', by: me.nick };
-    stock.push(it); s.stock = shopTrim_(stock); put_('houses', s);
+    stock.push(it); s.stock = shopTrim_(stock, s); put_('houses', s);
     feed_(`💰 ${me.nick} 把 ${String(req.name || item).slice(0, 14)} 賣給毛二街`);
     return { ok: true, it: it };
   },
@@ -1469,7 +1484,7 @@ const ACTIONS = {
     const stock = Array.isArray(s.stock) ? s.stock : [];
     (Array.isArray(req.items) ? req.items : []).slice(0, 3).filter(x => x && shopItemOk_(x.t, x.item))
       .forEach(x => stock.push({ id: uid_(), item: String(x.item), t: x.t, at: Date.now(), src: 's' }));
-    s.stock = shopTrim_(stock); s.rday = day; put_('houses', s);
+    s.stock = shopTrim_(stock, s); s.rday = day; put_('houses', s);
     return { stock: s.stock };
   },
   shopUpdate(req) {
@@ -2565,7 +2580,7 @@ Object.assign(ACTIONS, {
     if (brag) feed_(brag);
     if (shelf) {   // 賣掉的展示櫃、牆面裝飾放上毛二街的二手架，別人可以半價撿便宜
       const me = get_('players', req.playerId), sh = shop_(), stock = Array.isArray(sh.stock) ? sh.stock : [];
-      stock.push({ id: uid_(), item: shelf.item, t: shelf.t, at: Date.now(), src: 'p', by: me ? me.nick : '' }); sh.stock = shopTrim_(stock); put_('houses', sh);
+      stock.push({ id: uid_(), item: shelf.item, t: shelf.t, at: Date.now(), src: 'p', by: me ? me.nick : '' }); sh.stock = shopTrim_(stock, sh); put_('houses', sh);
     }
     return { show: s };
   }
@@ -2939,7 +2954,7 @@ function thiefLeave_(m, now) {
   if (loot.length) {
     const s = shop_(), stock = Array.isArray(s.stock) ? s.stock : [];
     loot.forEach(t => { if (Math.random() < 0.5) { sold.push(t.item); stock.push({ id: uid_(), item: String(t.item), t: 'item', at: now, src: 'p', by: '🦹 神秘人' }); } });
-    if (sold.length) { s.stock = shopTrim_(stock); put_('houses', s); }
+    if (sold.length) { s.stock = shopTrim_(stock, s); put_('houses', s); }
   }
   if (h) {
     feed_(`🦹 小偷帶著 ${loot.length} 個玩具從「${h.name}」溜走了……`);
