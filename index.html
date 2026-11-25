@@ -269,6 +269,9 @@ b.dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:#ff
 .tent.tuck>img{animation:tuck .8s ease-in-out}
 @keyframes tuck{0%,100%{transform:none}30%{transform:scale(1.06,.94)}60%{transform:scale(.97,1.04)}}
 .petheads{position:absolute;left:12px;top:142px;z-index:2900;display:flex;flex-direction:column;gap:6px;align-items:flex-start}.petheads.fold>:not(.phtog){display:none}
+.leftcol{position:absolute;left:12px;top:12px;z-index:2900;display:flex;flex-direction:column;align-items:flex-start;gap:8px;max-width:62%;pointer-events:none}.leftcol>*{pointer-events:auto}
+.leftcol .visits>div{height:1.5em;line-height:1.5em;white-space:nowrap}.leftcol .visits img{height:1.2em!important;width:auto!important;max-height:1.2em;vertical-align:-.25em!important}
+.leftcol .visits{position:relative!important}.leftcol .petheads{position:static!important}.leftcol .visits,.leftcol .petheads{top:auto!important;left:auto!important;max-width:100%}
 .phtog{border:0;border-radius:12px;padding:3px 10px;background:rgba(255,250,238,.92);box-shadow:0 1px 0 rgba(0,0,0,.1);display:flex;align-items:center;gap:4px;font-size:12px;font-weight:700;color:var(--ink)}.phtog img{width:16px;height:16px;transform:rotate(180deg);transition:transform .2s}.petheads.fold .phtog img{transform:none}
 .ph1{position:relative;width:38px;height:38px;border-radius:50%;padding:0;border:2.5px solid #fff;box-shadow:0 1px 3px rgba(0,0,0,.25);background:#fff1dc;overflow:visible}
 .ph1 img{width:100%;height:100%;object-fit:cover;border-radius:50%}
@@ -997,6 +1000,7 @@ img{-webkit-user-drag:none}
 .upit img{width:100%;aspect-ratio:1;object-fit:cover;border-radius:8px;background:#f6efe2}.upit b{font-size:12px;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.upit small{font-size:10.5px;color:var(--soft)}
 .redit{position:relative;width:min(300px,100%);aspect-ratio:848/1264;margin:8px auto;background:#efe4cf;border-radius:10px;overflow:hidden;touch-action:none;user-select:none}
 .redit>img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;pointer-events:none}
+.dkinds{display:flex;flex-direction:column;gap:6px}.dkinds button{text-align:left;border:2px solid var(--line);border-radius:12px;padding:8px 12px;background:#fffaf2;display:flex;flex-direction:column;gap:2px}.dkinds button.on{border-color:var(--accent);background:#fff0e6}.dkinds button[disabled]{opacity:.5}.dkinds small{color:var(--soft);font-size:12px}
 .rebd{position:absolute;border:3px solid #ffcc33;background:rgba(255,204,51,.18);border-radius:6px;cursor:move;touch-action:none}
 .rebd span,.refl span{position:absolute;left:4px;top:2px;font-size:11px;font-weight:700;color:#7a4a00;background:rgba(255,255,255,.85);border-radius:6px;padding:0 4px;pointer-events:none;white-space:nowrap}
 .rebd .rh{position:absolute;right:-9px;bottom:-9px;width:18px;height:18px;border-radius:50%;background:#ffcc33;border:2px solid #fff;touch-action:none}
@@ -1213,7 +1217,12 @@ body:has(.arcov) .modal{z-index:100000}   /* v2.36：遊戲畫面裡買代幣，
 .arcov .ah .apill .abuy{margin-left:6px;padding:3px 9px;border-radius:999px;font-size:12px}
 .arccv{position:relative;width:min(92vw,400px,calc(64vh * var(--a)));aspect-ratio:var(--a);margin-top:6px;border-radius:24px;padding:8px;background:linear-gradient(#ff9ec0,#f2709c);box-shadow:0 8px 0 #b84a74,0 12px 24px rgba(0,0,0,.35)}
 .arccv canvas{display:block;width:100%;height:100%;border-radius:18px;touch-action:none}
-.arccv .pshwin{top:40%}.pshwin.big{font-size:clamp(26px,9vw,40px)}
+.arccv .pshwin{top:40%}
+.ppcv{max-height:58dvh}.ppui{width:100%;max-width:400px;padding:6px 14px 14px;box-sizing:border-box;display:flex;flex-direction:column;gap:7px}.pprow{display:flex;gap:6px;align-items:center}
+.pprow button{border:0;border-radius:12px;padding:8px 10px;font-weight:800;background:rgba(255,255,255,.16);color:#fff;font-size:14px}.pprow button.on{background:#ff8fb8}
+.ppcnt{flex:1;display:flex;align-items:center;gap:5px;font-weight:800}.ppcnt b{font-size:20px;color:#ffd23f}.ppb{width:16px;height:16px;border-radius:50%;background:radial-gradient(circle at 35% 35%,#fff,#9aa3b5)}
+.ppnet{font-size:12px;font-weight:700}.ppnet.up{color:#7dffb2}.ppnet.dn{color:#ffb3c7}.pplab{font-size:13px;font-weight:800;white-space:nowrap}.pprow input[type=range]{flex:1;accent-color:#ff8fb8}
+.ppbets button{flex:1}.ppfire{flex:3;padding:14px!important;font-size:17px!important;background:#ff5f9a!important;box-shadow:0 4px 0 #b83a6b}.ppfire.on{transform:translateY(3px);box-shadow:0 1px 0 #b83a6b}.ppauto{flex:1}.ppauto.on{background:#ffd23f!important;color:#5a3a00!important}.pphint{font-size:11px;opacity:.75;text-align:center}.pshwin.big{font-size:clamp(26px,9vw,40px)}
 .clwpad{display:flex;align-items:center;gap:12px;margin-top:12px}.clwpad .mv{width:64px;height:64px;border-radius:50%;border:0;font-size:26px;background:#ffe9c9;color:#7a3b55;box-shadow:0 5px 0 #c99a6a;touch-action:none;user-select:none;-webkit-user-select:none}
 .clwpad .mv.on{transform:translateY(3px);box-shadow:0 2px 0 #c99a6a}.clwpad .arcbig{margin-top:0;padding:10px 26px;line-height:1.1}.clwpad .arcbig small{display:block;font-size:12px;font-weight:700;opacity:.85}
 .pshsum{margin-top:6px;display:flex;gap:6px;justify-content:center;min-height:1.3em}.pshsum span{display:flex;flex-direction:column;align-items:center;background:rgba(255,255,255,.12);border-radius:12px;padding:4px 12px;font-size:11px;font-weight:700;opacity:.95}.pshsum b{font-size:15px;color:#ffd23f}.pshsum .up{background:#3fbf7f}.pshsum .up b{color:#fff}.pshsum .dn b{color:#ffb3c7}.pshsum small{font-size:10px;font-weight:600;opacity:.85;white-space:nowrap;display:inline-flex;align-items:center;gap:2px}.pshsum small img{width:1.2em!important;height:1.2em!important;margin:0!important}
@@ -1964,7 +1973,7 @@ function roomEditor(o){const E=o?JSON.parse(JSON.stringify(o)):{name:'',r:'N',bo
   openModal(`<h3>🖼️ ${o?'編輯背景':'上傳新背景'}</h3>
     ${o?'':`<label class="mimg" style="display:block;text-align:center"><input type="file" accept="image/*" id="refile" hidden><span id="rel">📷 選一張背景圖（848×1264）</span></label>`}
     <div class="redit" id="redit"><img id="reimg" src="${img||''}" alt="" style="${img?'':'opacity:.2'}"><div class="rebd" id="rebd"><i class="rh"></i><span>軟木板</span></div><div class="refl" id="refl"><i class="fl"></i><i class="fr"></i><span>地板從這裡開始（拉線上下、拉兩端圓點左右）</span></div></div>
-    <p class="lead" style="font-size:12px">拉黃色框對準軟木板（右下角圓點調大小）；藍線是毛孩可以走的地板最上緣</p>
+    <p class="lead" style="font-size:12px" id="rehint">拉黃色框對準軟木板（右下角圓點調大小）；藍線是毛孩可以走的地板最上緣</p>
     ${fld('rename','名字',`<input id="rename" maxlength="12" value="${esc(E.name)}" placeholder="例如：星空露營房">`)}
     ${fld('retype','類別',`<select id="retype">${ROOM_TYPES.map(([k,n])=>`<option value="${k}" ${E.r===k?'selected':''}>${n}</option>`).join('')}</select>`)}
     <div id="resh" style="display:${E.r==='SH'?'':'none'}">${fld('reprice','價錢（🪙）',`<input id="reprice" type="number" min="0" max="99999" value="${+E.p||1500}">`,'藍線拉到牆和地板交界的地方，展示櫃會站在這條線上')}</div>
@@ -1972,7 +1981,8 @@ function roomEditor(o){const E=o?JSON.parse(JSON.stringify(o)):{name:'',r:'N',bo
     ${o?`<label class="chk"><input type="checkbox" id="reoff" ${E.off?'checked':''}> 下架（抽卡、一番賞不會再出現；已經有的人保留）</label>`:''}
     <div class="err" id="reerr"></div><div class="row2 sticky"><button id="reback">← 後台</button><button class="primary" id="resave">${o?'儲存':'上傳'}</button></div>`);
   $('#reback').onclick=adminSheet;$('#retype').onchange=e=>{$('#recu').style.display=e.target.value==='CU'?'':'none';$('#resh').style.display=e.target.value==='SH'?'':'none'};
-  const f2Opts=()=>{const on=$('#ref2').checked;[...$('#rehouse').options].forEach(o=>{if(o.value)o.disabled=on&&!o.dataset.f2});if(on&&$('#rehouse').selectedOptions[0]&&$('#rehouse').selectedOptions[0].disabled)$('#rehouse').value=''};$('#ref2').onchange=f2Opts;f2Opts();
+  const f2Opts=()=>{const on=$('#ref2').checked;[...$('#rehouse').options].forEach(o=>{if(o.value)o.disabled=on&&!o.dataset.f2});if(on&&$('#rehouse').selectedOptions[0]&&$('#rehouse').selectedOptions[0].disabled)$('#rehouse').value=''};const f2Lab=()=>{const on=$('#retype').value==='CU'&&$('#ref2').checked;$('#rebd span').textContent=on?'層板位置':'軟木板';$('#rehint').textContent=on?'二樓背景：黃色框拉到空牆上，就是放層板的地方（框高一點會排 2 排）；藍線是毛孩可以走的地板最上緣':'拉黃色框對準軟木板（右下角圓點調大小）；藍線是毛孩可以走的地板最上緣'};   // v2.96
+  $('#ref2').onchange=()=>{f2Opts();f2Lab()};f2Opts();f2Lab();$('#retype').addEventListener('change',f2Lab);
   const box=$('#redit'),bd=$('#rebd'),fl=$('#refl'),W=848,H=1264;
   const draw=()=>{const b=E.board;Object.assign(bd.style,{left:b[0]/W*100+'%',top:b[1]/H*100+'%',width:(b[2]-b[0])/W*100+'%',height:(b[3]-b[1])/H*100+'%'});
     Object.assign(fl.style,{top:E.floor.y0/H*100+'%',left:E.floor.t[0]/W*100+'%',width:(E.floor.t[1]-E.floor.t[0])/W*100+'%'})};draw();
@@ -2466,7 +2476,8 @@ function openHome(hid,keep){
 }
 // v1.91：毛孩頭像列排在右上按鈕（毛孩、家、二樓、農田、徵才…）下面，不會被擋住
 // v2.77：毛孩頭像在左邊，排在家人列下面
-function placeHeads(){const v=$('#visits'),p=$('#petheads');if(!p)return;const on=v&&v.style.display!=='none'&&v.offsetHeight;p.style.setProperty('top',(on?v.offsetTop+v.offsetHeight+8:12)+'px','important')}
+// v2.94：家人列和毛孩頭像放進同一個直欄（.leftcol），頭像自然排在家人列下面，不用量位置，進房間不會上下跳
+function placeHeads(){const v=$('#visits'),p=$('#petheads');if(!v||!p||v.parentElement.classList.contains('leftcol'))return;const c=document.createElement('div');c.className='leftcol';v.parentElement.insertBefore(c,v);c.appendChild(v);c.appendChild(p)}
 // v2.79：毛孩頭像開／關會記住（跟音效一樣：存在手機，也存進帳號 DB.game.ph），換家、重開都照上次的
 const PH={get fold(){try{const v=localStorage.getItem('mhd_ph');if(v!=null)return v==='1'}catch(e){}return !!(DB&&DB.game&&DB.game.ph)},set fold(on){try{localStorage.setItem('mhd_ph',on?'1':'0')}catch(e){}if(DB&&DB.game){DB.game.ph=on?1:0;save()}}};
 function renderFoot2(){
@@ -5166,7 +5177,7 @@ function renderArcade(){const v=$('#arcv');if(!v)return;const st=v.querySelector
   const d=document.createElement('button');d.className='arcdoor';d.innerHTML='<img src="assets/dance_door.webp" alt="">';Object.assign(d.style,hp(250,732),{width:(250/RW*100)+'%',height:(250*520/412/RH*100)+'%',zIndex:700});   // 門底貼著牆和地板的交界，看起來像牆後面的房間
   d.onclick=e=>{e.stopPropagation();openModal(`<div style="text-align:center"><div style="font-size:56px">🚧</div><h3>練舞室還在蓋</h3><p class="lead">工人正在趕工中……<br>之後這裡會有跟朋友 PK 的遊戲，敬請期待！</p></div><div class="row2"><button data-close class="primary">好期待</button></div>`)};st.appendChild(d);
   v.querySelector('.cbtns').innerHTML=`<button class="act" id="arctok">${tokIcon} ${a.tok}</button><button class="act" id="arcbuy">買代幣</button><button class="act" id="arcrk">🏆 排行</button>`;
-  $('#arctok').onclick=$('#arcbuy').onclick=arcBuy;$('#arcrk').onclick=arcRank;jobScene(st,'arcade',v.querySelector('.cbtns'))}
+  $('#arctok').onclick=$('#arcbuy').onclick=arcBuy;$('#arcrk').onclick=arcRank;if($('#arcpp'))$('#arcpp').onclick=ppGame;jobScene(st,'arcade',v.querySelector('.cbtns'))}
 function arcBuy(){const g=DB.game,a=arcG();openModal(`<h3>${tokIcon} 買代幣</h3><p class="lead">你有 🪙${g.coins||0}・代幣 ${a.tok} 枚<br>代幣只有<b>推幣機</b>用（1 枚 = 🪙10）<br>娃娃機、打地鼠、彈珠台直接付金幣</p>
   <div class="xcpl">${TOK_P.map(([n,c],i)=>`<button data-tk="${i}">${tokIcon} 代幣 ×${n}<small style="color:var(--soft)">　🪙${c}${n*10>c?`（省 ${n*10-c}）`:''}</small></button>`).join('')}</div><div class="row2"><button data-close>關閉</button></div>`);
   $('#sheet').querySelectorAll('[data-tk]').forEach(b=>b.onclick=()=>{const [n,c]=TOK_P[+b.dataset.tk];if((g.coins||0)<c)return toast(`金幣不夠，要 🪙${c}`);g.coins-=c;a.tok+=n;a.paid+=c;save();updTix&&updTix();sfx('coin');toast(`買了 ${n} 枚代幣！`);renderArcade();document.querySelectorAll('.arcov .atk').forEach(e=>e.textContent=a.tok);if(document.querySelector('.arcov'))closeModal();else arcBuy()})}
@@ -5174,6 +5185,94 @@ function arcPay(n){n=n||1;const a=arcG();if(a.tok<n){arcBuy();toast(`代幣不�
 function arcOv(title,a){const ov=document.createElement('div');ov.className='arcov';const A=arcG();
   ov.innerHTML=`<div class="ah"><button class="x">← 離開</button><b>${title}</b><span class="apill">🪙 <b class="acn">${(DB.game.coins||0).toLocaleString()}</b>${a&&a.tok?`<img style="margin-left:6px" src="assets/token.webp?v=3" alt=""><b class="atk">${A.tok}</b><button class="abuy noic">＋ 買</button>`:''}</span></div>`;
   document.body.appendChild(ov);ov.querySelector('.x').onclick=()=>{ov.remove();renderArcade()};if(ov.querySelector('.abuy'))ov.querySelector('.abuy').onclick=arcBuy;const upd=()=>{ov.querySelector('.acn').textContent=(DB.game.coins||0).toLocaleString();const t=ov.querySelector('.atk');if(t)t.textContent=arcG().tok};return {ov,upd}}
+
+// ================= 🎯 珠珠台（v2.93）：珠珠一路撞釘子往下掉，掉進洞吐珠珠；可以選倍數；珠珠 1 顆 = 🪙1，隨時換回金幣 =================
+// 珠珠台物理核心（遊戲和模擬共用）
+function ppMake(P){
+  const W=360,H=560,R=5.5,PR=3.2,G=900;
+  const pins=[];
+  // 釘子：交錯排列，中間留出風車通道
+  for(let r=0;r<13;r++){const y=120+r*28,off=r%2?0:17;for(let x=36+off;x<=W-36;x+=34){
+    if(r>=9&&Math.abs(x-W/2)<26)continue;   // 開花洞上方留空
+    pins.push({x,y})}}
+  // 開花洞旁邊的導引釘
+  pins.push({x:W/2-22,y:418},{x:W/2+22,y:418},{x:W/2-9,y:484},{x:W/2+9,y:484});   // 大放送洞上方兩根擋釘
+  // 洞：x0..x1 在 y 那條線上接住
+  const pockets=[
+    {k:'side',x0:60-P.sw,x1:60+P.sw,y:300,pay:P.side},
+    {k:'side',x0:W-60-P.sw,x1:W-60+P.sw,y:300,pay:P.side},
+    {k:'tulip',x0:W/2-P.tw,x1:W/2+P.tw,y:440,pay:P.tulip},
+    {k:'low',x0:85-P.lw,x1:85+P.lw,y:476,pay:P.low},
+    {k:'low',x0:W-85-P.lw,x1:W-85+P.lw,y:476,pay:P.low},
+    {k:'jack',x0:W/2-P.jw,x1:W/2+P.jw,y:500,pay:0},
+  ];
+  return {W,H,R,PR,G,pins,pockets};
+}
+// 一顆珠：power 0..1 → 從頂部哪裡落下；回傳 {k,pay}
+function ppStep(M,b,dt,st){
+  b.vy+=M.G*dt;b.x+=b.vx*dt;b.y+=b.vy*dt;
+  if(b.x<M.R+8){b.x=M.R+8;b.vx=Math.abs(b.vx)*.6}
+  if(b.x>M.W-M.R-8){b.x=M.W-M.R-8;b.vx=-Math.abs(b.vx)*.6}
+  for(const p of M.pins){const dx=b.x-p.x,dy=b.y-p.y,d2=dx*dx+dy*dy,rr=M.R+M.PR;if(d2<rr*rr&&d2>0.01){const d=Math.sqrt(d2),nx=dx/d,ny=dy/d;b.x=p.x+nx*rr;b.y=p.y+ny*rr;
+    const vn=b.vx*nx+b.vy*ny;if(vn<0){b.vx-=1.55*vn*nx;b.vy-=1.55*vn*ny;b.vx+=(Math.random()-.5)*40}}}
+  const open=st&&st.tulipOpen>0,fever=st&&st.fever>0;
+  // v2.95：碰到畫出來的洞（含珠子半徑）就算進洞，看起來進了就一定有分
+  for(const q of M.pockets){const w=q.k==='tulip'&&open?14:0,j=q.k==='jack',x0=j?q.x0-3:q.x0-w-M.R*.5,x1=j?q.x1+3:q.x1+w+M.R*.5,y0=j?q.y-2:q.y-2-M.R*.6,y1=j?q.y+10:q.y+14;
+    if(b.x>x0&&b.x<x1&&b.y>y0&&b.y<y1)return q}
+  b.py=b.y;
+  if(b.y>M.H-20)return {k:'out',pay:0};
+  return null}
+function ppLaunch(M,power){const x=40+power*(M.W-80)+(Math.random()-.5)*24;return {x,y:60,vx:(Math.random()-.5)*60,vy:40,py:60}}
+const PP_P={sw:5,lw:4,side:2,tulip:3,low:2,tw:4,jw:1,jack:20,fx:1,fn:10,topen:3};   // 模擬過：瞄最好的地方長期拿回約 97%
+const PP_BUY=[100,300,1000],PP_BETS=[1,2,5,10];
+const ppG=()=>{const a=arcG();a.pb=Math.max(0,Math.floor(+a.pb||0));return a};
+function ppGame(){const {ov,upd}=arcOv('<img class="mic" src="assets/icon_pinball.webp" alt="">珠珠台');const M=ppMake(PP_P);const {box,cv,ctx}=arcCanvas(ov,M.W,M.H,'ppcv');
+  const ui=document.createElement('div');ui.className='ppui';ov.appendChild(ui);
+  let bet=1,power=.45,firing=false,auto=false,balls=[],st={tulipOpen:0,fever:0},net=0,lastShot=0,flash=[],raf=0,feverMsg=0;
+  const A=ppG(),save2=()=>{save();upd()};
+  ui.innerHTML=`<div class="pprow"><span class="ppcnt"><i class="ppb"></i><b id="ppn">0</b> 顆</span><span class="ppnet" id="ppnet"></span><button id="ppbuy">買珠珠</button><button id="ppex">換金幣</button></div>
+    <div class="pprow"><span class="pplab">力道</span><input type="range" id="pppow" min="0" max="100" value="45"></div>
+    <div class="pprow ppbets">${PP_BETS.map(b=>`<button data-bet="${b}" class="${b===1?'on':''}">×${b}</button>`).join('')}</div>
+    <div class="pprow"><button id="ppfire" class="ppfire">按住發射</button><button id="ppauto" class="ppauto">自動</button></div>
+    <div class="pphint">每打一顆扣 ${'1'} 顆珠珠（×倍數），掉進洞吐回珠珠（也×倍數）・中間星星洞是大放送</div>`;
+  const q=s=>ui.querySelector(s),refresh=()=>{q('#ppn').textContent=A.pb.toLocaleString();const e=q('#ppnet');e.textContent=net?`這次${net>0?'贏':'輸'} ${Math.abs(net)} 顆`:'';e.className='ppnet '+(net>0?'up':net<0?'dn':'');
+    q('.pphint').textContent=`每打一顆扣 ${bet} 顆珠珠，掉進洞吐回的也是 ×${bet}・中間星星洞是大放送`};refresh();
+  q('#pppow').oninput=e=>power=+e.target.value/100;
+  ui.querySelectorAll('[data-bet]').forEach(b=>b.onclick=()=>{bet=+b.dataset.bet;ui.querySelectorAll('[data-bet]').forEach(x=>x.classList.toggle('on',x===b));refresh()});
+  const fb=q('#ppfire'),start=e=>{e.preventDefault();firing=true;fb.classList.add('on')},stop=()=>{firing=false;fb.classList.remove('on')};
+  fb.addEventListener('pointerdown',start);['pointerup','pointerleave','pointercancel'].forEach(t=>fb.addEventListener(t,stop));
+  q('#ppauto').onclick=()=>{auto=!auto;q('#ppauto').classList.toggle('on',auto);q('#ppauto').textContent=auto?'停止':'自動'};
+  q('#ppbuy').onclick=()=>{const g=DB.game;openModal(`<h3>買珠珠</h3><p class="lead">1 顆珠珠 = 🪙1・你有 🪙${(g.coins||0).toLocaleString()}</p><div class="xcpl">${PP_BUY.map(n=>`<button data-pn="${n}" ${(g.coins||0)>=n?'':'disabled'}>珠珠 ×${n}<small style="color:var(--soft)">　🪙${n}</small></button>`).join('')}</div><div class="row2"><button data-close>關閉</button></div>`);
+    $('#sheet').querySelectorAll('[data-pn]').forEach(b=>b.onclick=()=>{const n=+b.dataset.pn;if((g.coins||0)<n)return toast('金幣不夠');g.coins-=n;A.pb+=n;save2();updTix&&updTix();sfx('coin');closeModal();refresh();toast(`買了 ${n} 顆珠珠`)})};
+  q('#ppex').onclick=()=>{if(!A.pb)return toast('沒有珠珠可以換');openModal(`<h3>珠珠換金幣</h3><p class="lead">你有 ${A.pb.toLocaleString()} 顆珠珠・1 顆 = 🪙1</p><div class="row2"><button data-close>先不要</button><button class="primary" id="ppexok">全部換成 🪙${A.pb.toLocaleString()}</button></div>`);
+    $('#ppexok').onclick=()=>{const n=A.pb;if(!n||balls.length)return toast(balls.length?'等珠珠都掉完再換':'沒有珠珠');A.pb=0;grant(0,n);save2();updTix&&updTix();sfx('levelup');closeModal();refresh();toast(`換到 🪙${n.toLocaleString()}！`)}};
+  const shoot=()=>{if(A.pb<bet){firing=false;auto=false;fb.classList.remove('on');q('#ppauto').classList.remove('on');q('#ppauto').textContent='自動';toast('珠珠不夠了，按「買珠珠」');return}
+    A.pb-=bet;net-=bet;const b=ppLaunch(M,power);b.bet=bet;b.t=0;balls.push(b);refresh()};
+  const land=(b,qk)=>{let pay=qk.pay;if(st.fever>0&&qk.k!=='out'){pay+=PP_P.fx}if(qk.k==='tulip')st.tulipOpen=PP_P.topen;else if(st.tulipOpen>0&&qk.k!=='out')st.tulipOpen--;
+    if(qk.k==='jack'){pay+=PP_P.jack;st.fever=PP_P.fn;feverMsg=performance.now();sfx('levelup');arcFloat(box,'大放送！',1);if(ONLINE)feedPush(`🎯 ${DB.me.nick} 在珠珠台打中大放送！`)}
+    if(st.fever>0&&qk.k!=='jack')st.fever--;
+    const w=pay*b.bet;if(w){A.pb+=w;net+=w;flash.push({x:b.x,y:b.y,t:0,w});sfx('coin');refresh()}};
+  let last=performance.now(),saveT=0;
+  const loop=now=>{if(!ov.isConnected){cancelAnimationFrame(raf);save();return}const dt=Math.min(.05,(now-last)/1000);last=now;
+    if((firing||auto)&&now-lastShot>260&&balls.length<30){lastShot=now;shoot()}
+    const sub=4,h=dt/sub;for(let s=0;s<sub;s++)balls=balls.filter(b=>{b.t+=h;const r=ppStep(M,b,h,st);if(r){land(b,r);return false}if(b.t>8)return false;return true});
+    if(now-saveT>3000){saveT=now;save();upd()}
+    draw(now);raf=requestAnimationFrame(loop)};
+  const draw=now=>{const c=ctx,W=M.W,H=M.H;c.clearRect(0,0,W,H);
+    const gr=c.createLinearGradient(0,0,0,H);gr.addColorStop(0,'#ffd9ec');gr.addColorStop(1,'#e9d6ff');c.fillStyle=gr;rrect(c,0,0,W,H,26);c.fill();
+    c.strokeStyle='#ff8fb8';c.lineWidth=8;rrect(c,4,4,W-8,H-8,24);c.stroke();
+    c.fillStyle='rgba(255,255,255,.55)';rrect(c,40,48,W-80,22,11);c.fill();c.fillStyle='#ff5f9a';const ax=40+power*(W-80);c.beginPath();c.arc(ax,59,8,0,7);c.fill();
+    c.fillStyle='#c9a227';M.pins.forEach(p=>{c.beginPath();c.arc(p.x,p.y,M.PR,0,7);c.fill()});
+    c.fillStyle='#fff6c2';M.pins.forEach(p=>{c.beginPath();c.arc(p.x-1,p.y-1,1.2,0,7);c.fill()});
+    M.pockets.forEach(qp=>{const open=qp.k==='tulip'&&st.tulipOpen>0,w=open?14:0,x0=qp.x0-w,x1=qp.x1+w,cx=(x0+x1)/2;
+      if(qp.k==='jack'){c.save();c.translate(cx,qp.y+4);c.fillStyle=st.fever>0?'#ffd23f':'#ff5f9a';c.beginPath();for(let i=0;i<10;i++){const r=i%2?3.5:8,a=-Math.PI/2+i*Math.PI/5;c.lineTo(Math.cos(a)*r,Math.sin(a)*r)}c.closePath();c.fill();c.restore();c.fillStyle='#7a2a5a';c.font='bold 10px sans-serif';c.textAlign='center';c.fillText('大放送',cx,qp.y+24);return}
+      c.fillStyle=qp.k==='tulip'?(open?'#ff5f9a':'#ff9cc4'):qp.k==='side'?'#7fc8ff':'#9be3b5';rrect(c,x0-M.R*.5,qp.y-2,x1-x0+M.R,16,6);c.fill();
+      if(qp.k==='tulip'){c.fillStyle='#ff5f9a';c.beginPath();c.ellipse(x0-6-(open?6:0),qp.y-6,6,11,open?-.8:-.2,0,7);c.ellipse(x1+6+(open?6:0),qp.y-6,6,11,open?.8:.2,0,7);c.fill()}
+      c.fillStyle='#fff';c.font='bold 10px sans-serif';c.textAlign='center';c.fillText('+'+qp.pay*bet,cx,qp.y+11)});
+    balls.forEach(b=>{const g2=c.createRadialGradient(b.x-2,b.y-2,1,b.x,b.y,M.R);g2.addColorStop(0,'#ffffff');g2.addColorStop(1,'#9aa3b5');c.fillStyle=g2;c.beginPath();c.arc(b.x,b.y,M.R,0,7);c.fill()});
+    flash=flash.filter(f=>{f.t+=1/60;c.globalAlpha=Math.max(0,1-f.t);c.fillStyle='#ff3d7f';c.strokeStyle='#fff';c.lineWidth=3;c.font='bold 22px sans-serif';c.textAlign='center';c.strokeText('+'+f.w,f.x,f.y-f.t*40);c.fillText('+'+f.w,f.x,f.y-f.t*40);c.globalAlpha=1;return f.t<1});
+    if(st.fever>0){c.fillStyle='rgba(255,210,63,.92)';rrect(c,W/2-80,84,160,26,13);c.fill();c.fillStyle='#7a2a00';c.font='bold 14px sans-serif';c.textAlign='center';c.fillText(`大放送中！剩 ${st.fever} 顆`,W/2,102)}};
+  raf=requestAnimationFrame(loop)}
 // ---------- 🧸 娃娃機 ----------
 // ================= v2.36 玩個毛：娃娃機、推幣機改成真的物理（自己操作、自己瞄準）=================
 // 共用：畫布機台（邏輯大小 W×H，依螢幕縮放；圖片先載好）
@@ -5576,51 +5675,73 @@ function adminApplyBind(){const go=async(id,ok,b)=>{if(!armBtn(b,ok?'確定核�
 
 // ================= 🎨 訂製裝潢（v1.69） =================
 // 島民中心申請：🪙500、一個家 30 天一次、全島最多 3 件排隊；島主照描述生圖、上傳後寄信給申請人（只屬於那一家）
-const DECO_COST=500,DECO_DAYS=30;
+const DECO_COST=1000,DECO_DAYS=30;
 MAILN.deco='訂製裝潢';MAILT.deco='🎨 訂製裝潢';
 const customRoom=id=>(typeof DB!=='undefined'&&Array.isArray(DB.rooms)?DB.rooms:[]).find(r=>r.id===id);
 function decoForm(){const h=myHouse();if(!h)return toast('要有家才能申請訂製裝潢');if(!ONLINE)return toast('試做版沒有訂製裝潢');const g=DB.game,last=+h.decoAt||0,wait=last&&Date.now()-last<DECO_DAYS*864e5;let img='';
   openModal(`<h3 class="mh3"><img class="mic" src="assets/icon_deco.webp" alt="" style="width:36px;height:36px">訂製裝潢</h3>
-    ${wait?`<div class="locked" style="margin-bottom:10px">你家這個月已經申請過了，${Math.ceil((last+DECO_DAYS*864e5-Date.now())/864e5)} 天後可以再申請<br><small>有折扣碼的話，現在還是可以免費申請喔</small></div>`:''}${`
-    ${hasF2(h)?`<div class="field"><div class="flabel">要放在哪一層？</div><div class="seg" id="dfl"><button type="button" data-f="1" class="on">🏠 一樓</button><button type="button" data-f="2">🛏️ 二樓民宿</button></div><div class="hint">選二樓的話，做好的房間只能放在二樓</div></div>`:''}
+    ${wait?`<div class="locked" style="margin-bottom:10px">你家這個月已經申請過了，${Math.ceil((last+DECO_DAYS*864e5-Date.now())/864e5)} 天後可以再申請</div>`:''}${`
+    <div class="field"><div class="flabel">要哪一種？</div><div class="dkinds" id="dfl">${DECO_KINDS.map(([k,n,d])=>`<button type="button" data-f="${k}" class="${k==='b'?'on':''}" ${k!=='b'&&!hasF2(h)?'disabled':''}><b>${n}</b><small>${k!=='b'&&!hasF2(h)?'要先有二樓':d}</small></button>`).join('')}</div></div>
     <p class="lead"><b>你希望打造什麼樣的房間呢？</b><br>描述得越仔細越好！畢竟裝潢一個月只能換一次<br><small>（例如：風格／主色系／主題／氣氛⋯）</small></p>
     <textarea id="dtx" rows="7" maxlength="400" style="display:block;width:100%;box-sizing:border-box;min-height:170px;font-size:16px" placeholder="例如：想要粉紅色和奶油色的星空房間，有一扇大圓窗看得到月亮，牆上掛小燈串，氣氛溫暖安靜，像睡前的感覺"></textarea><div class="mcnt"><span id="dcn">0</span> / 400</div>
     <div class="row2"><label class="mimg"><input type="file" accept="image/*" id="dfile" hidden><span id="dimgl">📷 附一張參考圖（可以不附）</span></label></div><div id="dprev"></div>
     ${fld('dcode','折扣碼（有的話）','<input id="dcode" maxlength="20" autocomplete="off" placeholder="打對就免費許願">')}
-    <p class="lead" style="font-size:12px">一次 🪙${DECO_COST}・一個家一個月一次（用折扣碼不限）・做好的房間只屬於你家<br>申請完畢後請留意信箱 💌（如果做不出來，會全額退款）</p><div class="err" id="derr"></div>
-    <div class="row2"><button data-close>取消</button><button class="primary" id="dsend">${wait?'用折扣碼送出':`送出（🪙${DECO_COST}）`}</button></div>`}`);
-  let dfl=1;if($('#dfl'))$('#dfl').onclick=e=>{const b=e.target.closest('button');if(!b)return;dfl=+b.dataset.f;$('#dfl').querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===b))};
+    <p class="lead" style="font-size:12px">一次 🪙${DECO_COST}（折扣碼免費）・一個家一個月一次・做好的房間只屬於你家<br>申請完畢後請留意信箱 💌（如果做不出來，會全額退款）</p><div class="err" id="derr"></div>
+    <div class="row2"><button data-close>取消</button><button class="primary" id="dsend" ${wait?'disabled':''}>${`送出（🪙${DECO_COST}）`}</button></div>`}`);
+  let dfl='b';if($('#dfl'))$('#dfl').onclick=e=>{const b=e.target.closest('button');if(!b||b.disabled)return;dfl=b.dataset.f;$('#dfl').querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===b))};
   const tx=$('#dtx');$('#dcode').oninput=e=>{if(!wait)$('#dsend').textContent=e.target.value.trim()?'用折扣碼送出':`送出（🪙${DECO_COST}）`};tx.oninput=()=>$('#dcn').textContent=tx.value.length;
   $('#dfile').onchange=async e=>{const f=e.target.files[0];if(!f)return;try{img=await shrinkImg(f);$('#dprev').innerHTML=`<img class="mshot" src="${img}" alt="">`;$('#dimgl').textContent='📷 換一張'}catch(x){$('#derr').textContent='這張圖讀不進來，換一張試試'}};
   $('#dsend').onclick=async e=>{const v=tx.value.trim();if(v.length<5)return $('#derr').textContent='多描述一點你想要的房間吧';const hasCode=!!$('#dcode').value.trim();
-    if(wait&&!hasCode)return $('#derr').textContent='這個月已經申請過了，要用折扣碼才能再申請';if(!hasCode&&(g.coins||0)<DECO_COST)return $('#derr').textContent=`金幣不夠，要 🪙${DECO_COST}（有折扣碼可以免費）`;const b=e.currentTarget;b.disabled=true;b.textContent='送出中…';$('#derr').textContent='小島處理訂製比較慢，請等一下，不要關掉喔 🙏';
+    if(wait)return $('#derr').textContent='你家這個月已經申請過了';if(!hasCode&&(g.coins||0)<DECO_COST)return $('#derr').textContent=`金幣不夠，要 🪙${DECO_COST}（有折扣碼可以免費）`;const b=e.currentTarget;b.disabled=true;b.textContent='送出中…';$('#derr').textContent='小島處理訂製比較慢，請等一下，不要關掉喔 🙏';
     const code=($('#dcode')&&$('#dcode').value.trim())||'';let r;
-    try{try{r=await call('decoApply',Object.assign(cred(),{text:v,img,code,f2:dfl===2}),true)}
+    try{try{r=await call('decoApply',Object.assign(cred(),{text:v,img,code,kind:dfl,f2:dfl!=='b'}),true)}
       catch(x){if(!/太慢|連不上|忙/.test(x.message))throw x;   // v1.83：逾時不一定是失敗 → 先同步看看是不是已經送出了
         await sync(true);const hh=house(h.id);if(!(hh&&+hh.decoAt&&Date.now()-hh.decoAt<10*60000))throw x;r={free:hh.decoFree?1:0}}
-      const cost=r&&r.free?0:DECO_COST;g.coins=(g.coins||0)-cost;save();updTix&&updTix();if(cost)h.decoAt=Date.now();sfx('coin');
+      const cost=r&&r.free?0:DECO_COST;g.coins=(g.coins||0)-cost;save();updTix&&updTix();h.decoAt=Date.now();sfx('coin');
       openModal(`<div style="text-align:center"><img src="assets/icon_deco.webp" alt="" style="width:96px"><h3>申請送出了！</h3><p class="lead">島主會照你的描述幫你裝潢<br>完成後會寄信給你，請留意信箱 💌</p></div><div class="row2"><button data-close class="primary">好</button></div>`)}
     catch(x){$('#derr').textContent=x.message;b.disabled=false;b.textContent=$('#dcode').value.trim()?'用折扣碼送出':`送出（🪙${DECO_COST}）`}}}
 // ---------- 👑 島主：處理訂製申請 ----------
-const decoPrompt=t=>`請幫我畫一張遊戲的房間背景圖：3D 黏土風、可愛粉嫩、柔和打光的室內房間，正面視角，直式 2:3。上半部是牆面和窗戶等裝飾（右上方的牆留一塊可以貼便利貼的軟木板），下半部是寬敞、空曠、平整的地板（之後要放家具和毛孩，地板上不要有東西）。畫面裡不要有人物、動物，也不要有任何文字。\n\n房間主人的需求：「${t}」`;
+// v2.99：上傳訂製房時直接拉位置：黃色框＝佈告欄（一樓）／層板位置（二樓），藍線＝地板最上緣
+function posEditor(el,img,P,kind){const W=848,H=1264,lab=kind==='b'?'佈告欄（放二樓時是層板）':'層板位置';
+  el.innerHTML=`<p class="lead" style="font-size:12px;margin:8px 0 0">${kind==='d'?'這種不放層板，只要拉藍線到牆和地板交界':'拉黃色框到'+(kind==='b'?'佈告欄':'空牆')+'上（右下角圓點調大小）；藍線拉到牆和地板交界'}</p>
+    <div class="redit" id="pe"><img src="${img}" alt="">${P.board?`<div class="rebd" id="peb"><i class="rh"></i><span>${lab}</span></div>`:''}<div class="refl" id="pef"><i class="fl"></i><i class="fr"></i><span>地板從這裡開始</span></div></div>`;
+  const box=el.querySelector('#pe'),bd=el.querySelector('#peb'),fl=el.querySelector('#pef');
+  const draw=()=>{if(bd){const b=P.board;Object.assign(bd.style,{left:b[0]/W*100+'%',top:b[1]/H*100+'%',width:(b[2]-b[0])/W*100+'%',height:(b[3]-b[1])/H*100+'%'})}
+    Object.assign(fl.style,{top:P.floor.y0/H*100+'%',left:P.floor.t[0]/W*100+'%',width:(P.floor.t[1]-P.floor.t[0])/W*100+'%'})};draw();
+  const cl=(v,a,b)=>Math.round(Math.max(a,Math.min(b,v)));
+  const drag=(t,fn)=>{if(!t)return;t.onpointerdown=ev=>{ev.preventDefault();ev.stopPropagation();const r=box.getBoundingClientRect(),sx=ev.clientX,sy=ev.clientY,st=JSON.parse(JSON.stringify(P));
+    const mv=e=>{fn((e.clientX-sx)/r.width*W,(e.clientY-sy)/r.height*H,st);draw()},up=()=>{removeEventListener('pointermove',mv);removeEventListener('pointerup',up)};addEventListener('pointermove',mv);addEventListener('pointerup',up)}};
+  if(bd){drag(bd,(dx,dy,st)=>{const w=st.board[2]-st.board[0],h=st.board[3]-st.board[1],x=cl(st.board[0]+dx,0,W-w),y=cl(st.board[1]+dy,0,H-h);P.board=[x,y,x+w,y+h]});
+    drag(bd.querySelector('.rh'),(dx,dy,st)=>{P.board=[st.board[0],st.board[1],cl(st.board[2]+dx,st.board[0]+60,W),cl(st.board[3]+dy,st.board[1]+60,H)]})}
+  drag(fl,(dx,dy,st)=>{P.floor.y0=cl(st.floor.y0+dy,300,1150)});
+  drag(fl.querySelector('.fl'),(dx,dy,st)=>{P.floor.t=[cl(st.floor.t[0]+dx,0,st.floor.t[1]-120),st.floor.t[1]]});
+  drag(fl.querySelector('.fr'),(dx,dy,st)=>{P.floor.t=[st.floor.t[0],cl(st.floor.t[1]+dx,st.floor.t[0]+120,W)]})}
+// v2.99：訂製分三種（b 通用佈告欄版、w 二樓空牆版、d 二樓裝潢設計版）
+const DECO_KINDS=[['b','通用・佈告欄版','一樓二樓都能放，有佈告欄（二樓會變層板）'],['w','二樓・空牆版','只能放二樓，牆上留大片空牆，可以放比較多層板'],['d','二樓・裝潢設計版','只能放二樓，整面牆都設計好，不放層板']];
+const decoKind=m=>m.kind||(m.f2?'w':'b');
+const DECO_HEAD='請幫我畫一張遊戲的房間背景圖：3D 黏土風、可愛粉嫩、柔和打光的室內房間，正面視角，直式 2:3。',DECO_TAIL='下半部是寬敞、空曠、平整的地板（之後要放家具和毛孩，地板上不要有東西）。畫面裡不要有人物、動物，也不要有任何文字。';
+const decoPrompt=(t,k)=>{k=k===true?'w':k===false||!k?'b':k;const mid=k==='w'?'上半部是牆面，牆的正中間留一大塊乾淨的空牆（大約畫面寬度的 4 成、從畫面高度 1/4 到 3/5 左右），上面什麼都不要放（不要佈告欄、層架、相框、海報、窗戶），之後要掛層板；窗戶、植物、燈和小擺設放在左右兩側。'
+  :k==='d'?'上半部是牆面，整面牆可以盡情裝潢：窗戶、掛畫、層架、燈飾、植物都可以，不用留佈告欄或空牆。':'上半部是牆面和窗戶等裝飾，右上方的牆留一塊可以貼便利貼的軟木佈告欄（四四方方、看得清楚）。';
+  return `${DECO_HEAD}${mid}${DECO_TAIL}\n\n房間主人的需求：「${t}」`};
 function adminDecoOne(m){const st=m.st||'wait',done=st==='done',no=st==='no';let img='';
-  openModal(`<h3 class="mh3"><img class="mic" src="assets/icon_deco.webp" alt="" style="width:34px;height:34px">訂製裝潢</h3><p class="lead">${esc(m.nick)}${m.house?'・'+esc(m.house):''}・${ago(m.at)}・${m.free?'折扣碼（免費）':'已付 🪙'+(m.cost||DECO_COST)}${m.f2?'<br><b>🛏️ 二樓用</b>（做好會是二樓專用）':''}<br>${done?'<img class="mic" src="assets/icon_ok.webp" alt="">已經完成、寄出了':no?'<img class="mic" src="assets/icon_no.webp" alt="">已經退回、退款了':'⏳ 等你處理'}</p>
+  openModal(`<h3 class="mh3"><img class="mic" src="assets/icon_deco.webp" alt="" style="width:34px;height:34px">訂製裝潢</h3><p class="lead">${esc(m.nick)}${m.house?'・'+esc(m.house):''}・${ago(m.at)}・${m.free?'折扣碼（免費）':'已付 🪙'+(m.cost||DECO_COST)}<br><b>${(DECO_KINDS.find(x=>x[0]===decoKind(m))||DECO_KINDS[0])[1]}</b><br>${done?'<img class="mic" src="assets/icon_ok.webp" alt="">已經完成、寄出了':no?'<img class="mic" src="assets/icon_no.webp" alt="">已經退回、退款了':'⏳ 等你處理'}</p>
     <div class="mbody">${esc(m.text)}</div>${m.img?`<img class="mshot" src="${m.img}" alt="參考圖">`:''}
-    <div class="sec adm"><h4>🪄 生圖指令<span>貼給 AI 就好</span></h4><div class="prompt" id="dpr">${esc(decoPrompt(m.text))}</div><div class="row2"><button id="dcp">📋 複製指令</button></div></div>
+    <div class="sec adm"><h4>🪄 生圖指令<span>貼給 AI 就好</span></h4><div class="prompt" id="dpr">${esc(decoPrompt(m.text,decoKind(m)))}</div><div class="row2"><button id="dcp">📋 複製指令</button></div></div>
     ${!done&&!no?`<div class="sec adm"><h4><img class="mic" src="assets/icon_custom.webp" alt="">上傳做好的房間</h4>
       <input id="drn" maxlength="12" placeholder="房間名字（例如：小橘的星空房）">
-      <div class="photo" style="margin-top:8px"><div class="pv" id="drp" style="aspect-ratio:848/1264;width:90px">🖼️</div><div class="info" id="dri">直的房間圖（會自動裁成 2:3）<div class="btns"><label>⬆️ 選圖<input type="file" accept="image/*" id="drf" hidden></label></div></div></div>
+      <div class="photo" style="margin-top:8px"><div class="pv" id="drp" style="aspect-ratio:848/1264;width:90px">🖼️</div><div class="info" id="dri">直的房間圖（會自動裁成 2:3）<div class="btns"><label>⬆️ 選圖<input type="file" accept="image/*" id="drf" hidden></label></div></div></div><div id="drpos"></div>
       <textarea id="drr" rows="2" maxlength="300" style="display:block;width:100%;box-sizing:border-box" placeholder="想跟他說的話（選填）"></textarea><div class="err" id="drerr"></div>
       <div class="row2"><button class="primary" id="drok"><img class="mic" src="assets/icon_ok.webp" alt="">完成並寄給他</button></div>
       <div class="row2"><button id="drno"><img class="mic" src="assets/icon_no.webp" alt="">做不出來，退回並退款</button></div></div>`:''}
     <div class="row2"><button id="amb2">← 島民來信</button></div>`);
   $('#amb2').onclick=adminMailSheet;
-  $('#dcp').onclick=async()=>{try{await navigator.clipboard.writeText(decoPrompt(m.text));toast('指令已複製 📋')}catch(e){const r=document.createRange();r.selectNodeContents($('#dpr'));const s=getSelection();s.removeAllRanges();s.addRange(r);toast('已幫你選取，長按複製')}};
+  $('#dcp').onclick=async()=>{try{await navigator.clipboard.writeText(decoPrompt(m.text,decoKind(m)));toast('指令已複製 📋')}catch(e){const r=document.createRange();r.selectNodeContents($('#dpr'));const s=getSelection();s.removeAllRanges();s.addRange(r);toast('已幫你選取，長按複製')}};
   if(done||no)return;
-  $('#drf').onchange=async e=>{const f=e.target.files[0];if(!f)return;$('#dri').firstChild.textContent='處理中…';try{img=await roomCrop(f);$('#drp').innerHTML=`<img src="${img}" alt="" style="width:100%;height:100%;object-fit:cover">`;$('#dri').firstChild.textContent='✅ 裁好了（848×1264）'}catch(x){$('#dri').firstChild.textContent='這張圖讀不了，換一張'}};
+  const dk=decoKind(m),POS={board:dk==='w'?[254,330,594,700]:dk==='b'?[470,240,780,440]:null,floor:{y0:760,t:[120,730]}};
+  $('#drf').onchange=async e=>{const f=e.target.files[0];if(!f)return;$('#dri').firstChild.textContent='處理中…';try{img=await roomCrop(f);$('#drp').innerHTML=`<img src="${img}" alt="" style="width:100%;height:100%;object-fit:cover">`;$('#dri').firstChild.textContent='✅ 裁好了（848×1264）';posEditor($('#drpos'),img,POS,dk)}catch(x){$('#dri').firstChild.textContent='這張圖讀不了，換一張'}};
   $('#drok').onclick=async e=>{const name=$('#drn').value.trim();if(!name)return $('#drerr').textContent='幫房間取個名字';if(!img)return $('#drerr').textContent='先選房間的圖';const b=e.currentTarget;b.disabled=true;
     try{b.textContent='上傳圖片中…';const up=await call('upload',Object.assign(cred(),{dataUrl:img}),true);b.textContent='寄信中…';
-      const r=await adminCall('adminDecoFinish',{id:m.id,name,img:up.url,reply:$('#drr').value.trim()});(DB.rooms=DB.rooms||[]).push({id:r.roomId,name,img:up.url,houseId:m.houseId,r:'CU',f2:m.f2?1:''});m.st='done';toast('完成了！已經寄信給他 🎨');adminDecoOne(m)}
+      const r=await adminCall('adminDecoFinish',{id:m.id,name,img:up.url,reply:$('#drr').value.trim(),board:POS.board||undefined,floor:POS.floor});const nr={id:r.roomId,name,img:up.url,houseId:m.houseId,r:'CU',f2:m.f2?1:'',floor:Object.assign({b:[0,848]},POS.floor)};if(POS.board)nr.board=POS.board;(DB.rooms=DB.rooms||[]).push(nr);applyRooms();m.st='done';toast('完成了！已經寄信給他 🎨');adminDecoOne(m)}
     catch(x){$('#drerr').textContent=x.message;b.disabled=false;b.innerHTML='<img class="mic" src="assets/icon_ok.webp" alt="">完成並寄給他'}};
   $('#drno').onclick=async e=>{if(!armBtn(e.currentTarget,'確定退回並退款？'))return;try{await adminCall('adminDecoRefund',{id:m.id,reply:$('#drr').value.trim()});m.st='no';toast('退回了，已經寄信退款');adminDecoOne(m)}catch(x){$('#drerr').textContent=x.message}}}
 // 房間圖：裁成 848×1264、壓成 jpg（上傳雲端用）
@@ -6608,7 +6729,7 @@ function announceLetters(){if(!DB.me)return;let seen=[];try{seen=JSON.parse(loca
     sfx('gift');$('#lgopen').onclick=()=>openLetter(nw[0].id,()=>$('#bell').click())};
   setTimeout(go,1800)}
 // ================= 自動更新：發現新版本就重新載入 =================
-const APP_VER='v2.92';
+const APP_VER='v2.99';
 function checkUpdate(){
   if(!/^https?:/.test(location.protocol)||!API_URL)return;
   if(!$('#modal').classList.contains('hidden'))return; // 正在填表單時不打斷
