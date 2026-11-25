@@ -83,6 +83,11 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
 .note{aspect-ratio:1;border:0;padding:6%;font-size:clamp(8px,2.2vw,11px);line-height:1.25;text-align:left;overflow:hidden;
   box-shadow:0 2px 3px rgba(0,0,0,.18);color:#5a4030;display:flex;flex-direction:column;justify-content:space-between}
 .note small{font-size:.85em;opacity:.7;text-align:right}
+.board.wantb{grid-template-columns:repeat(3,minmax(0,1fr));grid-template-rows:minmax(0,1fr)!important;padding:16px 5px 3px!important;gap:6px;container-type:inline-size}.board.wantb::before{display:none}
+.board .wanttl{position:absolute!important;left:50%;top:-1%;transform:translateX(-50%);background:#d9302c;color:#fff;font-weight:900;font-size:clamp(10px,3cqw,15px);padding:1px 10px;border-radius:6px;white-space:nowrap;box-shadow:0 2px 0 rgba(0,0,0,.2);z-index:2}
+.board .wantc{height:100%;align-self:stretch;max-height:none}.wantc{position:relative;border:0;padding:4% 4% 0;background:#fffdf6;border-radius:4px;box-shadow:0 2px 3px rgba(0,0,0,.25);display:flex;flex-direction:column;align-items:center;justify-content:flex-end;min-height:0;overflow:hidden;transform:rotate(-2deg)}.wantc:nth-of-type(2){transform:rotate(2deg)}
+.wantc>img{flex:1 1 0;min-height:0;width:100%;height:100%;object-fit:contain}.wantc b{display:flex;align-items:center;gap:2px;font-size:clamp(9px,2.6cqw,13px);color:#b0261f;padding:2px 0;white-space:nowrap}.wantc b img{width:1.1em;height:1.1em}
+.wantc.done>img{opacity:.35}.wantc.done b{color:#7a6a5a}.wantempty{grid-column:1/-1;align-self:center;text-align:center;font-size:12px;color:#6b4a2b}
 .note.empty{background:transparent!important;box-shadow:none;border:1.5px dashed rgba(122,90,64,.45);color:#8a6a50;align-items:center;justify-content:center;font-size:clamp(12px,3.4vw,16px)}
 .empty-home{position:absolute;left:50%;top:72%;transform:translate(-50%,-50%);background:rgba(255,250,238,.95);border:2px dashed var(--wood);border-radius:18px;padding:14px 18px;text-align:center;font-size:15px;line-height:1.6;width:70%}
 .empty-home button{margin-top:8px;border:0;background:var(--accent);color:#fff;border-radius:12px;padding:8px 14px}
@@ -2455,7 +2460,7 @@ function openHome(hid,keep){
     call('visit',{playerId:DB.me.id,houseId:hid},true).catch(()=>{});visitReward(hid);renderFoot2()}
   if(ONLINE&&!keep){sync(true);pingWhere()}
   if(!keep&&isFamily(hid)&&demonOf(h))setTimeout(()=>{if(home&&home.id===hid&&demonOf(house(hid)))demonWelcome(house(hid))},1400);
-  if(isShopH(h)&&!keep)setTimeout(shopRestockMaybe,500);
+  if(isShopH(h)&&!keep){setTimeout(shopRestockMaybe,500);setTimeout(wantRollMaybe,900)}
   $('#foot').innerHTML=isParkH(h)?'毛毛公園：旅客和大家的毛孩都會來這裡散步。點旅客可以聊天，有時會收到小禮物；可以帶毛孩來遛遛。':isShopH(h)?'毛二街：點櫃檯或店員可以買二手、賣東西。收購和賣出都是原價的一半。':isFamily(hid)?'這是你家！右上可以新增毛孩、編輯家。點毛孩可以摸頭、看身分證、記錄體重醫療支出。':'朋友家：清地上的便便、餵飯、點毛孩摸頭、在軟木板貼便利貼。睡覺中的毛孩不能打擾喔。';
   window.scrollTo(0,0);
 }
@@ -2507,6 +2512,7 @@ function famTog(){const ft=$('#famtools');if(!ft)return;const n=ft.querySelector
 function renderBoard(){if(home&&FT.hid!==home.id){FT.hid=home.id;FT.fold=false}famTog();
   const h=house(home.id),B=BOARDS[h.room]||BOARDS.basic1,ins=10;
   const b=$('#board');Object.assign(b.style,hp(B[0]+ins,B[1]+ins),{width:((B[2]-B[0]-2*ins)/RW*100)+'%',height:((B[3]-B[1]-2*ins)/RH*100)+'%'});
+  b.classList.toggle('wantb',isShopH(h));$('#addnote').style.display=isShopH(h)?'none':'';if(isShopH(h)){$('#notebook').style.display='none';return wantBoard(b,h)}
   const all=DB.notes.filter(n=>n.houseId===home.id).sort((a,c)=>a.createdAt-c.createdAt),list=all.slice(-6);b.style.gridTemplateRows=list.length<=3?'repeat(1,minmax(0,1fr))':'';b.classList.toggle('one',list.length<=3);   // v2.83：3 張以下排一排，便條不會被壓扁
   b.innerHTML=list.map((n,i)=>{const rc=(n.replies||[]).length;return n.hidden?`<button class="note fold" data-id="${n.id}" style="background:${n.color};transform:rotate(${[-4,3,-2,5,-3,2][i%6]}deg)"><span>🔒<br>秘密便條</span><small>— ${esc(n.by)}</small></button>`
     :`<button class="note" data-id="${n.id}" style="background:${n.color};transform:rotate(${[-4,3,-2,5,-3,2][i%6]}deg)">
@@ -3987,6 +3993,26 @@ const shopName=(t,id)=>t==='acc'?((ACC[id]||{}).n||id):t==='cab'?((SHOW_CABS[id]
 const wDef=k=>{const [a,b]=String(k).split(':'),D=a==='sh'?WSH:a==='fr'?WFR:a==='cb'?WCB:null;return D&&D[b]?Object.assign({k:a,id:b},D[b]):null},wImg=k=>{const d=wDef(k);return d?`assets/w${d.k}_${d.id}.webp`:''};
 const shopIcon=(t,id)=>t==='cab'?`<span class="ii big"><img src="${showCabImg(id)}" alt=""></span>`:t==='w'?`<span class="ii big"><img src="${wImg(id)}" alt=""></span>`:t==='acc'?`<span class="ii big"><img src="${accImg(id)}" alt=""></span>`:itemIcon(id,'big');
 const keepScroll=fn=>{const st=$('#sheet').scrollTop;fn();$('#sheet').scrollTop=st};
+// ---------- v2.90：毛二街高價收購公仔（佈告欄改成收購板；後端 v73） ----------
+const WANT_N=3;
+function wantList(s){const w=s&&s.want;return w&&w.day===todayTW()&&Array.isArray(w.list)?w.list.filter(x=>x&&ITEMS[x.id]):[]}
+let wantRolling=false;
+async function wantRollMaybe(){const s=house(SHOP_ID);if(!s||!DB.me||wantRolling)return;if(s.want&&s.want.day===todayTW())return;if(ONLINE&&!myHouse())return;wantRolling=true;
+  const P=[];bbOn().forEach(S=>bbIdx(S).forEach(i=>{const id=bbId(S.id,i);if(ITEMS[id])P.push({id,h:(S.h||[]).includes(i)})}));
+  const pick=[];for(let k=0;k<WANT_N&&P.length;k++){const j=Math.floor(Math.random()*P.length);pick.push(P.splice(j,1)[0])}
+  const items=pick.map(x=>({id:x.id,p:x.h?4000+Math.floor(Math.random()*21)*100:1200+Math.floor(Math.random()*19)*100}));   // 普通款 1200～3000、隱藏版 4000～6000
+  try{const r=await call('shopWantRoll',{playerId:DB.me.id,items},true);if(r&&r.want){s.want=r.want;if(home&&isShopH(house(home.id)))renderBoard()}}catch(e){}finally{wantRolling=false}}
+function wantBoard(b,h){const L=wantList(h);b.style.gridTemplateRows='repeat(1,minmax(0,1fr))';b.classList.add('one');
+  b.innerHTML=`<div class="wanttl noic">高價收購</div>`+(L.length?L.map((x,i)=>`<button class="wantc${x.by?' done':''}" data-wi="${i}"><img src="${itemSrc(x.id)}" alt="" onerror="imgRetry(this)"><b class="noic">${x.by?'已收購':'<img src="assets/icon_coin.webp" alt="">'+x.p}</b></button>`).join(''):'<div class="wantempty">今天的收購單還沒貼出來</div>');
+  b.querySelectorAll('[data-wi]').forEach(el=>el.onclick=e=>{e.stopPropagation();wantSheet()})}
+function wantSheet(){if(!needMe())return;const s=house(SHOP_ID);if(!s)return;const L=wantList(s),bg=bag();
+  openModal(`<h3>高價收購</h3><p class="lead">店長今天想收這幾隻公仔，每一款只收一隻，先賣先贏！<br><small>每天換新的收購單</small></p>
+    ${L.length?`<div class="shopgrid">${L.map((x,i)=>{const it=ITEMS[x.id],S=bbSer(it.bb),n=+bg[x.id]||0;return `<div class="si${x.by?' clrsold':''}">${itemIcon(x.id,'big')}<div class="sn">${esc(it.name)}</div><div class="sf">${S?esc(S.n):''}${n?`・你有 ${n} 隻`:''}</div><button data-ws="${i}" ${!x.by&&n>0?'':'disabled'}>${x.by?esc(x.by)+' 賣掉了':n>0?'賣 🪙 '+x.p:'🪙 '+x.p}</button></div>`}).join('')}</div>`:'<div class="locked">今天的收購單還沒貼出來，等一下再來看看</div>'}
+    <div class="row2" style="margin-top:12px"><button data-close>關閉</button></div>`);
+  $('#sheet').querySelectorAll('[data-ws]').forEach(b=>b.onclick=async()=>{const i=+b.dataset.ws,x=L[i];if(!x||x.by||!(bag()[x.id]>0))return;if(!armBtn(b,`確定賣？🪙${x.p}`))return;
+    save();await new Promise(r=>setTimeout(r,1600));   // 先讓背包同步到小島（小島會檢查背包裡有沒有）
+    try{const r=await call('shopWantSell',{playerId:DB.me.id,i,id:x.id});x.by=DB.me.nick;bagAdd(x.id,-1);const rc=b.getBoundingClientRect();sfx('levelup');grant(0,r.p||x.p,{x:rc.left+rc.width/2,y:rc.top});save();toast(`賣給店家，拿到 🪙${r.p||x.p}！`);wantSheet();if(home&&isShopH(house(home.id)))renderBoard()}
+    catch(e){toast(e.message);if(/慢了一步/.test(e.message)){x.by='別人';wantSheet()}}})}
 // ---------- 店裡的畫面 ----------
 function renderShopHome(h){const mg=isMgr(h.id);
   $('#famtools').innerHTML=mg?`<button class="act" id="fs1">👔 店員</button><button class="act" id="fs2">⚙️ 店</button><button class="act" id="fs3">🧸 擺設</button>`:'';
@@ -6581,7 +6607,7 @@ function announceLetters(){if(!DB.me)return;let seen=[];try{seen=JSON.parse(loca
     sfx('gift');$('#lgopen').onclick=()=>openLetter(nw[0].id,()=>$('#bell').click())};
   setTimeout(go,1800)}
 // ================= 自動更新：發現新版本就重新載入 =================
-const APP_VER='v2.90';
+const APP_VER='v2.91';
 function checkUpdate(){
   if(!/^https?:/.test(location.protocol)||!API_URL)return;
   if(!$('#modal').classList.contains('hidden'))return; // 正在填表單時不打斷

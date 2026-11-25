@@ -1,6 +1,6 @@
 /*
  * 毛很多 babypets 後端・整理版 v73
- * v73：🎫 一番賞改成一抽 🪙800（現在這箱也是，之後每一箱都是）
+ * v73：🎫 一番賞改成一抽 🪙800（現在這箱也是，之後每一箱都是）；🏷️ 毛二街高價收購公仔（shop.want：每天 3 款、🪙1200～6000，賣出一隻那款就結束）
  * v72：🏷️ 毛二街出清：二手架超過 40 樣被擠下來的貨進出清候補（clrq，最多 30），每天換一批 6 樣到出清籃（clr），價錢是二手價的 1/4，沒賣掉的隔天刪掉
  * v71：🌱 農田紀錄（farm.log：誰在什麼時候種、澆、收，最近 30 筆）；🪵 新增 13 款層板
  * v70：🛏️ 二樓：玩具最多 25 個（地上＋層板）；二樓牆面掛層板（show.f2.w，跟展示間共用倉庫），層板上放玩具（toys2 的 w、c）；相框記掛上去的時間（wfa）；新增 10 款二樓背景
@@ -1476,6 +1476,30 @@ const ACTIONS = {
     stock.push(it); s.stock = shopTrim_(stock, s); put_('houses', s);
     feed_(`💰 ${me.nick} 把 ${String(req.name || item).slice(0, 14)} 賣給毛二街`);
     return { ok: true, it: it };
+  },
+  // v73：高價收購公仔。當天第一個進店的人帶 3 款上來（前端照系列挑），一天只收一次
+  shopWantRoll(req) {
+    resident_(req);
+    const s = shop_(), day = twDay_();
+    if (s.want && s.want.day === day) return { want: s.want };
+    const L = (Array.isArray(req.items) ? req.items : []).slice(0, 3)
+      .filter(x => x && /^bb\d+_\d{2}$/.test(String(x.id || '')) && Number(x.p) >= 1200 && Number(x.p) <= 6000)
+      .map(x => ({ id: String(x.id), p: Math.round(Number(x.p) / 100) * 100, by: '', at: 0 }));
+    s.want = { day: day, list: L }; put_('houses', s);
+    return { want: s.want };
+  },
+  // 賣公仔給店家：每一款只收一隻，先賣先贏（公仔在前端背包扣、金幣在前端加）
+  shopWantSell(req) {
+    const me = resident_(req), s = shop_(), w = s.want, i = Math.floor(Number(req.i));
+    if (!w || w.day !== twDay_() || !Array.isArray(w.list) || !w.list[i]) throw new Error('今天的收購已經換了，重新整理看看');
+    const it = w.list[i];
+    if (it.id !== String(req.id || '')) throw new Error('收購的款式換了，重新整理看看');
+    if (it.by) throw new Error(`慢了一步，${it.by} 已經賣給店家了`);
+    const g = me.game || {}, bag = g.bag && typeof g.bag === 'object' ? g.bag : {};
+    if (!(Number(bag[it.id]) > 0)) throw new Error('背包裡沒有這隻公仔（剛拿到的話等幾秒再試）');
+    it.by = me.nick; it.byId = me.id; it.at = Date.now(); s.want = w; put_('houses', s);
+    feed_(`💎 ${me.nick} 把公仔高價賣給毛二街，拿到 🪙${it.p}！`);
+    return { p: it.p };
   },
   // 每天補貨：當天第一個進店的人帶 3 樣上來，一天只收一次
   shopRestock(req) {
