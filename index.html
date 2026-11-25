@@ -641,6 +641,7 @@ html,body,button,.island,.imap,.logo{touch-action:manipulation}
 .coll .mini.locked{border-width:3px}
 /* v1.39 網格・一番賞 */
 .placing .pet,.placing .poop,.placing .tent,.placing .gift,.placing .petmenu{pointer-events:none}
+.placing .pet,.placing .staff,.placing .walker{opacity:.5;transition:opacity .4s}.placing .gnpc{opacity:.2}.placing .walker{pointer-events:none}
 .ggrid{position:absolute;inset:0;pointer-events:none;z-index:3}
 .ggrid svg{width:100%;height:100%;display:block}
 .ggrid polygon{fill:rgba(255,255,255,.14);stroke:rgba(255,255,255,.85);stroke-width:2.5;stroke-dasharray:10 7}
@@ -2619,6 +2620,7 @@ function tick(now){
   const dt=Math.min(0.05,(now-last)/1000);last=now;
   home.pets.forEach(r=>{if(!r.el)return;const p=pet(r.id);if(!p)return;
     if(r.sleep){placePet(r);return}
+    if(placing){if(!r.aside){const G=gG(),A=home.pets.filter(x=>x.el&&!x.sleep),i=A.indexOf(r),y=G.y0+4;r.aside=1;r.goal=null;r.fast=true;r.legs=1;r.tx=gX(y,(i+.5)/Math.max(1,A.length));r.ty=y;r.state='walk';if(i===0)setTimeout(()=>petSay(r,null,'借過借過～'),150)}if(r.state==='idle'){r.until=now+600;placePet(r);return}}else if(r.aside){r.aside=0;if(r.state==='idle')r.until=now+400+Math.random()*1200}
     if(r.state==='idle'&&now>r.until&&!r.anim){
       const hungry=!r.demon&&!r.guest&&isHungry(p)&&!home.bowl;
       if(r.demon){r.di=DEMON_IMG[Math.floor(Math.random()*2)];r.dw=DEMON_WALK[Math.floor(Math.random()*2)]}
@@ -6251,7 +6253,7 @@ function announceLetters(){if(!DB.me)return;let seen=[];try{seen=JSON.parse(loca
     sfx('gift');$('#lgopen').onclick=()=>openLetter(nw[0].id,()=>$('#bell').click())};
   setTimeout(go,1800)}
 // ================= 自動更新：發現新版本就重新載入 =================
-const APP_VER='v2.68';
+const APP_VER='v2.69';
 function checkUpdate(){
   if(!/^https?:/.test(location.protocol)||!API_URL)return;
   if(!$('#modal').classList.contains('hidden'))return; // 正在填表單時不打斷
