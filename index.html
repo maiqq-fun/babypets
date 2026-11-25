@@ -83,6 +83,7 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
 .note{aspect-ratio:1;border:0;padding:6%;font-size:clamp(8px,2.2vw,11px);line-height:1.25;text-align:left;overflow:hidden;
   box-shadow:0 2px 3px rgba(0,0,0,.18);color:#5a4030;display:flex;flex-direction:column;justify-content:space-between}
 .note small{font-size:.85em;opacity:.7;text-align:right}
+.board.one .note.nimg,.note.nimg{aspect-ratio:240/268}.note.nimg{box-shadow:none;filter:drop-shadow(0 2px 2px rgba(0,0,0,.2));aspect-ratio:240/268;padding:24% 9% 14%;border-radius:0}
 .board.wantb{grid-template-columns:repeat(3,minmax(0,1fr));grid-template-rows:minmax(0,1fr)!important;padding:16px 5px 3px!important;gap:6px;container-type:inline-size}.board.wantb::before{display:none}
 .board .wanttl{position:absolute!important;left:50%;top:-1%;transform:translateX(-50%);background:#d9302c;color:#fff;font-weight:900;font-size:clamp(10px,3cqw,15px);padding:1px 10px;border-radius:6px;white-space:nowrap;box-shadow:0 2px 0 rgba(0,0,0,.2);z-index:2}
 .board .wantc{height:100%;align-self:stretch;max-height:none}.wantc{position:relative;border:0;padding:4% 4% 0;background:#fffdf6;border-radius:4px;box-shadow:0 2px 3px rgba(0,0,0,.25);display:flex;flex-direction:column;align-items:center;justify-content:flex-end;min-height:0;overflow:hidden;transform:rotate(-2deg)}.wantc:nth-of-type(2){transform:rotate(2deg)}
@@ -161,7 +162,7 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
 details{margin-top:6px}
 details summary{font-size:13px;color:var(--accent-d);cursor:pointer}
 .visits{position:absolute;left:12px;top:60px;z-index:2900;background:rgba(255,250,238,.9);border-radius:12px;padding:3px 10px;font-size:12px;white-space:nowrap;max-width:58%;overflow:hidden;text-overflow:ellipsis;box-shadow:0 1px 0 rgba(0,0,0,.1)}
-.nightdim{position:absolute;inset:0;background:rgba(20,25,60,.38);opacity:0;transition:opacity 1s;pointer-events:none}
+.nightdim{position:absolute;inset:0;background:radial-gradient(ellipse at 50% 35%,rgba(255,214,140,.10),rgba(255,180,90,.20) 70%,rgba(150,95,40,.26));mix-blend-mode:multiply;opacity:0;transition:opacity 1s;pointer-events:none}   /* v3.01：晚上改成暖黃小夜燈（以前是深藍色，奶油色房間會變灰） */
 .nightdim.on{opacity:1}
 .poop{width:clamp(30px,9cqw,46px)}.poop img{width:100%;display:block;pointer-events:none}
 .bowl{width:clamp(56px,15cqw,80px)}.bowl img{width:100%;display:block}
@@ -1358,6 +1359,8 @@ const roomImg=id=>/^f2shop_/.test(id)?`assets/room_${id}.webp?v=2`:(typeof custo
 const CARD_COLORS=[['焦糖','#ff9a6b'],['玫瑰奶茶','#f48fb1'],['霧藍','#64b5f6'],['抹茶拿鐵','#5fbf95'],['芋頭','#9b8cff'],['可可','#b98d62']];
 // v3.00：身分證、便條紙改成奶茶暖棕色系。存的顏色碼不變（睡窩圖、舊資料都靠它），只有畫出來時換成新顏色
 const CC_SHOW={'#ff9a6b':'#e3ad7e','#f48fb1':'#dfa39d','#64b5f6':'#a7bccb','#5fbf95':'#b0c49a','#9b8cff':'#bcadd4','#b98d62':'#b38b6a'},ccShow=c=>CC_SHOW[String(c||'').toLowerCase()]||c;
+// v3.02：佈告欄上的便條用島主做的便條紙圖（膠帶、花、圖釘、肉球、星星）
+const NOTE_IMG={'#ffe98a':0,'#ffc7d4':1,'#bfe3ff':2,'#c9f0c0':3,'#ffd6a8':4},noteBg=c=>{const i=NOTE_IMG[String(c||'').toLowerCase()];return i==null?`background:${ncShow(c)}`:`background:url(assets/note_${i}.webp) center/100% 100% no-repeat`};
 const NC_SHOW={'#ffe98a':'#f5e6c4','#ffc7d4':'#f1d3c9','#bfe3ff':'#d8e2e6','#c9f0c0':'#dde6cc','#ffd6a8':'#efd8bb'},ncShow=c=>NC_SHOW[String(c||'').toLowerCase()]||c;
 const NOTE_COLORS=['#ffe98a','#ffc7d4','#bfe3ff','#c9f0c0','#ffd6a8'];
 const MED_TYPES=['看診','疫苗','驅蟲','健檢','手術','用藥','其他'];
@@ -2528,8 +2531,8 @@ function renderBoard(){if(home&&FT.hid!==home.id){FT.hid=home.id;FT.fold=false}f
   const b=$('#board');Object.assign(b.style,hp(B[0]+ins,B[1]+ins),{width:((B[2]-B[0]-2*ins)/RW*100)+'%',height:((B[3]-B[1]-2*ins)/RH*100)+'%'});
   b.classList.toggle('wantb',isShopH(h));$('#addnote').style.display=isShopH(h)?'none':'';if(isShopH(h)){$('#notebook').style.display='none';return wantBoard(b,h)}
   const all=DB.notes.filter(n=>n.houseId===home.id).sort((a,c)=>a.createdAt-c.createdAt),list=all.slice(-6);b.style.gridTemplateRows=list.length<=3?'repeat(1,minmax(0,1fr))':'';b.classList.toggle('one',list.length<=3);   // v2.83：3 張以下排一排，便條不會被壓扁
-  b.innerHTML=list.map((n,i)=>{const rc=(n.replies||[]).length;return n.hidden?`<button class="note fold" data-id="${n.id}" style="background:${ncShow(n.color)};transform:rotate(${[-4,3,-2,5,-3,2][i%6]}deg)"><span>🔒<br>秘密便條</span><small>— ${esc(n.by)}</small></button>`
-    :`<button class="note" data-id="${n.id}" style="background:${ncShow(n.color)};transform:rotate(${[-4,3,-2,5,-3,2][i%6]}deg)">
+  b.innerHTML=list.map((n,i)=>{const rc=(n.replies||[]).length;return n.hidden?`<button class="note fold nimg" data-id="${n.id}" style="${noteBg(n.color)};transform:rotate(${[-4,3,-2,5,-3,2][i%6]}deg)"><span>🔒<br>秘密便條</span><small>— ${esc(n.by)}</small></button>`
+    :`<button class="note nimg" data-id="${n.id}" style="${noteBg(n.color)};transform:rotate(${[-4,3,-2,5,-3,2][i%6]}deg)">
     <span>${n.secret?'🔒':''}${esc([...n.text].slice(0,12).join(''))}${[...n.text].length>12?'…':''}</span><small>${rc?`💬${rc} `:''}— ${esc(n.by)}</small></button>`}).join('')
     +(list.length?'':`<button class="note empty" id="boardadd" aria-label="貼便利貼">＋</button>`);
   b.querySelectorAll('.note[data-id]').forEach(el=>el.onclick=()=>noteView(el.dataset.id));
@@ -6732,7 +6735,7 @@ function announceLetters(){if(!DB.me)return;let seen=[];try{seen=JSON.parse(loca
     sfx('gift');$('#lgopen').onclick=()=>openLetter(nw[0].id,()=>$('#bell').click())};
   setTimeout(go,1800)}
 // ================= 自動更新：發現新版本就重新載入 =================
-const APP_VER='v3.00';
+const APP_VER='v3.02';
 function checkUpdate(){
   if(!/^https?:/.test(location.protocol)||!API_URL)return;
   if(!$('#modal').classList.contains('hidden'))return; // 正在填表單時不打斷
