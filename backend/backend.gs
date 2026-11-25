@@ -1,6 +1,6 @@
 /*
  * 毛很多 babypets 後端・整理版 v74
- * v74：🎨 訂製裝潢一次 🪙1000（以前申請的照當時付的退）
+ * v74：🎨 訂製裝潢一次 🪙1000（以前申請的照當時付的退）；申請分三種（kind：b 通用佈告欄版／w 二樓空牆版／d 二樓裝潢設計版），完成時一起存佈告欄（層板）位置和地板線；一個家一個月一次（折扣碼也算）
  * v73：🎫 一番賞改成一抽 🪙800（現在這箱也是，之後每一箱都是）；🏷️ 毛二街高價收購公仔（shop.want：每天 3 款、🪙1200～6000，賣出一隻那款就結束）
  * v72：🏷️ 毛二街出清：二手架超過 40 樣被擠下來的貨進出清候補（clrq，最多 30），每天換一批 6 樣到出清籃（clr），價錢是二手價的 1/4，沒賣掉的隔天刪掉
  * v71：🌱 農田紀錄（farm.log：誰在什麼時候種、澆、收，最近 30 筆）；🪵 新增 13 款層板
@@ -1964,17 +1964,17 @@ const ACTIONS = {
     if (text.length < 5) throw new Error('多描述一點你想要的房間吧');
     const img = String(req.img || '');
     if (img && (img.indexOf('data:image/') !== 0 || img.length > 45000)) throw new Error('參考圖太大了，換一張試試');
-    const f2 = req.f2 ? 1 : '';
+    const kind = ['b', 'w', 'd'].indexOf(String(req.kind)) >= 0 ? String(req.kind) : (req.f2 ? 'w' : 'b'), f2 = kind === 'b' ? '' : 1;
     if (f2 && !Number(h.floor2)) throw new Error('你家還沒有二樓喔，先申請擴建吧');
     const code = String(req.code || '').trim(), free = !!code && code === String(meta_('deco').code || '我毛很多');
     if (code && !free) throw new Error('折扣碼不對喔');
-    if (!free) {   // v41：用折扣碼免費，也不限一個月一次、不限排隊
-      if (Number(h.decoAt) && now - Number(h.decoAt) < DECO_DAYS_ * DAY_) throw new Error(`你家這個月已經申請過了，${Math.ceil((Number(h.decoAt) + DECO_DAYS_ * DAY_ - now) / DAY_)} 天後可以再申請`);
+    if (Number(h.decoAt) && now - Number(h.decoAt) < DECO_DAYS_ * DAY_) throw new Error(`你家這個月已經申請過了，${Math.ceil((Number(h.decoAt) + DECO_DAYS_ * DAY_ - now) / DAY_)} 天後可以再申請`);   // v74：折扣碼也一個月一次
+    if (!free) {
       if (all_('adminmail').filter(m => m.type === 'deco' && m.st === 'wait').length >= DECO_QUEUE_) throw new Error('訂製裝潢目前排滿了，過幾天再來看看');
     }
-    const m = { id: uid_(), fromId: me.id, nick: me.nick, house: h.name, houseId: h.id, anon: '', type: 'deco', text: text, img: img, at: now, day: twDay_(), read: '', replied: '', st: 'wait', cost: free ? 0 : DECO_COST_, free: free ? 1 : '', f2: f2 };
+    const m = { id: uid_(), fromId: me.id, nick: me.nick, house: h.name, houseId: h.id, anon: '', type: 'deco', text: text, img: img, at: now, day: twDay_(), read: '', replied: '', st: 'wait', cost: free ? 0 : DECO_COST_, free: free ? 1 : '', f2: f2, kind: kind };
     put_('adminmail', m);
-    if (!free) h.decoAt = now; h.decoFree = free ? now : ''; put_('houses', h);
+    h.decoAt = now; h.decoFree = free ? now : ''; put_('houses', h);
     const admin = meta_('island').adminId;
     if (admin && admin !== me.id) notify_([admin], 'mail', `🎨 ${me.nick} 申請了${f2 ? '二樓的' : ''}訂製裝潢`);
     return { id: m.id, free: free ? 1 : 0 };
@@ -1986,7 +1986,10 @@ const ACTIONS = {
     if (!name) throw new Error('幫房間取個名字');
     if (!/^https:\/\//.test(img)) throw new Error('先上傳房間的圖');
     const roomId = 'cu' + uid_().slice(0, 8), R = meta_('rooms');
-    R.list = (Array.isArray(R.list) ? R.list : []).concat({ id: roomId, name: name, img: img.slice(0, 400), houseId: m.houseId, r: 'CU', f2: m.f2 ? 1 : '', at: Date.now() }); R.ver = (Number(R.ver) || 0) + 1; put_('meta', R);
+    const nb = v => Math.round(clampN_(v, 0, 2000)), ro = { id: roomId, name: name, img: img.slice(0, 400), houseId: m.houseId, r: 'CU', f2: m.f2 ? 1 : '', at: Date.now() };
+    if (Array.isArray(req.board) && req.board.length === 4) ro.board = req.board.map(nb);   // v74：上傳時拉好的佈告欄／層板位置
+    if (req.floor && typeof req.floor === 'object') ro.floor = { y0: nb(req.floor.y0), t: [nb((req.floor.t || [])[0]), nb((req.floor.t || [])[1])], b: [0, 848] };
+    R.list = (Array.isArray(R.list) ? R.list : []).concat(ro); R.ver = (Number(R.ver) || 0) + 1; put_('meta', R);
     const reply = String(req.reply || '').trim().slice(0, 300);
     put_('letters', { id: uid_(), to: m.fromId, title: '🎨 你訂製的房間完成了！', body: `「${name}」裝潢好了！` + (m.f2 ? '這是二樓專用的，收下之後到二樓按「🎨 背景」就能換上。' : '收下之後到「⚙️ 家」就能換上。') + (reply ? `\n\n島主說：${reply}` : ''),
       at: Date.now(), coins: 0, tickets: 0, item: '', n: 0, room: roomId, roomName: name, read: [], claimed: [], hidden: [] });

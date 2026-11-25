@@ -1000,6 +1000,7 @@ img{-webkit-user-drag:none}
 .upit img{width:100%;aspect-ratio:1;object-fit:cover;border-radius:8px;background:#f6efe2}.upit b{font-size:12px;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.upit small{font-size:10.5px;color:var(--soft)}
 .redit{position:relative;width:min(300px,100%);aspect-ratio:848/1264;margin:8px auto;background:#efe4cf;border-radius:10px;overflow:hidden;touch-action:none;user-select:none}
 .redit>img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;pointer-events:none}
+.dkinds{display:flex;flex-direction:column;gap:6px}.dkinds button{text-align:left;border:2px solid var(--line);border-radius:12px;padding:8px 12px;background:#fffaf2;display:flex;flex-direction:column;gap:2px}.dkinds button.on{border-color:var(--accent);background:#fff0e6}.dkinds button[disabled]{opacity:.5}.dkinds small{color:var(--soft);font-size:12px}
 .rebd{position:absolute;border:3px solid #ffcc33;background:rgba(255,204,51,.18);border-radius:6px;cursor:move;touch-action:none}
 .rebd span,.refl span{position:absolute;left:4px;top:2px;font-size:11px;font-weight:700;color:#7a4a00;background:rgba(255,255,255,.85);border-radius:6px;padding:0 4px;pointer-events:none;white-space:nowrap}
 .rebd .rh{position:absolute;right:-9px;bottom:-9px;width:18px;height:18px;border-radius:50%;background:#ffcc33;border:2px solid #fff;touch-action:none}
@@ -5679,49 +5680,68 @@ MAILN.deco='訂製裝潢';MAILT.deco='🎨 訂製裝潢';
 const customRoom=id=>(typeof DB!=='undefined'&&Array.isArray(DB.rooms)?DB.rooms:[]).find(r=>r.id===id);
 function decoForm(){const h=myHouse();if(!h)return toast('要有家才能申請訂製裝潢');if(!ONLINE)return toast('試做版沒有訂製裝潢');const g=DB.game,last=+h.decoAt||0,wait=last&&Date.now()-last<DECO_DAYS*864e5;let img='';
   openModal(`<h3 class="mh3"><img class="mic" src="assets/icon_deco.webp" alt="" style="width:36px;height:36px">訂製裝潢</h3>
-    ${wait?`<div class="locked" style="margin-bottom:10px">你家這個月已經申請過了，${Math.ceil((last+DECO_DAYS*864e5-Date.now())/864e5)} 天後可以再申請<br><small>有折扣碼的話，現在還是可以免費申請喔</small></div>`:''}${`
-    ${hasF2(h)?`<div class="field"><div class="flabel">要放在哪一層？</div><div class="seg" id="dfl"><button type="button" data-f="1" class="on">🏠 一樓</button><button type="button" data-f="2">🛏️ 二樓民宿</button></div><div class="hint">選二樓的話，做好的房間只能放在二樓</div></div>`:''}
+    ${wait?`<div class="locked" style="margin-bottom:10px">你家這個月已經申請過了，${Math.ceil((last+DECO_DAYS*864e5-Date.now())/864e5)} 天後可以再申請</div>`:''}${`
+    <div class="field"><div class="flabel">要哪一種？</div><div class="dkinds" id="dfl">${DECO_KINDS.map(([k,n,d])=>`<button type="button" data-f="${k}" class="${k==='b'?'on':''}" ${k!=='b'&&!hasF2(h)?'disabled':''}><b>${n}</b><small>${k!=='b'&&!hasF2(h)?'要先有二樓':d}</small></button>`).join('')}</div></div>
     <p class="lead"><b>你希望打造什麼樣的房間呢？</b><br>描述得越仔細越好！畢竟裝潢一個月只能換一次<br><small>（例如：風格／主色系／主題／氣氛⋯）</small></p>
     <textarea id="dtx" rows="7" maxlength="400" style="display:block;width:100%;box-sizing:border-box;min-height:170px;font-size:16px" placeholder="例如：想要粉紅色和奶油色的星空房間，有一扇大圓窗看得到月亮，牆上掛小燈串，氣氛溫暖安靜，像睡前的感覺"></textarea><div class="mcnt"><span id="dcn">0</span> / 400</div>
     <div class="row2"><label class="mimg"><input type="file" accept="image/*" id="dfile" hidden><span id="dimgl">📷 附一張參考圖（可以不附）</span></label></div><div id="dprev"></div>
     ${fld('dcode','折扣碼（有的話）','<input id="dcode" maxlength="20" autocomplete="off" placeholder="打對就免費許願">')}
-    <p class="lead" style="font-size:12px">一次 🪙${DECO_COST}・一個家一個月一次（用折扣碼不限）・做好的房間只屬於你家<br>申請完畢後請留意信箱 💌（如果做不出來，會全額退款）</p><div class="err" id="derr"></div>
-    <div class="row2"><button data-close>取消</button><button class="primary" id="dsend">${wait?'用折扣碼送出':`送出（🪙${DECO_COST}）`}</button></div>`}`);
-  let dfl=1;if($('#dfl'))$('#dfl').onclick=e=>{const b=e.target.closest('button');if(!b)return;dfl=+b.dataset.f;$('#dfl').querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===b))};
+    <p class="lead" style="font-size:12px">一次 🪙${DECO_COST}（折扣碼免費）・一個家一個月一次・做好的房間只屬於你家<br>申請完畢後請留意信箱 💌（如果做不出來，會全額退款）</p><div class="err" id="derr"></div>
+    <div class="row2"><button data-close>取消</button><button class="primary" id="dsend" ${wait?'disabled':''}>${`送出（🪙${DECO_COST}）`}</button></div>`}`);
+  let dfl='b';if($('#dfl'))$('#dfl').onclick=e=>{const b=e.target.closest('button');if(!b||b.disabled)return;dfl=b.dataset.f;$('#dfl').querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===b))};
   const tx=$('#dtx');$('#dcode').oninput=e=>{if(!wait)$('#dsend').textContent=e.target.value.trim()?'用折扣碼送出':`送出（🪙${DECO_COST}）`};tx.oninput=()=>$('#dcn').textContent=tx.value.length;
   $('#dfile').onchange=async e=>{const f=e.target.files[0];if(!f)return;try{img=await shrinkImg(f);$('#dprev').innerHTML=`<img class="mshot" src="${img}" alt="">`;$('#dimgl').textContent='📷 換一張'}catch(x){$('#derr').textContent='這張圖讀不進來，換一張試試'}};
   $('#dsend').onclick=async e=>{const v=tx.value.trim();if(v.length<5)return $('#derr').textContent='多描述一點你想要的房間吧';const hasCode=!!$('#dcode').value.trim();
-    if(wait&&!hasCode)return $('#derr').textContent='這個月已經申請過了，要用折扣碼才能再申請';if(!hasCode&&(g.coins||0)<DECO_COST)return $('#derr').textContent=`金幣不夠，要 🪙${DECO_COST}（有折扣碼可以免費）`;const b=e.currentTarget;b.disabled=true;b.textContent='送出中…';$('#derr').textContent='小島處理訂製比較慢，請等一下，不要關掉喔 🙏';
+    if(wait)return $('#derr').textContent='你家這個月已經申請過了';if(!hasCode&&(g.coins||0)<DECO_COST)return $('#derr').textContent=`金幣不夠，要 🪙${DECO_COST}（有折扣碼可以免費）`;const b=e.currentTarget;b.disabled=true;b.textContent='送出中…';$('#derr').textContent='小島處理訂製比較慢，請等一下，不要關掉喔 🙏';
     const code=($('#dcode')&&$('#dcode').value.trim())||'';let r;
-    try{try{r=await call('decoApply',Object.assign(cred(),{text:v,img,code,f2:dfl===2}),true)}
+    try{try{r=await call('decoApply',Object.assign(cred(),{text:v,img,code,kind:dfl,f2:dfl!=='b'}),true)}
       catch(x){if(!/太慢|連不上|忙/.test(x.message))throw x;   // v1.83：逾時不一定是失敗 → 先同步看看是不是已經送出了
         await sync(true);const hh=house(h.id);if(!(hh&&+hh.decoAt&&Date.now()-hh.decoAt<10*60000))throw x;r={free:hh.decoFree?1:0}}
-      const cost=r&&r.free?0:DECO_COST;g.coins=(g.coins||0)-cost;save();updTix&&updTix();if(cost)h.decoAt=Date.now();sfx('coin');
+      const cost=r&&r.free?0:DECO_COST;g.coins=(g.coins||0)-cost;save();updTix&&updTix();h.decoAt=Date.now();sfx('coin');
       openModal(`<div style="text-align:center"><img src="assets/icon_deco.webp" alt="" style="width:96px"><h3>申請送出了！</h3><p class="lead">島主會照你的描述幫你裝潢<br>完成後會寄信給你，請留意信箱 💌</p></div><div class="row2"><button data-close class="primary">好</button></div>`)}
     catch(x){$('#derr').textContent=x.message;b.disabled=false;b.textContent=$('#dcode').value.trim()?'用折扣碼送出':`送出（🪙${DECO_COST}）`}}}
 // ---------- 👑 島主：處理訂製申請 ----------
-// v2.97：二樓用的申請 → 牆中間留一大塊空牆放層板（不要軟木板）
-const decoPrompt=(t,f2)=>f2?`請幫我畫一張遊戲的房間背景圖：3D 黏土風、可愛粉嫩、柔和打光的室內房間，正面視角，直式 2:3。上半部是牆面，牆的正中間留一大塊乾淨的空牆（大約畫面寬度的 4 成、從畫面高度 1/4 到 3/5 左右），上面什麼都不要放（不要軟木板、層架、相框、海報、窗戶），之後要掛層板；窗戶、植物、燈和小擺設放在左右兩側。下半部是寬敞、空曠、平整的地板（之後要放家具和毛孩，地板上不要有東西）。畫面裡不要有人物、動物，也不要有任何文字。\n\n房間主人的需求：「${t}」`
-  :`請幫我畫一張遊戲的房間背景圖：3D 黏土風、可愛粉嫩、柔和打光的室內房間，正面視角，直式 2:3。上半部是牆面和窗戶等裝飾（右上方的牆留一塊可以貼便利貼的軟木板），下半部是寬敞、空曠、平整的地板（之後要放家具和毛孩，地板上不要有東西）。畫面裡不要有人物、動物，也不要有任何文字。\n\n房間主人的需求：「${t}」`;
+// v2.99：上傳訂製房時直接拉位置：黃色框＝佈告欄（一樓）／層板位置（二樓），藍線＝地板最上緣
+function posEditor(el,img,P,kind){const W=848,H=1264,lab=kind==='b'?'佈告欄（放二樓時是層板）':'層板位置';
+  el.innerHTML=`<p class="lead" style="font-size:12px;margin:8px 0 0">${kind==='d'?'這種不放層板，只要拉藍線到牆和地板交界':'拉黃色框到'+(kind==='b'?'佈告欄':'空牆')+'上（右下角圓點調大小）；藍線拉到牆和地板交界'}</p>
+    <div class="redit" id="pe"><img src="${img}" alt="">${P.board?`<div class="rebd" id="peb"><i class="rh"></i><span>${lab}</span></div>`:''}<div class="refl" id="pef"><i class="fl"></i><i class="fr"></i><span>地板從這裡開始</span></div></div>`;
+  const box=el.querySelector('#pe'),bd=el.querySelector('#peb'),fl=el.querySelector('#pef');
+  const draw=()=>{if(bd){const b=P.board;Object.assign(bd.style,{left:b[0]/W*100+'%',top:b[1]/H*100+'%',width:(b[2]-b[0])/W*100+'%',height:(b[3]-b[1])/H*100+'%'})}
+    Object.assign(fl.style,{top:P.floor.y0/H*100+'%',left:P.floor.t[0]/W*100+'%',width:(P.floor.t[1]-P.floor.t[0])/W*100+'%'})};draw();
+  const cl=(v,a,b)=>Math.round(Math.max(a,Math.min(b,v)));
+  const drag=(t,fn)=>{if(!t)return;t.onpointerdown=ev=>{ev.preventDefault();ev.stopPropagation();const r=box.getBoundingClientRect(),sx=ev.clientX,sy=ev.clientY,st=JSON.parse(JSON.stringify(P));
+    const mv=e=>{fn((e.clientX-sx)/r.width*W,(e.clientY-sy)/r.height*H,st);draw()},up=()=>{removeEventListener('pointermove',mv);removeEventListener('pointerup',up)};addEventListener('pointermove',mv);addEventListener('pointerup',up)}};
+  if(bd){drag(bd,(dx,dy,st)=>{const w=st.board[2]-st.board[0],h=st.board[3]-st.board[1],x=cl(st.board[0]+dx,0,W-w),y=cl(st.board[1]+dy,0,H-h);P.board=[x,y,x+w,y+h]});
+    drag(bd.querySelector('.rh'),(dx,dy,st)=>{P.board=[st.board[0],st.board[1],cl(st.board[2]+dx,st.board[0]+60,W),cl(st.board[3]+dy,st.board[1]+60,H)]})}
+  drag(fl,(dx,dy,st)=>{P.floor.y0=cl(st.floor.y0+dy,300,1150)});
+  drag(fl.querySelector('.fl'),(dx,dy,st)=>{P.floor.t=[cl(st.floor.t[0]+dx,0,st.floor.t[1]-120),st.floor.t[1]]});
+  drag(fl.querySelector('.fr'),(dx,dy,st)=>{P.floor.t=[st.floor.t[0],cl(st.floor.t[1]+dx,st.floor.t[0]+120,W)]})}
+// v2.99：訂製分三種（b 通用佈告欄版、w 二樓空牆版、d 二樓裝潢設計版）
+const DECO_KINDS=[['b','通用・佈告欄版','一樓二樓都能放，有佈告欄（二樓會變層板）'],['w','二樓・空牆版','只能放二樓，牆上留大片空牆，可以放比較多層板'],['d','二樓・裝潢設計版','只能放二樓，整面牆都設計好，不放層板']];
+const decoKind=m=>m.kind||(m.f2?'w':'b');
+const DECO_HEAD='請幫我畫一張遊戲的房間背景圖：3D 黏土風、可愛粉嫩、柔和打光的室內房間，正面視角，直式 2:3。',DECO_TAIL='下半部是寬敞、空曠、平整的地板（之後要放家具和毛孩，地板上不要有東西）。畫面裡不要有人物、動物，也不要有任何文字。';
+const decoPrompt=(t,k)=>{k=k===true?'w':k===false||!k?'b':k;const mid=k==='w'?'上半部是牆面，牆的正中間留一大塊乾淨的空牆（大約畫面寬度的 4 成、從畫面高度 1/4 到 3/5 左右），上面什麼都不要放（不要佈告欄、層架、相框、海報、窗戶），之後要掛層板；窗戶、植物、燈和小擺設放在左右兩側。'
+  :k==='d'?'上半部是牆面，整面牆可以盡情裝潢：窗戶、掛畫、層架、燈飾、植物都可以，不用留佈告欄或空牆。':'上半部是牆面和窗戶等裝飾，右上方的牆留一塊可以貼便利貼的軟木佈告欄（四四方方、看得清楚）。';
+  return `${DECO_HEAD}${mid}${DECO_TAIL}\n\n房間主人的需求：「${t}」`};
 function adminDecoOne(m){const st=m.st||'wait',done=st==='done',no=st==='no';let img='';
-  openModal(`<h3 class="mh3"><img class="mic" src="assets/icon_deco.webp" alt="" style="width:34px;height:34px">訂製裝潢</h3><p class="lead">${esc(m.nick)}${m.house?'・'+esc(m.house):''}・${ago(m.at)}・${m.free?'折扣碼（免費）':'已付 🪙'+(m.cost||DECO_COST)}${m.f2?'<br><b>🛏️ 二樓用</b>（做好會是二樓專用）':''}<br>${done?'<img class="mic" src="assets/icon_ok.webp" alt="">已經完成、寄出了':no?'<img class="mic" src="assets/icon_no.webp" alt="">已經退回、退款了':'⏳ 等你處理'}</p>
+  openModal(`<h3 class="mh3"><img class="mic" src="assets/icon_deco.webp" alt="" style="width:34px;height:34px">訂製裝潢</h3><p class="lead">${esc(m.nick)}${m.house?'・'+esc(m.house):''}・${ago(m.at)}・${m.free?'折扣碼（免費）':'已付 🪙'+(m.cost||DECO_COST)}<br><b>${(DECO_KINDS.find(x=>x[0]===decoKind(m))||DECO_KINDS[0])[1]}</b><br>${done?'<img class="mic" src="assets/icon_ok.webp" alt="">已經完成、寄出了':no?'<img class="mic" src="assets/icon_no.webp" alt="">已經退回、退款了':'⏳ 等你處理'}</p>
     <div class="mbody">${esc(m.text)}</div>${m.img?`<img class="mshot" src="${m.img}" alt="參考圖">`:''}
-    <div class="sec adm"><h4>🪄 生圖指令<span>貼給 AI 就好</span></h4><div class="prompt" id="dpr">${esc(decoPrompt(m.text,m.f2))}</div><div class="row2"><button id="dcp">📋 複製指令</button></div></div>
+    <div class="sec adm"><h4>🪄 生圖指令<span>貼給 AI 就好</span></h4><div class="prompt" id="dpr">${esc(decoPrompt(m.text,decoKind(m)))}</div><div class="row2"><button id="dcp">📋 複製指令</button></div></div>
     ${!done&&!no?`<div class="sec adm"><h4><img class="mic" src="assets/icon_custom.webp" alt="">上傳做好的房間</h4>
       <input id="drn" maxlength="12" placeholder="房間名字（例如：小橘的星空房）">
-      <div class="photo" style="margin-top:8px"><div class="pv" id="drp" style="aspect-ratio:848/1264;width:90px">🖼️</div><div class="info" id="dri">直的房間圖（會自動裁成 2:3）<div class="btns"><label>⬆️ 選圖<input type="file" accept="image/*" id="drf" hidden></label></div></div></div>
+      <div class="photo" style="margin-top:8px"><div class="pv" id="drp" style="aspect-ratio:848/1264;width:90px">🖼️</div><div class="info" id="dri">直的房間圖（會自動裁成 2:3）<div class="btns"><label>⬆️ 選圖<input type="file" accept="image/*" id="drf" hidden></label></div></div></div><div id="drpos"></div>
       <textarea id="drr" rows="2" maxlength="300" style="display:block;width:100%;box-sizing:border-box" placeholder="想跟他說的話（選填）"></textarea><div class="err" id="drerr"></div>
       <div class="row2"><button class="primary" id="drok"><img class="mic" src="assets/icon_ok.webp" alt="">完成並寄給他</button></div>
       <div class="row2"><button id="drno"><img class="mic" src="assets/icon_no.webp" alt="">做不出來，退回並退款</button></div></div>`:''}
     <div class="row2"><button id="amb2">← 島民來信</button></div>`);
   $('#amb2').onclick=adminMailSheet;
-  $('#dcp').onclick=async()=>{try{await navigator.clipboard.writeText(decoPrompt(m.text,m.f2));toast('指令已複製 📋')}catch(e){const r=document.createRange();r.selectNodeContents($('#dpr'));const s=getSelection();s.removeAllRanges();s.addRange(r);toast('已幫你選取，長按複製')}};
+  $('#dcp').onclick=async()=>{try{await navigator.clipboard.writeText(decoPrompt(m.text,decoKind(m)));toast('指令已複製 📋')}catch(e){const r=document.createRange();r.selectNodeContents($('#dpr'));const s=getSelection();s.removeAllRanges();s.addRange(r);toast('已幫你選取，長按複製')}};
   if(done||no)return;
-  $('#drf').onchange=async e=>{const f=e.target.files[0];if(!f)return;$('#dri').firstChild.textContent='處理中…';try{img=await roomCrop(f);$('#drp').innerHTML=`<img src="${img}" alt="" style="width:100%;height:100%;object-fit:cover">`;$('#dri').firstChild.textContent='✅ 裁好了（848×1264）'}catch(x){$('#dri').firstChild.textContent='這張圖讀不了，換一張'}};
+  const dk=decoKind(m),POS={board:dk==='w'?[254,330,594,700]:dk==='b'?[470,240,780,440]:null,floor:{y0:760,t:[120,730]}};
+  $('#drf').onchange=async e=>{const f=e.target.files[0];if(!f)return;$('#dri').firstChild.textContent='處理中…';try{img=await roomCrop(f);$('#drp').innerHTML=`<img src="${img}" alt="" style="width:100%;height:100%;object-fit:cover">`;$('#dri').firstChild.textContent='✅ 裁好了（848×1264）';posEditor($('#drpos'),img,POS,dk)}catch(x){$('#dri').firstChild.textContent='這張圖讀不了，換一張'}};
   $('#drok').onclick=async e=>{const name=$('#drn').value.trim();if(!name)return $('#drerr').textContent='幫房間取個名字';if(!img)return $('#drerr').textContent='先選房間的圖';const b=e.currentTarget;b.disabled=true;
     try{b.textContent='上傳圖片中…';const up=await call('upload',Object.assign(cred(),{dataUrl:img}),true);b.textContent='寄信中…';
-      const r=await adminCall('adminDecoFinish',{id:m.id,name,img:up.url,reply:$('#drr').value.trim()});const nr={id:r.roomId,name,img:up.url,houseId:m.houseId,r:'CU',f2:m.f2?1:''};(DB.rooms=DB.rooms||[]).push(nr);m.st='done';toast('完成了！已經寄信給他 🎨');
-      if(m.f2){nr.board=[254,330,594,700];setTimeout(()=>{roomEditor(nr);toast('把黃色框拉到空牆上，就是放層板的地方，拉好按儲存')},400)}else adminDecoOne(m)}
+      const r=await adminCall('adminDecoFinish',{id:m.id,name,img:up.url,reply:$('#drr').value.trim(),board:POS.board||undefined,floor:POS.floor});const nr={id:r.roomId,name,img:up.url,houseId:m.houseId,r:'CU',f2:m.f2?1:'',floor:Object.assign({b:[0,848]},POS.floor)};if(POS.board)nr.board=POS.board;(DB.rooms=DB.rooms||[]).push(nr);applyRooms();m.st='done';toast('完成了！已經寄信給他 🎨');adminDecoOne(m)}
     catch(x){$('#drerr').textContent=x.message;b.disabled=false;b.innerHTML='<img class="mic" src="assets/icon_ok.webp" alt="">完成並寄給他'}};
   $('#drno').onclick=async e=>{if(!armBtn(e.currentTarget,'確定退回並退款？'))return;try{await adminCall('adminDecoRefund',{id:m.id,reply:$('#drr').value.trim()});m.st='no';toast('退回了，已經寄信退款');adminDecoOne(m)}catch(x){$('#drerr').textContent=x.message}}}
 // 房間圖：裁成 848×1264、壓成 jpg（上傳雲端用）
@@ -6709,7 +6729,7 @@ function announceLetters(){if(!DB.me)return;let seen=[];try{seen=JSON.parse(loca
     sfx('gift');$('#lgopen').onclick=()=>openLetter(nw[0].id,()=>$('#bell').click())};
   setTimeout(go,1800)}
 // ================= 自動更新：發現新版本就重新載入 =================
-const APP_VER='v2.98';
+const APP_VER='v2.99';
 function checkUpdate(){
   if(!/^https?:/.test(location.protocol)||!API_URL)return;
   if(!$('#modal').classList.contains('hidden'))return; // 正在填表單時不打斷
