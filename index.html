@@ -1507,7 +1507,7 @@ async function sync(quiet){
   try{const t0=Date.now(),d=await api('getState',Object.assign(cred(),{where:curWhere()}));if(+d.now){const o=+d.now-(t0+Date.now())/2;T_OFF=Math.abs(o)<5000?0:o}
     Object.assign(DB,{houses:d.houses,pets:d.pets,weights:d.weights,medical:d.medical,expenses:d.expenses,notes:d.notes,feed:d.feed,famOk:d.famOk,players:d.players||[],tlogs:d.tlogs||[]});
     DB.houses.forEach(h=>{if(!Array.isArray(h.poops))h.poops=[]});
-    keepPending();DB.letters=(d.letters||[]).filter(l=>!LGONE[l.id]).map(l=>Object.assign(l,LSTATE[l.id]||{},CLAIMED['l:'+l.id]?{claimed:true}:{}));DB.drops=(d.drops||[]).filter(x=>!PICKED.has(x.id));DB.notice=d.notice&&d.notice.t&&!(+d.notice.until&&Date.now()>+d.notice.until)?d.notice:null;DB.center=d.center||DB.center||null;DB.applies=d.applies||[];DB.rooms=d.rooms||DB.rooms||[];if(Array.isArray(d.bbx)){DB.bbx=d.bbx;bbRegister()}applyRooms();DB.amail=+d.amail||0;setTimeout(updAdminBadge,0);DB.kuji=d.kuji||DB.kuji||null;DB.online=d.online||[];setTimeout(checkAdminGifts,600);DB.rank=d.rank||DB.rank||null;osLogin();pushCheckLater();setTimeout(noticePop,1200);DB.dbl=d.dbl||'';DB.adminId=d.adminId||'';DB.star=d.star||null;DB.xmas=d.xmas||null;DB.trades=Array.isArray(d.trades)?d.trades:(DB.trades||[]);if(typeof xcSync==='function')setTimeout(xcSync,0);if(typeof bgmSync==='function')setTimeout(bgmSync,0);DB.jobs=d.jobs||null;DB.thief=d.thief||null;setTimeout(jobPayCheck,1500);if(d.player){DB.starDone=+d.player.starDone||0;DB.xmasDone=+d.player.xmasDone||0}   // v2.29：後端找不到玩家（無痕、資料被換掉）時不要整個卡住
+    keepPending();DB.letters=(d.letters||[]).filter(l=>!LGONE[l.id]).map(l=>Object.assign(l,LSTATE[l.id]||{},CLAIMED['l:'+l.id]?{claimed:true}:{}));DB.drops=(d.drops||[]).filter(x=>!PICKED.has(x.id));DB.notice=d.notice&&d.notice.t&&!(+d.notice.until&&Date.now()>+d.notice.until)?d.notice:null;DB.center=d.center||DB.center||null;DB.applies=d.applies||[];DB.rooms=d.rooms||DB.rooms||[];if(d.roompos)applyRoomPos(d.roompos);if(Array.isArray(d.bbx)){DB.bbx=d.bbx;bbRegister()}applyRooms();DB.amail=+d.amail||0;setTimeout(updAdminBadge,0);DB.kuji=d.kuji||DB.kuji||null;DB.online=d.online||[];setTimeout(checkAdminGifts,600);DB.rank=d.rank||DB.rank||null;osLogin();pushCheckLater();setTimeout(noticePop,1200);DB.dbl=d.dbl||'';DB.adminId=d.adminId||'';DB.star=d.star||null;DB.xmas=d.xmas||null;DB.trades=Array.isArray(d.trades)?d.trades:(DB.trades||[]);if(typeof xcSync==='function')setTimeout(xcSync,0);if(typeof bgmSync==='function')setTimeout(bgmSync,0);DB.jobs=d.jobs||null;DB.thief=d.thief||null;setTimeout(jobPayCheck,1500);if(d.player){DB.starDone=+d.player.starDone||0;DB.xmasDone=+d.player.xmasDone||0}   // v2.29：後端找不到玩家（無痕、資料被換掉）時不要整個卡住
     if(!d.player&&DB.me&&DB.me.houseId&&!d.houses.some(h=>h.id===DB.me.houseId))DB.me.houseId=null;   // 家不在島上了 → 可以重新蓋／加入
     setTimeout(announceLetters,0);setTimeout(updGuestBar,0);setTimeout(notePop,500);
     if(d.player&&DB.me){DB.me.code=d.player.code||DB.me.code;if(d.player.pin)DB.me.pin=d.player.pin;const ml=Array.isArray(d.player.mail)?d.player.mail:[];if(ml.length)claimMail(ml)}
@@ -1911,7 +1911,7 @@ function adminUploadSec(d){
   const th=(src,lab,sub,attr)=>`<button class="upit" ${attr}><img src="${src}" alt="" loading="lazy"><b>${esc(lab)}</b><small>${sub}</small></button>`;
   return `<div class="sec adm"><h4>🖼️ 背景（房間）<span>${R.length} 張</span></h4>
     <p class="lead">建議尺寸 848×1264（直式），會自動裁切。上傳後可以拉框設定軟木板和地板範圍</p>
-    <div class="row2"><button id="aurm">＋ 上傳新背景</button></div>
+    <div class="row2"><button id="aurm">＋ 上傳新背景</button><button id="arpos">📐 調整內建背景</button></div>
     <div class="upgrid">${R.map(r=>th(r.img,r.name,(ROOM_TN[r.r||'CU']||'訂製款')+(r.f2?'・2F':'')+(r.off?'・已下架':''),`data-urm="${r.id}"`)).join('')||'<p class="lead">還沒有自己上傳的背景</p>'}</div></div>
   <div class="sec adm"><h4>🏠 房子款式<span>${(C.styles||[]).length} 款</span></h4>
     <p class="lead">建議尺寸 512×512，綠底會自動去背；只要傳白天的，清晨、日落、夜晚會自動調色</p>
@@ -1928,7 +1928,7 @@ function adminUploadSec(d){
   <div class="sec adm"><h4>🎨 訂製款折扣碼</h4><p class="lead">島民申請訂製裝潢時打這組碼就免費，不限次數</p>
     <div class="row2"><input id="adcode" maxlength="20" value="${esc(d.decoCode||'我毛很多')}"><button id="adcodeb">儲存</button></div></div>`}
 function adminUploadBind(d){
-  $('#aurm').onclick=()=>roomEditor(null);$('#aust').onclick=()=>styleEditor(null);$('#auit').onclick=()=>itemEditor(null);
+  $('#aurm').onclick=()=>roomEditor(null);$('#arpos').onclick=roomPosPick;$('#aust').onclick=()=>styleEditor(null);$('#auit').onclick=()=>itemEditor(null);
   $('#aubb').onclick=()=>bbEditor(null);document.querySelectorAll('[data-ubb]').forEach(b=>b.onclick=()=>bbEditor(+b.dataset.ubb));
   document.querySelectorAll('[data-urm]').forEach(b=>b.onclick=()=>roomEditor((DB.rooms||[]).find(r=>r.id===b.dataset.urm)));
   document.querySelectorAll('[data-ust]').forEach(b=>b.onclick=()=>styleEditor((CAT.styles||[]).find(x=>String(x.n)===b.dataset.ust)));
@@ -3419,6 +3419,23 @@ function shopSheet(tab){
 // 🎰 一番賞獎品清單（新增背景時改這裡就好，後端會跟著用）：A 賞至少 1 間、B 至少 2、C 至少 3、D 至少 4
 // v1.83：島主上傳的背景（DB.rooms）：N／R／SSR 跟一般房間一樣（可抽卡、進一番賞）；LTD 限定款＝H（只進一番賞 A 賞）；CU 訂製款＝C（只給那一家）
 const KUJI_TIER={LTD:'A',SSR:'B',R:'C',N:'D'};
+// v3.04：島主在後台調整過的內建背景位置（佈告欄／層板框、地板線）
+const RP0={};function applyRoomPos(P){if(!P||typeof P!=='object')return;Object.keys(P).forEach(id=>{const o=P[id]||{};if(!RP0[id])RP0[id]={b:BOARDS[id]?BOARDS[id].slice():null,f:RFLOOR[id]?JSON.parse(JSON.stringify(RFLOOR[id])):null};
+  if(o.board)BOARDS[id]=o.board;if(o.floor&&o.floor.t)RFLOOR[id]=Object.assign({},RFLOOR[id]||{},{y0:o.floor.y0,t:o.floor.t,b:(RFLOOR[id]&&RFLOOR[id].b)||[0,848]})});DB.roompos=P}
+function builtinRooms(){const S=new Set(['basic1','basic2','basic3','shop2'].concat(typeof CARDS!=='undefined'?CARDS.map(c=>c.id):[]).concat(typeof F2SHOP!=='undefined'?F2SHOP.map(x=>x.id):[]));
+  return [...S].filter(id=>!(typeof customRoom==='function'&&customRoom(id))).map(id=>({id,n:(typeof F2SHOP!=='undefined'&&(F2SHOP.find(x=>x.id===id)||{}).n)||(ROOMS.find(r=>r[0]===id)||[])[1]||(id==='shop2'?'毛二街':cardById(id).name),img:roomImg(id),f2:/^f2shop_/.test(id)}))}
+function roomPosPick(){const L=builtinRooms(),P=DB.roompos||{};
+  openModal(`<h3>📐 調整內建背景</h3><p class="lead" style="font-size:12px">點一張背景，拉黃色框（${'佈告欄／二樓是層板'}）和藍線（地板最上緣，玩具能放的範圍）</p>
+    <div class="upgrid">${L.map(r=>`<button class="upit" data-rp="${r.id}"><img src="${r.img}" alt="" loading="lazy"><b>${esc(r.n)}</b><small>${r.f2?'二樓':'一樓'}${P[r.id]?'・調過':''}</small></button>`).join('')}</div><div class="row2"><button id="rpback">← 後台</button></div>`);
+  $('#rpback').onclick=adminSheet;$('#sheet').querySelectorAll('[data-rp]').forEach(b=>b.onclick=()=>roomPosEdit(L.find(r=>r.id===b.dataset.rp)))}
+function roomPosEdit(r){const G=roomGrid(r.id),B=BOARDS[r.id],has=!!B||!r.f2||true,POS={board:(B||[470,240,780,440]).slice(),floor:{y0:G.y0,t:G.t.slice()}};
+  openModal(`<h3>📐 ${esc(r.n)}</h3><div id="rpe"></div><div class="err" id="rperr"></div>
+    <div class="row2"><button id="rpcan">← 背景列表</button><button class="primary" id="rpok">儲存</button></div>${(DB.roompos||{})[r.id]?'<div class="row2"><button id="rpreset">恢復原本的位置</button></div>':''}`);
+  posEditor($('#rpe'),r.img,POS,r.f2?'w':'b');$('#rpcan').onclick=roomPosPick;
+  const save=async(reset)=>{try{const res=await adminCall('adminRoomPos',{room:r.id,board:POS.board,floor:POS.floor,reset:reset?1:0});
+      if(reset&&RP0[r.id]){if(RP0[r.id].b)BOARDS[r.id]=RP0[r.id].b;else delete BOARDS[r.id];if(RP0[r.id].f)RFLOOR[r.id]=RP0[r.id].f;else delete RFLOOR[r.id]}
+      applyRoomPos(res.pos);toast(reset?'恢復原本的位置了':'存好了，大家重新整理就會看到');if(home)openHome(home.id,true);roomPosPick()}catch(e){$('#rperr').textContent=e.message}};
+  $('#rpok').onclick=()=>save(0);if($('#rpreset'))$('#rpreset').onclick=()=>save(1)}
 function applyRooms(){(DB.rooms||[]).forEach(r=>{const t=r.r||'CU';if(Array.isArray(r.board))BOARDS[r.id]=r.board;if(r.floor&&r.floor.t)RFLOOR[r.id]=Object.assign({b:[0,848]},r.floor);
   Object.keys(KUJI_POOL).forEach(k=>{const i=KUJI_POOL[k].indexOf(r.id);if(i>=0)KUJI_POOL[k].splice(i,1)});
   if(t==='CU'||t==='SH')return;let c=CARDS.find(x=>x.id===r.id);if(!c){c={id:r.id};CARDS.push(c)}Object.assign(c,{name:r.name,r:t==='LTD'?'H':t,img:r.img,off:!!r.off,custom:1});
@@ -4372,7 +4389,7 @@ function centerMenu(s){openModal(`<div class="mqd"><img src="${esc(s.img2||s.img
   <div class="cmenu"><button id="cm1">${mic('mail',30)}<span><b>寫信給島主</b><small>回報問題、建議、許願</small></span></button>
     <button id="cm2"><img class="mic" src="assets/icon_renew.webp" alt=""><span><b>申請都更・外牆整修</b><small>換房子的外觀（Lv${RENEW_LV}・🪙${RENEW_COST}・一個月一次）</small></span></button>
     <button id="cm3"><img class="mic" src="assets/icon_expand.webp" alt=""><span><b>申請擴建</b><small>二樓民宿、農田（Lv${EXP_LV}・🪙${EXP_COST}）</small></span></button>
-    <button id="cm5"><img class="mic" src="assets/icon_deco.webp" alt=""><span><b>訂製裝潢</b><small>照你的描述做一間專屬房間（🪙500・一個月一次）</small></span></button>
+    <button id="cm5"><img class="mic" src="assets/icon_deco.webp" alt=""><span><b>訂製裝潢</b><small>照你的描述做一間專屬房間（🪙${DECO_COST}・一個月一次）</small></span></button>
     <button id="cm6"><span class="mic">📖</span><span><b>新手說明</b><small>這座島可以玩什麼？</small></span></button>
     <button id="cm4"><span class="mic">📌</span><span><b>看公告</b><small>${DB.notice&&DB.notice.t?'島主有新公告喔':'目前沒有公告'}</small></span></button></div>
   <div class="row2"><button data-close>掰掰</button></div>`);
@@ -4424,7 +4441,7 @@ setInterval(()=>{const n=DB.notice;if(n&&+n.until&&Date.now()>+n.until){DB.notic
 const EXP_COST=1000,EXP_LV=7,INN_CAP_H=12,FARM_N0=4,FARM_MAX=6,FARM_GROW_H=8,FARM_WMAX=3,PLOT_COST=500;
 const EXPN={floor2:'二樓民宿',farm:'農田',show:'展示間',renew:'都更・外牆整修'};
 const expCostOf=k=>k==='show'?SHOW_COST:k==='renew'?RENEW_COST:EXP_COST;
-const RENEW_COST=300,RENEW_LV=7,RENEW_DAYS=30;
+const RENEW_COST=500,RENEW_LV=7,RENEW_DAYS=30;
 const CROP={tomato:{n:'小番茄',seed:'seed_tomato',item:'c_tomato'},pumpkin:{n:'南瓜',seed:'seed_pumpkin',item:'c_pumpkin'},apple:{n:'金蘋果',seed:'seed_apple',item:'c_apple'}};
 Object.assign(ITEMS,{
   seed_tomato:{name:'小番茄種子',emo:'🌱',kind:'seed',price:30,crop:'tomato'},     // v2.22：利潤 +50（長得快）
@@ -5970,187 +5987,187 @@ Object.assign(ITEMS,{e_micro:{name:'微波爐',emo:'🏠',kind:'toy',price:120,s
 {const OC={ball:'toy',yarn:'toy',wand:'toy',bone:'toy',fishdoll:'toy',duck:'toy',t_snake:'toy',t_trike:'toy',t_axolotl:'toy',t_shark:'toy',t_penguin:'toy',t_duck:'toy',t_astro:'toy',t_ufo:'toy',rainbow:'toy',teddy:'toy',tumbler:'toy',rings:'toy',squeaky:'toy',n_fishrope:'toy',n_dogplush:'toy',n_spikyball:'toy',n_puzzleball:'toy',n_teether:'toy',n_frisbee:'toy',n_mouse:'toy',n_balltower:'toy',n_ringrope:'toy',n_feeder:'toy',n_springstar:'toy',n_bonepillow:'toy',n_ropeknot:'toy',n_catpillow:'toy',rainbowball:'toy',piggy:'toy',train:'toy',t_skate:'toy',unicorn:'toy',gacha:'toy',box:'pet',cushion:'pet',t_cattent:'pet',t_fishbed:'pet',t_cattower:'pet',t_catsofa:'pet',t_swing:'pet',fountain:'pet',cattree:'pet',scratch:'pet',blanket:'pet',n_bowl:'pet',n_catbed:'pet',n_cattree:'pet',n_carrier:'pet',n_treatjar:'pet',n_litter:'pet',n_spacepack:'pet',n_cavebed:'pet',n_groom:'pet',n_tunnel:'pet',dinerbowl:'pet',t_fishdisp:'pet',crown:'pet',castle:'pet',t_backpack:'pet',t_fridge:'appl',t_claw:'appl',t_arcade:'appl',t_cattv:'appl',t_record:'appl',t_dj:'appl',t_pc:'appl',t_fan:'appl',robot:'appl',bubble:'appl',purifier:'appl',dehumid:'appl',n_humid:'appl',record:'appl',heater:'appl',fan:'appl',t_polaroid:'appl',t_suitcase:'furn',sofa:'furn',n_bonecab:'furn',n_armchair:'furn',n_bookshelf:'furn',clock:'furn',coatrack:'furn',cocoa:'furn',piano:'furn',plantshelf:'furn',slide:'furn',teepee:'furn',t_teepee:'furn',swing:'furn',t_vinyls:'furn',t_cart:'furn',t_lamp:'deco',t_globe:'deco',t_bookcat:'deco',t_scope:'deco',starlamp:'deco',xmastree:'deco',crystal:'deco',n_pawlamp:'deco',n_lava:'deco',n_diffuser:'deco',n_memoboard:'deco',globe:'deco',mushlamp:'deco',monstera:'deco',yarnbasket:'deco',pumpkin:'deco',fishbowl:'deco',books:'deco',balloons:'deco',balloonair:'deco',trash:'deco'};for(const k in OC)if(ITEMS[k]&&!ITEMS[k].cat)ITEMS[k].cat=OC[k]}
 // v2.75：民宿用品 4 個色系（奶茶 m_、黑森林 k_、薰衣草 v_、繽紛 r_），綠幕照輪廓去背
 Object.assign(ITEMS,{
-  m_bed:{name:'奶茶貓耳小床',emo:'🏠',kind:'toy',price:180,sz:1.7,cat:'innm',nw:1},
-  m_nlamp:{name:'奶茶床頭燈',emo:'🏠',kind:'toy',price:80,sz:1.1,cat:'innm',nw:1},
-  m_sink:{name:'奶茶洗手台',emo:'🏠',kind:'toy',price:150,sz:1.5,cat:'innm',nw:1},
-  m_vanity:{name:'奶茶化妝台',emo:'🏠',kind:'toy',price:150,sz:1.5,cat:'innm',nw:1},
-  m_closet:{name:'奶茶衣櫃',emo:'🏠',kind:'toy',price:180,sz:1.7,cat:'innm',nw:1},
-  m_robe:{name:'奶茶浴袍吊架',emo:'🏠',kind:'toy',price:120,sz:1.5,cat:'innm',nw:1},
-  m_tcart:{name:'奶茶毛巾推車',emo:'🏠',kind:'toy',price:110,sz:1.3,cat:'innm',nw:1},
-  m_towels:{name:'奶茶毛巾堆',emo:'🏠',kind:'toy',price:50,sz:1.0,cat:'innm',nw:1},
-  m_tbskt:{name:'奶茶毛巾籃',emo:'🏠',kind:'toy',price:60,sz:1.0,cat:'innm',nw:1},
-  m_aroma:{name:'奶茶香氛蠟燭組',emo:'🏠',kind:'toy',price:60,sz:0.9,cat:'innm',nw:1},
-  m_shampoo:{name:'奶茶沐浴乳組',emo:'🏠',kind:'toy',price:50,sz:0.9,cat:'innm',nw:1},
-  m_tissue:{name:'奶茶面紙盒',emo:'🏠',kind:'toy',price:30,sz:0.8,cat:'innm',nw:1},
-  m_dryer:{name:'奶茶吹風機',emo:'🏠',kind:'toy',price:60,sz:0.9,cat:'innm',nw:1},
-  m_iron:{name:'奶茶離子夾',emo:'🏠',kind:'toy',price:50,sz:0.9,cat:'innm',nw:1},
-  m_curl:{name:'奶茶電捲棒',emo:'🏠',kind:'toy',price:50,sz:0.9,cat:'innm',nw:1},
-  m_steamer:{name:'奶茶掛燙機',emo:'🏠',kind:'toy',price:90,sz:1.2,cat:'innm',nw:1},
-  m_kettle:{name:'奶茶快煮壺',emo:'🏠',kind:'toy',price:70,sz:1.0,cat:'innm',nw:1},
-  m_coffee:{name:'奶茶咖啡機',emo:'🏠',kind:'toy',price:100,sz:1.1,cat:'innm',nw:1},
-  m_micro:{name:'奶茶微波爐',emo:'🏠',kind:'toy',price:110,sz:1.2,cat:'innm',nw:1},
-  m_fryer:{name:'奶茶氣炸鍋',emo:'🏠',kind:'toy',price:100,sz:1.1,cat:'innm',nw:1},
-  m_rice:{name:'奶茶電子鍋',emo:'🏠',kind:'toy',price:90,sz:1.0,cat:'innm',nw:1},
-  m_fridge:{name:'奶茶冰箱',emo:'🏠',kind:'toy',price:160,sz:1.6,cat:'innm',nw:1},
-  m_washer:{name:'奶茶洗衣機',emo:'🏠',kind:'toy',price:150,sz:1.5,cat:'innm',nw:1},
-  m_vacuum:{name:'奶茶吸塵器',emo:'🏠',kind:'toy',price:100,sz:1.2,cat:'innm',nw:1},
-  m_purif:{name:'奶茶空氣清淨機',emo:'🏠',kind:'toy',price:110,sz:1.2,cat:'innm',nw:1},
-  m_humid:{name:'奶茶加濕器',emo:'🏠',kind:'toy',price:80,sz:1.0,cat:'innm',nw:1},
-  m_fan:{name:'奶茶電風扇',emo:'🏠',kind:'toy',price:70,sz:1.2,cat:'innm',nw:1},
-  m_heater:{name:'奶茶電暖器',emo:'🏠',kind:'toy',price:90,sz:1.1,cat:'innm',nw:1},
-  m_thermo:{name:'奶茶溫濕度計',emo:'🏠',kind:'toy',price:50,sz:0.8,cat:'innm',nw:1},
-  m_clock:{name:'奶茶鬧鐘',emo:'🏠',kind:'toy',price:50,sz:0.8,cat:'innm',nw:1},
-  m_tub:{name:'奶茶泡澡桶',emo:'🏠',kind:'toy',price:160,sz:1.6,cat:'innm',nw:1},
-  m_bath:{name:'奶茶浴缸',emo:'🏠',kind:'toy',price:180,sz:1.7,cat:'innm',nw:1},
-  m_shower:{name:'奶茶淋浴間',emo:'🏠',kind:'toy',price:200,sz:1.8,cat:'innm',nw:1},
-  m_toilet:{name:'奶茶馬桶',emo:'🏠',kind:'toy',price:120,sz:1.3,cat:'innm',nw:1},
-  m_pawmat:{name:'奶茶肉球地墊',emo:'🏠',kind:'toy',price:60,sz:1.4,cat:'innm',nw:1,flat:true},
-  m_laundry:{name:'奶茶洗衣籃',emo:'🏠',kind:'toy',price:70,sz:1.1,cat:'innm',nw:1},
-  m_towelroll:{name:'奶茶蝴蝶結毛巾捲',emo:'🏠',kind:'toy',price:50,sz:0.9,cat:'innm',nw:1},
-  m_candle:{name:'奶茶香氛蠟燭',emo:'🏠',kind:'toy',price:40,sz:0.8,cat:'innm',nw:1},
-  m_lotion:{name:'奶茶乳液瓶',emo:'🏠',kind:'toy',price:30,sz:0.8,cat:'innm',nw:1},
-  m_spray:{name:'奶茶噴霧瓶',emo:'🏠',kind:'toy',price:30,sz:0.8,cat:'innm',nw:1},
-  m_cream:{name:'奶茶乳霜',emo:'🏠',kind:'toy',price:40,sz:0.8,cat:'innm',nw:1},
-  m_tube:{name:'奶茶護手霜',emo:'🏠',kind:'toy',price:30,sz:0.7,cat:'innm',nw:1},
-  m_serum:{name:'奶茶精華液',emo:'🏠',kind:'toy',price:40,sz:0.7,cat:'innm',nw:1},
-  m_brush:{name:'奶茶梳子',emo:'🏠',kind:'toy',price:30,sz:0.8,cat:'innm',nw:1},
-  m_comb:{name:'奶茶扁梳',emo:'🏠',kind:'toy',price:30,sz:0.8,cat:'innm',nw:1},
-  m_mirror:{name:'奶茶化妝鏡',emo:'🏠',kind:'toy',price:60,sz:0.9,cat:'innm',nw:1},
-  m_mlamp:{name:'奶茶蘑菇燈',emo:'🏠',kind:'toy',price:60,sz:0.9,cat:'innm',nw:1},
-  m_toast:{name:'奶茶烤麵包機',emo:'🏠',kind:'toy',price:80,sz:1.0,cat:'innm',nw:1},
-  m_blender:{name:'奶茶果汁機',emo:'🏠',kind:'toy',price:80,sz:1.0,cat:'innm',nw:1},
-  m_waffle:{name:'奶茶鬆餅機',emo:'🏠',kind:'toy',price:80,sz:1.0,cat:'innm',nw:1},
-  m_radio:{name:'奶茶收音機',emo:'🏠',kind:'toy',price:70,sz:0.9,cat:'innm',nw:1},
-  m_proj:{name:'奶茶投影機',emo:'🏠',kind:'toy',price:90,sz:0.9,cat:'innm',nw:1},
-  m_game:{name:'奶茶掌上遊戲機',emo:'🏠',kind:'toy',price:80,sz:0.8,cat:'innm',nw:1},
-  m_camera:{name:'奶茶拍立得',emo:'🏠',kind:'toy',price:70,sz:0.8,cat:'innm',nw:1},
-  m_globe:{name:'奶茶雪花球',emo:'🏠',kind:'toy',price:60,sz:0.8,cat:'innm',nw:1},
-  m_succ:{name:'奶茶多肉罐',emo:'🏠',kind:'toy',price:50,sz:0.8,cat:'innm',nw:1},
-  m_books:{name:'奶茶書本',emo:'🏠',kind:'toy',price:40,sz:0.9,cat:'innm',nw:1},
-  m_sbox:{name:'奶茶收納盒',emo:'🏠',kind:'toy',price:40,sz:0.9,cat:'innm',nw:1},
-  m_cat:{name:'奶茶打盹貓',emo:'🏠',kind:'toy',price:80,sz:1.0,cat:'innm',nw:1},
-  m_blanket:{name:'奶茶毛毯捲',emo:'🏠',kind:'toy',price:60,sz:1.0,cat:'innm',nw:1},
-  k_towels:{name:'黑森林毛巾堆',emo:'🏠',kind:'toy',price:50,sz:1.0,cat:'innk',nw:1},
-  k_tbskt:{name:'黑森林毛巾籃',emo:'🏠',kind:'toy',price:60,sz:1.0,cat:'innk',nw:1},
-  k_shampoo:{name:'黑森林沐浴乳組',emo:'🏠',kind:'toy',price:50,sz:0.9,cat:'innk',nw:1},
-  k_diffuser:{name:'黑森林擴香瓶',emo:'🏠',kind:'toy',price:50,sz:0.8,cat:'innk',nw:1},
-  k_candle:{name:'黑森林香氛蠟燭',emo:'🏠',kind:'toy',price:40,sz:0.8,cat:'innk',nw:1},
-  k_tissue:{name:'黑森林面紙盒',emo:'🏠',kind:'toy',price:30,sz:0.8,cat:'innk',nw:1},
-  k_serum:{name:'黑森林精華液',emo:'🏠',kind:'toy',price:40,sz:0.7,cat:'innk',nw:1},
-  k_cream:{name:'黑森林乳霜',emo:'🏠',kind:'toy',price:40,sz:0.8,cat:'innk',nw:1},
-  k_tube:{name:'黑森林護手霜',emo:'🏠',kind:'toy',price:30,sz:0.7,cat:'innk',nw:1},
-  k_perfume:{name:'黑森林香水',emo:'🏠',kind:'toy',price:60,sz:0.8,cat:'innk',nw:1},
-  k_spray:{name:'黑森林噴霧瓶',emo:'🏠',kind:'toy',price:30,sz:0.8,cat:'innk',nw:1},
-  k_dryer:{name:'黑森林吹風機',emo:'🏠',kind:'toy',price:60,sz:0.9,cat:'innk',nw:1},
-  k_iron:{name:'黑森林離子夾',emo:'🏠',kind:'toy',price:50,sz:0.9,cat:'innk',nw:1},
-  k_brush:{name:'黑森林梳子',emo:'🏠',kind:'toy',price:30,sz:0.8,cat:'innk',nw:1},
-  k_comb:{name:'黑森林扁梳',emo:'🏠',kind:'toy',price:30,sz:0.8,cat:'innk',nw:1},
-  k_mirror:{name:'黑森林化妝鏡',emo:'🏠',kind:'toy',price:60,sz:0.9,cat:'innk',nw:1},
-  k_phones:{name:'黑森林耳機',emo:'🏠',kind:'toy',price:70,sz:0.9,cat:'innk',nw:1},
-  k_coffee:{name:'黑森林咖啡機',emo:'🏠',kind:'toy',price:100,sz:1.1,cat:'innk',nw:1},
-  k_kettle:{name:'黑森林手沖壺',emo:'🏠',kind:'toy',price:70,sz:0.9,cat:'innk',nw:1},
-  k_moka:{name:'黑森林摩卡壺',emo:'🏠',kind:'toy',price:60,sz:0.9,cat:'innk',nw:1},
-  k_grinder:{name:'黑森林磨豆機',emo:'🏠',kind:'toy',price:70,sz:0.9,cat:'innk',nw:1},
-  k_heater:{name:'黑森林電暖器',emo:'🏠',kind:'toy',price:90,sz:1.1,cat:'innk',nw:1},
-  k_radio:{name:'黑森林收音機',emo:'🏠',kind:'toy',price:70,sz:0.9,cat:'innk',nw:1},
-  k_clock:{name:'黑森林鬧鐘',emo:'🏠',kind:'toy',price:50,sz:0.9,cat:'innk',nw:1},
-  k_camera:{name:'黑森林相機',emo:'🏠',kind:'toy',price:80,sz:0.9,cat:'innk',nw:1},
-  k_game:{name:'黑森林掌上遊戲機',emo:'🏠',kind:'toy',price:80,sz:0.8,cat:'innk',nw:1},
-  k_speaker:{name:'黑森林喇叭',emo:'🏠',kind:'toy',price:90,sz:1.0,cat:'innk',nw:1},
-  k_fan:{name:'黑森林電風扇',emo:'🏠',kind:'toy',price:70,sz:1.1,cat:'innk',nw:1},
-  k_astro:{name:'黑森林太空貓',emo:'🏠',kind:'toy',price:80,sz:1.0,cat:'innk',nw:1},
-  k_books:{name:'黑森林書本',emo:'🏠',kind:'toy',price:40,sz:0.9,cat:'innk',nw:1},
-  k_sbox:{name:'黑森林收納盒',emo:'🏠',kind:'toy',price:40,sz:0.9,cat:'innk',nw:1},
-  k_blanket:{name:'黑森林毛毯捲',emo:'🏠',kind:'toy',price:60,sz:1.0,cat:'innk',nw:1},
-  k_jar:{name:'黑森林收納罐',emo:'🏠',kind:'toy',price:40,sz:0.8,cat:'innk',nw:1},
-  k_lantern:{name:'黑森林露營燈',emo:'🏠',kind:'toy',price:70,sz:0.9,cat:'innk',nw:1},
-  k_ufo:{name:'黑森林飛碟',emo:'🏠',kind:'toy',price:80,sz:1.0,cat:'innk',nw:1},
-  k_terra:{name:'黑森林苔蘚玻璃罩',emo:'🏠',kind:'toy',price:70,sz:0.9,cat:'innk',nw:1},
-  k_cat:{name:'黑森林打盹黑貓',emo:'🏠',kind:'toy',price:80,sz:1.0,cat:'innk',nw:1},
-  v_towels:{name:'薰衣草毛巾堆',emo:'🏠',kind:'toy',price:50,sz:1.0,cat:'innv',nw:1},
-  v_tbskt:{name:'薰衣草毛巾籃',emo:'🏠',kind:'toy',price:60,sz:1.0,cat:'innv',nw:1},
-  v_shampoo:{name:'薰衣草沐浴乳組',emo:'🏠',kind:'toy',price:50,sz:0.9,cat:'innv',nw:1},
-  v_diffuser:{name:'薰衣草擴香瓶',emo:'🏠',kind:'toy',price:50,sz:0.8,cat:'innv',nw:1},
-  v_candle:{name:'薰衣草香氛蠟燭',emo:'🏠',kind:'toy',price:40,sz:0.8,cat:'innv',nw:1},
-  v_tissue:{name:'薰衣草面紙盒',emo:'🏠',kind:'toy',price:30,sz:0.8,cat:'innv',nw:1},
-  v_serum:{name:'薰衣草精華液',emo:'🏠',kind:'toy',price:40,sz:0.7,cat:'innv',nw:1},
-  v_cream:{name:'薰衣草乳霜',emo:'🏠',kind:'toy',price:40,sz:0.8,cat:'innv',nw:1},
-  v_tube:{name:'薰衣草護手霜',emo:'🏠',kind:'toy',price:30,sz:0.7,cat:'innv',nw:1},
-  v_perfume:{name:'薰衣草香水',emo:'🏠',kind:'toy',price:60,sz:0.8,cat:'innv',nw:1},
-  v_spray:{name:'薰衣草噴霧瓶',emo:'🏠',kind:'toy',price:30,sz:0.8,cat:'innv',nw:1},
-  v_dryer:{name:'薰衣草吹風機',emo:'🏠',kind:'toy',price:60,sz:0.9,cat:'innv',nw:1},
-  v_iron:{name:'薰衣草離子夾',emo:'🏠',kind:'toy',price:50,sz:0.9,cat:'innv',nw:1},
-  v_brush:{name:'薰衣草梳子',emo:'🏠',kind:'toy',price:30,sz:0.8,cat:'innv',nw:1},
-  v_comb:{name:'薰衣草扁梳',emo:'🏠',kind:'toy',price:30,sz:0.8,cat:'innv',nw:1},
-  v_mirror:{name:'薰衣草化妝鏡',emo:'🏠',kind:'toy',price:60,sz:0.9,cat:'innv',nw:1},
-  v_phones:{name:'薰衣草耳機',emo:'🏠',kind:'toy',price:70,sz:0.9,cat:'innv',nw:1},
-  v_coffee:{name:'薰衣草咖啡機',emo:'🏠',kind:'toy',price:100,sz:1.1,cat:'innv',nw:1},
-  v_kettle:{name:'薰衣草手沖壺',emo:'🏠',kind:'toy',price:70,sz:0.9,cat:'innv',nw:1},
-  v_moka:{name:'薰衣草摩卡壺',emo:'🏠',kind:'toy',price:60,sz:0.9,cat:'innv',nw:1},
-  v_grinder:{name:'薰衣草磨豆機',emo:'🏠',kind:'toy',price:70,sz:0.9,cat:'innv',nw:1},
-  v_heater:{name:'薰衣草電暖器',emo:'🏠',kind:'toy',price:90,sz:1.1,cat:'innv',nw:1},
-  v_radio:{name:'薰衣草收音機',emo:'🏠',kind:'toy',price:70,sz:0.9,cat:'innv',nw:1},
-  v_clock:{name:'薰衣草鬧鐘',emo:'🏠',kind:'toy',price:50,sz:0.9,cat:'innv',nw:1},
-  v_camera:{name:'薰衣草相機',emo:'🏠',kind:'toy',price:80,sz:0.9,cat:'innv',nw:1},
-  v_game:{name:'薰衣草掌上遊戲機',emo:'🏠',kind:'toy',price:80,sz:0.8,cat:'innv',nw:1},
-  v_speaker:{name:'薰衣草喇叭',emo:'🏠',kind:'toy',price:90,sz:1.0,cat:'innv',nw:1},
-  v_fan:{name:'薰衣草電風扇',emo:'🏠',kind:'toy',price:70,sz:1.1,cat:'innv',nw:1},
-  v_astro:{name:'薰衣草太空貓',emo:'🏠',kind:'toy',price:80,sz:1.0,cat:'innv',nw:1},
-  v_books:{name:'薰衣草書本',emo:'🏠',kind:'toy',price:40,sz:0.9,cat:'innv',nw:1},
-  v_sbox:{name:'薰衣草收納盒',emo:'🏠',kind:'toy',price:40,sz:0.9,cat:'innv',nw:1},
-  v_blanket:{name:'薰衣草毛毯捲',emo:'🏠',kind:'toy',price:60,sz:1.0,cat:'innv',nw:1},
-  v_candy:{name:'薰衣草糖果罐',emo:'🏠',kind:'toy',price:50,sz:0.8,cat:'innv',nw:1},
-  v_lantern:{name:'薰衣草提燈',emo:'🏠',kind:'toy',price:70,sz:0.9,cat:'innv',nw:1},
-  v_globe:{name:'薰衣草雪花球',emo:'🏠',kind:'toy',price:60,sz:0.8,cat:'innv',nw:1},
-  v_terra:{name:'薰衣草蘑菇玻璃罐',emo:'🏠',kind:'toy',price:70,sz:0.9,cat:'innv',nw:1},
-  v_cat:{name:'薰衣草打盹貓',emo:'🏠',kind:'toy',price:80,sz:1.0,cat:'innv',nw:1},
-  r_towels:{name:'繽紛毛巾堆',emo:'🏠',kind:'toy',price:50,sz:1.0,cat:'innr',nw:1},
-  r_tbskt:{name:'繽紛毛巾籃',emo:'🏠',kind:'toy',price:60,sz:1.0,cat:'innr',nw:1},
-  r_lotion:{name:'繽紛乳液瓶',emo:'🏠',kind:'toy',price:30,sz:0.8,cat:'innr',nw:1},
-  r_diffuser:{name:'繽紛擴香瓶',emo:'🏠',kind:'toy',price:50,sz:0.8,cat:'innr',nw:1},
-  r_candle:{name:'繽紛香氛蠟燭',emo:'🏠',kind:'toy',price:40,sz:0.8,cat:'innr',nw:1},
-  r_tissue:{name:'繽紛面紙盒',emo:'🏠',kind:'toy',price:30,sz:0.8,cat:'innr',nw:1},
-  r_spray:{name:'繽紛噴霧瓶',emo:'🏠',kind:'toy',price:30,sz:0.8,cat:'innr',nw:1},
-  r_cream:{name:'繽紛乳霜',emo:'🏠',kind:'toy',price:40,sz:0.8,cat:'innr',nw:1},
-  r_tube:{name:'繽紛護手霜',emo:'🏠',kind:'toy',price:30,sz:0.7,cat:'innr',nw:1},
-  r_perfume:{name:'繽紛香水',emo:'🏠',kind:'toy',price:60,sz:0.8,cat:'innr',nw:1},
-  r_pump:{name:'繽紛洗手乳',emo:'🏠',kind:'toy',price:30,sz:0.8,cat:'innr',nw:1},
-  r_candy:{name:'繽紛糖果罐',emo:'🏠',kind:'toy',price:50,sz:0.8,cat:'innr',nw:1},
-  r_dryer:{name:'繽紛吹風機',emo:'🏠',kind:'toy',price:60,sz:0.9,cat:'innr',nw:1},
-  r_iron:{name:'繽紛離子夾',emo:'🏠',kind:'toy',price:50,sz:0.9,cat:'innr',nw:1},
-  r_brush:{name:'繽紛梳子',emo:'🏠',kind:'toy',price:30,sz:0.8,cat:'innr',nw:1},
-  r_comb:{name:'繽紛扁梳',emo:'🏠',kind:'toy',price:30,sz:0.8,cat:'innr',nw:1},
-  r_mirror:{name:'繽紛化妝鏡',emo:'🏠',kind:'toy',price:60,sz:0.9,cat:'innr',nw:1},
-  r_phones:{name:'繽紛耳機',emo:'🏠',kind:'toy',price:70,sz:0.9,cat:'innr',nw:1},
-  r_coffee:{name:'繽紛咖啡機',emo:'🏠',kind:'toy',price:100,sz:1.1,cat:'innr',nw:1},
-  r_kettle:{name:'繽紛茶壺',emo:'🏠',kind:'toy',price:70,sz:0.9,cat:'innr',nw:1},
-  r_moka:{name:'繽紛摩卡壺',emo:'🏠',kind:'toy',price:60,sz:0.9,cat:'innr',nw:1},
-  r_toast:{name:'繽紛烤麵包機',emo:'🏠',kind:'toy',price:80,sz:1.0,cat:'innr',nw:1},
-  r_blender:{name:'繽紛果汁機',emo:'🏠',kind:'toy',price:80,sz:1.0,cat:'innr',nw:1},
-  r_oven:{name:'繽紛小烤箱',emo:'🏠',kind:'toy',price:90,sz:1.1,cat:'innr',nw:1},
-  r_radio:{name:'繽紛收音機',emo:'🏠',kind:'toy',price:70,sz:0.9,cat:'innr',nw:1},
-  r_clock:{name:'繽紛鬧鐘',emo:'🏠',kind:'toy',price:50,sz:0.9,cat:'innr',nw:1},
-  r_camera:{name:'繽紛相機',emo:'🏠',kind:'toy',price:80,sz:0.9,cat:'innr',nw:1},
-  r_game:{name:'繽紛掌上遊戲機',emo:'🏠',kind:'toy',price:80,sz:0.8,cat:'innr',nw:1},
-  r_pawheat:{name:'繽紛肉球暖爐',emo:'🏠',kind:'toy',price:90,sz:1.0,cat:'innr',nw:1},
-  r_fan:{name:'繽紛電風扇',emo:'🏠',kind:'toy',price:70,sz:1.1,cat:'innr',nw:1},
-  r_globe:{name:'繽紛雪花球',emo:'🏠',kind:'toy',price:60,sz:0.8,cat:'innr',nw:1},
-  r_plant:{name:'繽紛貓臉盆栽',emo:'🏠',kind:'toy',price:50,sz:0.9,cat:'innr',nw:1},
-  r_books:{name:'繽紛書本',emo:'🏠',kind:'toy',price:40,sz:0.9,cat:'innr',nw:1},
-  r_sbox:{name:'繽紛收納盒',emo:'🏠',kind:'toy',price:40,sz:0.9,cat:'innr',nw:1},
-  r_cat:{name:'繽紛打盹貓',emo:'🏠',kind:'toy',price:80,sz:1.0,cat:'innr',nw:1},
-  r_blanket:{name:'繽紛毛毯捲',emo:'🏠',kind:'toy',price:60,sz:1.0,cat:'innr',nw:1},
-  r_bathset:{name:'繽紛小鴨沐浴組',emo:'🏠',kind:'toy',price:60,sz:0.9,cat:'innr',nw:1},
-  r_aclock:{name:'繽紛貓耳時鐘',emo:'🏠',kind:'toy',price:60,sz:0.9,cat:'innr',nw:1},
-  r_grinder:{name:'繽紛磨豆機',emo:'🏠',kind:'toy',price:70,sz:0.9,cat:'innr',nw:1},
-  r_drip:{name:'繽紛美式咖啡機',emo:'🏠',kind:'toy',price:90,sz:1.0,cat:'innr',nw:1},
-  r_fryer:{name:'繽紛氣炸鍋',emo:'🏠',kind:'toy',price:100,sz:1.1,cat:'innr',nw:1},
-  r_rice:{name:'繽紛電子鍋',emo:'🏠',kind:'toy',price:90,sz:1.0,cat:'innr',nw:1},
-  r_micro:{name:'繽紛微波爐',emo:'🏠',kind:'toy',price:110,sz:1.1,cat:'innr',nw:1},
-  r_tv:{name:'繽紛電視',emo:'🏠',kind:'toy',price:120,sz:1.1,cat:'innr',nw:1},
-  r_lucky:{name:'繽紛招財貓',emo:'🏠',kind:'toy',price:120,sz:1.0,cat:'innr',nw:1},
-  r_catbed:{name:'繽紛貓耳窩',emo:'🏠',kind:'toy',price:120,sz:1.4,cat:'innr',nw:1}});
-const TOY_CATS=[['all','全部'],['new','🆕 新品'],['toy','🧸 玩具'],['pet','🐾 寵物用品'],['appl','🏠 家電'],['furn','🛋️ 家具'],['deco','🌸 擺飾'],['innm','奶茶民宿'],['innk','黑森林民宿'],['innv','薰衣草民宿'],['innr','繽紛民宿']];let toyCat='all';
+  m_bed:{name:'奶茶貓耳小床',emo:'🏠',kind:'toy',price:180,sz:1.7,cat:'furn',ser:'m',nw:1},
+  m_nlamp:{name:'奶茶床頭燈',emo:'🏠',kind:'toy',price:80,sz:1.1,cat:'deco',ser:'m',nw:1},
+  m_sink:{name:'奶茶洗手台',emo:'🏠',kind:'toy',price:150,sz:1.5,cat:'furn',ser:'m',nw:1},
+  m_vanity:{name:'奶茶化妝台',emo:'🏠',kind:'toy',price:150,sz:1.5,cat:'furn',ser:'m',nw:1},
+  m_closet:{name:'奶茶衣櫃',emo:'🏠',kind:'toy',price:180,sz:1.7,cat:'furn',ser:'m',nw:1},
+  m_robe:{name:'奶茶浴袍吊架',emo:'🏠',kind:'toy',price:120,sz:1.5,cat:'furn',ser:'m',nw:1},
+  m_tcart:{name:'奶茶毛巾推車',emo:'🏠',kind:'toy',price:110,sz:1.3,cat:'furn',ser:'m',nw:1},
+  m_towels:{name:'奶茶毛巾堆',emo:'🏠',kind:'toy',price:50,sz:1.0,cat:'bath',ser:'m',nw:1},
+  m_tbskt:{name:'奶茶毛巾籃',emo:'🏠',kind:'toy',price:60,sz:1.0,cat:'bath',ser:'m',nw:1},
+  m_aroma:{name:'奶茶香氛蠟燭組',emo:'🏠',kind:'toy',price:60,sz:0.9,cat:'deco',ser:'m',nw:1},
+  m_shampoo:{name:'奶茶沐浴乳組',emo:'🏠',kind:'toy',price:50,sz:0.9,cat:'bath',ser:'m',nw:1},
+  m_tissue:{name:'奶茶面紙盒',emo:'🏠',kind:'toy',price:30,sz:0.8,cat:'bath',ser:'m',nw:1},
+  m_dryer:{name:'奶茶吹風機',emo:'🏠',kind:'toy',price:60,sz:0.9,cat:'appl',ser:'m',nw:1},
+  m_iron:{name:'奶茶離子夾',emo:'🏠',kind:'toy',price:50,sz:0.9,cat:'appl',ser:'m',nw:1},
+  m_curl:{name:'奶茶電捲棒',emo:'🏠',kind:'toy',price:50,sz:0.9,cat:'appl',ser:'m',nw:1},
+  m_steamer:{name:'奶茶掛燙機',emo:'🏠',kind:'toy',price:90,sz:1.2,cat:'appl',ser:'m',nw:1},
+  m_kettle:{name:'奶茶快煮壺',emo:'🏠',kind:'toy',price:70,sz:1.0,cat:'appl',ser:'m',nw:1},
+  m_coffee:{name:'奶茶咖啡機',emo:'🏠',kind:'toy',price:100,sz:1.1,cat:'appl',ser:'m',nw:1},
+  m_micro:{name:'奶茶微波爐',emo:'🏠',kind:'toy',price:110,sz:1.2,cat:'appl',ser:'m',nw:1},
+  m_fryer:{name:'奶茶氣炸鍋',emo:'🏠',kind:'toy',price:100,sz:1.1,cat:'appl',ser:'m',nw:1},
+  m_rice:{name:'奶茶電子鍋',emo:'🏠',kind:'toy',price:90,sz:1.0,cat:'appl',ser:'m',nw:1},
+  m_fridge:{name:'奶茶冰箱',emo:'🏠',kind:'toy',price:160,sz:1.6,cat:'appl',ser:'m',nw:1},
+  m_washer:{name:'奶茶洗衣機',emo:'🏠',kind:'toy',price:150,sz:1.5,cat:'appl',ser:'m',nw:1},
+  m_vacuum:{name:'奶茶吸塵器',emo:'🏠',kind:'toy',price:100,sz:1.2,cat:'appl',ser:'m',nw:1},
+  m_purif:{name:'奶茶空氣清淨機',emo:'🏠',kind:'toy',price:110,sz:1.2,cat:'appl',ser:'m',nw:1},
+  m_humid:{name:'奶茶加濕器',emo:'🏠',kind:'toy',price:80,sz:1.0,cat:'appl',ser:'m',nw:1},
+  m_fan:{name:'奶茶電風扇',emo:'🏠',kind:'toy',price:70,sz:1.2,cat:'appl',ser:'m',nw:1},
+  m_heater:{name:'奶茶電暖器',emo:'🏠',kind:'toy',price:90,sz:1.1,cat:'appl',ser:'m',nw:1},
+  m_thermo:{name:'奶茶溫濕度計',emo:'🏠',kind:'toy',price:50,sz:0.8,cat:'deco',ser:'m',nw:1},
+  m_clock:{name:'奶茶鬧鐘',emo:'🏠',kind:'toy',price:50,sz:0.8,cat:'deco',ser:'m',nw:1},
+  m_tub:{name:'奶茶泡澡桶',emo:'🏠',kind:'toy',price:160,sz:1.6,cat:'furn',ser:'m',nw:1},
+  m_bath:{name:'奶茶浴缸',emo:'🏠',kind:'toy',price:180,sz:1.7,cat:'furn',ser:'m',nw:1},
+  m_shower:{name:'奶茶淋浴間',emo:'🏠',kind:'toy',price:200,sz:1.8,cat:'furn',ser:'m',nw:1},
+  m_toilet:{name:'奶茶馬桶',emo:'🏠',kind:'toy',price:120,sz:1.3,cat:'furn',ser:'m',nw:1},
+  m_pawmat:{name:'奶茶肉球地墊',emo:'🏠',kind:'toy',price:60,sz:1.4,cat:'pet',ser:'m',nw:1,flat:true},
+  m_laundry:{name:'奶茶洗衣籃',emo:'🏠',kind:'toy',price:70,sz:1.1,cat:'furn',ser:'m',nw:1},
+  m_towelroll:{name:'奶茶蝴蝶結毛巾捲',emo:'🏠',kind:'toy',price:50,sz:0.9,cat:'bath',ser:'m',nw:1},
+  m_candle:{name:'奶茶香氛蠟燭',emo:'🏠',kind:'toy',price:40,sz:0.8,cat:'deco',ser:'m',nw:1},
+  m_lotion:{name:'奶茶乳液瓶',emo:'🏠',kind:'toy',price:30,sz:0.8,cat:'bath',ser:'m',nw:1},
+  m_spray:{name:'奶茶噴霧瓶',emo:'🏠',kind:'toy',price:30,sz:0.8,cat:'bath',ser:'m',nw:1},
+  m_cream:{name:'奶茶乳霜',emo:'🏠',kind:'toy',price:40,sz:0.8,cat:'bath',ser:'m',nw:1},
+  m_tube:{name:'奶茶護手霜',emo:'🏠',kind:'toy',price:30,sz:0.7,cat:'bath',ser:'m',nw:1},
+  m_serum:{name:'奶茶精華液',emo:'🏠',kind:'toy',price:40,sz:0.7,cat:'bath',ser:'m',nw:1},
+  m_brush:{name:'奶茶梳子',emo:'🏠',kind:'toy',price:30,sz:0.8,cat:'bath',ser:'m',nw:1},
+  m_comb:{name:'奶茶扁梳',emo:'🏠',kind:'toy',price:30,sz:0.8,cat:'bath',ser:'m',nw:1},
+  m_mirror:{name:'奶茶化妝鏡',emo:'🏠',kind:'toy',price:60,sz:0.9,cat:'bath',ser:'m',nw:1},
+  m_mlamp:{name:'奶茶蘑菇燈',emo:'🏠',kind:'toy',price:60,sz:0.9,cat:'deco',ser:'m',nw:1},
+  m_toast:{name:'奶茶烤麵包機',emo:'🏠',kind:'toy',price:80,sz:1.0,cat:'appl',ser:'m',nw:1},
+  m_blender:{name:'奶茶果汁機',emo:'🏠',kind:'toy',price:80,sz:1.0,cat:'appl',ser:'m',nw:1},
+  m_waffle:{name:'奶茶鬆餅機',emo:'🏠',kind:'toy',price:80,sz:1.0,cat:'appl',ser:'m',nw:1},
+  m_radio:{name:'奶茶收音機',emo:'🏠',kind:'toy',price:70,sz:0.9,cat:'appl',ser:'m',nw:1},
+  m_proj:{name:'奶茶投影機',emo:'🏠',kind:'toy',price:90,sz:0.9,cat:'appl',ser:'m',nw:1},
+  m_game:{name:'奶茶掌上遊戲機',emo:'🏠',kind:'toy',price:80,sz:0.8,cat:'appl',ser:'m',nw:1},
+  m_camera:{name:'奶茶拍立得',emo:'🏠',kind:'toy',price:70,sz:0.8,cat:'appl',ser:'m',nw:1},
+  m_globe:{name:'奶茶雪花球',emo:'🏠',kind:'toy',price:60,sz:0.8,cat:'deco',ser:'m',nw:1},
+  m_succ:{name:'奶茶多肉罐',emo:'🏠',kind:'toy',price:50,sz:0.8,cat:'deco',ser:'m',nw:1},
+  m_books:{name:'奶茶書本',emo:'🏠',kind:'toy',price:40,sz:0.9,cat:'deco',ser:'m',nw:1},
+  m_sbox:{name:'奶茶收納盒',emo:'🏠',kind:'toy',price:40,sz:0.9,cat:'deco',ser:'m',nw:1},
+  m_cat:{name:'奶茶打盹貓',emo:'🏠',kind:'toy',price:80,sz:1.0,cat:'deco',ser:'m',nw:1},
+  m_blanket:{name:'奶茶毛毯捲',emo:'🏠',kind:'toy',price:60,sz:1.0,cat:'deco',ser:'m',nw:1},
+  k_towels:{name:'黑森林毛巾堆',emo:'🏠',kind:'toy',price:50,sz:1.0,cat:'bath',ser:'k',nw:1},
+  k_tbskt:{name:'黑森林毛巾籃',emo:'🏠',kind:'toy',price:60,sz:1.0,cat:'bath',ser:'k',nw:1},
+  k_shampoo:{name:'黑森林沐浴乳組',emo:'🏠',kind:'toy',price:50,sz:0.9,cat:'bath',ser:'k',nw:1},
+  k_diffuser:{name:'黑森林擴香瓶',emo:'🏠',kind:'toy',price:50,sz:0.8,cat:'deco',ser:'k',nw:1},
+  k_candle:{name:'黑森林香氛蠟燭',emo:'🏠',kind:'toy',price:40,sz:0.8,cat:'deco',ser:'k',nw:1},
+  k_tissue:{name:'黑森林面紙盒',emo:'🏠',kind:'toy',price:30,sz:0.8,cat:'bath',ser:'k',nw:1},
+  k_serum:{name:'黑森林精華液',emo:'🏠',kind:'toy',price:40,sz:0.7,cat:'bath',ser:'k',nw:1},
+  k_cream:{name:'黑森林乳霜',emo:'🏠',kind:'toy',price:40,sz:0.8,cat:'bath',ser:'k',nw:1},
+  k_tube:{name:'黑森林護手霜',emo:'🏠',kind:'toy',price:30,sz:0.7,cat:'bath',ser:'k',nw:1},
+  k_perfume:{name:'黑森林香水',emo:'🏠',kind:'toy',price:60,sz:0.8,cat:'bath',ser:'k',nw:1},
+  k_spray:{name:'黑森林噴霧瓶',emo:'🏠',kind:'toy',price:30,sz:0.8,cat:'bath',ser:'k',nw:1},
+  k_dryer:{name:'黑森林吹風機',emo:'🏠',kind:'toy',price:60,sz:0.9,cat:'appl',ser:'k',nw:1},
+  k_iron:{name:'黑森林離子夾',emo:'🏠',kind:'toy',price:50,sz:0.9,cat:'appl',ser:'k',nw:1},
+  k_brush:{name:'黑森林梳子',emo:'🏠',kind:'toy',price:30,sz:0.8,cat:'bath',ser:'k',nw:1},
+  k_comb:{name:'黑森林扁梳',emo:'🏠',kind:'toy',price:30,sz:0.8,cat:'bath',ser:'k',nw:1},
+  k_mirror:{name:'黑森林化妝鏡',emo:'🏠',kind:'toy',price:60,sz:0.9,cat:'bath',ser:'k',nw:1},
+  k_phones:{name:'黑森林耳機',emo:'🏠',kind:'toy',price:70,sz:0.9,cat:'appl',ser:'k',nw:1},
+  k_coffee:{name:'黑森林咖啡機',emo:'🏠',kind:'toy',price:100,sz:1.1,cat:'appl',ser:'k',nw:1},
+  k_kettle:{name:'黑森林手沖壺',emo:'🏠',kind:'toy',price:70,sz:0.9,cat:'appl',ser:'k',nw:1},
+  k_moka:{name:'黑森林摩卡壺',emo:'🏠',kind:'toy',price:60,sz:0.9,cat:'appl',ser:'k',nw:1},
+  k_grinder:{name:'黑森林磨豆機',emo:'🏠',kind:'toy',price:70,sz:0.9,cat:'appl',ser:'k',nw:1},
+  k_heater:{name:'黑森林電暖器',emo:'🏠',kind:'toy',price:90,sz:1.1,cat:'appl',ser:'k',nw:1},
+  k_radio:{name:'黑森林收音機',emo:'🏠',kind:'toy',price:70,sz:0.9,cat:'appl',ser:'k',nw:1},
+  k_clock:{name:'黑森林鬧鐘',emo:'🏠',kind:'toy',price:50,sz:0.9,cat:'deco',ser:'k',nw:1},
+  k_camera:{name:'黑森林相機',emo:'🏠',kind:'toy',price:80,sz:0.9,cat:'appl',ser:'k',nw:1},
+  k_game:{name:'黑森林掌上遊戲機',emo:'🏠',kind:'toy',price:80,sz:0.8,cat:'appl',ser:'k',nw:1},
+  k_speaker:{name:'黑森林喇叭',emo:'🏠',kind:'toy',price:90,sz:1.0,cat:'appl',ser:'k',nw:1},
+  k_fan:{name:'黑森林電風扇',emo:'🏠',kind:'toy',price:70,sz:1.1,cat:'appl',ser:'k',nw:1},
+  k_astro:{name:'黑森林太空貓',emo:'🏠',kind:'toy',price:80,sz:1.0,cat:'deco',ser:'k',nw:1},
+  k_books:{name:'黑森林書本',emo:'🏠',kind:'toy',price:40,sz:0.9,cat:'deco',ser:'k',nw:1},
+  k_sbox:{name:'黑森林收納盒',emo:'🏠',kind:'toy',price:40,sz:0.9,cat:'deco',ser:'k',nw:1},
+  k_blanket:{name:'黑森林毛毯捲',emo:'🏠',kind:'toy',price:60,sz:1.0,cat:'deco',ser:'k',nw:1},
+  k_jar:{name:'黑森林收納罐',emo:'🏠',kind:'toy',price:40,sz:0.8,cat:'deco',ser:'k',nw:1},
+  k_lantern:{name:'黑森林露營燈',emo:'🏠',kind:'toy',price:70,sz:0.9,cat:'deco',ser:'k',nw:1},
+  k_ufo:{name:'黑森林飛碟',emo:'🏠',kind:'toy',price:80,sz:1.0,cat:'deco',ser:'k',nw:1},
+  k_terra:{name:'黑森林苔蘚玻璃罩',emo:'🏠',kind:'toy',price:70,sz:0.9,cat:'deco',ser:'k',nw:1},
+  k_cat:{name:'黑森林打盹黑貓',emo:'🏠',kind:'toy',price:80,sz:1.0,cat:'deco',ser:'k',nw:1},
+  v_towels:{name:'薰衣草毛巾堆',emo:'🏠',kind:'toy',price:50,sz:1.0,cat:'bath',ser:'v',nw:1},
+  v_tbskt:{name:'薰衣草毛巾籃',emo:'🏠',kind:'toy',price:60,sz:1.0,cat:'bath',ser:'v',nw:1},
+  v_shampoo:{name:'薰衣草沐浴乳組',emo:'🏠',kind:'toy',price:50,sz:0.9,cat:'bath',ser:'v',nw:1},
+  v_diffuser:{name:'薰衣草擴香瓶',emo:'🏠',kind:'toy',price:50,sz:0.8,cat:'deco',ser:'v',nw:1},
+  v_candle:{name:'薰衣草香氛蠟燭',emo:'🏠',kind:'toy',price:40,sz:0.8,cat:'deco',ser:'v',nw:1},
+  v_tissue:{name:'薰衣草面紙盒',emo:'🏠',kind:'toy',price:30,sz:0.8,cat:'bath',ser:'v',nw:1},
+  v_serum:{name:'薰衣草精華液',emo:'🏠',kind:'toy',price:40,sz:0.7,cat:'bath',ser:'v',nw:1},
+  v_cream:{name:'薰衣草乳霜',emo:'🏠',kind:'toy',price:40,sz:0.8,cat:'bath',ser:'v',nw:1},
+  v_tube:{name:'薰衣草護手霜',emo:'🏠',kind:'toy',price:30,sz:0.7,cat:'bath',ser:'v',nw:1},
+  v_perfume:{name:'薰衣草香水',emo:'🏠',kind:'toy',price:60,sz:0.8,cat:'bath',ser:'v',nw:1},
+  v_spray:{name:'薰衣草噴霧瓶',emo:'🏠',kind:'toy',price:30,sz:0.8,cat:'bath',ser:'v',nw:1},
+  v_dryer:{name:'薰衣草吹風機',emo:'🏠',kind:'toy',price:60,sz:0.9,cat:'appl',ser:'v',nw:1},
+  v_iron:{name:'薰衣草離子夾',emo:'🏠',kind:'toy',price:50,sz:0.9,cat:'appl',ser:'v',nw:1},
+  v_brush:{name:'薰衣草梳子',emo:'🏠',kind:'toy',price:30,sz:0.8,cat:'bath',ser:'v',nw:1},
+  v_comb:{name:'薰衣草扁梳',emo:'🏠',kind:'toy',price:30,sz:0.8,cat:'bath',ser:'v',nw:1},
+  v_mirror:{name:'薰衣草化妝鏡',emo:'🏠',kind:'toy',price:60,sz:0.9,cat:'bath',ser:'v',nw:1},
+  v_phones:{name:'薰衣草耳機',emo:'🏠',kind:'toy',price:70,sz:0.9,cat:'appl',ser:'v',nw:1},
+  v_coffee:{name:'薰衣草咖啡機',emo:'🏠',kind:'toy',price:100,sz:1.1,cat:'appl',ser:'v',nw:1},
+  v_kettle:{name:'薰衣草手沖壺',emo:'🏠',kind:'toy',price:70,sz:0.9,cat:'appl',ser:'v',nw:1},
+  v_moka:{name:'薰衣草摩卡壺',emo:'🏠',kind:'toy',price:60,sz:0.9,cat:'appl',ser:'v',nw:1},
+  v_grinder:{name:'薰衣草磨豆機',emo:'🏠',kind:'toy',price:70,sz:0.9,cat:'appl',ser:'v',nw:1},
+  v_heater:{name:'薰衣草電暖器',emo:'🏠',kind:'toy',price:90,sz:1.1,cat:'appl',ser:'v',nw:1},
+  v_radio:{name:'薰衣草收音機',emo:'🏠',kind:'toy',price:70,sz:0.9,cat:'appl',ser:'v',nw:1},
+  v_clock:{name:'薰衣草鬧鐘',emo:'🏠',kind:'toy',price:50,sz:0.9,cat:'deco',ser:'v',nw:1},
+  v_camera:{name:'薰衣草相機',emo:'🏠',kind:'toy',price:80,sz:0.9,cat:'appl',ser:'v',nw:1},
+  v_game:{name:'薰衣草掌上遊戲機',emo:'🏠',kind:'toy',price:80,sz:0.8,cat:'appl',ser:'v',nw:1},
+  v_speaker:{name:'薰衣草喇叭',emo:'🏠',kind:'toy',price:90,sz:1.0,cat:'appl',ser:'v',nw:1},
+  v_fan:{name:'薰衣草電風扇',emo:'🏠',kind:'toy',price:70,sz:1.1,cat:'appl',ser:'v',nw:1},
+  v_astro:{name:'薰衣草太空貓',emo:'🏠',kind:'toy',price:80,sz:1.0,cat:'deco',ser:'v',nw:1},
+  v_books:{name:'薰衣草書本',emo:'🏠',kind:'toy',price:40,sz:0.9,cat:'deco',ser:'v',nw:1},
+  v_sbox:{name:'薰衣草收納盒',emo:'🏠',kind:'toy',price:40,sz:0.9,cat:'deco',ser:'v',nw:1},
+  v_blanket:{name:'薰衣草毛毯捲',emo:'🏠',kind:'toy',price:60,sz:1.0,cat:'deco',ser:'v',nw:1},
+  v_candy:{name:'薰衣草糖果罐',emo:'🏠',kind:'toy',price:50,sz:0.8,cat:'deco',ser:'v',nw:1},
+  v_lantern:{name:'薰衣草提燈',emo:'🏠',kind:'toy',price:70,sz:0.9,cat:'deco',ser:'v',nw:1},
+  v_globe:{name:'薰衣草雪花球',emo:'🏠',kind:'toy',price:60,sz:0.8,cat:'deco',ser:'v',nw:1},
+  v_terra:{name:'薰衣草蘑菇玻璃罐',emo:'🏠',kind:'toy',price:70,sz:0.9,cat:'deco',ser:'v',nw:1},
+  v_cat:{name:'薰衣草打盹貓',emo:'🏠',kind:'toy',price:80,sz:1.0,cat:'deco',ser:'v',nw:1},
+  r_towels:{name:'繽紛毛巾堆',emo:'🏠',kind:'toy',price:50,sz:1.0,cat:'bath',ser:'r',nw:1},
+  r_tbskt:{name:'繽紛毛巾籃',emo:'🏠',kind:'toy',price:60,sz:1.0,cat:'bath',ser:'r',nw:1},
+  r_lotion:{name:'繽紛乳液瓶',emo:'🏠',kind:'toy',price:30,sz:0.8,cat:'bath',ser:'r',nw:1},
+  r_diffuser:{name:'繽紛擴香瓶',emo:'🏠',kind:'toy',price:50,sz:0.8,cat:'deco',ser:'r',nw:1},
+  r_candle:{name:'繽紛香氛蠟燭',emo:'🏠',kind:'toy',price:40,sz:0.8,cat:'deco',ser:'r',nw:1},
+  r_tissue:{name:'繽紛面紙盒',emo:'🏠',kind:'toy',price:30,sz:0.8,cat:'bath',ser:'r',nw:1},
+  r_spray:{name:'繽紛噴霧瓶',emo:'🏠',kind:'toy',price:30,sz:0.8,cat:'bath',ser:'r',nw:1},
+  r_cream:{name:'繽紛乳霜',emo:'🏠',kind:'toy',price:40,sz:0.8,cat:'bath',ser:'r',nw:1},
+  r_tube:{name:'繽紛護手霜',emo:'🏠',kind:'toy',price:30,sz:0.7,cat:'bath',ser:'r',nw:1},
+  r_perfume:{name:'繽紛香水',emo:'🏠',kind:'toy',price:60,sz:0.8,cat:'bath',ser:'r',nw:1},
+  r_pump:{name:'繽紛洗手乳',emo:'🏠',kind:'toy',price:30,sz:0.8,cat:'bath',ser:'r',nw:1},
+  r_candy:{name:'繽紛糖果罐',emo:'🏠',kind:'toy',price:50,sz:0.8,cat:'deco',ser:'r',nw:1},
+  r_dryer:{name:'繽紛吹風機',emo:'🏠',kind:'toy',price:60,sz:0.9,cat:'appl',ser:'r',nw:1},
+  r_iron:{name:'繽紛離子夾',emo:'🏠',kind:'toy',price:50,sz:0.9,cat:'appl',ser:'r',nw:1},
+  r_brush:{name:'繽紛梳子',emo:'🏠',kind:'toy',price:30,sz:0.8,cat:'bath',ser:'r',nw:1},
+  r_comb:{name:'繽紛扁梳',emo:'🏠',kind:'toy',price:30,sz:0.8,cat:'bath',ser:'r',nw:1},
+  r_mirror:{name:'繽紛化妝鏡',emo:'🏠',kind:'toy',price:60,sz:0.9,cat:'bath',ser:'r',nw:1},
+  r_phones:{name:'繽紛耳機',emo:'🏠',kind:'toy',price:70,sz:0.9,cat:'appl',ser:'r',nw:1},
+  r_coffee:{name:'繽紛咖啡機',emo:'🏠',kind:'toy',price:100,sz:1.1,cat:'appl',ser:'r',nw:1},
+  r_kettle:{name:'繽紛茶壺',emo:'🏠',kind:'toy',price:70,sz:0.9,cat:'appl',ser:'r',nw:1},
+  r_moka:{name:'繽紛摩卡壺',emo:'🏠',kind:'toy',price:60,sz:0.9,cat:'appl',ser:'r',nw:1},
+  r_toast:{name:'繽紛烤麵包機',emo:'🏠',kind:'toy',price:80,sz:1.0,cat:'appl',ser:'r',nw:1},
+  r_blender:{name:'繽紛果汁機',emo:'🏠',kind:'toy',price:80,sz:1.0,cat:'appl',ser:'r',nw:1},
+  r_oven:{name:'繽紛小烤箱',emo:'🏠',kind:'toy',price:90,sz:1.1,cat:'appl',ser:'r',nw:1},
+  r_radio:{name:'繽紛收音機',emo:'🏠',kind:'toy',price:70,sz:0.9,cat:'appl',ser:'r',nw:1},
+  r_clock:{name:'繽紛鬧鐘',emo:'🏠',kind:'toy',price:50,sz:0.9,cat:'deco',ser:'r',nw:1},
+  r_camera:{name:'繽紛相機',emo:'🏠',kind:'toy',price:80,sz:0.9,cat:'appl',ser:'r',nw:1},
+  r_game:{name:'繽紛掌上遊戲機',emo:'🏠',kind:'toy',price:80,sz:0.8,cat:'appl',ser:'r',nw:1},
+  r_pawheat:{name:'繽紛肉球暖爐',emo:'🏠',kind:'toy',price:90,sz:1.0,cat:'appl',ser:'r',nw:1},
+  r_fan:{name:'繽紛電風扇',emo:'🏠',kind:'toy',price:70,sz:1.1,cat:'appl',ser:'r',nw:1},
+  r_globe:{name:'繽紛雪花球',emo:'🏠',kind:'toy',price:60,sz:0.8,cat:'deco',ser:'r',nw:1},
+  r_plant:{name:'繽紛貓臉盆栽',emo:'🏠',kind:'toy',price:50,sz:0.9,cat:'deco',ser:'r',nw:1},
+  r_books:{name:'繽紛書本',emo:'🏠',kind:'toy',price:40,sz:0.9,cat:'deco',ser:'r',nw:1},
+  r_sbox:{name:'繽紛收納盒',emo:'🏠',kind:'toy',price:40,sz:0.9,cat:'deco',ser:'r',nw:1},
+  r_cat:{name:'繽紛打盹貓',emo:'🏠',kind:'toy',price:80,sz:1.0,cat:'deco',ser:'r',nw:1},
+  r_blanket:{name:'繽紛毛毯捲',emo:'🏠',kind:'toy',price:60,sz:1.0,cat:'deco',ser:'r',nw:1},
+  r_bathset:{name:'繽紛小鴨沐浴組',emo:'🏠',kind:'toy',price:60,sz:0.9,cat:'bath',ser:'r',nw:1},
+  r_aclock:{name:'繽紛貓耳時鐘',emo:'🏠',kind:'toy',price:60,sz:0.9,cat:'deco',ser:'r',nw:1},
+  r_grinder:{name:'繽紛磨豆機',emo:'🏠',kind:'toy',price:70,sz:0.9,cat:'appl',ser:'r',nw:1},
+  r_drip:{name:'繽紛美式咖啡機',emo:'🏠',kind:'toy',price:90,sz:1.0,cat:'appl',ser:'r',nw:1},
+  r_fryer:{name:'繽紛氣炸鍋',emo:'🏠',kind:'toy',price:100,sz:1.1,cat:'appl',ser:'r',nw:1},
+  r_rice:{name:'繽紛電子鍋',emo:'🏠',kind:'toy',price:90,sz:1.0,cat:'appl',ser:'r',nw:1},
+  r_micro:{name:'繽紛微波爐',emo:'🏠',kind:'toy',price:110,sz:1.1,cat:'appl',ser:'r',nw:1},
+  r_tv:{name:'繽紛電視',emo:'🏠',kind:'toy',price:120,sz:1.1,cat:'appl',ser:'r',nw:1},
+  r_lucky:{name:'繽紛招財貓',emo:'🏠',kind:'toy',price:120,sz:1.0,cat:'deco',ser:'r',nw:1},
+  r_catbed:{name:'繽紛貓耳窩',emo:'🏠',kind:'toy',price:120,sz:1.4,cat:'furn',ser:'r',nw:1}});
+const TOY_CATS=[['all','全部'],['new','🆕 新品'],['toy','🧸 玩具'],['pet','🐾 寵物用品'],['appl','🏠 家電'],['furn','🛋️ 家具'],['deco','🌸 擺飾'],['bath','🧴 盥洗保養']];let toyCat='all';
 const toyCatOk=(it,c)=>c==='all'||(c==='new'?!!it.nw:(it.cat||'toy')===c);
 function toyCatBar(cur,attr){return `<div class="tcats">${TOY_CATS.map(([k,n])=>`<button ${attr}="${k}" class="${k===cur?'on':''}">${n}</button>`).join('')}</div>`}
 // ================= 💼 毛孩打工（v1.90） =================
@@ -6265,7 +6282,7 @@ if(ONLINE){
 else setTimeout(dailyLogin,800);
 
 // ================= 圖示：自動把 emoji 換成素材 =================
-const ICMAP={'🔄':'sync','🗄':'showcase','🎨':'palette','🌟':'sparkle','💼':'briefcase','👋':'wave','🔕':'mute2','👀':'eyes','🟢':'online','🙏':'pray','🏅':'medal','🚨':'siren','🥇':'gold','🥈':'silver','🥉':'bronze','💢':'anger','💨':'dash','🔥':'fire','🪵':'plank','🔨':'hammer','🧱':'brick','💌':'loveletter','👛':'purse','🎭':'masks','⚡':'bolt','🆕':'new','🌸':'flower','📥':'inbox','📤':'outbox','🎪':'circus','💡':'idea2','🐞':'bug2','🌠':'shooting','😆':'lol','😢':'cry','🎊':'popper','🍅':'assets/item_c_tomato.webp','🎃':'assets/item_c_pumpkin.webp','🍎':'assets/item_c_apple.webp','🐟':'assets/item_fish.webp','🍪':'assets/item_cookie.webp','🎄':'assets/item_xmastree.webp','🌱':'assets/item_seed_tomato.webp','🛋':'assets/item_sofa.webp','😈':'assets/demon_head.webp','📹':'assets/pet_cam.webp','🦹':'assets/thief_sneak.webp','🔍':'search','🏆':'assets/icon_rank.webp','👗':'assets/icon_closet.webp','📣':'megaphone','🔒':'lock','🌐':'globe','♂':'male','♀':'female','🎒':'bag','✅':'check','⚠':'warn','🏷':'tag','🎴':'pack','⏳':'hourglass','🛏':'bed','🌙':'moon','☀':'sun','🏥':'clinic','⏰':'alarm','☁':'cloud','🧧':'redpacket','📌':'pin','💧':'drop','🌡':'thermo','💉':'syringe','💊':'pill','🪥':'toothbrush','👁':'eye','🪮':'comb','🚶':'walk','💦':'pee','🤢':'vomit','🛁':'bath','✂':'scissors','🏃':'shoes','😴':'sleep','🔢':'number','🔁':'repeat','🐕':'dog','🐈':'cat','🐇':'rabbit','🐹':'hamster','🐦':'bird',
+const ICMAP={'🧴':'toothbrush','🔄':'sync','🗄':'showcase','🎨':'palette','🌟':'sparkle','💼':'briefcase','👋':'wave','🔕':'mute2','👀':'eyes','🟢':'online','🙏':'pray','🏅':'medal','🚨':'siren','🥇':'gold','🥈':'silver','🥉':'bronze','💢':'anger','💨':'dash','🔥':'fire','🪵':'plank','🔨':'hammer','🧱':'brick','💌':'loveletter','👛':'purse','🎭':'masks','⚡':'bolt','🆕':'new','🌸':'flower','📥':'inbox','📤':'outbox','🎪':'circus','💡':'idea2','🐞':'bug2','🌠':'shooting','😆':'lol','😢':'cry','🎊':'popper','🍅':'assets/item_c_tomato.webp','🎃':'assets/item_c_pumpkin.webp','🍎':'assets/item_c_apple.webp','🐟':'assets/item_fish.webp','🍪':'assets/item_cookie.webp','🎄':'assets/item_xmastree.webp','🌱':'assets/item_seed_tomato.webp','🛋':'assets/item_sofa.webp','😈':'assets/demon_head.webp','📹':'assets/pet_cam.webp','🦹':'assets/thief_sneak.webp','🔍':'search','🏆':'assets/icon_rank.webp','👗':'assets/icon_closet.webp','📣':'megaphone','🔒':'lock','🌐':'globe','♂':'male','♀':'female','🎒':'bag','✅':'check','⚠':'warn','🏷':'tag','🎴':'pack','⏳':'hourglass','🛏':'bed','🌙':'moon','☀':'sun','🏥':'clinic','⏰':'alarm','☁':'cloud','🧧':'redpacket','📌':'pin','💧':'drop','🌡':'thermo','💉':'syringe','💊':'pill','🪥':'toothbrush','👁':'eye','🪮':'comb','🚶':'walk','💦':'pee','🤢':'vomit','🛁':'bath','✂':'scissors','🏃':'shoes','😴':'sleep','🔢':'number','🔁':'repeat','🐕':'dog','🐈':'cat','🐇':'rabbit','🐹':'hamster','🐦':'bird',
   '✨':'assets/fx_star.webp','⭐':'assets/fx_star.webp','★':'assets/fx_star.webp','🎉':'assets/fx_firework.webp','💕':'assets/fx_heart.webp','💖':'assets/fx_heart.webp','❤':'assets/fx_heart.webp','💤':'assets/fx_z.webp','🎵':'assets/fx_notes.webp','💰':'assets/money_bag.webp','💩':'assets/poop.webp','🍤':'assets/item_cookie.webp','🍚':'bowl','🦴':'assets/item_bone.webp','🏡':'home','🙋':'family','👥':'family','🐾':'paws','🏠':'home','←':'back','＋':'add','🙂':'me','📲':'install','🔗':'link','🔊':'sound','🔇':'mute','📅':'calendar','📋':'tasks','🔑':'key','👑':'crown','💬':'chat','💛':'mood','✏':'pencil','⚖':'scale','🩺':'medical','🧾':'wallet','🎂':'cake','🍖':'bowl','📝':'note','🎁':'gift','🦮':'leash','🧹':'broom','📒':'book','🧸':'toy','📷':'camera','🔔':'bell','🎟':'ticket','🪙':'coin','💗':'heart','🏪':'shop','⚙':'gear','🛍':'buy2','👔':'staff','🤚':'hand','🪪':'id',
   '✉':'letter','😊':'me','📮':'mail','📢':'megaphone','📜':'note','🗓':'calendar','📆':'calendar','⏱':'alarm','🛠':'gear','🏗':'hammer','🚧':'hammer','👉':'next','👆':'hand','✋':'hand','👏':'hand','✌':'hand','❌':'no','🌏':'globe','🌍':'globe','👤':'me','🧭':'globe','📖':'book','🙈':'eye','⛄':'assets/xm_snowman.webp','🦌':'assets/acc_reindeer.webp','💪':'bolt','🎯':'pinball','🔵':'assets/token5.webp','🟣':'assets/token.webp','🏛':'home','🖼':'deco','🪄':'idea','🛒':'buy2','🎲':'renew','🗑':'broom',
   '🥫':'assets/item_meat.webp','🍗':'assets/item_chicken.webp','🧀':'assets/item_cheese.webp','🥕':'assets/item_carrot.webp','🌻':'assets/item_seeds.webp','💎':'assets/item_crystal.webp','😭':'cry','🥺':'cry','🏝':'island','❔':'question','❓':'question','🍬':'candy','🚪':'door','🏁':'flag','🔴':'chip10','✕':'close','✓':'tick','☐':'box','➜':'arrow_r','◀':'tri_l','▶':'tri_r','▼':'tri_d','⇄':'swap','↺':'undo','↔':'flip'};
@@ -6735,7 +6752,7 @@ function announceLetters(){if(!DB.me)return;let seen=[];try{seen=JSON.parse(loca
     sfx('gift');$('#lgopen').onclick=()=>openLetter(nw[0].id,()=>$('#bell').click())};
   setTimeout(go,1800)}
 // ================= 自動更新：發現新版本就重新載入 =================
-const APP_VER='v3.03';
+const APP_VER='v3.06';
 function checkUpdate(){
   if(!/^https?:/.test(location.protocol)||!API_URL)return;
   if(!$('#modal').classList.contains('hidden'))return; // 正在填表單時不打斷
