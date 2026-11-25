@@ -3405,7 +3405,7 @@ const KUJI_POOL={
   B:['ocean','star','space','ufobase','pearl','spacecat','crystalstar'],
   C:['sakura','forest','cloud','xmas','arcade','washitsu','circus','pinkroom','street','nightmkt','hiphop','calibeach','magicattic','clouddream','catbakery','monsterroom','starcircus'],
   D:['study','garden','cafe','beach','dessert','library','cabin','surf','mushroomstudy','sunnypet','cattreehouse']};
-const KUJI_PRICE=200,KUJI_PRICE2=1200,KUJI_SELL0=100,KUJI_SELL2=400,CARD_PRICE=100;
+const KUJI_PRICE=800,KUJI_PRICE2=800,KUJI_SELL0=100,KUJI_SELL2=400,CARD_PRICE=100;   // v2.90：一番賞一抽 🪙800，重複的賣 🪙400
 const kujiSell=p=>(p||kujiPrice())>=KUJI_PRICE2?KUJI_SELL2:KUJI_SELL0;   // v2.71：🪙1200 的箱子，重複的賣 🪙400
 const kujiPrice=()=>+(DB.kuji&&DB.kuji.price)||KUJI_PRICE;   // v2.71：一番賞不下架了，抽完開新箱，新箱一抽 🪙1200（價錢跟著箱子，小島說了算）
 const KG={A:{n:'A 賞',img:'assets/badge_a.webp'},B:{n:'B 賞',img:'assets/badge_b.webp'},C:{n:'C 賞',img:'assets/badge_c.webp'},D:{n:'D 賞',img:'assets/badge_d.webp'},L:{n:'最後賞',img:'assets/badge_last.webp'}};
@@ -6581,7 +6581,7 @@ function announceLetters(){if(!DB.me)return;let seen=[];try{seen=JSON.parse(loca
     sfx('gift');$('#lgopen').onclick=()=>openLetter(nw[0].id,()=>$('#bell').click())};
   setTimeout(go,1800)}
 // ================= 自動更新：發現新版本就重新載入 =================
-const APP_VER='v2.89';
+const APP_VER='v2.90';
 function checkUpdate(){
   if(!/^https?:/.test(location.protocol)||!API_URL)return;
   if(!$('#modal').classList.contains('hidden'))return; // 正在填表單時不打斷

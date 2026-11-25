@@ -1,5 +1,6 @@
 /*
- * 毛很多 babypets 後端・整理版 v72
+ * 毛很多 babypets 後端・整理版 v73
+ * v73：🎫 一番賞改成一抽 🪙800（現在這箱也是，之後每一箱都是）
  * v72：🏷️ 毛二街出清：二手架超過 40 樣被擠下來的貨進出清候補（clrq，最多 30），每天換一批 6 樣到出清籃（clr），價錢是二手價的 1/4，沒賣掉的隔天刪掉
  * v71：🌱 農田紀錄（farm.log：誰在什麼時候種、澆、收，最近 30 筆）；🪵 新增 13 款層板
  * v70：🛏️ 二樓：玩具最多 25 個（地上＋層板）；二樓牆面掛層板（show.f2.w，跟展示間共用倉庫），層板上放玩具（toys2 的 w、c）；相框記掛上去的時間（wfa）；新增 10 款二樓背景
@@ -85,7 +86,7 @@ const DROP_P_ = 0.65, DROP_DAY_MAX_ = 3300, DROP_GOLD_ = 200;              // v5
 const DEMON_AFTER_ = 5 * DAY_, DEMON_FREE_ = 3 * HOUR_, DEMON_GOAL_ = 10, DEMON_CD_ = 10 * 60000;
 const DEMON_PTS_ = { feed: 3, pat: 1, toy: 2, treat: 2 };   // v48：任何一種互動都直接解救
 const ONLINE_MS_ = 3 * 60000;
-const KUJI_PLAN_ = { A: 1, B: 2, C: 3, D: 4 }, KUJI_PRICE0_ = 200, KUJI_PRICE_NEW_ = 1200;            // 一箱 10 張
+const KUJI_PLAN_ = { A: 1, B: 2, C: 3, D: 4 }, KUJI_PRICE0_ = 800, KUJI_PRICE_NEW_ = 800;            // 一箱 10 張
 const KUJI_ROOMS_ = {                                    // 前端抽籤時會帶最新清單上來覆蓋
   A: ['party','princess'],
   B: ['ocean','star','space','sweetdevil','ufobase','pearl'],
@@ -616,7 +617,7 @@ function kuji_() {
   else if (k.closed || k.items.every(x => x.by)) { const nk = kujiNewBox_((Number(k.no) || 1) + 1); nk.log = Array.isArray(k.log) ? k.log : []; k = nk; put_('meta', k); }
   return k;
 }
-function kujiPrice_(k) { return Number(k && k.price) || KUJI_PRICE0_; }
+function kujiPrice_(k) { return KUJI_PRICE_NEW_; }   // v73：不管哪一箱都是 🪙800
 function kujiView_(k) { return { price: kujiPrice_(k), closed: !!k.closed, no: Number(k.no) || 1, items: k.items.map(x => ({ g: x.g, room: x.room, t: !!x.by })), log: (k.log || []).slice(-6) }; }
 
 // ================= 推播（OneSignal） =================
@@ -1358,7 +1359,7 @@ const ACTIONS = {
     let k = kuji_();
     if (k.closed || !k.items.some(x => !x.by)) throw new Error('一番賞正在換新箱，等一下再試 🙏');
     const price = kujiPrice_(k);
-    if ((Number(req.pay) || KUJI_PRICE0_) < price) throw new Error(`一番賞漲價了，現在一抽 🪙${price}，金幣退回給你，重新整理再抽`);
+    if ((Number(req.pay) || 0) < price) throw new Error(`一番賞漲價了，現在一抽 🪙${price}，金幣退回給你，重新整理再抽`);
     const pool = k.items.filter(x => !x.by), t = pool[Math.floor(Math.random() * pool.length)];
     t.by = me.nick; t.at = Date.now();
     const last = k.items.every(x => x.by), owned = ownedOf_(h), dup = owned.indexOf(t.room) >= 0;
