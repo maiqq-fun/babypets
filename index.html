@@ -3332,7 +3332,7 @@ const ITEMS={
 };
 const TREAT_MAX=3,TOY_MAX=20;
 // v2.87：重新去背的圖（原本被切到），加版本號讓手機重抓
-setTimeout(()=>['slide','teepee','rainbowball','unicorn','trash'].forEach(k=>{if(ITEMS[k]&&!ITEMS[k].img)ITEMS[k].img=`assets/item_${k}.webp?v=2`}),0);
+setTimeout(()=>['slide','teepee','rainbowball','unicorn','trash','sweetpotato','pudding','sofa'].forEach(k=>{if(ITEMS[k]&&!ITEMS[k].img)ITEMS[k].img=`assets/item_${k}.webp?v=2`}),0);
 
 // ---------- v1.48 新玩具 ----------
 Object.assign(ITEMS,{
@@ -6580,7 +6580,7 @@ function announceLetters(){if(!DB.me)return;let seen=[];try{seen=JSON.parse(loca
     sfx('gift');$('#lgopen').onclick=()=>openLetter(nw[0].id,()=>$('#bell').click())};
   setTimeout(go,1800)}
 // ================= 自動更新：發現新版本就重新載入 =================
-const APP_VER='v2.87';
+const APP_VER='v2.88';
 function checkUpdate(){
   if(!/^https?:/.test(location.protocol)||!API_URL)return;
   if(!$('#modal').classList.contains('hidden'))return; // 正在填表單時不打斷
