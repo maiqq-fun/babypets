@@ -1053,7 +1053,7 @@ img{-webkit-user-drag:none}
 .bbcard .inf{flex:1;min-width:0;position:relative;z-index:1}
 .bbcard .inf b{font-size:15px;display:block;line-height:1.25}.bbcard .en{font-size:10px;letter-spacing:1px;opacity:.8}
 .bbcard .tz{display:flex;align-items:flex-end;gap:2px;margin:6px 0 4px;height:58px;min-width:0}.bbcard .tz img{height:100%;width:auto;max-width:33%;object-fit:contain;filter:drop-shadow(0 2px 2px rgba(0,0,0,.25))}
-.bbcard .dx{display:flex;gap:3px;align-items:center;flex-wrap:wrap}.bbcard .dx i{width:10px;height:10px;border-radius:3px;background:rgba(255,255,255,.25)}.bbcard .dx i.on{background:#fff}
+.bbcard .dx{display:flex;gap:3px;align-items:center;flex-wrap:wrap}.bbcard .dx i{width:10px;height:10px;border-radius:3px;background:rgba(255,255,255,.25)}.bbcard .dx i.on{background:#fff}.dx i.fam{background:rgba(255,255,255,.55)}.bblg{display:flex!important;align-items:center;gap:4px;margin-top:2px}.bblg i{display:inline-block;width:10px;height:10px;border-radius:3px;background:#fff}.bblg i.fam{background:rgba(255,255,255,.55);margin-left:4px}
 .bbcard .mr{font-size:11px;background:rgba(0,0,0,.25);border-radius:10px;padding:2px 8px;margin-left:6px;font-weight:600}
 .bbcard .buy{position:relative;z-index:1;border:0;border-radius:16px;background:#fff;color:#3b2c22;font-weight:800;font-size:14px;padding:9px 10px;box-shadow:0 3px 0 rgba(0,0,0,.2);white-space:nowrap}
 .bbcard .buy small{display:block;font-size:11px;font-weight:600;opacity:.7}
@@ -3377,7 +3377,8 @@ const KUJI_POOL={
   B:['ocean','star','space','ufobase','pearl','spacecat','crystalstar'],
   C:['sakura','forest','cloud','xmas','arcade','washitsu','circus','pinkroom','street','nightmkt','hiphop','calibeach','magicattic','clouddream','catbakery','monsterroom','starcircus'],
   D:['study','garden','cafe','beach','dessert','library','cabin','surf','mushroomstudy','sunnypet','cattreehouse']};
-const KUJI_PRICE=200,KUJI_PRICE2=1200,KUJI_SELL=100,CARD_PRICE=100;
+const KUJI_PRICE=200,KUJI_PRICE2=1200,KUJI_SELL0=100,KUJI_SELL2=400,CARD_PRICE=100;
+const kujiSell=p=>(p||kujiPrice())>=KUJI_PRICE2?KUJI_SELL2:KUJI_SELL0;   // v2.71：🪙1200 的箱子，重複的賣 🪙400
 const kujiPrice=()=>+(DB.kuji&&DB.kuji.price)||KUJI_PRICE;   // v2.71：一番賞不下架了，抽完開新箱，新箱一抽 🪙1200（價錢跟著箱子，小島說了算）
 const KG={A:{n:'A 賞',img:'assets/badge_a.webp'},B:{n:'B 賞',img:'assets/badge_b.webp'},C:{n:'C 賞',img:'assets/badge_c.webp'},D:{n:'D 賞',img:'assets/badge_d.webp'},L:{n:'最後賞',img:'assets/badge_last.webp'}};
 const KUJI_IMGS=['assets/kuji_booth.webp','assets/kuji_closed.webp','assets/kuji_open.webp'].concat(Object.values(KG).map(x=>x.img));
@@ -3394,7 +3395,7 @@ function kujiBody(coins){preloadKuji();const k=DB.kuji,h=myHouse();
   <div class="kboard">${['A','B','C','D'].map(g=>{const L=k.items.filter(x=>x.g===g);return `<div class="krow"><img src="${KG[g].img}" alt="${KG[g].n}"><div class="krooms">${L.map(x=>`<span class="${x.t?'gone':''}">${cardById(x.room).r==='H'?'隱藏版':esc(rName(x.room))}</span>`).join('')}</div><em>${L.filter(x=>!x.t).length}/${L.length}</em></div>`}).join('')}
     <div class="krow"><img src="${KG.L.img}" alt="最後賞"><div class="krooms"><span>抽到最後一張的人，再送 1 次卡牌</span></div></div></div>
   ${(k.log||[]).length?`<div class="sec"><h4>🎊 最近抽到</h4>${k.log.slice().reverse().slice(0,5).map(l=>`<div class="frow"><span>${esc(l.nick)} 抽到 ${KG[l.g]?KG[l.g].n:''}「${esc(rName(l.room))}」${l.last?' 🏁':''}</span><span class="ago">${ago(+l.at)}</span></div>`).join('')}</div>`:''}
-  <div class="hint">${h?`抽到已經有的房間，可以送給還沒有的家、賣掉換 ${KUJI_SELL} 金幣，或放棄`:'有家之後才能抽喔'}${kujiPrice()<KUJI_PRICE2?`<br>⚠️ 這箱抽完就漲價囉，下一箱開始一抽 🪙${KUJI_PRICE2}`:''}</div>`}
+  <div class="hint">${h?`抽到已經有的房間，可以送給還沒有的家、賣掉換 ${kujiSell()} 金幣，或放棄`:'有家之後才能抽喔'}${kujiPrice()<KUJI_PRICE2?`<br>⚠️ 這箱抽完就漲價囉，下一箱開始一抽 🪙${KUJI_PRICE2}`:''}</div>`}
 function kujiBind(S){
   const c=S.querySelector('[data-card]');if(c)c.onclick=()=>{const h=myHouse(),g=DB.game;if(!h||(g.coins||0)<CARD_PRICE)return;
     const go=()=>{g.coins-=CARD_PRICE;sfx('coin');save();updHud();closeModal();openPack({free:1,ok:1})};
@@ -3403,7 +3404,7 @@ function kujiBind(S){
 }
 function kujiDraw(ok){
   const h=myHouse(),g=DB.game;if(!h)return toast('有家之後才能抽一番賞');if(DB.kuji&&DB.kuji.closed)return toast('一番賞已經下架了 🙏');const kp=kujiPrice();if((g.coins||0)<kp)return toast('金幣不夠喔');
-  if(!ok&&CARDS.every(c=>owned(h.id).has(c.id))){openModal(`<div style="text-align:center"><img src="${KG.A.img}" alt="" style="width:80px"><h3>房間都收集完了！</h3><p class="lead">一番賞抽到的都會是重複的房間，可以送給還沒有的家，或賣掉換 ${KUJI_SELL} 金幣</p></div><div class="row2"><button data-close>先不要</button><button class="primary" id="kgo">還是要抽</button></div>`);$('#kgo').onclick=()=>{closeModal();kujiDraw(1)};return}
+  if(!ok&&CARDS.every(c=>owned(h.id).has(c.id))){openModal(`<div style="text-align:center"><img src="${KG.A.img}" alt="" style="width:80px"><h3>房間都收集完了！</h3><p class="lead">一番賞抽到的都會是重複的房間，可以送給還沒有的家，或賣掉換 ${kujiSell()} 金幣</p></div><div class="row2"><button data-close>先不要</button><button class="primary" id="kgo">還是要抽</button></div>`);$('#kgo').onclick=()=>{closeModal();kujiDraw(1)};return}
   g.coins-=kp;sfx('coin');save();updHud();closeModal();preloadKuji();
   const ov=document.createElement('div');ov.className='gacha kujiov';
   ov.innerHTML=`<div class="rays" id="rays"></div><div class="hint2" id="kh">點籤紙撕開</div><div class="kstage" id="kst"><img class="ktc" id="ktc" src="assets/kuji_closed.webp" alt="籤紙"></div><div class="gbtns" id="kb"></div>`;
@@ -3427,8 +3428,8 @@ function kujiDraw(ok){
       kb.querySelector('#kok').onclick=finish;
       kb.querySelector('#kuse').onclick=()=>{const old=h.room;h.room=res.room;ov.remove();toast(`已經換成「${rName(res.room)}」🏠`);openHome(h.id);if(res.last)setTimeout(()=>openPack({free:1}),400);
         call('updateHouse',Object.assign(cred(),{patch:{room:res.room}}),true).catch(e=>{h.room=old;toast(e.message)})};return}
-    kb.innerHTML=`<button id="kgive" class="primary">🎁 送人</button><button id="ksell">🪙 賣掉 +${KUJI_SELL}</button><button id="kdrop">放棄</button>`;
-    kb.querySelector('#ksell').onclick=()=>{g.coins=(g.coins||0)+KUJI_SELL;save();updHud();toast(`賣掉了，拿回 ${KUJI_SELL} 金幣 🪙`);finish()};
+    kb.innerHTML=`<button id="kgive" class="primary">🎁 送人</button><button id="ksell">🪙 賣掉 +${kujiSell(kp)}</button><button id="kdrop">放棄</button>`;
+    kb.querySelector('#ksell').onclick=()=>{g.coins=(g.coins||0)+kujiSell(kp);save();updHud();toast(`賣掉了，拿回 ${kujiSell(kp)} 金幣 🪙`);finish()};
     kb.querySelector('#kdrop').onclick=()=>{if(!armBtn(kb.querySelector('#kdrop'),'確定放棄？'))return;finish()};
     kb.querySelector('#kgive').onclick=()=>{const L=DB.houses.filter(x=>x.id!==h.id&&!isSpecialH(x)&&!owned(x.id).has(res.room));
       if(!L.length)return toast('島上每一家都已經有這間了，賣掉吧');
@@ -5294,10 +5295,10 @@ const bbMine=(sid,i)=>{const d=bbData().d[sid];return (Array.isArray(d)&&+d[i]>0
 const bbFam=(sid,i)=>{const id=bbId(sid,i),h=myHouse();if(!h)return false;if(hasShow(h)&&showNorm(h.show).it.some(a=>a.includes(id)))return true;return (DB.players||[]).some(p=>p.houseId===h.id&&p.id!==(DB.me&&DB.me.id)&&(p.figs||[]).includes(id))};
 function bbShop(){if(!needMe())return;const v=document.createElement('div');v.className='bbv';v.id='bbv';document.body.appendChild(v);bbShopRender()}
 function bbShopRender(){const v=$('#bbv');if(!v)return;const g=DB.game;
-  v.innerHTML=`<div class="bbh"><b>🎁 MAIMINE 盲盒店<small>一盒 🪙${BB_PRICE}・每個系列 ${BB_PITY} 盒內必出隱藏版</small></b><span class="bbc">🪙 ${(g.coins||0).toLocaleString()}</span><button class="x">關閉</button></div>
-  <div class="bbl">${bbOn().map(S=>{const n=bbDex(S.id).filter(x=>+x>0).length;return `<div class="bbcard" style="background:${S.c}"><img class="bx" src="${bbBox(S.id)}" alt=""><div class="inf">${S.en?`<span class="en">${esc(S.en)}</span>`:''}<b>${esc(S.n)}</b>
+  v.innerHTML=`<div class="bbh"><b>🎁 MAIMINE 盲盒店<small>一盒 🪙${BB_PRICE}・每個系列 ${BB_PITY} 盒內必出隱藏版</small><small class="bblg"><i class="on"></i>你的<i class="fam"></i>只有家人有（含展示間）</small></b><span class="bbc">🪙 ${(g.coins||0).toLocaleString()}</span><button class="x">關閉</button></div>
+  <div class="bbl">${bbOn().map(S=>{const n=bbIdx(S).filter(i=>bbMine(S.id,i)).length;return `<div class="bbcard" style="background:${S.c}"><img class="bx" src="${bbBox(S.id)}" alt=""><div class="inf">${S.en?`<span class="en">${esc(S.en)}</span>`:''}<b>${esc(S.n)}</b>
     <div class="tz">${S.t.map(i=>`<img src="${bbImg(S.id,i)}" alt="">`).join('')}</div>
-    <div class="dx">${bbIdx(S).map(i=>`<i class="${bbHas(S.id,i)?'on':''}"></i>`).join('')}<span class="mr">${n?`收集 ${n}/${bbIdx(S).length}`:`＋${bbIdx(S).length-3} 款等你發現`}</span></div></div>
+    <div class="dx">${bbIdx(S).map(i=>`<i class="${bbMine(S.id,i)?'on':bbFam(S.id,i)?'fam':''}"></i>`).join('')}<span class="mr">${n?`收集 ${n}/${bbIdx(S).length}`:`＋${bbIdx(S).length-3} 款等你發現`}</span></div></div>
     <button class="buy" data-bb="${S.id}">抽一盒<small>🪙${BB_PRICE}</small></button></div>`}).join('')}</div>`;
   v.querySelector('.x').onclick=()=>v.remove();v.querySelectorAll('[data-bb]').forEach(b=>b.onclick=()=>bbDraw(+b.dataset.bb))}
 let bbBusy=false;
@@ -6255,7 +6256,7 @@ function announceLetters(){if(!DB.me)return;let seen=[];try{seen=JSON.parse(loca
     sfx('gift');$('#lgopen').onclick=()=>openLetter(nw[0].id,()=>$('#bell').click())};
   setTimeout(go,1800)}
 // ================= 自動更新：發現新版本就重新載入 =================
-const APP_VER='v2.71';
+const APP_VER='v2.72';
 function checkUpdate(){
   if(!/^https?:/.test(location.protocol)||!API_URL)return;
   if(!$('#modal').classList.contains('hidden'))return; // 正在填表單時不打斷
