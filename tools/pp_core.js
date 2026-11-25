@@ -7,7 +7,7 @@ function ppMake(P){
     if(r>=9&&Math.abs(x-W/2)<26)continue;   // 開花洞上方留空
     pins.push({x,y})}}
   // 開花洞旁邊的導引釘
-  pins.push({x:W/2-22,y:418},{x:W/2+22,y:418});
+  pins.push({x:W/2-22,y:418},{x:W/2+22,y:418},{x:W/2-9,y:484},{x:W/2+9,y:484});   // 大放送洞上方兩根擋釘
   // 洞：x0..x1 在 y 那條線上接住
   const pockets=[
     {k:'side',x0:60-P.sw,x1:60+P.sw,y:300,pay:P.side},
@@ -27,8 +27,9 @@ function ppStep(M,b,dt,st){
   for(const p of M.pins){const dx=b.x-p.x,dy=b.y-p.y,d2=dx*dx+dy*dy,rr=M.R+M.PR;if(d2<rr*rr&&d2>0.01){const d=Math.sqrt(d2),nx=dx/d,ny=dy/d;b.x=p.x+nx*rr;b.y=p.y+ny*rr;
     const vn=b.vx*nx+b.vy*ny;if(vn<0){b.vx-=1.55*vn*nx;b.vy-=1.55*vn*ny;b.vx+=(Math.random()-.5)*40}}}
   const open=st&&st.tulipOpen>0,fever=st&&st.fever>0;
-  for(const q of M.pockets){const w=q.k==='tulip'&&open?14:0,x0=q.x0-w,x1=q.x1+w;
-    if(b.py<q.y&&b.y>=q.y&&b.x>x0&&b.x<x1)return q}
+  // v2.95：碰到畫出來的洞（含珠子半徑）就算進洞，看起來進了就一定有分
+  for(const q of M.pockets){const w=q.k==='tulip'&&open?14:0,j=q.k==='jack',x0=j?q.x0-3:q.x0-w-M.R*.5,x1=j?q.x1+3:q.x1+w+M.R*.5,y0=j?q.y-2:q.y-2-M.R*.6,y1=j?q.y+10:q.y+14;
+    if(b.x>x0&&b.x<x1&&b.y>y0&&b.y<y1)return q}
   b.py=b.y;
   if(b.y>M.H-20)return {k:'out',pay:0};
   return null}

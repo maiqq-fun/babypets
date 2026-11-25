@@ -5194,7 +5194,7 @@ function ppMake(P){
     if(r>=9&&Math.abs(x-W/2)<26)continue;   // 開花洞上方留空
     pins.push({x,y})}}
   // 開花洞旁邊的導引釘
-  pins.push({x:W/2-22,y:418},{x:W/2+22,y:418});
+  pins.push({x:W/2-22,y:418},{x:W/2+22,y:418},{x:W/2-9,y:484},{x:W/2+9,y:484});   // 大放送洞上方兩根擋釘
   // 洞：x0..x1 在 y 那條線上接住
   const pockets=[
     {k:'side',x0:60-P.sw,x1:60+P.sw,y:300,pay:P.side},
@@ -5214,14 +5214,14 @@ function ppStep(M,b,dt,st){
   for(const p of M.pins){const dx=b.x-p.x,dy=b.y-p.y,d2=dx*dx+dy*dy,rr=M.R+M.PR;if(d2<rr*rr&&d2>0.01){const d=Math.sqrt(d2),nx=dx/d,ny=dy/d;b.x=p.x+nx*rr;b.y=p.y+ny*rr;
     const vn=b.vx*nx+b.vy*ny;if(vn<0){b.vx-=1.55*vn*nx;b.vy-=1.55*vn*ny;b.vx+=(Math.random()-.5)*40}}}
   const open=st&&st.tulipOpen>0,fever=st&&st.fever>0;
-  for(const q of M.pockets){const w=q.k==='tulip'&&open?14:0,x0=q.x0-w,x1=q.x1+w;
-    if(b.py<q.y&&b.y>=q.y&&b.x>x0&&b.x<x1)return q}
+  // v2.95：碰到畫出來的洞（含珠子半徑）就算進洞，看起來進了就一定有分
+  for(const q of M.pockets){const w=q.k==='tulip'&&open?14:0,j=q.k==='jack',x0=j?q.x0-3:q.x0-w-M.R*.5,x1=j?q.x1+3:q.x1+w+M.R*.5,y0=j?q.y-2:q.y-2-M.R*.6,y1=j?q.y+10:q.y+14;
+    if(b.x>x0&&b.x<x1&&b.y>y0&&b.y<y1)return q}
   b.py=b.y;
   if(b.y>M.H-20)return {k:'out',pay:0};
   return null}
 function ppLaunch(M,power){const x=40+power*(M.W-80)+(Math.random()-.5)*24;return {x,y:60,vx:(Math.random()-.5)*60,vy:40,py:60}}
-
-const PP_P={sw:14,lw:13,side:2,tulip:3,low:2,tw:10,jw:2,jack:20,fx:1,fn:20,topen:3};   // 模擬過：瞄最好的地方長期拿回約 97%
+const PP_P={sw:5,lw:4,side:2,tulip:3,low:2,tw:4,jw:1,jack:20,fx:1,fn:10,topen:3};   // 模擬過：瞄最好的地方長期拿回約 97%
 const PP_BUY=[100,300,1000],PP_BETS=[1,2,5,10];
 const ppG=()=>{const a=arcG();a.pb=Math.max(0,Math.floor(+a.pb||0));return a};
 function ppGame(){const {ov,upd}=arcOv('<img class="mic" src="assets/icon_pinball.webp" alt="">珠珠台');const M=ppMake(PP_P);const {box,cv,ctx}=arcCanvas(ov,M.W,M.H,'ppcv');
@@ -5263,8 +5263,8 @@ function ppGame(){const {ov,upd}=arcOv('<img class="mic" src="assets/icon_pinbal
     c.fillStyle='#c9a227';M.pins.forEach(p=>{c.beginPath();c.arc(p.x,p.y,M.PR,0,7);c.fill()});
     c.fillStyle='#fff6c2';M.pins.forEach(p=>{c.beginPath();c.arc(p.x-1,p.y-1,1.2,0,7);c.fill()});
     M.pockets.forEach(qp=>{const open=qp.k==='tulip'&&st.tulipOpen>0,w=open?14:0,x0=qp.x0-w,x1=qp.x1+w,cx=(x0+x1)/2;
-      if(qp.k==='jack'){c.save();c.translate(cx,qp.y+4);c.fillStyle=st.fever>0?'#ffd23f':'#ff5f9a';c.beginPath();for(let i=0;i<10;i++){const r=i%2?6:13,a=-Math.PI/2+i*Math.PI/5;c.lineTo(Math.cos(a)*r,Math.sin(a)*r)}c.closePath();c.fill();c.restore();c.fillStyle='#7a2a5a';c.font='bold 10px sans-serif';c.textAlign='center';c.fillText('大放送',cx,qp.y+30);return}
-      c.fillStyle=qp.k==='tulip'?(open?'#ff5f9a':'#ff9cc4'):qp.k==='side'?'#7fc8ff':'#9be3b5';rrect(c,x0-4,qp.y-2,x1-x0+8,16,6);c.fill();
+      if(qp.k==='jack'){c.save();c.translate(cx,qp.y+4);c.fillStyle=st.fever>0?'#ffd23f':'#ff5f9a';c.beginPath();for(let i=0;i<10;i++){const r=i%2?3.5:8,a=-Math.PI/2+i*Math.PI/5;c.lineTo(Math.cos(a)*r,Math.sin(a)*r)}c.closePath();c.fill();c.restore();c.fillStyle='#7a2a5a';c.font='bold 10px sans-serif';c.textAlign='center';c.fillText('大放送',cx,qp.y+24);return}
+      c.fillStyle=qp.k==='tulip'?(open?'#ff5f9a':'#ff9cc4'):qp.k==='side'?'#7fc8ff':'#9be3b5';rrect(c,x0-M.R*.5,qp.y-2,x1-x0+M.R,16,6);c.fill();
       if(qp.k==='tulip'){c.fillStyle='#ff5f9a';c.beginPath();c.ellipse(x0-6-(open?6:0),qp.y-6,6,11,open?-.8:-.2,0,7);c.ellipse(x1+6+(open?6:0),qp.y-6,6,11,open?.8:.2,0,7);c.fill()}
       c.fillStyle='#fff';c.font='bold 10px sans-serif';c.textAlign='center';c.fillText('+'+qp.pay*bet,cx,qp.y+11)});
     balls.forEach(b=>{const g2=c.createRadialGradient(b.x-2,b.y-2,1,b.x,b.y,M.R);g2.addColorStop(0,'#ffffff');g2.addColorStop(1,'#9aa3b5');c.fillStyle=g2;c.beginPath();c.arc(b.x,b.y,M.R,0,7);c.fill()});
@@ -6705,7 +6705,7 @@ function announceLetters(){if(!DB.me)return;let seen=[];try{seen=JSON.parse(loca
     sfx('gift');$('#lgopen').onclick=()=>openLetter(nw[0].id,()=>$('#bell').click())};
   setTimeout(go,1800)}
 // ================= 自動更新：發現新版本就重新載入 =================
-const APP_VER='v2.94';
+const APP_VER='v2.95';
 function checkUpdate(){
   if(!/^https?:/.test(location.protocol)||!API_URL)return;
   if(!$('#modal').classList.contains('hidden'))return; // 正在填表單時不打斷
