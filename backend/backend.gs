@@ -1,5 +1,6 @@
 /*
- * 毛很多 babypets 後端・整理版 v70
+ * 毛很多 babypets 後端・整理版 v71
+ * v71：🌱 農田紀錄（farm.log：誰在什麼時候種、澆、收，最近 30 筆）；🪵 新增 13 款層板
  * v70：🛏️ 二樓：玩具最多 25 個（地上＋層板）；二樓牆面掛層板（show.f2.w，跟展示間共用倉庫），層板上放玩具（toys2 的 w、c）；相框記掛上去的時間（wfa）；新增 10 款二樓背景
  * v69：🎫 一番賞不下架了：這箱抽完自動開下一箱，新箱一抽 🪙1200（price 跟著箱子；前端帶 pay，付不夠就擋下來）
  * v68：🌱 修「澆水、收成會跳回去」：寫進試算表的資料要先真的存好（flush）才讓下一個人排進來；以前偶爾會被別人讀到舊的那份再整列蓋回去
@@ -1886,7 +1887,7 @@ const ACTIONS = {
     const h = mustFam_(req), f = farm_(h), i = plot_(f, req.i), c = String(req.c || '');
     if (!CROPS_[c]) throw new Error('沒有這種種子');
     if (f.p[i]) throw new Error('這格已經種東西了');
-    f.p[i] = { c: c, at: Date.now(), w: [] }; h.farm = f; put_('houses', h);
+    f.p[i] = { c: c, at: Date.now(), w: [] }; farmLog_(f, req, 'plant', i, c); h.farm = f; put_('houses', h);
     return f.p[i];
   },
   farmWater(req) {
@@ -1899,14 +1900,14 @@ const ACTIONS = {
     if (now >= ripeAt_(c)) throw new Error('已經可以收成了，不用再澆水');
     if (w.length >= cropWMax_(c)) throw new Error(`這格已經澆滿 ${cropWMax_(c)} 次了`);
     if (w.length && now - Number(w[w.length - 1].t || w[w.length - 1]) < HOUR_) throw new Error('剛剛才澆過，1 小時後再澆');
-    w.push({ t: now, by: req.playerId }); c.w = w; h.farm = f; put_('houses', h);
+    w.push({ t: now, by: req.playerId }); c.w = w; farmLog_(f, req, 'water', i, c.c); h.farm = f; put_('houses', h);
     return c;
   },
   farmHarvest(req) {
     const h = mustFam_(req), f = farm_(h), i = plot_(f, req.i), c = f.p[i], now = Date.now();
     if (!c) throw new Error('這格是空的');
     if (now < ripeAt_(c)) throw new Error('還沒成熟喔');
-    f.p[i] = null; h.farm = f; put_('houses', h);
+    f.p[i] = null; farmLog_(f, req, 'harvest', i, c.c); h.farm = f; put_('houses', h);
     const bag = c.c === 'apple' && Math.random() < 0.2 ? 50 + Math.floor(Math.random() * 16) * 10 : 0;   // 金蘋果 20% 多一個錢袋（50～200）
     return { c: c.c, bag: bag };
   },
@@ -1997,6 +1998,8 @@ function renewStyleOk_(h, style) {
 }
 function toyKey_(h, req) { if (Number(req.floor) === 2) { if (!Number(h.floor2)) throw new Error('這個家還沒有二樓'); return 'toys2'; } return 'toys'; }
 const innComfort_ = h => Math.min(TOY2_MAX_, (Array.isArray(h.toys2) ? h.toys2 : []).length) * 2;     // 二樓每個玩具 +2 舒適度
+// v71：農田紀錄（最近 30 筆）
+function farmLog_(f, req, a, i, c) { const p = req.playerId ? get_('players', req.playerId) : null; f.log = (Array.isArray(f.log) ? f.log : []).concat([{ t: Date.now(), by: p ? p.nick : '', a: a, i: i, c: c || '' }]).slice(-30); }
 function farm_(h) { const f = h.farm && typeof h.farm === 'object' ? h.farm : null; if (!f) throw new Error('這個家還沒有農田'); f.n = clampN_(f.n || FARM_N0_, 1, FARM_MAX_); f.p = Array.isArray(f.p) ? f.p : []; while (f.p.length < FARM_MAX_) f.p.push(null); return f; }
 // v57：小番茄長得快（4 小時、澆水最多快 1 小時），南瓜、金蘋果 8 小時（澆 3 次快 3 小時）
 const FARM_GROW_ = { tomato: 4, pumpkin: 8, apple: 8 }, FARM_WMAX_ = { tomato: 1, pumpkin: 3, apple: 3 };
@@ -2392,7 +2395,7 @@ const SHOW_CAB_N_ = { wood: '木頭腳掌', plain: '簡約原木', butter: '奶�
 // v60：櫃子 3 → 5 個。it 的位置：0～2 原本的櫃子、3～4 層板、5 壁櫃、6～7 新的兩個櫃子（櫃子位置 3、4）
 const SHOW_N_ = 20, SHOW_POS_ = 5, SHOW_CAB_MAX_ = 30, SHOW_IT_ = 8;
 const cabIt_ = p => p < 3 ? p : p + 3;
-const WSH_P_ = {"wood": 1000, "white": 1000, "metal": 1000, "checker": 1500, "cherry": 1500, "cloud": 1500, "drip": 1500, "holo": 1500, "lamp": 1500, "moon": 1500, "mushroom": 1500, "navy": 1500, "neon": 1500, "pinkbow": 1500, "pinkglass": 1500, "pipe": 1500, "planet": 1500, "rail": 1500, "scallop": 1500, "snow": 1500, "ufo": 1500, "cloud2": 1000, "bow2": 1000, "bear2": 1000, "skycloud2": 1000, "star2": 1000, "blackcat2": 1000}, WFR_P_ = {"wood": 300, "gold": 300, "moon": 800, "game": 800, "catring": 800, "calico": 800, "game2": 800, "globe": 800, "mecha": 800, "polaroid": 800, "chainheart": 800, "cattv": 800, "starchain": 800, "clapper": 800, "navybow": 800, "navywave": 800, "porthole": 800, "creamwave": 800, "creamarch": 800, "creamring": 800, "pinkarch": 800, "pinkcat": 800, "pinkheart": 800, "cloud2": 800, "wings2": 800, "catlilac2": 800, "space2": 800, "star2": 800, "gamer2": 800, "tabby2": 800, "moon2": 800, "headset2": 800, "ufo2": 800, "rainbow2": 800, "tv2": 800}, WCB_P_ = {"cat": 1500, "purple": 1500, "shop": 1500}, WCB_N_ = {"cat": 9, "purple": 6, "shop": 6};
+const WSH_P_ = {"wood": 1000, "white": 1000, "metal": 1000, "checker": 1500, "cherry": 1500, "cloud": 1500, "drip": 1500, "holo": 1500, "lamp": 1500, "moon": 1500, "mushroom": 1500, "navy": 1500, "neon": 1500, "pinkbow": 1500, "pinkglass": 1500, "pipe": 1500, "planet": 1500, "rail": 1500, "scallop": 1500, "snow": 1500, "ufo": 1500, "cloud2": 1000, "bow2": 1000, "bear2": 1000, "skycloud2": 1000, "star2": 1000, "blackcat2": 1000, "creampaw3": 1500, "sagebow3": 1500, "terrazzo3": 1000, "gingham3": 1500, "creammoon3": 1500, "sprinkle3": 1000, "pinkdrip3": 1000, "redpaw3": 1500, "rainbow3": 1500, "saturn3": 1500, "angelcat3": 1500, "cherrymint3": 1500, "angelheart3": 1500}, WFR_P_ = {"wood": 300, "gold": 300, "moon": 800, "game": 800, "catring": 800, "calico": 800, "game2": 800, "globe": 800, "mecha": 800, "polaroid": 800, "chainheart": 800, "cattv": 800, "starchain": 800, "clapper": 800, "navybow": 800, "navywave": 800, "porthole": 800, "creamwave": 800, "creamarch": 800, "creamring": 800, "pinkarch": 800, "pinkcat": 800, "pinkheart": 800, "cloud2": 800, "wings2": 800, "catlilac2": 800, "space2": 800, "star2": 800, "gamer2": 800, "tabby2": 800, "moon2": 800, "headset2": 800, "ufo2": 800, "rainbow2": 800, "tv2": 800}, WCB_P_ = {"cat": 1500, "purple": 1500, "shop": 1500}, WCB_N_ = {"cat": 9, "purple": 6, "shop": 6};
 const NEON_C_ = ['pink', 'blue', 'yellow', 'purple', 'mint', 'white'];
 // 島主上傳的展示間背景（rooms 裡類別 SH）
 function shRoom_(id) { return roomsView_().find(r => r.id === id && r.r === 'SH') || null; }
