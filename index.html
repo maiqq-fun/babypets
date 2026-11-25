@@ -2386,7 +2386,7 @@ function roomPicker(id,cur,hid,fl){const list=roomChoices(hid);return `<div clas
 function bindRoom(id,cb){const g=$('#'+id);g.onclick=e=>{const b=e.target.closest('button');if(!b||b.disabled)return;g.querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===b));cb(b.dataset.v)}}
 // ================= 家裡 =================
 const RW=848,RH=1264,FLOOR={x0:110,x1:750,y0:840,y1:1170};
-const BOARDS={shop2:[425,236,706,445],starhouse:[452,240,836,482],basic1:[432,352,698,536],basic2:[422,335,710,547],basic3:[433,346,700,534],study:[456,286,689,486],garden:[428,255,680,479],cafe:[444,297,681,499],beach:[417,275,698,492],sakura:[435,270,701,507],forest:[432,266,690,492],cloud:[429,265,686,495],xmas:[433,269,689,505],ocean:[428,275,683,496],star:[425,248,690,507],space:[431,280,693,467],dessert:[432,270,762,456],arcade:[432,277,742,462],library:[440,284,742,452],washitsu:[448,280,735,462],circus:[434,302,733,463],cabin:[432,288,738,462],party:[445,281,738,462],pinkroom:[422,236,737,422],sweetdevil:[430,245,705,476],ufobase:[420,262,738,455],street:[426,261,733,455],pearl:[402,248,733,470],surf:[412,250,708,460],nightmkt:[412,280,720,462],redcheck:[422,240,745,435],princess:[426,263,755,457],hiphop:[412,268,764,479],hawaiicat:[430,265,712,460],calibeach:[467,181,798,420],snoopy:[481,173,793,412],stussy:[474,195,815,439],spacecat:[448,245,760,446],crystalstar:[480,242,742,402],magicattic:[527,226,812,409],clouddream:[528,207,826,405],catbakery:[481,251,813,450],monsterroom:[472,236,774,444],starcircus:[443,253,757,436],mushroomstudy:[416,267,748,465],sunnypet:[440,295,708,450],cattreehouse:[445,262,740,448]};
+const BOARDS={shop2:[432,232,804,436],starhouse:[452,240,836,482],basic1:[432,352,698,536],basic2:[422,335,710,547],basic3:[433,346,700,534],study:[456,286,689,486],garden:[428,255,680,479],cafe:[444,297,681,499],beach:[417,275,698,492],sakura:[435,270,701,507],forest:[432,266,690,492],cloud:[429,265,686,495],xmas:[433,269,689,505],ocean:[428,275,683,496],star:[425,248,690,507],space:[431,280,693,467],dessert:[432,270,762,456],arcade:[432,277,742,462],library:[440,284,742,452],washitsu:[448,280,735,462],circus:[434,302,733,463],cabin:[432,288,738,462],party:[445,281,738,462],pinkroom:[422,236,737,422],sweetdevil:[430,245,705,476],ufobase:[420,262,738,455],street:[426,261,733,455],pearl:[402,248,733,470],surf:[412,250,708,460],nightmkt:[412,280,720,462],redcheck:[422,240,745,435],princess:[426,263,755,457],hiphop:[412,268,764,479],hawaiicat:[430,265,712,460],calibeach:[467,181,798,420],snoopy:[481,173,793,412],stussy:[474,195,815,439],spacecat:[448,245,760,446],crystalstar:[480,242,742,402],magicattic:[527,226,812,409],clouddream:[528,207,826,405],catbakery:[481,251,813,450],monsterroom:[472,236,774,444],starcircus:[443,253,757,436],mushroomstudy:[416,267,748,465],sunnypet:[440,295,708,450],cattreehouse:[445,262,740,448]};
 const BOWL={x:424,y:1150};
 const hp=(x,y)=>({left:(x/RW*100)+'%',top:(y/RH*100)+'%'});
 let home=null,raf=0,last=0;
@@ -6552,7 +6552,7 @@ function announceLetters(){if(!DB.me)return;let seen=[];try{seen=JSON.parse(loca
     sfx('gift');$('#lgopen').onclick=()=>openLetter(nw[0].id,()=>$('#bell').click())};
   setTimeout(go,1800)}
 // ================= 自動更新：發現新版本就重新載入 =================
-const APP_VER='v2.80';
+const APP_VER='v2.81';
 function checkUpdate(){
   if(!/^https?:/.test(location.protocol)||!API_URL)return;
   if(!$('#modal').classList.contains('hidden'))return; // 正在填表單時不打斷
