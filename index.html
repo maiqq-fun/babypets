@@ -2454,7 +2454,8 @@ function openHome(hid,keep){
 // v1.91：毛孩頭像列排在右上按鈕（毛孩、家、二樓、農田、徵才…）下面，不會被擋住
 // v2.77：毛孩頭像在左邊，排在家人列下面
 function placeHeads(){const v=$('#visits'),p=$('#petheads');if(!p)return;const on=v&&v.style.display!=='none'&&v.offsetHeight;p.style.setProperty('top',(on?v.offsetTop+v.offsetHeight+8:12)+'px','important')}
-const PH={fold:false,hid:null};
+// v2.79：毛孩頭像開／關會記住（跟音效一樣：存在手機，也存進帳號 DB.game.ph），換家、重開都照上次的
+const PH={get fold(){try{const v=localStorage.getItem('mhd_ph');if(v!=null)return v==='1'}catch(e){}return !!(DB&&DB.game&&DB.game.ph)},set fold(on){try{localStorage.setItem('mhd_ph',on?'1':'0')}catch(e){}if(DB&&DB.game){DB.game.ph=on?1:0;save()}}};
 function renderFoot2(){
   const h=house(home.id),L=h.visits&&h.visits.day===todayTW()?h.visits.list||[]:[];
   const SH=isShopH(h),M=SH?shopMgrs().map(id=>({id,nick:nickOf(id)})):membersOf(h.id);
@@ -2462,7 +2463,7 @@ function renderFoot2(){
   $('#visits').onclick=()=>peopleSheet(h.id);
   const own=petsOf(h.id),gs=guestsOf(h.id).map(g=>pet(g.petId)).filter(p=>p.houseId!==h.id&&!jobNow(p.id)).concat(workersAt(h.id).map(w=>pet(w.petId)).filter(p=>p&&p.houseId!==h.id));
   const heads=own.concat(gs).map(p=>{const o=outAt(p.id),away=o&&o.id!==h.id,sl=!away&&sleepState(p);return `<button class="ph1${away?' away':''}" data-pid="${p.id}" title="${esc(p.name)}"><img src="${!away&&petDemon(p)?'assets/demon_head.webp':petHead(p)}" alt="">${away?(jobNow(p.id)?'<i>💼</i>':'<i>🐾</i>'):sl?'<i>💤</i>':p.houseId!==h.id?'<i>🏠</i>':''}</button>`}).join('');
-  if(PH.hid!==home.id){PH.hid=home.id;PH.fold=false}$('#petheads').innerHTML=heads?`<button class="phtog noic" aria-label="收起毛孩頭像"><img src="assets/icon_tri_d.webp" alt=""><span>${PH.fold?'毛孩':''}</span></button>`+heads:'';$('#petheads').classList.toggle('fold',PH.fold);{const t=$('#petheads .phtog');if(t)t.onclick=e=>{e.stopPropagation();PH.fold=!PH.fold;$('#petheads').classList.toggle('fold',PH.fold);t.querySelector('span').textContent=PH.fold?'毛孩':''}}placeHeads();setTimeout(placeHeads,400);$('#petheads').querySelectorAll('[data-pid]').forEach(b=>b.onclick=()=>{const pid=b.dataset.pid,pp=pet(pid),o=outAt(pid),jw=jobNow(pid);if(jw&&o&&o.id!==h.id)return toast(`${pp.name} 在${JOB_PLACE[jw.place]}打工中 💼 ${JOB_SLOTS[jw.slot][1]}:00 下班`);if(o&&o.id!==h.id){if(pp.houseId===h.id&&isFamily(h.id))return recallSheet(pp,o);toast(`${pp.name} 出門去 ${o.name} 玩了 🐾`)}idCard(pid)});
+  $('#petheads').innerHTML=heads?`<button class="phtog noic" aria-label="收起毛孩頭像"><img src="assets/icon_tri_d.webp" alt=""><span>${PH.fold?'毛孩':''}</span></button>`+heads:'';$('#petheads').classList.toggle('fold',PH.fold);{const t=$('#petheads .phtog');if(t)t.onclick=e=>{e.stopPropagation();PH.fold=!PH.fold;$('#petheads').classList.toggle('fold',PH.fold);t.querySelector('span').textContent=PH.fold?'毛孩':''}}placeHeads();setTimeout(placeHeads,400);$('#petheads').querySelectorAll('[data-pid]').forEach(b=>b.onclick=()=>{const pid=b.dataset.pid,pp=pet(pid),o=outAt(pid),jw=jobNow(pid);if(jw&&o&&o.id!==h.id)return toast(`${pp.name} 在${JOB_PLACE[jw.place]}打工中 💼 ${JOB_SLOTS[jw.slot][1]}:00 下班`);if(o&&o.id!==h.id){if(pp.houseId===h.id&&isFamily(h.id))return recallSheet(pp,o);toast(`${pp.name} 出門去 ${o.name} 玩了 🐾`)}idCard(pid)});
   const dm=!SH&&!isFamily(h.id)&&demonOf(h);
   if(dm&&+dm.until>Date.now()){const mins=Math.ceil((+dm.until-Date.now())/60000);$('#visits').insertAdjacentHTML('beforeend',`<div>餓魔被救回來了，${mins>=60?Math.floor(mins/60)+' 小時 '+(mins%60)+' 分':mins+' 分鐘'}後又會變回餓魔（主人回家才會真的好）</div>`)}
   $('#visits').style.display=M.length||L.length||(dm&&+dm.until>Date.now())?'':'none';
@@ -6539,7 +6540,7 @@ function announceLetters(){if(!DB.me)return;let seen=[];try{seen=JSON.parse(loca
     sfx('gift');$('#lgopen').onclick=()=>openLetter(nw[0].id,()=>$('#bell').click())};
   setTimeout(go,1800)}
 // ================= 自動更新：發現新版本就重新載入 =================
-const APP_VER='v2.78';
+const APP_VER='v2.79';
 function checkUpdate(){
   if(!/^https?:/.test(location.protocol)||!API_URL)return;
   if(!$('#modal').classList.contains('hidden'))return; // 正在填表單時不打斷
