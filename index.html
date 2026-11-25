@@ -91,6 +91,7 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
 .act:active{transform:translateY(2px);box-shadow:0 1px 0 rgba(0,0,0,.15)}
 .famtools{position:absolute;right:12px;top:62px;display:flex;flex-direction:column;gap:8px;z-index:3000}
 .famtools .act{font-size:13px;padding:6px 10px}
+#famtools{right:auto;left:12px;align-items:flex-start}
 .petmenu{position:absolute;transform:translate(-50%,-100%);display:flex;gap:6px;background:#fff;padding:6px;border-radius:16px;box-shadow:0 3px 0 rgba(0,0,0,.15);z-index:2800}
 .petmenu button{border:0;background:#fff3e2;border-radius:12px;padding:7px 10px;font-size:14px;white-space:nowrap}
 /* modal */
@@ -2454,7 +2455,7 @@ function renderFoot2(){
   $('#petheads').innerHTML=heads;placeHeads();setTimeout(placeHeads,400);$('#petheads').querySelectorAll('[data-pid]').forEach(b=>b.onclick=()=>{const pid=b.dataset.pid,pp=pet(pid),o=outAt(pid),jw=jobNow(pid);if(jw&&o&&o.id!==h.id)return toast(`${pp.name} 在${JOB_PLACE[jw.place]}打工中 💼 ${JOB_SLOTS[jw.slot][1]}:00 下班`);if(o&&o.id!==h.id){if(pp.houseId===h.id&&isFamily(h.id))return recallSheet(pp,o);toast(`${pp.name} 出門去 ${o.name} 玩了 🐾`)}idCard(pid)});
   const dm=!SH&&!isFamily(h.id)&&demonOf(h);
   if(dm&&+dm.until>Date.now()){const mins=Math.ceil((+dm.until-Date.now())/60000);$('#visits').insertAdjacentHTML('beforeend',`<div>餓魔被救回來了，${mins>=60?Math.floor(mins/60)+' 小時 '+(mins%60)+' 分':mins+' 分鐘'}後又會變回餓魔（主人回家才會真的好）</div>`)}
-  $('#visits').style.display=M.length||L.length||(dm&&+dm.until>Date.now())?'':'none';
+  $('#visits').style.display=M.length||L.length||(dm&&+dm.until>Date.now())?'':'none';famPos();
   $('#nightdim').classList.toggle('on',isNight());
 }
 function renderHome(){
@@ -2478,7 +2479,9 @@ function renderHome(){
 }
 $('#back').onclick=()=>{cancelAnimationFrame(raf);home=null;placing=null;$('#home').classList.remove('placing');if($('#gcancel'))$('#gcancel').remove();if(ONLINE){sync(true);pingWhere()}$('#home').classList.add('hidden');$('#island').classList.remove('hidden');renderIsland();renderFoot();window.scrollTo(0,0)};
 // ---------- 留言板 ----------
-function renderBoard(){
+// v2.74：右邊的按鈕（毛孩、家、監視器…）搬到左邊、排在家人列下面，才不會蓋住佈告欄
+function famPos(){const v=$('#visits'),ft=$('#famtools');if(!ft)return;const on=v&&v.style.display!=='none'&&v.offsetHeight;ft.style.setProperty('top',(on?v.offsetTop+v.offsetHeight+8:12)+'px','important')}
+function renderBoard(){famPos();
   const h=house(home.id),B=BOARDS[h.room]||BOARDS.basic1,ins=10;
   const b=$('#board');Object.assign(b.style,hp(B[0]+ins,B[1]+ins),{width:((B[2]-B[0]-2*ins)/RW*100)+'%',height:((B[3]-B[1]-2*ins)/RH*100)+'%'});
   const all=DB.notes.filter(n=>n.houseId===home.id).sort((a,c)=>a.createdAt-c.createdAt),list=all.slice(-6);
@@ -6256,7 +6259,7 @@ function announceLetters(){if(!DB.me)return;let seen=[];try{seen=JSON.parse(loca
     sfx('gift');$('#lgopen').onclick=()=>openLetter(nw[0].id,()=>$('#bell').click())};
   setTimeout(go,1800)}
 // ================= 自動更新：發現新版本就重新載入 =================
-const APP_VER='v2.73';
+const APP_VER='v2.74';
 function checkUpdate(){
   if(!/^https?:/.test(location.protocol)||!API_URL)return;
   if(!$('#modal').classList.contains('hidden'))return; // 正在填表單時不打斷
