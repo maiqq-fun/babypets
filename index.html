@@ -886,6 +886,14 @@ img{-webkit-user-drag:none}
 .chead .pill{border:0;border-radius:999px;padding:9px 16px;font-size:16px;background:#fff6e6;box-shadow:0 0 0 2px var(--wood);color:var(--ink)}
 .ctitle{background:#fff6e6;border-radius:999px;padding:4px 18px;text-align:center;font-weight:700;font-size:18px;color:#3f6b2a;box-shadow:0 0 0 2px var(--wood);line-height:1.2}
 .ctitle small{display:block;font-size:11px;font-weight:400;color:#8a7a60}
+/* v2.78：二樓、農田、展示間…的上排跟家裡的上排一樣大、同樣位置，切換時不會跳 */
+.centerv .chead{max-width:520px;margin:0 auto;padding:8px 14px 6px;gap:6px;justify-content:flex-start;min-height:52px}
+.centerv .chead .pill{border:2px solid var(--wood);background:rgba(255,250,238,.94);padding:6px 14px;font-size:15px;box-shadow:0 2px 0 rgba(0,0,0,.12);margin-left:0}
+.centerv .chead .ctitle{margin:0 auto;border:2px solid var(--wood);background:rgba(255,250,238,.94);box-shadow:0 2px 0 rgba(0,0,0,.12);padding:4px 14px;font-size:clamp(15px,4.4vw,19px);max-width:48%}
+.centerv .chead .cpad{width:52px;flex:none}
+#homewrap .top.hbar,.centerv .chead{height:62px;min-height:62px;box-sizing:border-box;align-items:center}
+#homewrap .top.hbar>.pill:not(.housename),.centerv .chead>.pill{height:38px;box-sizing:border-box;display:inline-flex;align-items:center}
+#homewrap .top.hbar .housename,.centerv .chead .ctitle{height:46px;box-sizing:border-box;display:flex;flex-direction:column;align-items:center;justify-content:center;line-height:1.2}
 .cwrap{flex:1;min-height:0;width:100%;display:flex;justify-content:center;align-items:flex-start;overflow:hidden}
 .cstage{position:relative;height:100%;flex:none;aspect-ratio:848/1264;container-type:inline-size;overflow:hidden}
 .cbg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
@@ -4263,7 +4271,7 @@ let cEls=[];
 const pinSeen=()=>{try{return +(localStorage.getItem('mhd_pinseen')||0)}catch(e){return 0}};
 function openCenter(){sfx&&sfx('tap');try{if(DB.notice&&DB.notice.at)localStorage.setItem('mhd_pinseen',String(DB.notice.at))}catch(e){}let v=$('#centerv');if(v)v.remove();v=document.createElement('div');v.id='centerv';v.className='centerv';
   const n=DB.notice&&DB.notice.t?DB.notice:null;
-  v.innerHTML=`<div class="chead"><button class="pill" id="cback">← 小島</button><div class="ctitle">島民中心<small>大家的服務處</small></div><span style="width:84px"></span></div>
+  v.innerHTML=`<div class="chead"><button class="pill" id="cback">← 小島</button><div class="ctitle">島民中心<small>大家的服務處</small></div><span class="cpad"></span></div>
     <div class="cwrap"><div class="cstage" id="cstage"><img class="cbg" src="assets/room_center.webp" alt="">
       <button class="cboard noic" id="cboard" style="left:${CBOARD[0]/RW*100}%;top:${CBOARD[1]/RH*100}%;width:${(CBOARD[2]-CBOARD[0])/RW*100}%;height:${(CBOARD[3]-CBOARD[1])/RH*100}%">
         ${n?`<span class="cnote"><b><img class="mic" style="width:1.4em;height:1.4em" src="assets/icon_notice.webp" alt="">島主公告</b>${esc(n.t)}</span>`:'<span class="cnote empty">目前沒有公告</span>'}</button></div></div>
@@ -4356,7 +4364,7 @@ const hasF2=h=>!!(h&&+h.floor2),hasFarm=h=>!!(h&&h.farm&&typeof h.farm==='object
 function up2(p){const h=house(p.houseId);if(!hasF2(h)||isHungry(p)||outAt(p.id))return false;try{if(sleepState(p))return false}catch(e){}return hash01(p.id+'up'+Math.floor(Date.now()/1800000))<0.4}
 // ---------- 共用：全螢幕場景 ----------
 function sceneOpen(id,title,sub,bg,back){let v=$('#'+id);if(v)v.remove();v=document.createElement('div');v.id=id;v.className='centerv scene';
-  v.innerHTML=`<div class="chead"><button class="pill" data-back>${back||'← 回去'}</button><div class="ctitle">${title}<small>${sub||''}</small></div><span style="width:84px"></span></div>
+  v.innerHTML=`<div class="chead"><button class="pill" data-back>${back||'← 回去'}</button><div class="ctitle">${title}<small>${sub||''}</small></div><span class="cpad"></span></div>
     <div class="cwrap"><div class="cstage"><img class="cbg" src="${bg}" alt=""></div></div><div class="cbtns"></div>`;
   document.body.appendChild(v);v.querySelector('[data-back]').onclick=()=>{v.remove();if(home&&!$('#home').classList.contains('hidden'))openHome(home.id,true)};return v}
 const stageXY=(st,e)=>{const r=st.getBoundingClientRect();return {x:(e.clientX-r.left)/r.width*RW,y:(e.clientY-r.top)/r.height*RH}};
@@ -6531,7 +6539,7 @@ function announceLetters(){if(!DB.me)return;let seen=[];try{seen=JSON.parse(loca
     sfx('gift');$('#lgopen').onclick=()=>openLetter(nw[0].id,()=>$('#bell').click())};
   setTimeout(go,1800)}
 // ================= 自動更新：發現新版本就重新載入 =================
-const APP_VER='v2.77';
+const APP_VER='v2.78';
 function checkUpdate(){
   if(!/^https?:/.test(location.protocol)||!API_URL)return;
   if(!$('#modal').classList.contains('hidden'))return; // 正在填表單時不打斷
