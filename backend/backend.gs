@@ -1,5 +1,6 @@
 /*
- * 毛很多 babypets 後端・整理版 v69
+ * 毛很多 babypets 後端・整理版 v70
+ * v70：🛏️ 二樓：玩具最多 25 個（地上＋層板）；二樓牆面每個位置可以掛層板或相框（show.f2，跟展示間共用倉庫），層板上放玩具（toys2 的 w、c）；相框記掛上去的時間（wfa、f2.fa）；新增 6 款二樓背景
  * v69：🎫 一番賞不下架了：這箱抽完自動開下一箱，新箱一抽 🪙1200（price 跟著箱子；前端帶 pay，付不夠就擋下來）
  * v68：🌱 修「澆水、收成會跳回去」：寫進試算表的資料要先真的存好（flush）才讓下一個人排進來；以前偶爾會被別人讀到舊的那份再整列蓋回去
  * v67：🏝️ 外島（adminMoveHouse）：島主把沒在玩的家搬到外島（slot 100～112）；外島的家冬眠：不長便便、不掉錢、不變餓魔、小偷不去、不推播肚子餓；搬回主島時重新計時
@@ -72,7 +73,7 @@ const STYLE_COUNT_ = 42;                                 // 房子款式（13～
 
 const POOP_EVERY = 3 * HOUR_, POOP_MAX_HOUSE = 5;       // v41：每隻毛孩每 3 小時 1 坨，一個家最多 5 坨（原本 4 小時、4 坨）
 const MAX_MEMBERS_ = 5;                                  // 一個家最多 5 個家人
-const TREAT_MAX_ = 3, TOY_MAX_ = 20, GIFT_MAX_ = 8;      // 零食每天 3 個、地上玩具 20 個、未拆禮物 8 份
+const TREAT_MAX_ = 3, TOY_MAX_ = 20, TOY2_MAX_ = 25, F2_N_ = 6, GIFT_MAX_ = 8;      // 零食每天 3 個、地上玩具 20 個、未拆禮物 8 份
 const TOY_ITEMS_ = ['ball','yarn','wand','bone','fishdoll','duck','box','cushion','crown','starlamp','rainbow','castle'];
 const ITEM_NAMES_ = { fish: '🐟小魚乾', meat: '🥫肉泥', chicken: '🍗雞肉條', cheese: '🧀起司', carrot: '🥕胡蘿蔔', seeds: '🌻瓜子', cookie: '🍪寵物餅乾', cake: '🎂生日蛋糕' };
 const WALK_MS_ = 30 * 60000, GUEST_MAX_ = 3;              // 遛遛 30 分鐘、一個家最多 3 位客人
@@ -1232,9 +1233,17 @@ const ACTIONS = {
   },
   placeToy(req) {
     const h = mustFam_(req, true), k = toyKey_(h, req), toys = Array.isArray(h[k]) ? h[k] : [];
-    if (toys.length >= TOY_MAX_) throw new Error(`地上最多放 ${TOY_MAX_} 個玩具`);
+    const cap = k === 'toys2' ? TOY2_MAX_ : TOY_MAX_;
+    if (toys.length >= cap) throw new Error(k === 'toys2' ? `二樓最多放 ${cap} 個玩具` : `地上最多放 ${cap} 個玩具`);
     if (!/^[a-z0-9_]{1,20}$/i.test(String(req.item || ''))) throw new Error('這不是玩具');
     const t = { id: uid_(), item: req.item, x: Math.round(Number(req.x) || 400), y: Math.round(Number(req.y) || 1000) };
+    if (k === 'toys2' && req.w !== undefined && req.w !== null && req.w !== '') {   // v70：放在二樓牆上的層板
+      const w = Math.floor(Number(req.w)), c = Math.floor(Number(req.c)), s = h.show && typeof h.show === 'object' ? showNorm_(h.show) : null;
+      if (!s || !(w >= 0 && w < F2_N_) || String(s.f2.w[w]).indexOf('sh:') !== 0) throw new Error('這裡沒有層板');
+      if (!(c >= 0 && c < 5)) throw new Error('沒有這一格');
+      if (toys.some(x => Number(x.w) === w && x.w !== undefined && x.w !== null && Number(x.c) === c)) throw new Error('這格已經有東西了');
+      t.w = w; t.c = c;
+    }
     toys.push(t); h[k] = toys; put_('houses', h);
     return t;
   },
@@ -1987,7 +1996,7 @@ function renewStyleOk_(h, style) {
   if (all_('houses').some(x => x.id !== h.id && Number(x.style) === style)) throw new Error('這款房子島上已經有人用了，換一款吧');
 }
 function toyKey_(h, req) { if (Number(req.floor) === 2) { if (!Number(h.floor2)) throw new Error('這個家還沒有二樓'); return 'toys2'; } return 'toys'; }
-const innComfort_ = h => Math.min(TOY_MAX_, (Array.isArray(h.toys2) ? h.toys2 : []).length) * 2;     // 二樓每個玩具 +2 舒適度
+const innComfort_ = h => Math.min(TOY2_MAX_, (Array.isArray(h.toys2) ? h.toys2 : []).length) * 2;     // 二樓每個玩具 +2 舒適度
 function farm_(h) { const f = h.farm && typeof h.farm === 'object' ? h.farm : null; if (!f) throw new Error('這個家還沒有農田'); f.n = clampN_(f.n || FARM_N0_, 1, FARM_MAX_); f.p = Array.isArray(f.p) ? f.p : []; while (f.p.length < FARM_MAX_) f.p.push(null); return f; }
 // v57：小番茄長得快（4 小時、澆水最多快 1 小時），南瓜、金蘋果 8 小時（澆 3 次快 3 小時）
 const FARM_GROW_ = { tomato: 4, pumpkin: 8, apple: 8 }, FARM_WMAX_ = { tomato: 1, pumpkin: 3, apple: 3 };
@@ -2405,6 +2414,13 @@ function showNorm_(s) {
   return a.map(x => has_(D, x) ? x : ''); };
   s.wsh = two(s.wsh, WSH_P_); s.wcb = has_(WCB_P_, s.wcb) ? s.wcb : ''; s.wfr = two(s.wfr, WFR_P_, 4);
   s.wfp = Array.isArray(s.wfp) ? s.wfp.slice(0, 4).map(x => String(x || '')) : []; while (s.wfp.length < 4) s.wfp.push('');
+  s.wfa = Array.isArray(s.wfa) ? s.wfa.slice(0, 4).map(x => Number(x) || 0) : []; while (s.wfa.length < 4) s.wfa.push(0);
+  {  // v70：二樓牆面，每個位置是 'sh:款式' 或 'fr:款式' 或空的
+    const f = s.f2 && typeof s.f2 === 'object' ? s.f2 : {};
+    const ok = x => { const p = String(x || '').split(':'); return (p[0] === 'sh' && has_(WSH_P_, p[1])) || (p[0] === 'fr' && has_(WFR_P_, p[1])) ? p[0] + ':' + p[1] : ''; };
+    const arr = (a, fn) => { a = Array.isArray(a) ? a.slice(0, F2_N_) : []; while (a.length < F2_N_) a.push(''); return a.map(fn); };
+    s.f2 = { w: arr(f.w, ok), fp: arr(f.fp, x => String(x || '').slice(0, 40)), fa: arr(f.fa, x => Number(x) || 0) };
+  }
   s.neon = s.neon && typeof s.neon === 'object' && s.neon.t ? { t: String(s.neon.t).slice(0, 12), c: NEON_C_.indexOf(s.neon.c) >= 0 ? s.neon.c : 'pink' } : null;
   s.hon = Array.isArray(s.hon) ? s.hon.slice(0, 30) : [];
   return s;
@@ -2442,7 +2458,8 @@ Object.assign(ACTIONS, {
     const okPos = () => { if (!(pos >= 0 && pos < SHOW_POS_)) throw new Error('沒有這個位置'); };
     const okSlot = () => { if (!(pos >= 0 && pos < SHOW_IT_)) throw new Error('沒有這個位置'); const cap = wallCap_(s, pos); if (!cap) throw new Error(pos < 3 ? '這裡還沒有櫃子' : '這裡還沒有層板'); if (!(i >= 0 && i < cap)) throw new Error('沒有這一格'); };
     const W = { sh: WSH_P_, cb: WCB_P_, fr: WFR_P_ }, kind = String(req.kind || ''), row = Math.floor(Number(req.row)), busy = p => s.it[p].some(Boolean);
-    const wFree = (k, wid, ex) => (Number(s.wo[k + ':' + wid]) || 0) - (k === 'sh' ? s.wsh : k === 'fr' ? s.wfr : [s.wcb]).filter((x, r) => x === wid && r !== ex).length;
+    const wFree = (k, wid, ex, exF2) => (Number(s.wo[k + ':' + wid]) || 0) - (k === 'sh' ? s.wsh : k === 'fr' ? s.wfr : [s.wcb]).filter((x, r) => x === wid && r !== ex).length - s.f2.w.filter((x, r) => x === k + ':' + wid && r !== exF2).length;
+    const shBusy2 = r => (Array.isArray(h.toys2) ? h.toys2 : []).some(t => t.w !== undefined && t.w !== null && t.w !== '' && Number(t.w) === r);
     const free = (cid, except) => (Number(s.cabs[cid]) || 0) - s.pos.filter((c, k) => c === cid && k !== except).length;
     let brag = '', shelf = null;
     if (op === 'buyRoom') {
@@ -2513,11 +2530,25 @@ Object.assign(ACTIONS, {
       } else {
         if (!(row >= 0 && row < 4)) throw new Error('沒有這個位置');
         if (id && wFree('fr', id, row) <= 0) throw new Error('這款相框都掛出去了');
-        s.wfr[row] = id; if (!id) s.wfp[row] = '';
+        s.wfr[row] = id; if (!id) { s.wfp[row] = ''; s.wfa[row] = 0; }
       }
+    } else if (op === 'f2W') {   // v70：二樓牆面的一個位置掛層板或相框（id 空的＝收起來）
+      if (!Number(h.floor2)) throw new Error('這個家還沒有二樓');
+      if (!(row >= 0 && row < F2_N_)) throw new Error('沒有這個位置');
+      const cur = s.f2.w[row];
+      if (!id) { if (cur.indexOf('sh:') === 0 && shBusy2(row)) throw new Error('層板上還有玩具，先收回背包'); s.f2.w[row] = ''; s.f2.fp[row] = ''; s.f2.fa[row] = 0; }
+      else {
+        if (!(kind === 'sh' || kind === 'fr') || !has_(W[kind], id)) throw new Error('沒有這一款');
+        if (cur !== kind + ':' + id && wFree(kind, id, -1, row) <= 0) throw new Error('這款都掛出去了');
+        if (cur.indexOf('sh:') === 0 && kind !== 'sh' && shBusy2(row)) throw new Error('層板上還有玩具，先收回背包');
+        s.f2.w[row] = kind + ':' + id; if (kind !== 'fr') { s.f2.fp[row] = ''; s.f2.fa[row] = 0; }
+      }
+    } else if (op === 'f2Pet') {
+      if (!(row >= 0 && row < F2_N_) || s.f2.w[row].indexOf('fr:') !== 0) throw new Error('這裡還沒有相框');
+      s.f2.fp[row] = String(req.pet || '').slice(0, 40); s.f2.fa[row] = Date.now();
     } else if (op === 'frPet') {
       if (!(row >= 0 && row < 4) || !s.wfr[row]) throw new Error('這裡還沒有相框');
-      s.wfp[row] = String(req.pet || '').slice(0, 40);
+      s.wfp[row] = String(req.pet || '').slice(0, 40); s.wfa[row] = Date.now();
     } else if (op === 'neon') {
       const t = String(req.t || '').trim().slice(0, 12), c = String(req.c || '');
       if (!t) throw new Error('招牌要寫字');
@@ -2588,7 +2619,7 @@ Object.assign(ACTIONS, {
     return { owned: o };
   }
 });
-const DECO_F2_ = { f2shop_pig: 1500, f2shop_xmas: 2000, f2shop_ghost: 2000, f2shop_space: 2000 };   // v57：3000 → 2000（買過的補差價，見 econFix_）
+const DECO_F2_ = { f2shop_pig: 1500, f2shop_xmas: 2000, f2shop_ghost: 2000, f2shop_space: 2000, f2shop_loftblack: 2000, f2shop_loftgreen: 2000, f2shop_daisy: 1500, f2shop_creampaw: 1500, f2shop_spacewhite: 2000, f2shop_spacemint: 2000 };   // v57：3000 → 2000（買過的補差價，見 econFix_）
 
 // ================= 🎁 島主上傳的盲盒系列（v51） =================
 // meta bbx.list = [{ id(101 起), n, en, c, off, box, f: [{ n, img, r: N/R/S/H }] }]
