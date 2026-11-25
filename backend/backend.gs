@@ -1,6 +1,6 @@
 /*
  * 毛很多 babypets 後端・整理版 v70
- * v70：🛏️ 二樓：玩具最多 25 個（地上＋層板）；二樓牆面每個位置可以掛層板或相框（show.f2，跟展示間共用倉庫），層板上放玩具（toys2 的 w、c）；相框記掛上去的時間（wfa、f2.fa）；新增 6 款二樓背景
+ * v70：🛏️ 二樓：玩具最多 25 個（地上＋層板）；二樓牆面掛層板（show.f2.w，跟展示間共用倉庫），層板上放玩具（toys2 的 w、c）；相框記掛上去的時間（wfa）；新增 10 款二樓背景
  * v69：🎫 一番賞不下架了：這箱抽完自動開下一箱，新箱一抽 🪙1200（price 跟著箱子；前端帶 pay，付不夠就擋下來）
  * v68：🌱 修「澆水、收成會跳回去」：寫進試算表的資料要先真的存好（flush）才讓下一個人排進來；以前偶爾會被別人讀到舊的那份再整列蓋回去
  * v67：🏝️ 外島（adminMoveHouse）：島主把沒在玩的家搬到外島（slot 100～112）；外島的家冬眠：不長便便、不掉錢、不變餓魔、小偷不去、不推播肚子餓；搬回主島時重新計時
@@ -2417,7 +2417,7 @@ function showNorm_(s) {
   s.wfa = Array.isArray(s.wfa) ? s.wfa.slice(0, 4).map(x => Number(x) || 0) : []; while (s.wfa.length < 4) s.wfa.push(0);
   {  // v70：二樓牆面，每個位置是 'sh:款式' 或 'fr:款式' 或空的
     const f = s.f2 && typeof s.f2 === 'object' ? s.f2 : {};
-    const ok = x => { const p = String(x || '').split(':'); return (p[0] === 'sh' && has_(WSH_P_, p[1])) || (p[0] === 'fr' && has_(WFR_P_, p[1])) ? p[0] + ':' + p[1] : ''; };
+    const ok = x => { const p = String(x || '').split(':'); return p[0] === 'sh' && has_(WSH_P_, p[1]) ? 'sh:' + p[1] : ''; };
     const arr = (a, fn) => { a = Array.isArray(a) ? a.slice(0, F2_N_) : []; while (a.length < F2_N_) a.push(''); return a.map(fn); };
     s.f2 = { w: arr(f.w, ok), fp: arr(f.fp, x => String(x || '').slice(0, 40)), fa: arr(f.fa, x => Number(x) || 0) };
   }
@@ -2538,10 +2538,9 @@ Object.assign(ACTIONS, {
       const cur = s.f2.w[row];
       if (!id) { if (cur.indexOf('sh:') === 0 && shBusy2(row)) throw new Error('層板上還有玩具，先收回背包'); s.f2.w[row] = ''; s.f2.fp[row] = ''; s.f2.fa[row] = 0; }
       else {
-        if (!(kind === 'sh' || kind === 'fr') || !has_(W[kind], id)) throw new Error('沒有這一款');
+        if (kind !== 'sh' || !has_(WSH_P_, id)) throw new Error('二樓只能掛層板');
         if (cur !== kind + ':' + id && wFree(kind, id, -1, row) <= 0) throw new Error('這款都掛出去了');
-        if (cur.indexOf('sh:') === 0 && kind !== 'sh' && shBusy2(row)) throw new Error('層板上還有玩具，先收回背包');
-        s.f2.w[row] = kind + ':' + id; if (kind !== 'fr') { s.f2.fp[row] = ''; s.f2.fa[row] = 0; }
+        s.f2.w[row] = 'sh:' + id;
       }
     } else if (op === 'f2Pet') {
       if (!(row >= 0 && row < F2_N_) || s.f2.w[row].indexOf('fr:') !== 0) throw new Error('這裡還沒有相框');
@@ -2619,7 +2618,7 @@ Object.assign(ACTIONS, {
     return { owned: o };
   }
 });
-const DECO_F2_ = { f2shop_pig: 1500, f2shop_xmas: 2000, f2shop_ghost: 2000, f2shop_space: 2000, f2shop_loftblack: 2000, f2shop_loftgreen: 2000, f2shop_daisy: 1500, f2shop_creampaw: 1500, f2shop_spacewhite: 2000, f2shop_spacemint: 2000 };   // v57：3000 → 2000（買過的補差價，見 econFix_）
+const DECO_F2_ = { f2shop_pig: 1500, f2shop_xmas: 2000, f2shop_ghost: 2000, f2shop_space: 2000, f2shop_loftblack: 2000, f2shop_loftgreen: 2000, f2shop_daisy: 1500, f2shop_creampaw: 1500, f2shop_spacewhite: 2000, f2shop_spacemint: 2000, f2shop_princess2: 2000, f2shop_crystal2: 2000, f2shop_mine: 2000, f2shop_fairyforest: 2000 };   // v57：3000 → 2000（買過的補差價，見 econFix_）
 
 // ================= 🎁 島主上傳的盲盒系列（v51） =================
 // meta bbx.list = [{ id(101 起), n, en, c, off, box, f: [{ n, img, r: N/R/S/H }] }]

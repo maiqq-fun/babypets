@@ -3516,6 +3516,8 @@ let placing=null;
 // ---------- 每間房間的地板範圍（v1.40）----------
 const RF_Y1=1240,RF_DEF={y0:770,t:[105,745],b:[20,828],x:[]};
 const RFLOOR={
+  f2shop_princess2:{y0:765,t:[60,800],b:[0,848],x:[[0,700,245,850],[610,700,848,880]]},f2shop_crystal2:{y0:765,t:[60,800],b:[0,848],x:[[0,700,245,860],[610,700,848,880]]},
+  f2shop_mine:{y0:815,t:[60,800],b:[0,848],x:[[0,760,230,1010],[655,760,848,960]]},f2shop_fairyforest:{y0:720,t:[100,760],b:[0,848],x:[[0,700,290,880],[0,880,170,1140],[680,700,848,990]]},
   f2shop_loftblack:{y0:760,t:[60,800],b:[0,848],x:[[0,700,250,1000],[730,700,848,840]]},f2shop_loftgreen:{y0:760,t:[60,800],b:[0,848],x:[[0,700,320,1000]]},
   f2shop_daisy:{y0:770,t:[60,800],b:[0,848],x:[[0,700,260,850],[0,850,150,1040],[730,700,848,850]]},f2shop_creampaw:{y0:770,t:[60,800],b:[0,848],x:[[0,700,230,910],[0,800,140,1000],[690,700,848,880]]},
   f2shop_spacewhite:{y0:780,t:[60,800],b:[0,848],x:[[0,700,240,1000],[640,700,848,880]]},f2shop_spacemint:{y0:780,t:[60,800],b:[0,848],x:[[0,700,240,1000],[680,700,848,880]]},
@@ -4425,40 +4427,26 @@ function f2ToyMenu(t){const h=house(F2.hid);openModal(`<h3>${itemIcon(t.item)} $
   $('#tfl2').onclick=()=>{t.flip=!t.flip;closeModal();renderF2();call('moveToy',Object.assign(cred(),{toyId:t.id,x:t.x,y:t.y,flip:t.flip,floor:2}),true).catch(e=>toast(e.message))};
   $('#tbk2').onclick=()=>{h.toys2=(h.toys2||[]).filter(x=>x!==t);bagAdd(t.item,1);closeModal();renderF2();toast('收回背包了');
     call('removeToy',Object.assign(cred(),{toyId:t.id,floor:2}),true).catch(e=>{(h.toys2=h.toys2||[]).push(t);bagAdd(t.item,-1);renderF2();toast(e.message)})}}
-// ---------- v2.75：二樓牆面（層板、相框；每個位置自己選要掛哪一種） ----------
+// ---------- v2.75：二樓牆面（只掛層板，層板上放玩具） ----------
 const f2pc=(v,k)=>v/(k?RH:RW)*100+'%';
 function f2ShelfGeo(R,k){const S=WSH[k],rw=R[2]-R[0],rh=R[3]-R[1],w=Math.min(rw,rh*S.a),hh=w/S.a,x0=(R[0]+R[2])/2-w/2,top=R[3]-hh;return {w,hh,x0,top,line:top+hh*S.y/100,cw:w*.76/5}}
-function f2FrameGeo(R,k){const F=WFR[k],rw=R[2]-R[0],rh=R[3]-R[1],hh=Math.min(rh,rw/F.a),w=hh*F.a;return {w,hh,x0:(R[0]+R[2])/2-w/2,top:(R[1]+R[3])/2-hh/2}}
 function f2Wall(st,h,fam){const sp=f2Spots(h.room2||'basic1');if(!sp.length)return;
   const add=(el,R,z,fn)=>{el.classList.add('f2w');Object.assign(el.style,{left:f2pc(R[0]),top:f2pc(R[1],1),width:f2pc(R[2]),zIndex:z});if(R[3]!=null)el.style.height=f2pc(R[3],1);if(fn)el.onclick=e=>{e.stopPropagation();if(F2.placing)return;fn()};st.appendChild(el);return el};
   const ghost=(R,txt,fn)=>{if(!fam)return;const g=document.createElement('button');g.className='shwghost';g.innerHTML=txt;g.style.transform='none';add(g,[R[0]+6,R[1]+6,R[2]-R[0]-12,R[3]-R[1]-12],4,fn)};
-  if(!hasShow(h)){sp.forEach(R=>ghost(R,'＋',()=>toast('層板、相框跟展示間共用，要先蓋展示間才買得到喔')));return}
+  if(!hasShow(h)){sp.forEach(R=>ghost(R,'＋ 層板',()=>toast('層板跟展示間共用，要先蓋展示間才買得到喔')));return}
   const s=showNorm(h.show);
-  sp.forEach((R,i)=>{const v=s.f2.w[i],[kind,id]=v.split(':');
-    if(!v)return ghost(R,'＋<br>層板・相框',()=>f2WallPick(i));
-    if(kind==='sh'){const g=f2ShelfGeo(R,id),el=document.createElement('button');el.className='shw';el.innerHTML=`<img class="wimg" src="assets/wsh_${id}.webp" alt="">`;add(el,[g.x0,g.top,g.w],5,()=>fam?f2ShelfMenu(i):toast(WSH[id].n));
-      (h.toys2||[]).filter(t=>t.w===i).forEach(t=>{const c=Math.max(0,Math.min(4,+t.c||0)),th=g.cw*1.7,el2=document.createElement('span');el2.className='shwit';el2.innerHTML=`<img src="${itemSrc(t.item)}" alt="">`;add(el2,[g.x0+g.w*.12+g.cw*c,g.line-th,g.cw,th],6)})}
-    else{const g=f2FrameGeo(R,id),F=WFR[id],ho=F.h||[15,15,85,85],pt=wallPhoto(s.f2.fp[i],i,s,1),el=document.createElement('button');el.className='shframe';
-      el.innerHTML=`${pt?`<img class="ph" src="${pt}" alt="" style="left:${ho[0]}%;top:${ho[1]}%;width:${ho[2]-ho[0]}%;height:${ho[3]-ho[1]}%">`:`<span class="ph" style="left:${ho[0]}%;top:${ho[1]}%;width:${ho[2]-ho[0]}%;height:${ho[3]-ho[1]}%">🐾</span>`}<img class="fimg" src="assets/wfr_${id}.webp" alt="">`;
-      add(el,[g.x0,g.top,g.w],4,()=>f2FrameMenu(i))}})}
+  sp.forEach((R,i)=>{const v=s.f2.w[i],id=v.split(':')[1];if(!v)return ghost(R,'＋ 層板',()=>f2WallPick(i));
+    const g=f2ShelfGeo(R,id),el=document.createElement('button');el.className='shw';el.innerHTML=`<img class="wimg" src="assets/wsh_${id}.webp" alt="">`;add(el,[g.x0,g.top,g.w],5,()=>fam?f2ShelfMenu(i):toast(WSH[id].n));
+    (h.toys2||[]).filter(t=>t.w===i).forEach(t=>{const c=Math.max(0,Math.min(4,+t.c||0)),th=g.cw*1.7,el2=document.createElement('span');el2.className='shwit';el2.innerHTML=`<img src="${itemSrc(t.item)}" alt="">`;add(el2,[g.x0+g.w*.12+g.cw*c,g.line-th,g.cw,th],6)})})}
 const f2ShBusy=(h,i)=>(h.toys2||[]).some(t=>t.w===i);
-// 選要掛什麼：層板或相框都可以
+// 選要掛哪一款層板（跟展示間共用倉庫）
 function f2WallPick(i){const h=house(F2.hid);if(!h||!hasShow(h))return;const s=showNorm(h.show),cur=s.f2.w[i];
-  const opt=(kind,D,pre)=>Object.keys(D).filter(id=>(+s.wo[kind+':'+id]||0)>0).map(id=>{const f=wFree(s,kind,id,-1,i),on=cur===kind+':'+id;return `<button class="si${on?' on':''}" data-k="${kind}" data-w="${id}" ${f<=0&&!on?'disabled':''}><img class="pv" src="assets/${pre}_${id}.webp" alt="" style="aspect-ratio:1"><div class="sn">${esc(D[id].n)}</div><div class="sf">${on?'掛著':f>0?'倉庫 '+f:'都掛出去了'}</div></button>`}).join('');
-  const a=opt('sh',WSH,'wsh'),b=opt('fr',WFR,'wfr');
-  openModal(`<h3>這裡要掛什麼？</h3><p class="lead" style="font-size:12px">層板可以放 5 個玩具（算在二樓 ${TOY2_MAX} 個裡）；相框放毛孩照片。跟展示間共用倉庫</p>
-    <h4>層板</h4><div class="shgrid">${a||'<div class="locked" style="grid-column:1/-1">倉庫裡沒有層板</div>'}</div><h4>相框</h4><div class="shgrid">${b||'<div class="locked" style="grid-column:1/-1">倉庫裡沒有相框</div>'}</div>
-    <div class="row2">${cur?'<button id="f2wput">收起來</button>':''}<button id="f2wbuy">🛒 買層板、相框</button><button data-close>關閉</button></div>`);
+  const a=Object.keys(WSH).filter(id=>(+s.wo['sh:'+id]||0)>0).map(id=>{const f=wFree(s,'sh',id,-1,i),on=cur==='sh:'+id;return `<button class="si${on?' on':''}" data-w="${id}" ${f<=0&&!on?'disabled':''}><img class="pv" src="assets/wsh_${id}.webp" alt="" style="aspect-ratio:1"><div class="sn">${esc(WSH[id].n)}</div><div class="sf">${on?'掛著':f>0?'倉庫 '+f:'都掛出去了'}</div></button>`}).join('');
+  openModal(`<h3>${cur?'換成哪一款層板？':'掛哪一款層板？'}</h3><p class="lead" style="font-size:12px">每個層板可以放 5 個玩具（算在二樓 ${TOY2_MAX} 個裡）・跟展示間共用倉庫</p>
+    <div class="shgrid">${a||'<div class="locked" style="grid-column:1/-1">倉庫裡沒有層板，去裝潢目錄買一個吧</div>'}</div>
+    <div class="row2">${cur?'<button id="f2wput">收起來</button>':''}<button id="f2wbuy">🛒 買層板</button><button data-close>關閉</button></div>`);
   $('#f2wbuy').onclick=()=>decoShop('wall');if($('#f2wput'))$('#f2wput').onclick=()=>{if(f2ShBusy(h,i))return toast('層板上還有玩具，先收回背包');if(showDo(h.id,{op:'f2W',row:i,id:''}))closeModal()};
-  $('#sheet').querySelectorAll('[data-w]').forEach(x=>x.onclick=()=>{const kind=x.dataset.k;if(cur.startsWith('sh:')&&kind!=='sh'&&f2ShBusy(h,i))return toast('層板上還有玩具，先收回背包');if(showDo(h.id,{op:'f2W',kind,row:i,id:x.dataset.w,busy:f2ShBusy(h,i)}))closeModal()})}
-function f2FrameMenu(i){const h=house(F2.hid),s=showNorm(h.show),fam=isFamily(h.id),pid=s.f2.fp[i],p=pet(pid),pt=wallPhoto(pid,i,s,1),fr=WFR[s.f2.w[i].split(':')[1]]||{};
-  if(!fam)return openModal(`<div style="text-align:center">${pt?`<img src="${pt}" alt="" style="width:180px;border-radius:14px">`:'<div class="locked">還沒放照片</div>'}<h3>${p?esc(p.name):'相框'}</h3></div><div class="row2"><button data-close class="primary">好</button></div>`);
-  const P=petsOf(h.id);
-  openModal(`<h3>${esc(fr.n||'相框')}</h3><p class="lead" style="font-size:13px">放哪一隻毛孩的照片？同一隻毛孩掛好幾個相框（展示間、二樓一起算），會照掛上去的順序輪流放第 1、2、3…張生活照</p>
-    <div class="xcgrid">${P.map(x=>`<button data-fp="${x.id}" class="${x.id===pid?'on':''}"><img src="${wallPhoto(x.id)}" alt="" style="border-radius:10px;object-fit:cover">${esc(x.name)}</button>`).join('')||'<div class="locked" style="grid-column:1/-1">家裡還沒有毛孩</div>'}</div>
-    <div class="row2"><button id="f2frsw">換別的</button><button id="f2frput">收起來</button><button data-close class="primary">關閉</button></div>`);
-  $('#f2frsw').onclick=()=>f2WallPick(i);$('#f2frput').onclick=()=>{if(showDo(h.id,{op:'f2W',row:i,id:''}))closeModal()};
-  $('#sheet').querySelectorAll('[data-fp]').forEach(b=>b.onclick=()=>{if(showDo(h.id,{op:'f2Pet',row:i,pet:b.dataset.fp}))closeModal()})}
+  $('#sheet').querySelectorAll('[data-w]').forEach(x=>x.onclick=()=>{if(showDo(h.id,{op:'f2W',kind:'sh',row:i,id:x.dataset.w}))closeModal()})}
 // 層板：5 格放玩具
 function f2ShelfMenu(i){const h=house(F2.hid),s=showNorm(h.show),id=s.f2.w[i].split(':')[1],T=(h.toys2||[]).filter(t=>t.w===i),at=c=>T.find(t=>(+t.c||0)===c);
   openModal(`<h3>${esc((WSH[id]||{}).n||'層板')}</h3><p class="lead" style="font-size:12px">點空格放玩具，點玩具收回背包・二樓（地上＋層板）最多 ${TOY2_MAX} 個，現在 ${(h.toys2||[]).length} 個</p>
@@ -4473,12 +4461,12 @@ function f2ShelfMenu(i){const h=house(F2.hid),s=showNorm(h.show),id=s.f2.w[i].sp
     $('#sheet').querySelectorAll('[data-p]').forEach(pb=>pb.onclick=()=>{const item=pb.dataset.p,R=f2Spots(h.room2||'basic1')[i]||[0,0,0,0],tmp={id:'tmp'+uid(),item,w:i,c,x:Math.round((R[0]+R[2])/2),y:Math.round(R[3])};
       bagAdd(item,-1);(h.toys2=h.toys2||[]).push(tmp);renderF2();f2ShelfMenu(i);sfx&&sfx('pat');
       call('placeToy',Object.assign(cred(),{item,x:tmp.x,y:tmp.y,floor:2,w:i,c}),true).then(t=>{tmp.id=t.id}).catch(er=>{h.toys2=(h.toys2||[]).filter(x=>x!==tmp);bagAdd(item,1);renderF2();toast(er.message)})})})}
-// 換背景：新背景放不下的層板、相框收回倉庫（層板上的玩具收回背包）
+// 換背景：新背景放不下的層板收回倉庫（層板上的玩具收回背包）
 async function f2WallFit(h){if(!hasShow(h))return;const n=f2Spots(h.room2||'basic1').length,s=showNorm(h.show);let moved=0;
   for(let i=n;i<F2_N;i++){if(!s.f2.w[i])continue;const T=(h.toys2||[]).filter(t=>t.w===i);
     for(const t of T){h.toys2=h.toys2.filter(x=>x!==t);bagAdd(t.item,1);try{await call('removeToy',Object.assign(cred(),{toyId:t.id,floor:2}),true)}catch(e){}}
     showDo(h.id,{op:'f2W',row:i,id:''});moved++}
-  if(moved)toast('新背景掛不下的層板、相框收回倉庫了（層板上的玩具收回背包）')}
+  if(moved)toast('新背景掛不下的層板收回倉庫了（層板上的玩具收回背包）')}
 // 二樓的家具網格：用二樓背景房間的地板算（跟一樓一樣 7×5，大家具占 2 格）
 function f2G(h,fn){const o=GRID;GRID=roomGrid(h.room2||'basic1');try{return fn()}finally{GRID=o}}
 function f2Occ(h,except){const o=new Set();(h.toys2||[]).forEach(t=>{if(t===except||t.w!=null)return;gCells(t).forEach(([r,c])=>o.add(r+','+c))});return o}
@@ -4569,14 +4557,16 @@ const WSH={"wood":{"n":"原木層板","p":1000,"a":3.551,"y":12},"white":{"n":"�
   WFR={"wood":{"n":"原木相框","p":300,"a":0.747,"h":[16.8,23.4,83.2,86.6]},"gold":{"n":"金色相框","p":300,"a":0.833,"h":[17.6,16.0,82.4,84.0]},"moon":{"n":"月亮雲朵","p":800,"a":0.984,"h":[19.5,22.9,81.7,83.3]},"game":{"n":"遊戲機","p":800,"a":0.965,"h":[18.3,27.1,86.7,69.7]},"catring":{"n":"貓耳圓框","p":800,"a":0.978,"h":[19.8,18.5,80.9,72.3]},"calico":{"n":"三花貓","p":800,"a":0.857,"h":[20.4,20.0,81.0,83.3]},"game2":{"n":"星球遊戲機","p":800,"a":0.995,"h":[18.0,20.2,82.5,70.7]},"globe":{"n":"雪花球","p":800,"a":0.887,"h":[15.7,16.2,82.2,73.5]},"mecha":{"n":"機械風","p":800,"a":1.266,"h":[11.5,30.3,89.0,81.8]},"polaroid":{"n":"拍立得","p":800,"a":0.84,"h":[9.1,14.7,91.1,74.4]},"chainheart":{"n":"鍊條愛心","p":800,"a":1.212,"h":[12.1,15.2,87.1,86.9]},"cattv":{"n":"貓耳電視","p":800,"a":1.07,"h":[11.7,22.0,89.0,74.4]},"starchain":{"n":"星星鍊條","p":800,"a":1.088,"h":[15.8,17.0,83.3,83.0]},"clapper":{"n":"電影場記板","p":800,"a":1.056,"h":[8.4,33.6,87.3,79.5]},"navybow":{"n":"深藍蝴蝶結","p":800,"a":0.877,"h":[24.2,23.3,80.5,86.9]},"navywave":{"n":"深藍波浪","p":800,"a":1.146,"h":[17.5,19.3,83.3,78.8]},"porthole":{"n":"太空舷窗","p":800,"a":1.0,"h":[17.4,17.8,82.8,82.2]},"creamwave":{"n":"奶油波浪","p":800,"a":0.923,"h":[19.2,17.9,80.6,81.9]},"creamarch":{"n":"奶油拱門","p":800,"a":0.858,"h":[15.0,13.5,84.5,84.8]},"creamring":{"n":"奶油蝴蝶結","p":800,"a":0.91,"h":[14.2,21.9,85.1,86.9]},"pinkarch":{"n":"粉紅緞帶","p":800,"a":0.94,"h":[22.8,20.4,78.0,85.4]},"pinkcat":{"n":"粉紅小貓","p":800,"a":0.938,"h":[19.3,25.4,81.6,80.8]},"pinkheart":{"n":"粉紅愛心","p":800,"a":1.088,"h":[15.8,22.0,83.8,82.1]},"cloud2":{"n":"雲朵","p":800,"a":1.212,"h":[13.0,20.9,87.0,85.1]},"wings2":{"n":"天使翅膀","p":800,"a":1.164,"h":[12.4,22.5,87.6,85.5]},"catlilac2":{"n":"紫色貓耳","p":800,"a":1.191,"h":[11.5,24.0,86.1,86.6]},"space2":{"n":"太空藍","p":800,"a":1.236,"h":[13.2,24.1,86.6,84.0]},"star2":{"n":"星星","p":800,"a":1.079,"h":[12.6,22.9,87.4,86.4]},"gamer2":{"n":"電玩","p":800,"a":1.236,"h":[12.3,20.7,87.5,80.8]},"tabby2":{"n":"虎斑貓","p":800,"a":1.209,"h":[14.4,25.9,85.6,81.1]},"moon2":{"n":"月亮雲朵","p":800,"a":1.079,"h":[14.8,27.5,85.9,86.1]},"headset2":{"n":"貓耳耳機","p":800,"a":1.322,"h":[19.8,24.0,80.4,88.4]},"ufo2":{"n":"UFO","p":800,"a":0.998,"h":[12.5,31.1,90.4,76.9]},"rainbow2":{"n":"彩虹","p":800,"a":1.084,"h":[11.1,24.1,89.3,86.8]},"tv2":{"n":"復古電視","p":800,"a":0.931,"h":[14.3,34.0,85.9,74.6]}},
   WCB={"cat":{"n":"貓耳拱門","p":1500,"a":0.982,"y":[42,63,79],"x":[18,82]},"purple":{"n":"紫色遮雨棚","p":1500,"a":0.963,"y":[57,80],"x":[16,84]},"shop":{"n":"紅色小店","p":1500,"a":1.066,"y":[57,80],"x":[22,78]}},
   WBADGE={"a": 0.885, "h": [15.3, 15.8, 84.9, 70.6]};
-// v2.75：二樓牆面。每個背景有幾個「牆上的位置」（848×1264 座標的框 [x0,y0,x1,y1]），每個位置可以掛層板或相框（跟展示間共用倉庫）
+// v2.75：二樓牆面。每個背景有幾排「牆上的位置」（848×1264 座標的框 [x0,y0,x1,y1]），每排掛一個層板（跟展示間共用倉庫）；很花的背景沒有位置
 const F2_N=6,TOY2_MAX=25;
-const WALL2={f2shop_pig:[],f2shop_xmas:[],f2shop_ghost:[],f2shop_space:[],
-  f2shop_loftblack:[[265,160,430,330],[440,160,605,330],[265,350,605,540],[265,555,605,735]],f2shop_loftgreen:[[265,160,430,330],[440,160,605,330],[265,350,605,540],[265,555,605,735]],
-  f2shop_daisy:[[230,170,395,335],[405,170,570,335],[230,355,570,545],[230,560,570,740]],f2shop_creampaw:[[230,170,395,335],[405,170,570,335],[230,355,570,545],[230,560,570,740]],
-  f2shop_spacewhite:[[258,405,370,590],[372,405,484,590],[486,405,598,590]],f2shop_spacemint:[[278,428,374,552],[376,428,470,552],[472,428,566,552]]};
-// 沒特別設定的背景：有佈告欄就把佈告欄切成 2～3 格
-function f2Spots(room){if(WALL2[room])return WALL2[room].slice(0,F2_N);const B0=BOARDS[room];if(!B0)return [];const B=[Math.max(B0[0],62),B0[1],Math.min(B0[2],786),B0[3]],n=B[2]-B[0]>300?3:2,w=(B[2]-B[0]-16)/n;return Array.from({length:n},(_,i)=>[Math.round(B[0]+8+w*i),B[1]+8,Math.round(B[0]+8+w*(i+1)),B[3]-8])}   // 手機上舞台左右會被裁掉，兩邊留 62 不要掛出畫面
+const WALL2={f2shop_pig:[],f2shop_xmas:[],f2shop_ghost:[],f2shop_space:[],f2shop_fairyforest:[],
+  f2shop_loftblack:[[265,160,605,330],[265,350,605,540],[265,555,605,735]],f2shop_loftgreen:[[265,160,605,330],[265,350,605,540],[265,555,605,735]],
+  f2shop_daisy:[[230,170,570,345],[230,360,570,545],[230,560,570,740]],f2shop_creampaw:[[230,170,570,345],[230,360,570,545],[230,560,570,740]],
+  f2shop_spacewhite:[[258,405,598,590]],f2shop_spacemint:[[278,428,566,552]],
+  f2shop_princess2:[[245,270,605,420],[245,440,605,590],[245,605,605,745]],f2shop_crystal2:[[245,270,605,420],[245,440,605,590],[245,605,605,745]],
+  f2shop_mine:[[260,250,700,420],[260,440,700,610],[260,630,700,790]]};
+// 沒特別設定的背景：有佈告欄就在佈告欄上排 1～2 排層板（手機上舞台左右會被裁掉，兩邊留 62）
+function f2Spots(room){if(WALL2[room])return WALL2[room].slice(0,F2_N);const B0=BOARDS[room];if(!B0)return [];const x0=Math.max(B0[0],62)+8,x1=Math.min(B0[2],786)-8,y0=B0[1]+8,y1=B0[3]-8,n=y1-y0>170?2:1,h=(y1-y0)/n;return Array.from({length:n},(_,i)=>[x0,Math.round(y0+h*i),x1,Math.round(y0+h*(i+1))])}   // 手機上舞台左右會被裁掉，兩邊留 62 不要掛出畫面
 const NEON_C={pink:'#ff5fa2',blue:'#4fc3ff',yellow:'#ffd23f',purple:'#b46bff',mint:'#3ee8b5',white:'#ffffff'},NEON_P=1500;
 // f：牆和地板交界的高度（原圖 1536 高裡的位置）
 const SHOW_ROOMS={basic:{n:'溫馨木地板',p:0,f:1040},lilac:{n:'薰衣草',p:800,f:1050},mint:{n:'薄荷條紋',p:800,f:1075},
@@ -4618,7 +4608,7 @@ function showNorm(s){s=s&&typeof s==='object'?s:{};const okR=r=>!!(SHOW_ROOMS[r]
   s.wo=s.wo&&typeof s.wo==='object'&&!Array.isArray(s.wo)?s.wo:{};const two=(a,D,n)=>{n=n||2;a=Array.isArray(a)?a.slice(0,n):[];while(a.length<n)a.push('');return a.map(x=>D[x]?x:'')};
   s.wsh=two(s.wsh,WSH);s.wcb=WCB[s.wcb]?s.wcb:'';s.wfr=two(s.wfr,WFR,4);s.wfp=Array.isArray(s.wfp)?s.wfp.slice(0,4).map(x=>String(x||'')):[];while(s.wfp.length<4)s.wfp.push('');while(s.wfp.length<2)s.wfp.push('');
   s.wfa=Array.isArray(s.wfa)?s.wfa.slice(0,4).map(x=>+x||0):[];while(s.wfa.length<4)s.wfa.push(0);
-  {const f=s.f2&&typeof s.f2==='object'?s.f2:{},ok=x=>{const [k,id]=String(x||'').split(':');return (k==='sh'&&WSH[id])||(k==='fr'&&WFR[id])?k+':'+id:''},arr=(a,fn)=>{a=Array.isArray(a)?a.slice(0,F2_N):[];while(a.length<F2_N)a.push('');return a.map(fn)};s.f2={w:arr(f.w,ok),fp:arr(f.fp,x=>String(x||'').slice(0,40)),fa:arr(f.fa,x=>+x||0)}}
+  {const f=s.f2&&typeof s.f2==='object'?s.f2:{},ok=x=>{const [k,id]=String(x||'').split(':');return k==='sh'&&WSH[id]?k+':'+id:''},arr=(a,fn)=>{a=Array.isArray(a)?a.slice(0,F2_N):[];while(a.length<F2_N)a.push('');return a.map(fn)};s.f2={w:arr(f.w,ok),fp:arr(f.fp,x=>String(x||'').slice(0,40)),fa:arr(f.fa,x=>+x||0)}}
   s.neon=s.neon&&typeof s.neon==='object'&&s.neon.t?{t:String(s.neon.t).slice(0,12),c:NEON_C[s.neon.c]?s.neon.c:'pink'}:null;s.hon=Array.isArray(s.hon)?s.hon.slice(0,30):[];return s}
 const wallCap=(s,p)=>p>=6?(s.pos[p-3]?SHOW_N:0):p<3?(s.pos[p]?SHOW_N:0):p<5?(s.wsh[p-3]?5:0):(s.wcb?WCB[s.wcb].y.length*3:0);
 const wFree=(s,k,id,exRow,exF2)=>(+s.wo[k+':'+id]||0)-(k==='sh'?s.wsh:k==='fr'?s.wfr:[s.wcb]).filter((x,r)=>x===id&&r!==exRow).length-((s.f2&&s.f2.w)||[]).filter((x,r)=>x===k+':'+id&&r!==exF2).length;
@@ -4648,8 +4638,7 @@ function showOp(s,{op,id,pos,i,item}){s=showNorm(s);pos=+pos;i=+i;
   else if(op==='frPet'){if(!(row>=0&&row<4)||!s.wfr[row])throw new Error('這裡還沒有相框');s.wfp[row]=String(arguments[1].pet||'').slice(0,40);s.wfa[row]=Date.now()}
   else if(op==='f2W'){if(!(row>=0&&row<F2_N))throw new Error('沒有這個位置');const cur=s.f2.w[row];
     if(!id){if(cur.startsWith('sh:')&&arguments[1].busy)throw new Error('層板上還有玩具，先收回背包');s.f2.w[row]='';s.f2.fp[row]='';s.f2.fa[row]=0;return s}
-    if(!(kind==='sh'||kind==='fr')||!W[kind][id])throw new Error('沒有這一款');if(cur!==kind+':'+id&&wFree(s,kind,id,-1,row)<=0)throw new Error('這款都掛出去了');
-    if(cur.startsWith('sh:')&&kind!=='sh'&&arguments[1].busy)throw new Error('層板上還有玩具，先收回背包');s.f2.w[row]=kind+':'+id;if(kind!=='fr'){s.f2.fp[row]='';s.f2.fa[row]=0}}
+    if(kind!=='sh'||!W.sh[id])throw new Error('二樓只能掛層板');if(cur!==kind+':'+id&&wFree(s,kind,id,-1,row)<=0)throw new Error('這款都掛出去了');s.f2.w[row]=kind+':'+id}
   else if(op==='f2Pet'){if(!(row>=0&&row<F2_N)||!s.f2.w[row].startsWith('fr:'))throw new Error('這裡還沒有相框');s.f2.fp[row]=String(arguments[1].pet||'').slice(0,40);s.f2.fa[row]=Date.now()}
   else if(op==='neon'){const t=String(arguments[1].t||'').trim().slice(0,12),c=String(arguments[1].c||'');if(!t)throw new Error('招牌要寫字');if(!NEON_C[c])throw new Error('沒有這個顏色');s.neon={t,c}}
   else if(op==='honor'){}
@@ -5412,7 +5401,7 @@ async function bbDraw(sid){const S=bbSer(sid),g=DB.game;if(!S||S.off||bbBusy)ret
 function bbSpark(el,n,emo){const r=el.getBoundingClientRect();for(let k=0;k<n;k++){const s=document.createElement('div');s.className='bbspark';s.textContent=emo[k%emo.length];
   s.style.left=(r.left+r.width/2)+'px';s.style.top=(r.top+r.height/2)+'px';const a=Math.random()*6.28,d=60+Math.random()*120;s.style.setProperty('--dx',Math.cos(a)*d+'px');s.style.setProperty('--dy',Math.sin(a)*d+'px');document.body.appendChild(s);setTimeout(()=>s.remove(),1200)}}
 // ================= 🛋️ 裝潢目錄（毛二街裝潢專櫃）=================
-const F2SHOP=[{id:'f2shop_loftblack',n:'黑貓工業閣樓',p:2000},{id:'f2shop_loftgreen',n:'森林綠閣樓',p:2000},{id:'f2shop_daisy',n:'奶油小雛菊',p:1500},{id:'f2shop_creampaw',n:'奶油貓掌房',p:1500},{id:'f2shop_spacewhite',n:'白色太空艙',p:2000},{id:'f2shop_spacemint',n:'薄荷太空站',p:2000},{id:'f2shop_pig',n:'粉紅小豬房',p:1500},{id:'f2shop_xmas',n:'聖誕小屋',p:2000},{id:'f2shop_ghost',n:'萬聖節幽靈屋',p:2000},{id:'f2shop_space',n:'星空太空房',p:2000}];
+const F2SHOP=[{id:'f2shop_loftblack',n:'黑貓工業閣樓',p:2000},{id:'f2shop_loftgreen',n:'森林綠閣樓',p:2000},{id:'f2shop_daisy',n:'奶油小雛菊',p:1500},{id:'f2shop_creampaw',n:'奶油貓掌房',p:1500},{id:'f2shop_spacewhite',n:'白色太空艙',p:2000},{id:'f2shop_spacemint',n:'薄荷太空站',p:2000},{id:'f2shop_princess2',n:'粉紅愛心城堡',p:2000},{id:'f2shop_crystal2',n:'水晶月光房',p:2000},{id:'f2shop_mine',n:'寶石礦坑',p:2000},{id:'f2shop_fairyforest',n:'蘑菇森林小徑',p:2000},{id:'f2shop_pig',n:'粉紅小豬房',p:1500},{id:'f2shop_xmas',n:'聖誕小屋',p:2000},{id:'f2shop_ghost',n:'萬聖節幽靈屋',p:2000},{id:'f2shop_space',n:'星空太空房',p:2000}];
 const f2Shop=id=>F2SHOP.find(x=>x.id===id);
 const shHid=()=>(SHV&&$('#shv'))?SHV.hid:((myHouse()||{}).id);
 function decoShop(tab){if(!needMe())return;const h=myHouse();if(!h)return toast('要有家才能買裝潢');tab=tab||'f2';const g=DB.game;
@@ -5670,93 +5659,275 @@ function jobScene(st,place,host){if(!ONLINE||!st)return;st.querySelectorAll('.jo
   if(host&&!host.querySelector('.jobbtn')){const n=jobOpen(place).length,b=document.createElement('button');b.className='act jobbtn';b.innerHTML=`📋 徵才${n?`<i class="jdot">${n}</i>`:''}`;b.onclick=()=>jobBoard(place);host.appendChild(b)}}
 
 // ================= 🧸 v2.33 新玩具 85 個＋玩具分類（玩具、寵物用品、家電、家具、擺飾）=================
-Object.assign(ITEMS,{e_micro:{name:'微波爐',emo:'🏠',kind:'toy',price:120,sz:1.3,cat:'appl',nw:1},
-  e_fryer:{name:'氣炸鍋',emo:'🏠',kind:'toy',price:110,sz:1.2,cat:'appl',nw:1},
-  e_coffee:{name:'咖啡機',emo:'🏠',kind:'toy',price:130,sz:1.25,cat:'appl',nw:1},
-  e_toast:{name:'烤麵包機',emo:'🏠',kind:'toy',price:80,sz:1.1,cat:'appl',nw:1},
-  e_rice:{name:'電子鍋',emo:'🏠',kind:'toy',price:90,sz:1.15,cat:'appl',nw:1},
-  e_kettle:{name:'快煮壺',emo:'🏠',kind:'toy',price:60,sz:1.05,cat:'appl',nw:1},
-  e_blender:{name:'果汁機',emo:'🏠',kind:'toy',price:80,sz:1.15,cat:'appl',nw:1},
-  e_mixer:{name:'攪拌機',emo:'🏠',kind:'toy',price:120,sz:1.2,cat:'appl',nw:1},
-  e_pot:{name:'燉鍋',emo:'🏠',kind:'toy',price:70,sz:1.15,cat:'appl',nw:1},
-  e_ih:{name:'電磁爐',emo:'🏠',kind:'toy',price:70,sz:1.15,cat:'appl',nw:1},
-  e_waffle:{name:'鬆餅機',emo:'🏠',kind:'toy',price:80,sz:1.15,cat:'appl',nw:1},
-  e_steam:{name:'蒸籠',emo:'🏠',kind:'toy',price:90,sz:1.2,cat:'appl',nw:1},
-  e_juicer:{name:'榨汁機',emo:'🏠',kind:'toy',price:60,sz:1.05,cat:'appl',nw:1},
-  e_popcorn:{name:'爆米花機',emo:'🏠',kind:'toy',price:120,sz:1.25,cat:'appl',nw:1},
-  e_water:{name:'飲水機',emo:'🏠',kind:'toy',price:110,sz:1.35,cat:'appl',nw:1},
-  e_vacuum:{name:'吸塵器',emo:'🏠',kind:'toy',price:130,sz:1.35,cat:'appl',nw:1},
-  e_washer:{name:'洗衣機',emo:'🏠',kind:'toy',price:180,sz:1.6,cat:'appl',nw:1},
-  e_dryer:{name:'烘衣機',emo:'🏠',kind:'toy',price:170,sz:1.6,cat:'appl',nw:1},
-  e_hairdry:{name:'吹風機',emo:'🏠',kind:'toy',price:60,sz:1.05,cat:'appl',nw:1},
-  p_knot:{name:'繩結球',emo:'🧸',kind:'toy',price:35,sz:1.0,cat:'toy',nw:1},
-  p_drum:{name:'雞腿玩具',emo:'🧸',kind:'toy',price:40,sz:1.0,cat:'toy',nw:1},
-  p_lolli:{name:'肉球棒棒糖',emo:'🧸',kind:'toy',price:40,sz:1.0,cat:'toy',nw:1},
-  p_whale:{name:'鯨魚玩偶',emo:'🧸',kind:'toy',price:60,sz:1.15,cat:'toy',nw:1},
-  p_cow:{name:'乳牛玩偶',emo:'🧸',kind:'toy',price:60,sz:1.15,cat:'toy',nw:1},
-  p_shoe:{name:'啃咬布鞋',emo:'🧸',kind:'toy',price:45,sz:1.05,cat:'toy',nw:1},
-  p_sock:{name:'襪子玩具',emo:'🧸',kind:'toy',price:30,sz:0.95,cat:'toy',nw:1},
-  p_carrot:{name:'胡蘿蔔拉繩',emo:'🧸',kind:'toy',price:35,sz:1.0,cat:'toy',nw:1},
-  p_sheep:{name:'綿羊玩偶',emo:'🧸',kind:'toy',price:60,sz:1.15,cat:'toy',nw:1},
-  p_block:{name:'益智方塊',emo:'🧸',kind:'toy',price:50,sz:1.05,cat:'toy',nw:1},
-  p_bellring:{name:'鈴鐺甜甜圈',emo:'🧸',kind:'toy',price:40,sz:1.0,cat:'toy',nw:1},
-  p_cheese:{name:'起司玩具',emo:'🧸',kind:'toy',price:35,sz:1.0,cat:'toy',nw:1},
-  p_hydrant:{name:'消防栓',emo:'🧸',kind:'toy',price:80,sz:1.3,cat:'toy',nw:1},
-  p_moon:{name:'月亮抱枕',emo:'🧸',kind:'toy',price:50,sz:1.1,cat:'toy',nw:1},
-  p_bearbed:{name:'熊熊窩',emo:'🐾',kind:'toy',price:130,sz:1.5,cat:'pet',nw:1},
-  g_dhouse:{name:'狗屋',emo:'🐾',kind:'toy',price:180,sz:1.7,cat:'pet',nw:1},
-  g_bed:{name:'寵物睡墊',emo:'🐾',kind:'toy',price:100,sz:1.45,cat:'pet',nw:1},
-  g_brush:{name:'梳毛刷',emo:'🐾',kind:'toy',price:40,sz:1.0,cat:'pet',nw:1},
-  g_leash:{name:'伸縮牽繩',emo:'🐾',kind:'toy',price:50,sz:1.0,cat:'pet',nw:1},
-  g_harness:{name:'胸背帶',emo:'🐾',kind:'toy',price:60,sz:1.05,cat:'pet',nw:1},
-  g_collar:{name:'項圈',emo:'🐾',kind:'toy',price:40,sz:1.0,cat:'pet',nw:1},
-  g_bandana:{name:'小領巾',emo:'🐾',kind:'toy',price:35,sz:0.95,cat:'pet',nw:1},
-  g_poopbag:{name:'撿便袋',emo:'🐾',kind:'toy',price:30,sz:0.95,cat:'pet',nw:1},
-  g_stroller:{name:'寵物推車',emo:'🐾',kind:'toy',price:170,sz:1.6,cat:'pet',nw:1},
-  g_carseat:{name:'車用睡窩',emo:'🐾',kind:'toy',price:110,sz:1.4,cat:'pet',nw:1},
-  g_slowbowl:{name:'慢食碗',emo:'🐾',kind:'toy',price:45,sz:1.05,cat:'pet',nw:1},
-  g_autofeed:{name:'自動餵食器',emo:'🐾',kind:'toy',price:140,sz:1.35,cat:'pet',nw:1},
-  g_pawmat:{name:'肉球地墊',emo:'🐾',kind:'toy',price:60,sz:1.5,cat:'pet',nw:1,flat:true},
-  g_tissue:{name:'面紙盒',emo:'🐾',kind:'toy',price:30,sz:0.95,cat:'pet',nw:1},
-  g_shampoo:{name:'寵物洗毛精',emo:'🐾',kind:'toy',price:40,sz:0.95,cat:'pet',nw:1},
-  g_spray:{name:'除臭噴霧',emo:'🐾',kind:'toy',price:35,sz:0.95,cat:'pet',nw:1},
-  g_earclean:{name:'清耳液',emo:'🐾',kind:'toy',price:30,sz:0.9,cat:'pet',nw:1},
-  g_roller:{name:'黏毛滾輪',emo:'🐾',kind:'toy',price:30,sz:1.0,cat:'pet',nw:1},
-  b_ringswing:{name:'小鳥圓環鞦韆',emo:'🐾',kind:'toy',price:50,sz:1.15,cat:'pet',nw:1},
-  b_bellperch:{name:'鈴鐺棲木',emo:'🐾',kind:'toy',price:45,sz:1.1,cat:'pet',nw:1},
-  b_rattan:{name:'藤編球',emo:'🧸',kind:'toy',price:35,sz:1.0,cat:'toy',nw:1},
-  b_flower:{name:'花框鞦韆',emo:'🐾',kind:'toy',price:50,sz:1.15,cat:'pet',nw:1},
-  b_tassel:{name:'啃咬流蘇',emo:'🧸',kind:'toy',price:35,sz:1.05,cat:'toy',nw:1},
-  b_beads:{name:'串珠蛇',emo:'🧸',kind:'toy',price:35,sz:1.05,cat:'toy',nw:1},
-  b_house:{name:'小鳥屋',emo:'🐾',kind:'toy',price:90,sz:1.25,cat:'pet',nw:1},
-  b_ladder:{name:'小梯子',emo:'🐾',kind:'toy',price:40,sz:1.15,cat:'pet',nw:1},
-  b_corn:{name:'玉米編織',emo:'🧸',kind:'toy',price:35,sz:1.05,cat:'toy',nw:1},
-  b_star:{name:'星星鈴鐺',emo:'🧸',kind:'toy',price:35,sz:1.05,cat:'toy',nw:1},
-  b_hearts:{name:'愛心積木串',emo:'🧸',kind:'toy',price:40,sz:1.05,cat:'toy',nw:1},
-  b_tunnel:{name:'草編隧道',emo:'🐾',kind:'toy',price:60,sz:1.2,cat:'pet',nw:1},
-  b_basket:{name:'吊籃',emo:'🐾',kind:'toy',price:60,sz:1.15,cat:'pet',nw:1},
-  b_daisy:{name:'小花磨牙板',emo:'🧸',kind:'toy',price:30,sz:1.0,cat:'toy',nw:1},
-  b_cockatiel:{name:'玄鳳棲木',emo:'🐾',kind:'toy',price:70,sz:1.2,cat:'pet',nw:1},
-  b_shred:{name:'撕撕紙籃',emo:'🧸',kind:'toy',price:40,sz:1.05,cat:'toy',nw:1},
-  b_sponge:{name:'浮石花疊疊',emo:'🧸',kind:'toy',price:35,sz:1.05,cat:'toy',nw:1},
-  b_rainbow:{name:'彩虹鈴鐺',emo:'🧸',kind:'toy',price:45,sz:1.1,cat:'toy',nw:1},
-  b_leaf:{name:'葉子磨牙片',emo:'🧸',kind:'toy',price:30,sz:1.0,cat:'toy',nw:1},
-  b_tree:{name:'棲木小樹',emo:'🐾',kind:'toy',price:80,sz:1.3,cat:'pet',nw:1},
-  c_bellball:{name:'鈴鐺洞洞球',emo:'🧸',kind:'toy',price:35,sz:1.0,cat:'toy',nw:1},
-  c_fishbone:{name:'魚骨玩具',emo:'🧸',kind:'toy',price:35,sz:1.0,cat:'toy',nw:1},
-  c_pawpad:{name:'肉球坐墊',emo:'🐾',kind:'toy',price:50,sz:1.15,cat:'pet',nw:1},
-  c_kicker:{name:'踢踢魚',emo:'🧸',kind:'toy',price:45,sz:1.05,cat:'toy',nw:1},
-  c_catnip:{name:'貓草袋',emo:'🧸',kind:'toy',price:35,sz:1.0,cat:'toy',nw:1},
-  c_feather:{name:'羽毛鈴鐺',emo:'🧸',kind:'toy',price:40,sz:1.05,cat:'toy',nw:1},
-  c_furball:{name:'貓耳毛球',emo:'🧸',kind:'toy',price:45,sz:1.05,cat:'toy',nw:1},
-  c_cubehouse:{name:'洞洞紙箱屋',emo:'🐾',kind:'toy',price:80,sz:1.3,cat:'pet',nw:1},
-  c_donut:{name:'甜甜圈窩',emo:'🐾',kind:'toy',price:90,sz:1.4,cat:'pet',nw:1},
-  c_cageball:{name:'草編籠球',emo:'🧸',kind:'toy',price:40,sz:1.0,cat:'toy',nw:1},
-  c_post:{name:'貓抓柱',emo:'🐾',kind:'toy',price:90,sz:1.35,cat:'pet',nw:1},
-  c_sushi:{name:'鮭魚壽司抱枕',emo:'🧸',kind:'toy',price:45,sz:1.05,cat:'toy',nw:1},
-  c_bird:{name:'小鳥玩偶',emo:'🧸',kind:'toy',price:40,sz:1.0,cat:'toy',nw:1}});
+Object.assign(ITEMS,{e_micro:{name:'微波爐',emo:'🏠',kind:'toy',price:120,sz:1.3,cat:'appl'},
+  e_fryer:{name:'氣炸鍋',emo:'🏠',kind:'toy',price:110,sz:1.2,cat:'appl'},
+  e_coffee:{name:'咖啡機',emo:'🏠',kind:'toy',price:130,sz:1.25,cat:'appl'},
+  e_toast:{name:'烤麵包機',emo:'🏠',kind:'toy',price:80,sz:1.1,cat:'appl'},
+  e_rice:{name:'電子鍋',emo:'🏠',kind:'toy',price:90,sz:1.15,cat:'appl'},
+  e_kettle:{name:'快煮壺',emo:'🏠',kind:'toy',price:60,sz:1.05,cat:'appl'},
+  e_blender:{name:'果汁機',emo:'🏠',kind:'toy',price:80,sz:1.15,cat:'appl'},
+  e_mixer:{name:'攪拌機',emo:'🏠',kind:'toy',price:120,sz:1.2,cat:'appl'},
+  e_pot:{name:'燉鍋',emo:'🏠',kind:'toy',price:70,sz:1.15,cat:'appl'},
+  e_ih:{name:'電磁爐',emo:'🏠',kind:'toy',price:70,sz:1.15,cat:'appl'},
+  e_waffle:{name:'鬆餅機',emo:'🏠',kind:'toy',price:80,sz:1.15,cat:'appl'},
+  e_steam:{name:'蒸籠',emo:'🏠',kind:'toy',price:90,sz:1.2,cat:'appl'},
+  e_juicer:{name:'榨汁機',emo:'🏠',kind:'toy',price:60,sz:1.05,cat:'appl'},
+  e_popcorn:{name:'爆米花機',emo:'🏠',kind:'toy',price:120,sz:1.25,cat:'appl'},
+  e_water:{name:'飲水機',emo:'🏠',kind:'toy',price:110,sz:1.35,cat:'appl'},
+  e_vacuum:{name:'吸塵器',emo:'🏠',kind:'toy',price:130,sz:1.35,cat:'appl'},
+  e_washer:{name:'洗衣機',emo:'🏠',kind:'toy',price:180,sz:1.6,cat:'appl'},
+  e_dryer:{name:'烘衣機',emo:'🏠',kind:'toy',price:170,sz:1.6,cat:'appl'},
+  e_hairdry:{name:'吹風機',emo:'🏠',kind:'toy',price:60,sz:1.05,cat:'appl'},
+  p_knot:{name:'繩結球',emo:'🧸',kind:'toy',price:35,sz:1.0,cat:'toy'},
+  p_drum:{name:'雞腿玩具',emo:'🧸',kind:'toy',price:40,sz:1.0,cat:'toy'},
+  p_lolli:{name:'肉球棒棒糖',emo:'🧸',kind:'toy',price:40,sz:1.0,cat:'toy'},
+  p_whale:{name:'鯨魚玩偶',emo:'🧸',kind:'toy',price:60,sz:1.15,cat:'toy'},
+  p_cow:{name:'乳牛玩偶',emo:'🧸',kind:'toy',price:60,sz:1.15,cat:'toy'},
+  p_shoe:{name:'啃咬布鞋',emo:'🧸',kind:'toy',price:45,sz:1.05,cat:'toy'},
+  p_sock:{name:'襪子玩具',emo:'🧸',kind:'toy',price:30,sz:0.95,cat:'toy'},
+  p_carrot:{name:'胡蘿蔔拉繩',emo:'🧸',kind:'toy',price:35,sz:1.0,cat:'toy'},
+  p_sheep:{name:'綿羊玩偶',emo:'🧸',kind:'toy',price:60,sz:1.15,cat:'toy'},
+  p_block:{name:'益智方塊',emo:'🧸',kind:'toy',price:50,sz:1.05,cat:'toy'},
+  p_bellring:{name:'鈴鐺甜甜圈',emo:'🧸',kind:'toy',price:40,sz:1.0,cat:'toy'},
+  p_cheese:{name:'起司玩具',emo:'🧸',kind:'toy',price:35,sz:1.0,cat:'toy'},
+  p_hydrant:{name:'消防栓',emo:'🧸',kind:'toy',price:80,sz:1.3,cat:'toy'},
+  p_moon:{name:'月亮抱枕',emo:'🧸',kind:'toy',price:50,sz:1.1,cat:'toy'},
+  p_bearbed:{name:'熊熊窩',emo:'🐾',kind:'toy',price:130,sz:1.5,cat:'pet'},
+  g_dhouse:{name:'狗屋',emo:'🐾',kind:'toy',price:180,sz:1.7,cat:'pet'},
+  g_bed:{name:'寵物睡墊',emo:'🐾',kind:'toy',price:100,sz:1.45,cat:'pet'},
+  g_brush:{name:'梳毛刷',emo:'🐾',kind:'toy',price:40,sz:1.0,cat:'pet'},
+  g_leash:{name:'伸縮牽繩',emo:'🐾',kind:'toy',price:50,sz:1.0,cat:'pet'},
+  g_harness:{name:'胸背帶',emo:'🐾',kind:'toy',price:60,sz:1.05,cat:'pet'},
+  g_collar:{name:'項圈',emo:'🐾',kind:'toy',price:40,sz:1.0,cat:'pet'},
+  g_bandana:{name:'小領巾',emo:'🐾',kind:'toy',price:35,sz:0.95,cat:'pet'},
+  g_poopbag:{name:'撿便袋',emo:'🐾',kind:'toy',price:30,sz:0.95,cat:'pet'},
+  g_stroller:{name:'寵物推車',emo:'🐾',kind:'toy',price:170,sz:1.6,cat:'pet'},
+  g_carseat:{name:'車用睡窩',emo:'🐾',kind:'toy',price:110,sz:1.4,cat:'pet'},
+  g_slowbowl:{name:'慢食碗',emo:'🐾',kind:'toy',price:45,sz:1.05,cat:'pet'},
+  g_autofeed:{name:'自動餵食器',emo:'🐾',kind:'toy',price:140,sz:1.35,cat:'pet'},
+  g_pawmat:{name:'肉球地墊',emo:'🐾',kind:'toy',price:60,sz:1.5,cat:'pet',flat:true},
+  g_tissue:{name:'面紙盒',emo:'🐾',kind:'toy',price:30,sz:0.95,cat:'pet'},
+  g_shampoo:{name:'寵物洗毛精',emo:'🐾',kind:'toy',price:40,sz:0.95,cat:'pet'},
+  g_spray:{name:'除臭噴霧',emo:'🐾',kind:'toy',price:35,sz:0.95,cat:'pet'},
+  g_earclean:{name:'清耳液',emo:'🐾',kind:'toy',price:30,sz:0.9,cat:'pet'},
+  g_roller:{name:'黏毛滾輪',emo:'🐾',kind:'toy',price:30,sz:1.0,cat:'pet'},
+  b_ringswing:{name:'小鳥圓環鞦韆',emo:'🐾',kind:'toy',price:50,sz:1.15,cat:'pet'},
+  b_bellperch:{name:'鈴鐺棲木',emo:'🐾',kind:'toy',price:45,sz:1.1,cat:'pet'},
+  b_rattan:{name:'藤編球',emo:'🧸',kind:'toy',price:35,sz:1.0,cat:'toy'},
+  b_flower:{name:'花框鞦韆',emo:'🐾',kind:'toy',price:50,sz:1.15,cat:'pet'},
+  b_tassel:{name:'啃咬流蘇',emo:'🧸',kind:'toy',price:35,sz:1.05,cat:'toy'},
+  b_beads:{name:'串珠蛇',emo:'🧸',kind:'toy',price:35,sz:1.05,cat:'toy'},
+  b_house:{name:'小鳥屋',emo:'🐾',kind:'toy',price:90,sz:1.25,cat:'pet'},
+  b_ladder:{name:'小梯子',emo:'🐾',kind:'toy',price:40,sz:1.15,cat:'pet'},
+  b_corn:{name:'玉米編織',emo:'🧸',kind:'toy',price:35,sz:1.05,cat:'toy'},
+  b_star:{name:'星星鈴鐺',emo:'🧸',kind:'toy',price:35,sz:1.05,cat:'toy'},
+  b_hearts:{name:'愛心積木串',emo:'🧸',kind:'toy',price:40,sz:1.05,cat:'toy'},
+  b_tunnel:{name:'草編隧道',emo:'🐾',kind:'toy',price:60,sz:1.2,cat:'pet'},
+  b_basket:{name:'吊籃',emo:'🐾',kind:'toy',price:60,sz:1.15,cat:'pet'},
+  b_daisy:{name:'小花磨牙板',emo:'🧸',kind:'toy',price:30,sz:1.0,cat:'toy'},
+  b_cockatiel:{name:'玄鳳棲木',emo:'🐾',kind:'toy',price:70,sz:1.2,cat:'pet'},
+  b_shred:{name:'撕撕紙籃',emo:'🧸',kind:'toy',price:40,sz:1.05,cat:'toy'},
+  b_sponge:{name:'浮石花疊疊',emo:'🧸',kind:'toy',price:35,sz:1.05,cat:'toy'},
+  b_rainbow:{name:'彩虹鈴鐺',emo:'🧸',kind:'toy',price:45,sz:1.1,cat:'toy'},
+  b_leaf:{name:'葉子磨牙片',emo:'🧸',kind:'toy',price:30,sz:1.0,cat:'toy'},
+  b_tree:{name:'棲木小樹',emo:'🐾',kind:'toy',price:80,sz:1.3,cat:'pet'},
+  c_bellball:{name:'鈴鐺洞洞球',emo:'🧸',kind:'toy',price:35,sz:1.0,cat:'toy'},
+  c_fishbone:{name:'魚骨玩具',emo:'🧸',kind:'toy',price:35,sz:1.0,cat:'toy'},
+  c_pawpad:{name:'肉球坐墊',emo:'🐾',kind:'toy',price:50,sz:1.15,cat:'pet'},
+  c_kicker:{name:'踢踢魚',emo:'🧸',kind:'toy',price:45,sz:1.05,cat:'toy'},
+  c_catnip:{name:'貓草袋',emo:'🧸',kind:'toy',price:35,sz:1.0,cat:'toy'},
+  c_feather:{name:'羽毛鈴鐺',emo:'🧸',kind:'toy',price:40,sz:1.05,cat:'toy'},
+  c_furball:{name:'貓耳毛球',emo:'🧸',kind:'toy',price:45,sz:1.05,cat:'toy'},
+  c_cubehouse:{name:'洞洞紙箱屋',emo:'🐾',kind:'toy',price:80,sz:1.3,cat:'pet'},
+  c_donut:{name:'甜甜圈窩',emo:'🐾',kind:'toy',price:90,sz:1.4,cat:'pet'},
+  c_cageball:{name:'草編籠球',emo:'🧸',kind:'toy',price:40,sz:1.0,cat:'toy'},
+  c_post:{name:'貓抓柱',emo:'🐾',kind:'toy',price:90,sz:1.35,cat:'pet'},
+  c_sushi:{name:'鮭魚壽司抱枕',emo:'🧸',kind:'toy',price:45,sz:1.05,cat:'toy'},
+  c_bird:{name:'小鳥玩偶',emo:'🧸',kind:'toy',price:40,sz:1.0,cat:'toy'}});
 {const OC={ball:'toy',yarn:'toy',wand:'toy',bone:'toy',fishdoll:'toy',duck:'toy',t_snake:'toy',t_trike:'toy',t_axolotl:'toy',t_shark:'toy',t_penguin:'toy',t_duck:'toy',t_astro:'toy',t_ufo:'toy',rainbow:'toy',teddy:'toy',tumbler:'toy',rings:'toy',squeaky:'toy',n_fishrope:'toy',n_dogplush:'toy',n_spikyball:'toy',n_puzzleball:'toy',n_teether:'toy',n_frisbee:'toy',n_mouse:'toy',n_balltower:'toy',n_ringrope:'toy',n_feeder:'toy',n_springstar:'toy',n_bonepillow:'toy',n_ropeknot:'toy',n_catpillow:'toy',rainbowball:'toy',piggy:'toy',train:'toy',t_skate:'toy',unicorn:'toy',gacha:'toy',box:'pet',cushion:'pet',t_cattent:'pet',t_fishbed:'pet',t_cattower:'pet',t_catsofa:'pet',t_swing:'pet',fountain:'pet',cattree:'pet',scratch:'pet',blanket:'pet',n_bowl:'pet',n_catbed:'pet',n_cattree:'pet',n_carrier:'pet',n_treatjar:'pet',n_litter:'pet',n_spacepack:'pet',n_cavebed:'pet',n_groom:'pet',n_tunnel:'pet',dinerbowl:'pet',t_fishdisp:'pet',crown:'pet',castle:'pet',t_backpack:'pet',t_fridge:'appl',t_claw:'appl',t_arcade:'appl',t_cattv:'appl',t_record:'appl',t_dj:'appl',t_pc:'appl',t_fan:'appl',robot:'appl',bubble:'appl',purifier:'appl',dehumid:'appl',n_humid:'appl',record:'appl',heater:'appl',fan:'appl',t_polaroid:'appl',t_suitcase:'furn',sofa:'furn',n_bonecab:'furn',n_armchair:'furn',n_bookshelf:'furn',clock:'furn',coatrack:'furn',cocoa:'furn',piano:'furn',plantshelf:'furn',slide:'furn',teepee:'furn',t_teepee:'furn',swing:'furn',t_vinyls:'furn',t_cart:'furn',t_lamp:'deco',t_globe:'deco',t_bookcat:'deco',t_scope:'deco',starlamp:'deco',xmastree:'deco',crystal:'deco',n_pawlamp:'deco',n_lava:'deco',n_diffuser:'deco',n_memoboard:'deco',globe:'deco',mushlamp:'deco',monstera:'deco',yarnbasket:'deco',pumpkin:'deco',fishbowl:'deco',books:'deco',balloons:'deco',balloonair:'deco',trash:'deco'};for(const k in OC)if(ITEMS[k]&&!ITEMS[k].cat)ITEMS[k].cat=OC[k]}
-const TOY_CATS=[['all','全部'],['new','🆕 新品'],['toy','🧸 玩具'],['pet','🐾 寵物用品'],['appl','🏠 家電'],['furn','🛋️ 家具'],['deco','🌸 擺飾']];let toyCat='all';
+// v2.75：民宿用品 4 個色系（奶茶 m_、黑森林 k_、薰衣草 v_、繽紛 r_），綠幕照輪廓去背
+Object.assign(ITEMS,{
+  m_bed:{name:'奶茶貓耳小床',emo:'🏠',kind:'toy',price:180,sz:1.7,cat:'innm',nw:1},
+  m_nlamp:{name:'奶茶床頭燈',emo:'🏠',kind:'toy',price:80,sz:1.1,cat:'innm',nw:1},
+  m_sink:{name:'奶茶洗手台',emo:'🏠',kind:'toy',price:150,sz:1.5,cat:'innm',nw:1},
+  m_vanity:{name:'奶茶化妝台',emo:'🏠',kind:'toy',price:150,sz:1.5,cat:'innm',nw:1},
+  m_closet:{name:'奶茶衣櫃',emo:'🏠',kind:'toy',price:180,sz:1.7,cat:'innm',nw:1},
+  m_robe:{name:'奶茶浴袍吊架',emo:'🏠',kind:'toy',price:120,sz:1.5,cat:'innm',nw:1},
+  m_tcart:{name:'奶茶毛巾推車',emo:'🏠',kind:'toy',price:110,sz:1.3,cat:'innm',nw:1},
+  m_towels:{name:'奶茶毛巾堆',emo:'🏠',kind:'toy',price:50,sz:1.0,cat:'innm',nw:1},
+  m_tbskt:{name:'奶茶毛巾籃',emo:'🏠',kind:'toy',price:60,sz:1.0,cat:'innm',nw:1},
+  m_aroma:{name:'奶茶香氛蠟燭組',emo:'🏠',kind:'toy',price:60,sz:0.9,cat:'innm',nw:1},
+  m_shampoo:{name:'奶茶沐浴乳組',emo:'🏠',kind:'toy',price:50,sz:0.9,cat:'innm',nw:1},
+  m_tissue:{name:'奶茶面紙盒',emo:'🏠',kind:'toy',price:30,sz:0.8,cat:'innm',nw:1},
+  m_dryer:{name:'奶茶吹風機',emo:'🏠',kind:'toy',price:60,sz:0.9,cat:'innm',nw:1},
+  m_iron:{name:'奶茶離子夾',emo:'🏠',kind:'toy',price:50,sz:0.9,cat:'innm',nw:1},
+  m_curl:{name:'奶茶電捲棒',emo:'🏠',kind:'toy',price:50,sz:0.9,cat:'innm',nw:1},
+  m_steamer:{name:'奶茶掛燙機',emo:'🏠',kind:'toy',price:90,sz:1.2,cat:'innm',nw:1},
+  m_kettle:{name:'奶茶快煮壺',emo:'🏠',kind:'toy',price:70,sz:1.0,cat:'innm',nw:1},
+  m_coffee:{name:'奶茶咖啡機',emo:'🏠',kind:'toy',price:100,sz:1.1,cat:'innm',nw:1},
+  m_micro:{name:'奶茶微波爐',emo:'🏠',kind:'toy',price:110,sz:1.2,cat:'innm',nw:1},
+  m_fryer:{name:'奶茶氣炸鍋',emo:'🏠',kind:'toy',price:100,sz:1.1,cat:'innm',nw:1},
+  m_rice:{name:'奶茶電子鍋',emo:'🏠',kind:'toy',price:90,sz:1.0,cat:'innm',nw:1},
+  m_fridge:{name:'奶茶冰箱',emo:'🏠',kind:'toy',price:160,sz:1.6,cat:'innm',nw:1},
+  m_washer:{name:'奶茶洗衣機',emo:'🏠',kind:'toy',price:150,sz:1.5,cat:'innm',nw:1},
+  m_vacuum:{name:'奶茶吸塵器',emo:'🏠',kind:'toy',price:100,sz:1.2,cat:'innm',nw:1},
+  m_purif:{name:'奶茶空氣清淨機',emo:'🏠',kind:'toy',price:110,sz:1.2,cat:'innm',nw:1},
+  m_humid:{name:'奶茶加濕器',emo:'🏠',kind:'toy',price:80,sz:1.0,cat:'innm',nw:1},
+  m_fan:{name:'奶茶電風扇',emo:'🏠',kind:'toy',price:70,sz:1.2,cat:'innm',nw:1},
+  m_heater:{name:'奶茶電暖器',emo:'🏠',kind:'toy',price:90,sz:1.1,cat:'innm',nw:1},
+  m_thermo:{name:'奶茶溫濕度計',emo:'🏠',kind:'toy',price:50,sz:0.8,cat:'innm',nw:1},
+  m_clock:{name:'奶茶鬧鐘',emo:'🏠',kind:'toy',price:50,sz:0.8,cat:'innm',nw:1},
+  m_tub:{name:'奶茶泡澡桶',emo:'🏠',kind:'toy',price:160,sz:1.6,cat:'innm',nw:1},
+  m_bath:{name:'奶茶浴缸',emo:'🏠',kind:'toy',price:180,sz:1.7,cat:'innm',nw:1},
+  m_shower:{name:'奶茶淋浴間',emo:'🏠',kind:'toy',price:200,sz:1.8,cat:'innm',nw:1},
+  m_toilet:{name:'奶茶馬桶',emo:'🏠',kind:'toy',price:120,sz:1.3,cat:'innm',nw:1},
+  m_pawmat:{name:'奶茶肉球地墊',emo:'🏠',kind:'toy',price:60,sz:1.4,cat:'innm',nw:1,flat:true},
+  m_laundry:{name:'奶茶洗衣籃',emo:'🏠',kind:'toy',price:70,sz:1.1,cat:'innm',nw:1},
+  m_towelroll:{name:'奶茶蝴蝶結毛巾捲',emo:'🏠',kind:'toy',price:50,sz:0.9,cat:'innm',nw:1},
+  m_candle:{name:'奶茶香氛蠟燭',emo:'🏠',kind:'toy',price:40,sz:0.8,cat:'innm',nw:1},
+  m_lotion:{name:'奶茶乳液瓶',emo:'🏠',kind:'toy',price:30,sz:0.8,cat:'innm',nw:1},
+  m_spray:{name:'奶茶噴霧瓶',emo:'🏠',kind:'toy',price:30,sz:0.8,cat:'innm',nw:1},
+  m_cream:{name:'奶茶乳霜',emo:'🏠',kind:'toy',price:40,sz:0.8,cat:'innm',nw:1},
+  m_tube:{name:'奶茶護手霜',emo:'🏠',kind:'toy',price:30,sz:0.7,cat:'innm',nw:1},
+  m_serum:{name:'奶茶精華液',emo:'🏠',kind:'toy',price:40,sz:0.7,cat:'innm',nw:1},
+  m_brush:{name:'奶茶梳子',emo:'🏠',kind:'toy',price:30,sz:0.8,cat:'innm',nw:1},
+  m_comb:{name:'奶茶扁梳',emo:'🏠',kind:'toy',price:30,sz:0.8,cat:'innm',nw:1},
+  m_mirror:{name:'奶茶化妝鏡',emo:'🏠',kind:'toy',price:60,sz:0.9,cat:'innm',nw:1},
+  m_mlamp:{name:'奶茶蘑菇燈',emo:'🏠',kind:'toy',price:60,sz:0.9,cat:'innm',nw:1},
+  m_toast:{name:'奶茶烤麵包機',emo:'🏠',kind:'toy',price:80,sz:1.0,cat:'innm',nw:1},
+  m_blender:{name:'奶茶果汁機',emo:'🏠',kind:'toy',price:80,sz:1.0,cat:'innm',nw:1},
+  m_waffle:{name:'奶茶鬆餅機',emo:'🏠',kind:'toy',price:80,sz:1.0,cat:'innm',nw:1},
+  m_radio:{name:'奶茶收音機',emo:'🏠',kind:'toy',price:70,sz:0.9,cat:'innm',nw:1},
+  m_proj:{name:'奶茶投影機',emo:'🏠',kind:'toy',price:90,sz:0.9,cat:'innm',nw:1},
+  m_game:{name:'奶茶掌上遊戲機',emo:'🏠',kind:'toy',price:80,sz:0.8,cat:'innm',nw:1},
+  m_camera:{name:'奶茶拍立得',emo:'🏠',kind:'toy',price:70,sz:0.8,cat:'innm',nw:1},
+  m_globe:{name:'奶茶雪花球',emo:'🏠',kind:'toy',price:60,sz:0.8,cat:'innm',nw:1},
+  m_succ:{name:'奶茶多肉罐',emo:'🏠',kind:'toy',price:50,sz:0.8,cat:'innm',nw:1},
+  m_books:{name:'奶茶書本',emo:'🏠',kind:'toy',price:40,sz:0.9,cat:'innm',nw:1},
+  m_sbox:{name:'奶茶收納盒',emo:'🏠',kind:'toy',price:40,sz:0.9,cat:'innm',nw:1},
+  m_cat:{name:'奶茶打盹貓',emo:'🏠',kind:'toy',price:80,sz:1.0,cat:'innm',nw:1},
+  m_blanket:{name:'奶茶毛毯捲',emo:'🏠',kind:'toy',price:60,sz:1.0,cat:'innm',nw:1},
+  k_towels:{name:'黑森林毛巾堆',emo:'🏠',kind:'toy',price:50,sz:1.0,cat:'innk',nw:1},
+  k_tbskt:{name:'黑森林毛巾籃',emo:'🏠',kind:'toy',price:60,sz:1.0,cat:'innk',nw:1},
+  k_shampoo:{name:'黑森林沐浴乳組',emo:'🏠',kind:'toy',price:50,sz:0.9,cat:'innk',nw:1},
+  k_diffuser:{name:'黑森林擴香瓶',emo:'🏠',kind:'toy',price:50,sz:0.8,cat:'innk',nw:1},
+  k_candle:{name:'黑森林香氛蠟燭',emo:'🏠',kind:'toy',price:40,sz:0.8,cat:'innk',nw:1},
+  k_tissue:{name:'黑森林面紙盒',emo:'🏠',kind:'toy',price:30,sz:0.8,cat:'innk',nw:1},
+  k_serum:{name:'黑森林精華液',emo:'🏠',kind:'toy',price:40,sz:0.7,cat:'innk',nw:1},
+  k_cream:{name:'黑森林乳霜',emo:'🏠',kind:'toy',price:40,sz:0.8,cat:'innk',nw:1},
+  k_tube:{name:'黑森林護手霜',emo:'🏠',kind:'toy',price:30,sz:0.7,cat:'innk',nw:1},
+  k_perfume:{name:'黑森林香水',emo:'🏠',kind:'toy',price:60,sz:0.8,cat:'innk',nw:1},
+  k_spray:{name:'黑森林噴霧瓶',emo:'🏠',kind:'toy',price:30,sz:0.8,cat:'innk',nw:1},
+  k_dryer:{name:'黑森林吹風機',emo:'🏠',kind:'toy',price:60,sz:0.9,cat:'innk',nw:1},
+  k_iron:{name:'黑森林離子夾',emo:'🏠',kind:'toy',price:50,sz:0.9,cat:'innk',nw:1},
+  k_brush:{name:'黑森林梳子',emo:'🏠',kind:'toy',price:30,sz:0.8,cat:'innk',nw:1},
+  k_comb:{name:'黑森林扁梳',emo:'🏠',kind:'toy',price:30,sz:0.8,cat:'innk',nw:1},
+  k_mirror:{name:'黑森林化妝鏡',emo:'🏠',kind:'toy',price:60,sz:0.9,cat:'innk',nw:1},
+  k_phones:{name:'黑森林耳機',emo:'🏠',kind:'toy',price:70,sz:0.9,cat:'innk',nw:1},
+  k_coffee:{name:'黑森林咖啡機',emo:'🏠',kind:'toy',price:100,sz:1.1,cat:'innk',nw:1},
+  k_kettle:{name:'黑森林手沖壺',emo:'🏠',kind:'toy',price:70,sz:0.9,cat:'innk',nw:1},
+  k_moka:{name:'黑森林摩卡壺',emo:'🏠',kind:'toy',price:60,sz:0.9,cat:'innk',nw:1},
+  k_grinder:{name:'黑森林磨豆機',emo:'🏠',kind:'toy',price:70,sz:0.9,cat:'innk',nw:1},
+  k_heater:{name:'黑森林電暖器',emo:'🏠',kind:'toy',price:90,sz:1.1,cat:'innk',nw:1},
+  k_radio:{name:'黑森林收音機',emo:'🏠',kind:'toy',price:70,sz:0.9,cat:'innk',nw:1},
+  k_clock:{name:'黑森林鬧鐘',emo:'🏠',kind:'toy',price:50,sz:0.9,cat:'innk',nw:1},
+  k_camera:{name:'黑森林相機',emo:'🏠',kind:'toy',price:80,sz:0.9,cat:'innk',nw:1},
+  k_game:{name:'黑森林掌上遊戲機',emo:'🏠',kind:'toy',price:80,sz:0.8,cat:'innk',nw:1},
+  k_speaker:{name:'黑森林喇叭',emo:'🏠',kind:'toy',price:90,sz:1.0,cat:'innk',nw:1},
+  k_fan:{name:'黑森林電風扇',emo:'🏠',kind:'toy',price:70,sz:1.1,cat:'innk',nw:1},
+  k_astro:{name:'黑森林太空貓',emo:'🏠',kind:'toy',price:80,sz:1.0,cat:'innk',nw:1},
+  k_books:{name:'黑森林書本',emo:'🏠',kind:'toy',price:40,sz:0.9,cat:'innk',nw:1},
+  k_sbox:{name:'黑森林收納盒',emo:'🏠',kind:'toy',price:40,sz:0.9,cat:'innk',nw:1},
+  k_blanket:{name:'黑森林毛毯捲',emo:'🏠',kind:'toy',price:60,sz:1.0,cat:'innk',nw:1},
+  k_jar:{name:'黑森林收納罐',emo:'🏠',kind:'toy',price:40,sz:0.8,cat:'innk',nw:1},
+  k_lantern:{name:'黑森林露營燈',emo:'🏠',kind:'toy',price:70,sz:0.9,cat:'innk',nw:1},
+  k_ufo:{name:'黑森林飛碟',emo:'🏠',kind:'toy',price:80,sz:1.0,cat:'innk',nw:1},
+  k_terra:{name:'黑森林苔蘚玻璃罩',emo:'🏠',kind:'toy',price:70,sz:0.9,cat:'innk',nw:1},
+  k_cat:{name:'黑森林打盹黑貓',emo:'🏠',kind:'toy',price:80,sz:1.0,cat:'innk',nw:1},
+  v_towels:{name:'薰衣草毛巾堆',emo:'🏠',kind:'toy',price:50,sz:1.0,cat:'innv',nw:1},
+  v_tbskt:{name:'薰衣草毛巾籃',emo:'🏠',kind:'toy',price:60,sz:1.0,cat:'innv',nw:1},
+  v_shampoo:{name:'薰衣草沐浴乳組',emo:'🏠',kind:'toy',price:50,sz:0.9,cat:'innv',nw:1},
+  v_diffuser:{name:'薰衣草擴香瓶',emo:'🏠',kind:'toy',price:50,sz:0.8,cat:'innv',nw:1},
+  v_candle:{name:'薰衣草香氛蠟燭',emo:'🏠',kind:'toy',price:40,sz:0.8,cat:'innv',nw:1},
+  v_tissue:{name:'薰衣草面紙盒',emo:'🏠',kind:'toy',price:30,sz:0.8,cat:'innv',nw:1},
+  v_serum:{name:'薰衣草精華液',emo:'🏠',kind:'toy',price:40,sz:0.7,cat:'innv',nw:1},
+  v_cream:{name:'薰衣草乳霜',emo:'🏠',kind:'toy',price:40,sz:0.8,cat:'innv',nw:1},
+  v_tube:{name:'薰衣草護手霜',emo:'🏠',kind:'toy',price:30,sz:0.7,cat:'innv',nw:1},
+  v_perfume:{name:'薰衣草香水',emo:'🏠',kind:'toy',price:60,sz:0.8,cat:'innv',nw:1},
+  v_spray:{name:'薰衣草噴霧瓶',emo:'🏠',kind:'toy',price:30,sz:0.8,cat:'innv',nw:1},
+  v_dryer:{name:'薰衣草吹風機',emo:'🏠',kind:'toy',price:60,sz:0.9,cat:'innv',nw:1},
+  v_iron:{name:'薰衣草離子夾',emo:'🏠',kind:'toy',price:50,sz:0.9,cat:'innv',nw:1},
+  v_brush:{name:'薰衣草梳子',emo:'🏠',kind:'toy',price:30,sz:0.8,cat:'innv',nw:1},
+  v_comb:{name:'薰衣草扁梳',emo:'🏠',kind:'toy',price:30,sz:0.8,cat:'innv',nw:1},
+  v_mirror:{name:'薰衣草化妝鏡',emo:'🏠',kind:'toy',price:60,sz:0.9,cat:'innv',nw:1},
+  v_phones:{name:'薰衣草耳機',emo:'🏠',kind:'toy',price:70,sz:0.9,cat:'innv',nw:1},
+  v_coffee:{name:'薰衣草咖啡機',emo:'🏠',kind:'toy',price:100,sz:1.1,cat:'innv',nw:1},
+  v_kettle:{name:'薰衣草手沖壺',emo:'🏠',kind:'toy',price:70,sz:0.9,cat:'innv',nw:1},
+  v_moka:{name:'薰衣草摩卡壺',emo:'🏠',kind:'toy',price:60,sz:0.9,cat:'innv',nw:1},
+  v_grinder:{name:'薰衣草磨豆機',emo:'🏠',kind:'toy',price:70,sz:0.9,cat:'innv',nw:1},
+  v_heater:{name:'薰衣草電暖器',emo:'🏠',kind:'toy',price:90,sz:1.1,cat:'innv',nw:1},
+  v_radio:{name:'薰衣草收音機',emo:'🏠',kind:'toy',price:70,sz:0.9,cat:'innv',nw:1},
+  v_clock:{name:'薰衣草鬧鐘',emo:'🏠',kind:'toy',price:50,sz:0.9,cat:'innv',nw:1},
+  v_camera:{name:'薰衣草相機',emo:'🏠',kind:'toy',price:80,sz:0.9,cat:'innv',nw:1},
+  v_game:{name:'薰衣草掌上遊戲機',emo:'🏠',kind:'toy',price:80,sz:0.8,cat:'innv',nw:1},
+  v_speaker:{name:'薰衣草喇叭',emo:'🏠',kind:'toy',price:90,sz:1.0,cat:'innv',nw:1},
+  v_fan:{name:'薰衣草電風扇',emo:'🏠',kind:'toy',price:70,sz:1.1,cat:'innv',nw:1},
+  v_astro:{name:'薰衣草太空貓',emo:'🏠',kind:'toy',price:80,sz:1.0,cat:'innv',nw:1},
+  v_books:{name:'薰衣草書本',emo:'🏠',kind:'toy',price:40,sz:0.9,cat:'innv',nw:1},
+  v_sbox:{name:'薰衣草收納盒',emo:'🏠',kind:'toy',price:40,sz:0.9,cat:'innv',nw:1},
+  v_blanket:{name:'薰衣草毛毯捲',emo:'🏠',kind:'toy',price:60,sz:1.0,cat:'innv',nw:1},
+  v_candy:{name:'薰衣草糖果罐',emo:'🏠',kind:'toy',price:50,sz:0.8,cat:'innv',nw:1},
+  v_lantern:{name:'薰衣草提燈',emo:'🏠',kind:'toy',price:70,sz:0.9,cat:'innv',nw:1},
+  v_globe:{name:'薰衣草雪花球',emo:'🏠',kind:'toy',price:60,sz:0.8,cat:'innv',nw:1},
+  v_terra:{name:'薰衣草蘑菇玻璃罐',emo:'🏠',kind:'toy',price:70,sz:0.9,cat:'innv',nw:1},
+  v_cat:{name:'薰衣草打盹貓',emo:'🏠',kind:'toy',price:80,sz:1.0,cat:'innv',nw:1},
+  r_towels:{name:'繽紛毛巾堆',emo:'🏠',kind:'toy',price:50,sz:1.0,cat:'innr',nw:1},
+  r_tbskt:{name:'繽紛毛巾籃',emo:'🏠',kind:'toy',price:60,sz:1.0,cat:'innr',nw:1},
+  r_lotion:{name:'繽紛乳液瓶',emo:'🏠',kind:'toy',price:30,sz:0.8,cat:'innr',nw:1},
+  r_diffuser:{name:'繽紛擴香瓶',emo:'🏠',kind:'toy',price:50,sz:0.8,cat:'innr',nw:1},
+  r_candle:{name:'繽紛香氛蠟燭',emo:'🏠',kind:'toy',price:40,sz:0.8,cat:'innr',nw:1},
+  r_tissue:{name:'繽紛面紙盒',emo:'🏠',kind:'toy',price:30,sz:0.8,cat:'innr',nw:1},
+  r_spray:{name:'繽紛噴霧瓶',emo:'🏠',kind:'toy',price:30,sz:0.8,cat:'innr',nw:1},
+  r_cream:{name:'繽紛乳霜',emo:'🏠',kind:'toy',price:40,sz:0.8,cat:'innr',nw:1},
+  r_tube:{name:'繽紛護手霜',emo:'🏠',kind:'toy',price:30,sz:0.7,cat:'innr',nw:1},
+  r_perfume:{name:'繽紛香水',emo:'🏠',kind:'toy',price:60,sz:0.8,cat:'innr',nw:1},
+  r_pump:{name:'繽紛洗手乳',emo:'🏠',kind:'toy',price:30,sz:0.8,cat:'innr',nw:1},
+  r_candy:{name:'繽紛糖果罐',emo:'🏠',kind:'toy',price:50,sz:0.8,cat:'innr',nw:1},
+  r_dryer:{name:'繽紛吹風機',emo:'🏠',kind:'toy',price:60,sz:0.9,cat:'innr',nw:1},
+  r_iron:{name:'繽紛離子夾',emo:'🏠',kind:'toy',price:50,sz:0.9,cat:'innr',nw:1},
+  r_brush:{name:'繽紛梳子',emo:'🏠',kind:'toy',price:30,sz:0.8,cat:'innr',nw:1},
+  r_comb:{name:'繽紛扁梳',emo:'🏠',kind:'toy',price:30,sz:0.8,cat:'innr',nw:1},
+  r_mirror:{name:'繽紛化妝鏡',emo:'🏠',kind:'toy',price:60,sz:0.9,cat:'innr',nw:1},
+  r_phones:{name:'繽紛耳機',emo:'🏠',kind:'toy',price:70,sz:0.9,cat:'innr',nw:1},
+  r_coffee:{name:'繽紛咖啡機',emo:'🏠',kind:'toy',price:100,sz:1.1,cat:'innr',nw:1},
+  r_kettle:{name:'繽紛茶壺',emo:'🏠',kind:'toy',price:70,sz:0.9,cat:'innr',nw:1},
+  r_moka:{name:'繽紛摩卡壺',emo:'🏠',kind:'toy',price:60,sz:0.9,cat:'innr',nw:1},
+  r_toast:{name:'繽紛烤麵包機',emo:'🏠',kind:'toy',price:80,sz:1.0,cat:'innr',nw:1},
+  r_blender:{name:'繽紛果汁機',emo:'🏠',kind:'toy',price:80,sz:1.0,cat:'innr',nw:1},
+  r_oven:{name:'繽紛小烤箱',emo:'🏠',kind:'toy',price:90,sz:1.1,cat:'innr',nw:1},
+  r_radio:{name:'繽紛收音機',emo:'🏠',kind:'toy',price:70,sz:0.9,cat:'innr',nw:1},
+  r_clock:{name:'繽紛鬧鐘',emo:'🏠',kind:'toy',price:50,sz:0.9,cat:'innr',nw:1},
+  r_camera:{name:'繽紛相機',emo:'🏠',kind:'toy',price:80,sz:0.9,cat:'innr',nw:1},
+  r_game:{name:'繽紛掌上遊戲機',emo:'🏠',kind:'toy',price:80,sz:0.8,cat:'innr',nw:1},
+  r_pawheat:{name:'繽紛肉球暖爐',emo:'🏠',kind:'toy',price:90,sz:1.0,cat:'innr',nw:1},
+  r_fan:{name:'繽紛電風扇',emo:'🏠',kind:'toy',price:70,sz:1.1,cat:'innr',nw:1},
+  r_globe:{name:'繽紛雪花球',emo:'🏠',kind:'toy',price:60,sz:0.8,cat:'innr',nw:1},
+  r_plant:{name:'繽紛貓臉盆栽',emo:'🏠',kind:'toy',price:50,sz:0.9,cat:'innr',nw:1},
+  r_books:{name:'繽紛書本',emo:'🏠',kind:'toy',price:40,sz:0.9,cat:'innr',nw:1},
+  r_sbox:{name:'繽紛收納盒',emo:'🏠',kind:'toy',price:40,sz:0.9,cat:'innr',nw:1},
+  r_cat:{name:'繽紛打盹貓',emo:'🏠',kind:'toy',price:80,sz:1.0,cat:'innr',nw:1},
+  r_blanket:{name:'繽紛毛毯捲',emo:'🏠',kind:'toy',price:60,sz:1.0,cat:'innr',nw:1},
+  r_bathset:{name:'繽紛小鴨沐浴組',emo:'🏠',kind:'toy',price:60,sz:0.9,cat:'innr',nw:1},
+  r_aclock:{name:'繽紛貓耳時鐘',emo:'🏠',kind:'toy',price:60,sz:0.9,cat:'innr',nw:1},
+  r_grinder:{name:'繽紛磨豆機',emo:'🏠',kind:'toy',price:70,sz:0.9,cat:'innr',nw:1},
+  r_drip:{name:'繽紛美式咖啡機',emo:'🏠',kind:'toy',price:90,sz:1.0,cat:'innr',nw:1},
+  r_fryer:{name:'繽紛氣炸鍋',emo:'🏠',kind:'toy',price:100,sz:1.1,cat:'innr',nw:1},
+  r_rice:{name:'繽紛電子鍋',emo:'🏠',kind:'toy',price:90,sz:1.0,cat:'innr',nw:1},
+  r_micro:{name:'繽紛微波爐',emo:'🏠',kind:'toy',price:110,sz:1.1,cat:'innr',nw:1},
+  r_tv:{name:'繽紛電視',emo:'🏠',kind:'toy',price:120,sz:1.1,cat:'innr',nw:1},
+  r_lucky:{name:'繽紛招財貓',emo:'🏠',kind:'toy',price:120,sz:1.0,cat:'innr',nw:1},
+  r_catbed:{name:'繽紛貓耳窩',emo:'🏠',kind:'toy',price:120,sz:1.4,cat:'innr',nw:1}});
+const TOY_CATS=[['all','全部'],['new','🆕 新品'],['toy','🧸 玩具'],['pet','🐾 寵物用品'],['appl','🏠 家電'],['furn','🛋️ 家具'],['deco','🌸 擺飾'],['innm','奶茶民宿'],['innk','黑森林民宿'],['innv','薰衣草民宿'],['innr','繽紛民宿']];let toyCat='all';
 const toyCatOk=(it,c)=>c==='all'||(c==='new'?!!it.nw:(it.cat||'toy')===c);
 function toyCatBar(cur,attr){return `<div class="tcats">${TOY_CATS.map(([k,n])=>`<button ${attr}="${k}" class="${k===cur?'on':''}">${n}</button>`).join('')}</div>`}
 // ================= 💼 毛孩打工（v1.90） =================
