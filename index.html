@@ -2423,6 +2423,7 @@ function giftVisible(g,h){if(g.admin&&CLAIMED['g:'+g.id+':'+(DB.me&&DB.me.id)])r
 // ---------- 開門 ----------
 function openHome(hid,keep){
   const h=house(hid);if(!h)return;
+  if(placing&&(!home||home.id!==hid||!canEdit(hid))){placing=null;$('#home').classList.remove('placing');if($('#gcancel'))$('#gcancel').remove()}
   $('#island').classList.add('hidden');$('#home').classList.remove('hidden');
   setHname(h);useRoom(h);$('#roombg').src=roomImg(h.room);$('#hback').style.backgroundImage=`url(${roomImg(h.room)})`;if(!ONLINE)spawnPoops(h);
   const prev=home&&home.id===hid?home.pets:[];
@@ -2475,7 +2476,7 @@ function renderHome(){
   if($('#eh'))$('#eh').onclick=()=>petForm(h.id);
   renderBoard();renderFloor();renderFoot2();
 }
-$('#back').onclick=()=>{cancelAnimationFrame(raf);home=null;if(ONLINE){sync(true);pingWhere()}$('#home').classList.add('hidden');$('#island').classList.remove('hidden');renderIsland();renderFoot();window.scrollTo(0,0)};
+$('#back').onclick=()=>{cancelAnimationFrame(raf);home=null;placing=null;$('#home').classList.remove('placing');if($('#gcancel'))$('#gcancel').remove();if(ONLINE){sync(true);pingWhere()}$('#home').classList.add('hidden');$('#island').classList.remove('hidden');renderIsland();renderFoot();window.scrollTo(0,0)};
 // ---------- 留言板 ----------
 function renderBoard(){
   const h=house(home.id),B=BOARDS[h.room]||BOARDS.basic1,ins=10;
@@ -6253,7 +6254,7 @@ function announceLetters(){if(!DB.me)return;let seen=[];try{seen=JSON.parse(loca
     sfx('gift');$('#lgopen').onclick=()=>openLetter(nw[0].id,()=>$('#bell').click())};
   setTimeout(go,1800)}
 // ================= 自動更新：發現新版本就重新載入 =================
-const APP_VER='v2.69';
+const APP_VER='v2.70';
 function checkUpdate(){
   if(!/^https?:/.test(location.protocol)||!API_URL)return;
   if(!$('#modal').classList.contains('hidden'))return; // 正在填表單時不打斷
