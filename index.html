@@ -4586,7 +4586,7 @@ function f2Wall(st,h,fam){const sp=f2Spots(h.room2||'basic1');if(!sp.length)retu
   const s=showNorm(h.show);
   sp.forEach((R,i)=>{const v=s.f2.w[i],id=v.split(':')[1];if(!v)return ghost(R,'＋ 層板',()=>f2WallPick(i));
     const g=f2ShelfGeo(R,id),el=document.createElement('button');el.className='shw';el.innerHTML=`<img class="wimg" src="assets/wsh_${id}.webp" alt="">`;add(el,[g.x0,g.top,g.w],5,()=>fam?f2ShelfMenu(i):toast(WSH[id].n));
-    (h.toys2||[]).filter(t=>t.w===i).forEach(t=>{const c=Math.max(0,Math.min(4,+t.c||0)),th=g.cw*1.35,tw=g.cw*1.3,el2=document.createElement('span');el2.className='shwit';el2.innerHTML=`<img src="${itemSrc(t.item)}" alt="">`;add(el2,[g.x0+g.w*.12+g.cw*c+g.cw/2-tw/2,g.line-th+2,tw,th],6)})})}
+    (h.toys2||[]).filter(t=>t.w===i).forEach(t=>{const c=Math.max(0,Math.min(4,+t.c||0)),th=g.cw*1.2,tw=g.cw,el2=document.createElement('span');el2.className='shwit';el2.innerHTML=`<img src="${itemSrc(t.item)}" alt="">`;add(el2,[g.x0+g.w*.12+g.cw*c+g.cw/2-tw/2,g.line-th+2,tw,th],6)})})}
 const f2ShBusy=(h,i)=>(h.toys2||[]).some(t=>t.w===i);
 // 選要掛哪一款層板（跟展示間共用倉庫）
 function f2WallPick(i){const h=house(F2.hid);if(!h||!hasShow(h))return;const s=showNorm(h.show),cur=s.f2.w[i];
@@ -6941,7 +6941,7 @@ function announceLetters(){if(!DB.me)return;let seen=[];try{seen=JSON.parse(loca
     sfx('gift');$('#lgopen').onclick=()=>openLetter(nw[0].id,()=>$('#bell').click())};
   setTimeout(go,1800)}
 // ================= 自動更新：發現新版本就重新載入 =================
-const APP_VER='v3.14';
+const APP_VER='v3.15';
 function checkUpdate(){
   if(!/^https?:/.test(location.protocol)||!API_URL)return;
   if(!$('#modal').classList.contains('hidden'))return; // 正在填表單時不打斷
