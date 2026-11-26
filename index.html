@@ -4583,7 +4583,7 @@ function f2WallPick(i){const h=house(F2.hid);if(!h||!hasShow(h))return;const s=s
 // v2.76：民宿自己的層板商店（只有層板）。買了直接掛到點的那一排（展示間的「買了先掛空位」會先收回來）
 function f2ShelfShop(i){const h=house(F2.hid);if(!h||!hasShow(h))return toast('層板跟展示間共用，要先蓋展示間才買得到喔');const s=showNorm(h.show),g=DB.game;
   openModal(`<h3>🛒 買層板</h3><p class="lead" style="font-size:12px">你有 🪙${g.coins||0}・民宿只能掛層板，買了直接掛到這一排；也可以掛在展示間（倉庫共用）</p>
-    <div class="shgrid">${Object.keys(WSH).map(id=>{const n=+s.wo['sh:'+id]||0,f=wFree(s,'sh',id,-1,i);return `<button class="si" data-sb="${id}"><img class="pv" src="assets/wsh_${id}.webp" alt="" style="aspect-ratio:1">${n?`<span class="tag">有 ${n}</span>`:''}<div class="sn">${esc(WSH[id].n)}</div><div class="sf">${f>0?'倉庫 '+f:'🪙'+WSH[id].p}</div></button>`}).join('')}</div>
+    <div class="shgrid">${WSHK().map(id=>{const n=+s.wo['sh:'+id]||0,f=wFree(s,'sh',id,-1,i);return `<button class="si" data-sb="${id}"><img class="pv" src="assets/wsh_${id}.webp" alt="" style="aspect-ratio:1">${n?`<span class="tag">有 ${n}</span>`:WSH[id].nw?'<span class="tag">新</span>':''}<div class="sn">${esc(WSH[id].n)}</div><div class="sf">${f>0?'倉庫 '+f:'🪙'+WSH[id].p}</div></button>`}).join('')}</div>
     <div class="row2"><button id="f2sbk">← 回去</button><button data-close>關閉</button></div>`);
   $('#f2sbk').onclick=()=>f2WallPick(i);
   $('#sheet').querySelectorAll('[data-sb]').forEach(b=>b.onclick=()=>{const id=b.dataset.sb,it=WSH[id],f=wFree(showNorm(h.show),'sh',id,-1,i);
@@ -4709,7 +4709,8 @@ function cropSwap(id){const it=ITEMS[id],T=Object.entries(ITEMS).filter(([k,x])=
 const SHOW_COST=1500,SHOW_ROWS=4,SHOW_COLS=5,SHOW_N=SHOW_ROWS*SHOW_COLS,SHOW_POS=5,SHOW_IT=8;   // v2.30：櫃子 3 → 5 個（it 6、7 是新的兩個櫃子）
 const cabIt=p=>p<3?p:p+3,itCab=k=>k<3?k:k-3;
 // 🧱 牆面（v2.07）：層板 2 排（it[3]、it[4]，各 5 格）或壁櫃 1 個（it[5]）、相框 2 個、霓虹招牌、榮譽牆
-const WSH={"wood":{"n":"原木層板","p":1000,"a":3.551,"y":12},"white":{"n":"白金燈光","p":1000,"a":3.638,"y":10},"metal":{"n":"工業鐵板","p":1000,"a":3.698,"y":15},"checker":{"n":"黑白格子","p":1500,"a":2.182,"y":45},"cherry":{"n":"櫻桃奶油","p":1500,"a":1.89,"y":52},"cloud":{"n":"雲朵月亮","p":1500,"a":1.614,"y":62},"drip":{"n":"奶油滴滴","p":1500,"a":2.051,"y":60},"holo":{"n":"幻彩貓咪","p":1500,"a":1.966,"y":58},"lamp":{"n":"檯燈小貓","p":1500,"a":1.59,"y":62},"moon":{"n":"月亮夜空","p":1500,"a":1.767,"y":55},"mushroom":{"n":"蘑菇燈小貓","p":1500,"a":1.744,"y":60},"navy":{"n":"深藍星球","p":1500,"a":1.695,"y":57},"neon":{"n":"紫光星球","p":1500,"a":1.652,"y":60},"pinkbow":{"n":"蝴蝶結小貓","p":1500,"a":1.661,"y":60},"pinkglass":{"n":"粉紅玻璃","p":1500,"a":1.664,"y":58},"pipe":{"n":"工業水管","p":1500,"a":1.684,"y":53},"planet":{"n":"霓虹星環","p":1500,"a":2.0,"y":62},"rail":{"n":"金色扶手","p":1500,"a":2.806,"y":45},"scallop":{"n":"奶油拱門","p":1500,"a":1.653,"y":57},"snow":{"n":"雪景小屋","p":1500,"a":1.567,"y":57},"ufo":{"n":"UFO 飛碟","p":1500,"a":1.831,"y":66},"cloud2":{"n":"奶油雲朵","p":1000,"a":1.739,"y":64},"bow2":{"n":"粉紅蝴蝶結","p":1000,"a":1.61,"y":62},"bear2":{"n":"紫色小熊","p":1000,"a":1.707,"y":62},"skycloud2":{"n":"天空雲朵","p":1000,"a":1.646,"y":64},"star2":{"n":"黃色星星","p":1000,"a":1.458,"y":67},"blackcat2":{"n":"黑貓","p":1000,"a":1.639,"y":63},"creampaw3":{"n":"奶油肉球","p":1500,"a":2.232,"y":59},"sagebow3":{"n":"抹茶蝴蝶結","p":1500,"a":2.283,"y":63},"terrazzo3":{"n":"水磨石","p":1000,"a":3.125,"y":26},"gingham3":{"n":"抹茶格紋","p":1500,"a":2.577,"y":53},"creammoon3":{"n":"奶油月亮","p":1500,"a":2.262,"y":53},"sprinkle3":{"n":"糖霜滴滴","p":1000,"a":3.125,"y":19},"pinkdrip3":{"n":"草莓滴滴","p":1000,"a":3.401,"y":17},"redpaw3":{"n":"紅白肉球","p":1500,"a":2.058,"y":61},"rainbow3":{"n":"彩虹雲朵","p":1500,"a":2.146,"y":62},"saturn3":{"n":"藍色土星","p":1500,"a":2.212,"y":57},"angelcat3":{"n":"紫色天使貓","p":1500,"a":2.232,"y":57},"cherrymint3":{"n":"櫻桃薄荷","p":1500,"a":2.155,"y":49},"angelheart3":{"n":"粉紅天使心","p":1500,"a":2.101,"y":52}},
+const WSHK=()=>Object.keys(WSH).sort((a,b)=>(WSH[b].nw||0)-(WSH[a].nw||0));   // v3.11：新層板排前面
+const WSH={"wood":{"n":"原木層板","p":1000,"a":3.551,"y":12},"white":{"n":"白金燈光","p":1000,"a":3.638,"y":10},"metal":{"n":"工業鐵板","p":1000,"a":3.698,"y":15},"checker":{"n":"黑白格子","p":1500,"a":2.182,"y":45},"cherry":{"n":"櫻桃奶油","p":1500,"a":1.89,"y":52},"cloud":{"n":"雲朵月亮","p":1500,"a":1.614,"y":62},"drip":{"n":"奶油滴滴","p":1500,"a":2.051,"y":60},"holo":{"n":"幻彩貓咪","p":1500,"a":1.966,"y":58},"lamp":{"n":"檯燈小貓","p":1500,"a":1.59,"y":62},"moon":{"n":"月亮夜空","p":1500,"a":1.767,"y":55},"mushroom":{"n":"蘑菇燈小貓","p":1500,"a":1.744,"y":60},"navy":{"n":"深藍星球","p":1500,"a":1.695,"y":57},"neon":{"n":"紫光星球","p":1500,"a":1.652,"y":60},"pinkbow":{"n":"蝴蝶結小貓","p":1500,"a":1.661,"y":60},"pinkglass":{"n":"粉紅玻璃","p":1500,"a":1.664,"y":58},"pipe":{"n":"工業水管","p":1500,"a":1.684,"y":53},"planet":{"n":"霓虹星環","p":1500,"a":2.0,"y":62},"rail":{"n":"金色扶手","p":1500,"a":2.806,"y":45},"scallop":{"n":"奶油拱門","p":1500,"a":1.653,"y":57},"snow":{"n":"雪景小屋","p":1500,"a":1.567,"y":57},"ufo":{"n":"UFO 飛碟","p":1500,"a":1.831,"y":66},"cloud2":{"n":"奶油雲朵","p":1000,"a":1.739,"y":64},"bow2":{"n":"粉紅蝴蝶結","p":1000,"a":1.61,"y":62},"bear2":{"n":"紫色小熊","p":1000,"a":1.707,"y":62},"skycloud2":{"n":"天空雲朵","p":1000,"a":1.646,"y":64},"star2":{"n":"黃色星星","p":1000,"a":1.458,"y":67},"blackcat2":{"n":"黑貓","p":1000,"a":1.639,"y":63},"creampaw3":{"n":"奶油肉球","p":1500,"a":2.232,"y":59},"sagebow3":{"n":"抹茶蝴蝶結","p":1500,"a":2.283,"y":63},"terrazzo3":{"n":"水磨石","p":1000,"a":3.125,"y":26},"gingham3":{"n":"抹茶格紋","p":1500,"a":2.577,"y":53},"creammoon3":{"n":"奶油月亮","p":1500,"a":2.262,"y":53},"sprinkle3":{"n":"糖霜滴滴","p":1000,"a":3.125,"y":19},"pinkdrip3":{"n":"草莓滴滴","p":1000,"a":3.401,"y":17},"redpaw3":{"n":"紅白肉球","p":1500,"a":2.058,"y":61},"rainbow3":{"n":"彩虹雲朵","p":1500,"a":2.146,"y":62},"saturn3":{"n":"藍色土星","p":1500,"a":2.212,"y":57},"angelcat3":{"n":"紫色天使貓","p":1500,"a":2.232,"y":57},"cherrymint3":{"n":"櫻桃薄荷","p":1500,"a":2.155,"y":49},"angelheart3":{"n":"粉紅天使心","p":1500,"a":2.101,"y":52},"catawning4":{"n":"貓咪遮陽棚","p":1000,"a":1.605,"y":75.9,"nw":1},"planetarch4":{"n":"星球拱門","p":1000,"a":1.691,"y":72.9,"nw":1},"torii4":{"n":"和風鳥居","p":1500,"a":1.756,"y":73.7,"nw":1},"castle4":{"n":"城堡拱門","p":1500,"a":1.642,"y":73.4,"nw":1},"snowarch4":{"n":"冰雪拱門","p":1000,"a":1.575,"y":68.2,"nw":1},"tiki4":{"n":"夏威夷草屋","p":1500,"a":1.584,"y":73.1,"nw":1},"catwood4":{"n":"貓咪木牆","p":1500,"a":1.606,"y":68,"nw":1},"galaxy4":{"n":"夜空星球","p":1500,"a":1.622,"y":66.5,"nw":1},"cafe4":{"n":"咖啡小店","p":1500,"a":1.605,"y":74.9,"nw":1},"metal4":{"n":"齒輪鐵板","p":1500,"a":1.756,"y":71.2,"nw":1},"ice4":{"n":"冰磚牆","p":1500,"a":1.534,"y":71.6,"nw":1},"forest4":{"n":"森林蘑菇","p":1500,"a":1.601,"y":71.0,"nw":1},"mooncloud4":{"n":"月亮雲朵","p":1000,"a":1.812,"y":66.9,"nw":1},"vine4":{"n":"藤蔓樹枝","p":1000,"a":1.758,"y":70.8,"nw":1},"cyber4":{"n":"機械貓耳","p":1000,"a":1.917,"y":71.6,"nw":1},"circus4":{"n":"馬戲團","p":1500,"a":1.777,"y":69.6,"nw":1},"wave4":{"n":"海浪貝殼","p":1000,"a":1.838,"y":64.3,"nw":1},"steam4":{"n":"蒸氣燈籠","p":1500,"a":1.681,"y":72.5,"nw":1},"witch4":{"n":"魔法帷幕","p":1500,"a":1.617,"y":67.2,"nw":1},"shell4":{"n":"珍珠貝殼","p":1500,"a":1.553,"y":69,"nw":1},"fort4":{"n":"城堡徽章","p":1500,"a":1.591,"y":73.1,"nw":1},"cake4":{"n":"草莓蛋糕","p":1500,"a":1.739,"y":70.4,"nw":1},"gamepad4":{"n":"遊戲手把","p":1500,"a":1.670,"y":70.8,"nw":1},"ruins4":{"n":"叢林遺跡","p":1500,"a":1.586,"y":71.8,"nw":1},"factory4":{"n":"工廠管線","p":1500,"a":1.621,"y":64,"nw":1},"camp4":{"n":"山林露營","p":1500,"a":1.556,"y":70,"nw":1},"lab4":{"n":"實驗室","p":1500,"a":1.706,"y":69.1,"nw":1},"moonbase4":{"n":"月球基地","p":1500,"a":1.619,"y":71.0,"nw":1},"dj4":{"n":"DJ 音樂台","p":1500,"a":1.481,"y":69.1,"nw":1},"pirate4":{"n":"海盜船","p":1500,"a":1.461,"y":66.7,"nw":1}},
   WFR={"wood":{"n":"原木相框","p":300,"a":0.747,"h":[16.8,23.4,83.2,86.6]},"gold":{"n":"金色相框","p":300,"a":0.833,"h":[17.6,16.0,82.4,84.0]},"moon":{"n":"月亮雲朵","p":800,"a":0.984,"h":[19.5,22.9,81.7,83.3]},"game":{"n":"遊戲機","p":800,"a":0.965,"h":[18.3,27.1,86.7,69.7]},"catring":{"n":"貓耳圓框","p":800,"a":0.978,"h":[19.8,18.5,80.9,72.3]},"calico":{"n":"三花貓","p":800,"a":0.857,"h":[20.4,20.0,81.0,83.3]},"game2":{"n":"星球遊戲機","p":800,"a":0.995,"h":[18.0,20.2,82.5,70.7]},"globe":{"n":"雪花球","p":800,"a":0.887,"h":[15.7,16.2,82.2,73.5]},"mecha":{"n":"機械風","p":800,"a":1.266,"h":[11.5,30.3,89.0,81.8]},"polaroid":{"n":"拍立得","p":800,"a":0.84,"h":[9.1,14.7,91.1,74.4]},"chainheart":{"n":"鍊條愛心","p":800,"a":1.212,"h":[12.1,15.2,87.1,86.9]},"cattv":{"n":"貓耳電視","p":800,"a":1.07,"h":[11.7,22.0,89.0,74.4]},"starchain":{"n":"星星鍊條","p":800,"a":1.088,"h":[15.8,17.0,83.3,83.0]},"clapper":{"n":"電影場記板","p":800,"a":1.056,"h":[8.4,33.6,87.3,79.5]},"navybow":{"n":"深藍蝴蝶結","p":800,"a":0.877,"h":[24.2,23.3,80.5,86.9]},"navywave":{"n":"深藍波浪","p":800,"a":1.146,"h":[17.5,19.3,83.3,78.8]},"porthole":{"n":"太空舷窗","p":800,"a":1.0,"h":[17.4,17.8,82.8,82.2]},"creamwave":{"n":"奶油波浪","p":800,"a":0.923,"h":[19.2,17.9,80.6,81.9]},"creamarch":{"n":"奶油拱門","p":800,"a":0.858,"h":[15.0,13.5,84.5,84.8]},"creamring":{"n":"奶油蝴蝶結","p":800,"a":0.91,"h":[14.2,21.9,85.1,86.9]},"pinkarch":{"n":"粉紅緞帶","p":800,"a":0.94,"h":[22.8,20.4,78.0,85.4]},"pinkcat":{"n":"粉紅小貓","p":800,"a":0.938,"h":[19.3,25.4,81.6,80.8]},"pinkheart":{"n":"粉紅愛心","p":800,"a":1.088,"h":[15.8,22.0,83.8,82.1]},"cloud2":{"n":"雲朵","p":800,"a":1.212,"h":[13.0,20.9,87.0,85.1]},"wings2":{"n":"天使翅膀","p":800,"a":1.164,"h":[12.4,22.5,87.6,85.5]},"catlilac2":{"n":"紫色貓耳","p":800,"a":1.191,"h":[11.5,24.0,86.1,86.6]},"space2":{"n":"太空藍","p":800,"a":1.236,"h":[13.2,24.1,86.6,84.0]},"star2":{"n":"星星","p":800,"a":1.079,"h":[12.6,22.9,87.4,86.4]},"gamer2":{"n":"電玩","p":800,"a":1.236,"h":[12.3,20.7,87.5,80.8]},"tabby2":{"n":"虎斑貓","p":800,"a":1.209,"h":[14.4,25.9,85.6,81.1]},"moon2":{"n":"月亮雲朵","p":800,"a":1.079,"h":[14.8,27.5,85.9,86.1]},"headset2":{"n":"貓耳耳機","p":800,"a":1.322,"h":[19.8,24.0,80.4,88.4]},"ufo2":{"n":"UFO","p":800,"a":0.998,"h":[12.5,31.1,90.4,76.9]},"rainbow2":{"n":"彩虹","p":800,"a":1.084,"h":[11.1,24.1,89.3,86.8]},"tv2":{"n":"復古電視","p":800,"a":0.931,"h":[14.3,34.0,85.9,74.6]}},
   WCB={"cat":{"n":"貓耳拱門","p":1500,"a":0.982,"y":[42,63,79],"x":[18,82]},"purple":{"n":"紫色遮雨棚","p":1500,"a":0.963,"y":[57,80],"x":[16,84]},"shop":{"n":"紅色小店","p":1500,"a":1.066,"y":[57,80],"x":[22,78]}},
   WBADGE={"a": 0.885, "h": [15.3, 15.8, 84.9, 70.6]};
@@ -4752,7 +4753,31 @@ const SHOW_CABS={
   blackcat2:{n:'黑貓',p:1000,a:400/511,x:[10, 90],y:[38, 57, 76, 92]},
   space2:{n:'太空艙',p:2000,a:437/512,x:[11, 89],y:[38, 57, 77, 92]},
   bat2:{n:'蝙蝠骷髏',p:1000,a:489/504,x:[14, 86],y:[38, 57, 77, 92]},
-  game2:{n:'遊戲機',p:1000,a:399/509,x:[9, 91],y:[38, 57, 77, 92]}};
+  game2:{n:'遊戲機',p:1000,a:399/509,x:[9, 91],y:[38, 57, 77, 92]},
+  robocat4:{n:'機械貓',p:1500,a:517/550,x:[17, 82],y:[36.0, 53.3, 70.7, 87.8],nw:1},
+  moonstage4:{n:'月亮舞台',p:2000,a:519/561,x:[22, 79],y:[37.3, 53.8, 69.3, 85.7],nw:1},
+  whale4:{n:'鯨魚海洋',p:1500,a:540/581,x:[20, 82],y:[36.3, 52.3, 68.2, 84.5],nw:1},
+  carousel4:{n:'旋轉木馬',p:2000,a:541/611,x:[19, 81],y:[39.0, 54.0, 69.2, 83.8],nw:1},
+  planet4:{n:'星球太空',p:1000,a:471/561,x:[18, 83],y:[38.7, 54.7, 70.2, 86.6],nw:1},
+  cake4:{n:'草莓蛋糕',p:1000,a:476/566,x:[16, 89],y:[40.5, 56.7, 72.6, 87.1],nw:1},
+  logcat4:{n:'森林貓窩',p:1000,a:493/577,x:[19, 83],y:[38.0, 53.6, 69.8, 85.6],nw:1},
+  pearl4:{n:'貝殼珍珠',p:1000,a:512/576,x:[22, 78],y:[37.7, 52.1, 67.9, 83.7],nw:1},
+  torii4:{n:'和風神社',p:1500,a:512/580,x:[21, 80],y:[35.2, 50.7, 66.4, 81.9],nw:1},
+  witch4:{n:'魔法學院',p:1500,a:519/577,x:[19, 79],y:[35.9, 51.1, 66.7, 82.1],nw:1},
+  snow4:{n:'冰雪北極熊',p:1500,a:513/599,x:[20, 81],y:[36.4, 51.3, 66.1, 81.0],nw:1},
+  tiki4:{n:'夏日海灘',p:1500,a:529/595,x:[22, 75],y:[35.8, 50.4, 65.4, 80.3],nw:1},
+  castle4:{n:'萬聖城堡',p:1500,a:507/562,x:[21, 80],y:[37.4, 53.2, 68.1, 82.7],nw:1},
+  candy4:{n:'糖果屋',p:1500,a:504/560,x:[20, 80],y:[37.1, 53.2, 68.8, 85.5],nw:1},
+  rainbow4:{n:'彩虹雲朵',p:1500,a:504/606,x:[19, 79],y:[35.0, 48.5, 63.5, 78.9],nw:1},
+  steam4:{n:'蒸氣齒輪',p:2000,a:509/603,x:[21, 80],y:[35.0, 49.4, 64.0, 79.3],nw:1},
+  garage4:{n:'工具車庫',p:1000,a:520/566,x:[20, 78],y:[36.6, 52.3, 66.8, 82.3],nw:1},
+  astro4:{n:'太空貓',p:2000,a:508/565,x:[19, 80],y:[36.6, 52.2, 67.8, 82.7],nw:1},
+  gamer4:{n:'電競玩家',p:1500,a:524/586,x:[25, 80],y:[33.3, 48.8, 64.5, 79.0],nw:1},
+  camp4:{n:'露營小屋',p:1500,a:525/602,x:[21, 79],y:[34.9, 49.7, 64.8, 80.9],nw:1},
+  band4:{n:'搖滾樂團',p:2000,a:501/562,x:[19, 79],y:[37.0, 52.3, 67.6, 82.9],nw:1},
+  street4:{n:'街頭滑板',p:1500,a:527/564,x:[22, 80],y:[37.2, 52.7, 67.7, 82.8],nw:1},
+  lab4:{n:'實驗室',p:1500,a:503/583,x:[22, 81],y:[32.6, 47.3, 63.0, 78.6],nw:1},
+  study4:{n:'星象書房',p:2000,a:526/588,x:[23, 76],y:[33.5, 48.8, 64.5, 79.1],nw:1}};   // v3.11：島主做的 24 款新櫃子（nw＝新品，商店排前面）
 const hasShow=h=>!!(h&&h.show&&typeof h.show==='object');
 const shCustom=()=>(DB.rooms||[]).filter(r=>r.r==='SH');
 function showRoomDef(id){if(SHOW_ROOMS[id])return SHOW_ROOMS[id];const r=shCustom().find(x=>x.id===id);return r?{n:r.name,p:+r.p||0,f:Math.round((r.floor&&+r.floor.y0||800)*1536/1264),img:r.img,off:!!r.off}:SHOW_ROOMS.basic}
@@ -4871,7 +4896,7 @@ function showCabPick(p){const h=house(SHV.hid),s=showNorm(h.show),cur=s.pos[p];
   $('#sheet').querySelectorAll('[data-c]').forEach(b=>b.onclick=()=>{const id=b.dataset.c;if(id===cur)return closeModal();if(showDo(SHV.hid,{op:'cab',pos:p,id})){sfx('tap');closeModal()}})}
 function showCabShop(p,tabs){const hid=shHid(),h=house(hid),s=showNorm(h.show),g=DB.game;
   openModal(`<h3>${tabs?'🛋️ 裝潢目錄':'🗄️ 買櫃子'}</h3>${tabs||''}<p class="lead">你有 🪙${g.coins||0}・買了會先擺到空位，沒空位就收進倉庫</p>
-    <div class="shgrid">${Object.entries(SHOW_CABS).map(([id,C])=>`<button class="si" data-b="${id}"><img class="pv" src="${showCabImg(id)}" alt="">${+s.cabs[id]?`<span class="tag">有 ${+s.cabs[id]}</span>`:''}<div class="sn">${esc(C.n)}</div><div class="sf">🪙${C.p}</div></button>`).join('')}</div>
+    <div class="shgrid">${Object.entries(SHOW_CABS).sort((a,b)=>(b[1].nw||0)-(a[1].nw||0)).map(([id,C])=>`<button class="si" data-b="${id}"><img class="pv" src="${showCabImg(id)}" alt="">${+s.cabs[id]?`<span class="tag">有 ${+s.cabs[id]}</span>`:C.nw?'<span class="tag">新</span>':''}<div class="sn">${esc(C.n)}</div><div class="sf">🪙${C.p}</div></button>`).join('')}</div>
     <div class="row2">${$('#shv')?'<button id="shmy">🔁 擺櫃子</button>':''}<button data-close>關閉</button></div>`);if(tabs)decoTabs();
   if($('#shmy'))$('#shmy').onclick=()=>{const e=s.pos.indexOf('');showCabPick(p!=null?p:e>=0?e:0)};
   $('#sheet').querySelectorAll('[data-b]').forEach(b=>b.onclick=()=>{const id=b.dataset.b,C=SHOW_CABS[id];
@@ -4891,7 +4916,7 @@ function showRoomShop(tabs){const hid=shHid(),h=house(hid),s=showNorm(h.show),g=
     $('#shno').onclick=()=>showRoomShop(tabs);
     $('#shyes').onclick=()=>{if((g.coins||0)<R.p)return toast('金幣不夠');g.coins-=R.p;save();updTix&&updTix();
       if(showDo(hid,{op:'buyRoom',id},()=>{g.coins+=R.p;save();updTix&&updTix()})){sfx('coin');toast(`換上 ${R.n} 了！`);closeModal()}else{g.coins+=R.p;save()}}})}
-const BB_SERIES=[{"id":1,"n":"喵星派對","en":"","c":"#7f9671","f":["太空橘貓","青蛙外星貓","潮流耳機貓","星星魔法師","天使奶油貓","鯊魚橘貓","冰淇淋黑貓","恐龍貓","蛋殼小貓","UFO 貓"],"h":[9],"t":[0,1,2]},{"id":2,"n":"甜點喵咪烘焙所","en":"","c":"#d97a8a","f":["草莓蛋糕貓","奶油泡芙貓","草莓甜甜圈貓","蜂蜜鬆餅貓","可頌貓","藍莓塔貓","櫻桃卷貓","葡萄馬卡龍貓","吐司小貓","草莓烘焙師"],"h":[9],"t":[0,1,2]},{"id":3,"n":"夜行少年團","en":"NIGHT CREW","c":"#3e3a33","f":["ACE PILOT","SHADOW CAT","NIGHT RIDER","STREET DJ","MOON WIZARD","ANGEL ZERO","SLIME X","LITTLE DEMON","ROBOT KID","UNKNOWN"],"h":[6,9],"t":[0,1,2]},{"id":4,"n":"怪咖小鎮","en":"SNOWTOWN","c":"#2f3e64","f":["ZIPP","PUFF","BLAZE","PAWBOY","PINKY","SNOWBALL","MOOSE","GOTH","UFO KID","DINO BUD"],"h":[8,9],"t":[0,1,2]},{"id":5,"n":"潮熊俱樂部","en":"BEAR CLUB","c":"#38362f","f":["AVIATOR","BEAT BEAR","HOOD","LILAC","PANDA CLUB","UFO BEAR","PINK PUFF","SKATER","STAR KING","ANGEL JELLY"],"h":[5,9],"t":[0,1,2]},{"id":6,"n":"毛茸茸俱樂部","en":"MIMI MONSTERS","c":"#6b4a36","f":["Momo Pilot","Teddy Punk","Midnight","Witchy","Space Baby","Berry","Dino Boo","Moo Moo","Cookie Chef","Angel Puff"],"h":[7,9],"t":[0,1,2],"off":1},{"id":7,"n":"招財喵俱樂部","en":"LUCKY NEKO CLUB","c":"#b8453a","f":["招財喵","黑曜喵","櫻花喵","宇宙喵","舞獅喵","森林喵","電玩喵","鯛魚燒喵","福氣喵","財神喵"],"h":[8,9],"t":[0,2,3]},{"id":8,"n":"胖胖豬俱樂部","en":"PIGGY CLUB","c":"#d27f7a","f":["BUBBLE","KITTY","FROGGY","CHEF P","COSMO","STRAWBY","SHARKY","HIP-HOP","SWEETIE","MAGIC"],"h":[7,9],"t":[0,1,2]},{"id":9,"n":"陽光小鎮","en":"SUNNY TOWN","c":"#6b4f8f","f":["ZAP","BUBBLES","DINER DOT","DOC","CHILL","ARTSY","STARRY","SCOUT","NEKO GAMER","ROCKY"],"h":[6,9],"t":[0,1,2]},{"id":10,"n":"吉娃娃暴走團","en":"CHIHUAHUA CHAOS","c":"#2d2a26","f":["ALOHA","MONDAY","SPA DAY","QUACK","PUNK","CHOMP","HOWDY","CLOWNY","DINO PUP","SPACE PUP"],"h":[7,9],"t":[0,1,2]},{"id":11,"n":"厭世男孩","en":"SLEEPY BOYS","c":"#3d3129","f":["SKATE","BUBBLE","INK","MONSTER","NO.23","LEO","BONES","FLUFF","BEATS","JUICE"],"h":[7,9],"t":[0,1,2]},{"id":12,"n":"厭世女孩","en":"SLEEPY GIRLS","c":"#b77d7d","f":["SUNNY","NOISE","LOLLI","LEOPARD","KITTEN","POP","ANGEL","BOW","FLUFFY","CAMO"],"h":[6,9],"t":[0,1,3]},{"id":13,"n":"瑪爾濟斯散步團","en":"MALTESE WALK","c":"#5c6146","f":["領巾寶寶","飛行員","小青蛙","藝術家","耳機控","小精靈","萬聖小幽靈","小天使","太空人","小巫師"],"h":[7,9],"t":[0,2,3]},{"id":14,"n":"大眼女孩團","en":"BIG EYES GIRLS","c":"#9a6aa0","f":["泡泡妹","星星酷妹","草莓甜心","貓耳電音","飛行少女","天使藍藍","黑貓雙馬尾","黑兔帽T","信差貝蕾","小惡魔"],"h":[5,9],"t":[0,2,3]},{"id":15,"n":"魔法小屋","en":"MAGIC COTTAGE","c":"#8a6a9e","f":["莓果魔女","月光學霸","葉子魔女","兔兔魔女","精靈飛行員","瞌睡銀髮","蘋果魔女","星星糖","水晶法師","黑貓魔女"],"h":[8,9],"t":[0,1,3]},{"id":16,"n":"冒險森林","en":"FOREST QUEST","c":"#4d6b8a","f":["熊熊背包客","飛行員小粉","恐龍探險家","草帽嚮導","觸角電波妹","企鵝飛行員","電視機器人","捲角綿羊","蘑菇小子","小樹人"],"h":[6,9],"t":[0,2,3]},{"id":17,"n":"蘑菇村","en":"MUSHROOM VILLAGE","c":"#a0523d","f":["紅帽菇菇","花花菇妹","飛行菇菇","書蟲菇菇","背包菇菇","魔法師爺爺","樹墩爺爺","麵包師傅","雲朵菇菇","夜光菇"],"h":[5,9],"t":[0,1,2]},{"id":18,"n":"潮鞋實驗室","en":"SNEAKER LAB","c":"#3b342e","f":["紅星高筒","粉紅愛心","軍綠老爹鞋","紫色波浪","黑星魔鬼氈","火焰板鞋","骷髏黑鞋","天使翅膀","小花雛菊","貓耳肉球"],"h":[7,9],"t":[0,1,4]},{"id":19,"n":"豹紋辣妹","en":"LEOPARD GIRLS","c":"#c78a8f","f":["豹紋貓耳","護目鏡辣妹","豹紋漁夫帽","星星包包頭","泡泡糖耳機","紫髮遮陽帽","豹紋髮帶","白貓毛毛帽","粉紅墨鏡","星星棒球帽"],"h":[7,9],"t":[0,2,4]},{"id":20,"n":"小惡魔俱樂部","en":"LITTLE DEVILS","c":"#4a2c33","f":["白髮小惡魔","黑帽T惡魔","紫髮惡魔","尖刺頭帶","紅髮蝙蝠翼","耳機惡魔","金髮十字","毛毛帽惡魔","熊熊惡魔","天使惡魔"],"h":[7,9],"t":[0,1,4]},{"id":21,"n":"厭世橘貓","en":"LAZY TABBY","c":"#b8752e","f":["吐舌頭","金項鍊大哥","頭頂魚","紙箱貓","鯊魚裝","吐司貓","趴趴貓","耳機貓","抱魚驚嚇","獅子裝"],"h":[5,9],"t":[0,3,4]},{"id":22,"n":"馬戲團小丑","en":"CLOWN CIRCUS","c":"#5a3328","f":["小丑帽寶寶","高帽紳士","蝴蝶結妹妹","氣球狗小丑","紫髮厭世丑","皇冠小丑王","派對帽妹妹","兔耳小丑","撲克魔術師","星星眼鏡"],"h":[5,8],"t":[0,2,3]},{"id":23,"n":"像素小隊","en":"PIXEL PALS","c":"#3d3350","f":["貓耳耳機","愛心墨鏡","外星帽小子","護目鏡綠髮","星星小巫師","太空貓耳","骷髏帽T","狐狸裝","天使小白","像素惡魔"],"h":[7,9],"t":[0,1,2]},{"id":24,"n":"滑板俱樂部","en":"SKATE CLUB","c":"#2f2a3a","f":["棋盤笑臉","粉紅火焰","像素貓咪","雲朵星星","豹紋愛心","銀色閃光","塗鴉皇冠","鐳射幻彩","星球宇宙","像素蘑菇"],"h":[7,9],"t":[0,1,2]},{"id":25,"n":"像素貓咪","en":"PIXEL CATS","c":"#3a3028","f":["橘虎斑","灰白貓","三花貓","小黑","蝴蝶結白貓","暹羅貓","瞇眼虎斑","賓士貓","長毛三花","玳瑁貓"],"h":[7,9],"t":[0,2,4]},{"id":26,"n":"奶嘴寶寶","en":"PACIFIER BABIES","c":"#5a4a63","f":["兔兔寶寶","熊熊寶寶","綿羊寶寶","虎斑貓寶寶","草莓寶寶","恐龍寶寶","企鵝寶寶","耳機寶寶","星星寶寶","月亮寶寶"],"h":[7,9],"t":[0,1,4]},{"id":27,"n":"太空小隊","en":"SPACE CREW","c":"#3f3756","f":["天線隊長","貓耳隊員","星星隊員","護目鏡隊員","土星隊員","橘貓太空人","機器人","熊熊太空人","熊貓太空人","兔兔太空人"],"h":[7,9],"t":[0,1,2]},{"id":28,"n":"外星人派對","en":"ALIEN PARTY","c":"#3a2f52","f":["綠色小外星","粉紅章魚","三眼怪","翅膀外星人","飛碟寶寶","水母","雲朵怪","豆芽太空人","星空法師","獨眼惡魔"],"h":[7,9],"t":[0,1,4]}];
+const BB_SERIES=[{"id":1,"n":"喵星派對","en":"","c":"#7f9671","f":["太空橘貓","青蛙外星貓","潮流耳機貓","星星魔法師","天使奶油貓","鯊魚橘貓","冰淇淋黑貓","恐龍貓","蛋殼小貓","UFO 貓"],"h":[9],"t":[0,1,2]},{"id":2,"n":"甜點喵咪烘焙所","en":"","c":"#d97a8a","f":["草莓蛋糕貓","奶油泡芙貓","草莓甜甜圈貓","蜂蜜鬆餅貓","可頌貓","藍莓塔貓","櫻桃卷貓","葡萄馬卡龍貓","吐司小貓","草莓烘焙師"],"h":[9],"t":[0,1,2]},{"id":3,"n":"夜行少年團","en":"NIGHT CREW","c":"#3e3a33","f":["ACE PILOT","SHADOW CAT","NIGHT RIDER","STREET DJ","MOON WIZARD","ANGEL ZERO","SLIME X","LITTLE DEMON","ROBOT KID","UNKNOWN"],"h":[6,9],"t":[0,1,2]},{"id":4,"n":"怪咖小鎮","en":"SNOWTOWN","c":"#2f3e64","f":["ZIPP","PUFF","BLAZE","PAWBOY","PINKY","SNOWBALL","MOOSE","GOTH","UFO KID","DINO BUD"],"h":[8,9],"t":[0,1,2]},{"id":5,"n":"潮熊俱樂部","en":"BEAR CLUB","c":"#38362f","f":["AVIATOR","BEAT BEAR","HOOD","LILAC","PANDA CLUB","UFO BEAR","PINK PUFF","SKATER","STAR KING","ANGEL JELLY"],"h":[5,9],"t":[0,1,2]},{"id":6,"n":"毛茸茸俱樂部","en":"MIMI MONSTERS","c":"#6b4a36","f":["Momo Pilot","Teddy Punk","Midnight","Witchy","Space Baby","Berry","Dino Boo","Moo Moo","Cookie Chef","Angel Puff"],"h":[7,9],"t":[0,1,2],"off":1},{"id":7,"n":"招財喵俱樂部","en":"LUCKY NEKO CLUB","c":"#b8453a","f":["招財喵","黑曜喵","櫻花喵","宇宙喵","舞獅喵","森林喵","電玩喵","鯛魚燒喵","福氣喵","財神喵"],"h":[8,9],"t":[0,2,3]},{"id":8,"n":"胖胖豬俱樂部","en":"PIGGY CLUB","c":"#d27f7a","f":["BUBBLE","KITTY","FROGGY","CHEF P","COSMO","STRAWBY","SHARKY","HIP-HOP","SWEETIE","MAGIC"],"h":[7,9],"t":[0,1,2]},{"id":9,"n":"陽光小鎮","en":"SUNNY TOWN","c":"#6b4f8f","f":["ZAP","BUBBLES","DINER DOT","DOC","CHILL","ARTSY","STARRY","SCOUT","NEKO GAMER","ROCKY"],"h":[6,9],"t":[0,1,2]},{"id":10,"n":"吉娃娃暴走團","en":"CHIHUAHUA CHAOS","c":"#2d2a26","f":["ALOHA","MONDAY","SPA DAY","QUACK","PUNK","CHOMP","HOWDY","CLOWNY","DINO PUP","SPACE PUP"],"h":[7,9],"t":[0,1,2]},{"id":11,"n":"厭世男孩","en":"SLEEPY BOYS","c":"#3d3129","f":["SKATE","BUBBLE","INK","MONSTER","NO.23","LEO","BONES","FLUFF","BEATS","JUICE"],"h":[7,9],"t":[0,1,2]},{"id":12,"n":"厭世女孩","en":"SLEEPY GIRLS","c":"#b77d7d","f":["SUNNY","NOISE","LOLLI","LEOPARD","KITTEN","POP","ANGEL","BOW","FLUFFY","CAMO"],"h":[6,9],"t":[0,1,3]},{"id":13,"n":"瑪爾濟斯散步團","en":"MALTESE WALK","c":"#5c6146","f":["領巾寶寶","飛行員","小青蛙","藝術家","耳機控","小精靈","萬聖小幽靈","小天使","太空人","小巫師"],"h":[7,9],"t":[0,2,3]},{"id":14,"n":"大眼女孩團","en":"BIG EYES GIRLS","c":"#9a6aa0","f":["泡泡妹","星星酷妹","草莓甜心","貓耳電音","飛行少女","天使藍藍","黑貓雙馬尾","黑兔帽T","信差貝蕾","小惡魔"],"h":[5,9],"t":[0,2,3]},{"id":15,"n":"魔法小屋","en":"MAGIC COTTAGE","c":"#8a6a9e","f":["莓果魔女","月光學霸","葉子魔女","兔兔魔女","精靈飛行員","瞌睡銀髮","蘋果魔女","星星糖","水晶法師","黑貓魔女"],"h":[8,9],"t":[0,1,3]},{"id":16,"n":"冒險森林","en":"FOREST QUEST","c":"#4d6b8a","f":["熊熊背包客","飛行員小粉","恐龍探險家","草帽嚮導","觸角電波妹","企鵝飛行員","電視機器人","捲角綿羊","蘑菇小子","小樹人"],"h":[6,9],"t":[0,2,3]},{"id":17,"n":"蘑菇村","en":"MUSHROOM VILLAGE","c":"#a0523d","f":["紅帽菇菇","花花菇妹","飛行菇菇","書蟲菇菇","背包菇菇","魔法師爺爺","樹墩爺爺","麵包師傅","雲朵菇菇","夜光菇"],"h":[5,9],"t":[0,1,2]},{"id":18,"n":"潮鞋實驗室","en":"SNEAKER LAB","c":"#3b342e","f":["紅星高筒","粉紅愛心","軍綠老爹鞋","紫色波浪","黑星魔鬼氈","火焰板鞋","骷髏黑鞋","天使翅膀","小花雛菊","貓耳肉球"],"h":[7,9],"t":[0,1,4]},{"id":19,"n":"豹紋辣妹","en":"LEOPARD GIRLS","c":"#c78a8f","f":["豹紋貓耳","護目鏡辣妹","豹紋漁夫帽","星星包包頭","泡泡糖耳機","紫髮遮陽帽","豹紋髮帶","白貓毛毛帽","粉紅墨鏡","星星棒球帽"],"h":[7,9],"t":[0,2,4]},{"id":20,"n":"小惡魔俱樂部","en":"LITTLE DEVILS","c":"#4a2c33","f":["白髮小惡魔","黑帽T惡魔","紫髮惡魔","尖刺頭帶","紅髮蝙蝠翼","耳機惡魔","金髮十字","毛毛帽惡魔","熊熊惡魔","天使惡魔"],"h":[7,9],"t":[0,1,4]},{"id":21,"n":"厭世橘貓","en":"LAZY TABBY","c":"#b8752e","f":["吐舌頭","金項鍊大哥","頭頂魚","紙箱貓","鯊魚裝","吐司貓","趴趴貓","耳機貓","抱魚驚嚇","獅子裝"],"h":[5,9],"t":[0,3,4]},{"id":22,"n":"馬戲團小丑","en":"CLOWN CIRCUS","c":"#5a3328","f":["小丑帽寶寶","高帽紳士","蝴蝶結妹妹","氣球狗小丑","紫髮厭世丑","皇冠小丑王","派對帽妹妹","兔耳小丑","撲克魔術師","星星眼鏡"],"h":[5,8],"t":[0,2,3]},{"id":23,"n":"像素小隊","en":"PIXEL PALS","c":"#3d3350","f":["貓耳耳機","愛心墨鏡","外星帽小子","護目鏡綠髮","星星小巫師","太空貓耳","骷髏帽T","狐狸裝","天使小白","像素惡魔"],"h":[7,9],"t":[0,1,2]},{"id":24,"n":"滑板俱樂部","en":"SKATE CLUB","c":"#2f2a3a","f":["棋盤笑臉","粉紅火焰","像素貓咪","雲朵星星","豹紋愛心","銀色閃光","塗鴉皇冠","鐳射幻彩","星球宇宙","像素蘑菇"],"h":[7,9],"t":[0,1,2]},{"id":25,"n":"像素貓咪","en":"PIXEL CATS","c":"#3a3028","f":["橘虎斑","灰白貓","三花貓","小黑","蝴蝶結白貓","暹羅貓","瞇眼虎斑","賓士貓","長毛三花","玳瑁貓"],"h":[7,9],"t":[0,2,4]},{"id":26,"n":"奶嘴寶寶","en":"PACIFIER BABIES","c":"#5a4a63","f":["兔兔寶寶","熊熊寶寶","綿羊寶寶","虎斑貓寶寶","草莓寶寶","恐龍寶寶","企鵝寶寶","耳機寶寶","星星寶寶","月亮寶寶"],"h":[7,9],"t":[0,1,4]},{"id":27,"n":"太空小隊","en":"SPACE CREW","c":"#3f3756","f":["天線隊長","貓耳隊員","星星隊員","護目鏡隊員","土星隊員","橘貓太空人","機器人","熊熊太空人","熊貓太空人","兔兔太空人"],"h":[7,9],"t":[0,1,2]},{"id":28,"n":"外星人派對","en":"ALIEN PARTY","c":"#3a2f52","f":["綠色小外星","粉紅章魚","三眼怪","翅膀外星人","飛碟寶寶","水母","雲朵怪","豆芽太空人","星空法師","獨眼惡魔"],"h":[7,9],"t":[0,1,4]},{"id":29,"n":"籃球喵","en":"BASKETBALL CATS","c":"#c97a2e","f":["23號球員","紫帽耳機","金鍊墨鏡","30號眨眼","白帽球迷","反戴帽喝飲料","黑帽抱球","11號吶喊","裁判貓","鯊魚球衣"],"h":[2,9],"t":[0,1,3]},{"id":30,"n":"棒球喵","en":"BASEBALL CATS","c":"#2f3e64","f":["打擊手","捕手","投手","耳機球員","吹泡泡","熱狗觀眾","抱球睡覺","玉米頭啦啦隊","加油手套","棒球帽T"],"h":[6,7],"t":[0,1,2]},{"id":31,"n":"雞仔日常","en":"CHICKEN DAILY","c":"#6b4a2a","f":["墨鏡雞","香蕉雞","吐司雞","青蛙雞","泡湯雞","紙箱雞","昏倒雞","鯛魚燒雞","爆炸頭歌手","噴火恐龍雞"],"h":[8,9],"t":[0,1,2]},{"id":32,"n":"厭世喵料理","en":"LAZY CAT SNACKS","c":"#6b4f8f","f":["鯊魚喵","香蕉喵","紙箱喵","鮭魚壽司喵","馬桶喵","拉麵喵","薯條喵","企鵝喵","荷包蛋喵","紅鶴泳圈喵"],"h":[3,9],"t":[0,1,2]},{"id":33,"n":"厭世怪喵","en":"GRUMPY CATS","c":"#5c6146","f":["吐舌橘貓","驚嚇賓士","OK繃黑貓","紙箱三花","鯊魚帽T","墨鏡三花","便便頭","青蛙裝","飯糰頭","小雞裝"],"h":[6,8],"t":[0,1,2]},{"id":34,"n":"厭世小怪獸","en":"SLEEPY MONSTERS","c":"#8a6a9e","f":["獨眼角角","紫毛毛","吐舌小幽靈","科學怪人","三眼怪","蛋殼怪","小惡魔","當機機器人","雪人怪","蘑菇怪"],"h":[7,9],"t":[0,1,2]},{"id":35,"n":"太空喵小隊","en":"SPACE KITTIES","c":"#3f3756","f":["橘貓太空人","灰貓太空人","三花太空人","黑貓太空人","白貓太空人","黑面罩","土星睡貓","護目鏡貓","泡泡頭盔","飛碟喵"],"h":[5,9],"t":[0,1,2]},{"id":36,"n":"動物帽T寶寶","en":"HOODIE BABIES","c":"#8a5a4e","f":["小熊","棕熊","草莓","兔兔","熊貓","柴犬","乳牛","青蛙","小蜜蜂","無尾熊"],"h":[4,9],"t":[0,1,2]},{"id":37,"n":"嘟嘟車","en":"TOOT TOOT CARS","c":"#b8453a","f":["小紅車","計程車","警車","冰淇淋車","吉普車","露營車","跑車","救護車","砂石車","賽車"],"h":[5,9],"t":[0,1,2]},{"id":38,"n":"怪獸派對","en":"MONSTER PARTY","c":"#4a3a6a","f":["獨眼綠怪","三眼吐舌","毛毛雪怪","蘑菇史萊姆","縫線娃娃","小死神","果凍怪","藍色小龍","機器人","黑煤球"],"h":[5,7],"t":[0,1,2]},{"id":39,"n":"公主物語","en":"PRINCESS TALES","c":"#6b4f8f","f":["灰姑娘","玫瑰公主","星空公主","冰雪公主","紅心女王","森林公主","暗黑公主","天使公主","美人魚","沙漠公主"],"h":[3,8],"t":[0,1,2]},{"id":40,"n":"鬥牛犬日常","en":"FRENCHIE DAYS","c":"#3b342e","f":["國王","鯊魚裝","夏威夷","香蕉裝","熱狗堡","兔兔裝","青蛙裝","大廚","健身","上班族"],"h":[0,9],"t":[1,2,3]},{"id":41,"n":"博美寶寶","en":"POMERANIAN PUFFS","c":"#c78a8f","f":["博美國王","蝴蝶結白博美","飛行員","青蛙裝","耳機黑博美","水手","小蜜蜂","愛心墨鏡","大廚","獨角獸"],"h":[0,9],"t":[1,2,3]},{"id":42,"n":"潮玩小物","en":"STREET GEAR","c":"#3d3350","f":["貓耳耳機","像素電視","帆布鞋","火焰滑板","黑膠唱盤","拍立得","貓咪背包","塗鴉噴漆","掌上遊戲機","扭蛋機"],"h":[4,9],"t":[0,1,2]},{"id":43,"n":"柯基屁屁","en":"CORGI BUTTS","c":"#6b4a36","f":["開心柯基","恐龍裝","柯基國王","墨鏡金鍊","荷包蛋睡覺","鯊魚裝","小蜜蜂","柯基屁屁","大廚","毛毛斗篷"],"h":[2,7],"t":[0,1,3]},{"id":44,"n":"柴犬遊俄羅斯","en":"SHIBA IN RUSSIA","c":"#8a3a2e","f":["雷鋒帽柴","頭巾柴","毛球帽柴","彈琴柴","皇冠頭飾","讀書柴","鬆餅柴","墨鏡皮草","紅帽柴","套娃柴"],"h":[4,9],"t":[0,1,2]},{"id":45,"n":"軟萌動物園","en":"SOFT ZOO","c":"#6a8bb5","f":["帽子小狗","三花貓","綿羊","兔兔","圍巾企鵝","刺蝟","飛行員小鴨","熊貓","小豬","青蛙"],"h":[4,6],"t":[0,1,2]},{"id":46,"n":"軟萌好朋友","en":"SOFT FRIENDS","c":"#b8903e","f":["條紋小男孩","飛行員小狗","蝴蝶結貓","吊帶兔兔","貝蕾帽綿羊","帽T浣熊","黃帽小鴨","恐龍裝","讀書熊","鈴鐺乳牛"],"h":[5,8],"t":[0,1,2]},{"id":47,"n":"粉粉兔日常","en":"PINKY BUNNY","c":"#a07aa8","f":["拜託兔","咖啡兔","歡呼兔","趴趴兔","耳機兔","抱星星兔","蓋被兔","讀書兔","毛帽小雞","漢堡兔"],"h":[5,8],"t":[0,1,2]},{"id":48,"n":"圓圓雞日常","en":"ROUND CHICK","c":"#7f9a5e","f":["毛帽小雞","珍奶小雞","鯊魚小雞","讀書小雞","青蛙小雞","蓋被小雞","墨鏡小雞","抱魚小雞","紙箱小雞","廚師小雞"],"h":[2,9],"t":[0,1,3]}];
 
 // ================= 🎄 小麋鹿豆豆的聖誕禮物（v2.02）=================
 // 島主在後台按「開始」到 12/25；禮物一天 4 個時段（紅／綠）＋晚上 8～10 點金色，每人每天最多撿 3 個、手上最多拿 3 個
@@ -5193,10 +5218,10 @@ function neonEdit(){const hid=SHV?SHV.hid:(myHouse()||{}).id,h=house(hid);if(!h|
     else if(showDo(hid,{op:'neon',t,c:col})){sfx('tap');closeModal()}}}
 // 裝潢目錄：牆面
 function wallShop(tabs){const hid=shHid(),h=house(hid),s=showNorm(h.show),g=DB.game;
-  const card=(kind,id,D,pre)=>{const n=+s.wo[kind+':'+id]||0;return `<button class="si" data-wb="${kind}:${id}"><img class="pv" src="assets/${pre}_${id}.webp" alt="" style="aspect-ratio:1">${n?`<span class="tag">有 ${n}</span>`:''}<div class="sn">${esc(D[id].n)}</div><div class="sf">🪙${D[id].p}</div></button>`};
+  const card=(kind,id,D,pre)=>{const n=+s.wo[kind+':'+id]||0;return `<button class="si" data-wb="${kind}:${id}"><img class="pv" src="assets/${pre}_${id}.webp" alt="" style="aspect-ratio:1">${n?`<span class="tag">有 ${n}</span>`:D[id].nw?'<span class="tag">新</span>':''}<div class="sn">${esc(D[id].n)}</div><div class="sf">🪙${D[id].p}</div></button>`};
   openModal(`<h3>🛋️ 裝潢目錄</h3>${tabs||''}<p class="lead" style="font-size:12px">你有 🪙${g.coins||0}・買了會先掛到空位，沒空位就收進倉庫</p>
     <div class="dcsec">✨ 霓虹招牌</div><div class="shgrid"><button class="si" id="wbneon"><div class="pv" style="aspect-ratio:1;display:flex;align-items:center;justify-content:center;background:#2a2030;border-radius:10px;container-type:inline-size"><span class="shneon" style="position:relative;transform:none;left:auto;top:auto;font-size:14px;--nc:#ff5fa2">OPEN</span></div><div class="sn">自己打字</div><div class="sf">${s.neon?'改字':'🪙'+NEON_P}</div></button></div>
-    <div class="dcsec">🪵 層板（最多 2 排，每排 5 格）</div><div class="shgrid">${Object.keys(WSH).map(id=>card('sh',id,WSH,'wsh')).join('')}</div>
+    <div class="dcsec">🪵 層板（最多 2 排，每排 5 格）</div><div class="shgrid">${WSHK().map(id=>card('sh',id,WSH,'wsh')).join('')}</div>
     <div class="dcsec">🏠 壁櫃（取代層板）</div><div class="shgrid">${Object.keys(WCB).map(id=>card('cb',id,WCB,'wcb')).join('')}</div>
     <div class="dcsec">📷 相框（最多 4 個）</div><div class="shgrid">${Object.keys(WFR).map(id=>card('fr',id,WFR,'wfr')).join('')}</div>
     <div class="row2"><button data-close>關閉</button></div>`);if(tabs)decoTabs();
@@ -6201,7 +6226,115 @@ Object.assign(ITEMS,{
   r_tv:{name:'繽紛電視',emo:'🏠',kind:'toy',price:120,sz:1.1,cat:'appl',ser:'r',nw:1},
   r_lucky:{name:'繽紛招財貓',emo:'🏠',kind:'toy',price:120,sz:1.0,cat:'deco',ser:'r',nw:1},
   r_catbed:{name:'繽紛貓耳窩',emo:'🏠',kind:'toy',price:120,sz:1.4,cat:'furn',ser:'r',nw:1}});
-const TOY_CATS=[['all','全部'],['new','🆕 新品'],['toy','🧸 玩具'],['pet','🐾 寵物用品'],['appl','🏠 家電'],['furn','🛋️ 家具'],['deco','🌸 擺飾'],['bath','🧴 盥洗保養']];let toyCat='all';
+Object.assign(ITEMS,{xm_a00:{name:'聖誕壁爐',emo:'🎄',kind:'toy',price:120,sz:1.6,cat:'xmas'},
+xm_a01:{name:'雪夜窗景',emo:'🎄',kind:'toy',price:100,sz:1.4,cat:'xmas'},
+xm_a02:{name:'格紋沙發椅',emo:'🎄',kind:'toy',price:120,sz:1.4,cat:'xmas'},
+xm_a03:{name:'雪花毯捲',emo:'🎄',kind:'toy',price:60,sz:1.0,cat:'xmas'},
+xm_a04:{name:'腳掌抱枕組',emo:'🎄',kind:'toy',price:60,sz:1.0,cat:'xmas'},
+xm_a05:{name:'鈴鐺檯燈',emo:'🎄',kind:'toy',price:70,sz:1.1,cat:'xmas'},
+xm_a10:{name:'聖誕書架',emo:'🎄',kind:'toy',price:100,sz:1.4,cat:'xmas'},
+xm_a11:{name:'腳掌小櫃',emo:'🎄',kind:'toy',price:100,sz:1.3,cat:'xmas'},
+xm_a12:{name:'小屋水晶球',emo:'🎄',kind:'toy',price:80,sz:0.9,cat:'xmas'},
+xm_a13:{name:'星星提燈',emo:'🎄',kind:'toy',price:70,sz:0.9,cat:'xmas'},
+xm_a14:{name:'三燭燭台',emo:'🎄',kind:'toy',price:70,sz:1.0,cat:'xmas'},
+xm_a15:{name:'鈴鐺擴香',emo:'🎄',kind:'toy',price:50,sz:0.8,cat:'xmas'},
+xm_a20:{name:'雪景掛畫',emo:'🎄',kind:'toy',price:60,sz:1.0,cat:'xmas'},
+xm_a21:{name:'貓咪相框',emo:'🎄',kind:'toy',price:60,sz:0.9,cat:'xmas'},
+xm_a22:{name:'雪人娃娃',emo:'🎄',kind:'toy',price:60,sz:1.0,cat:'xmas'},
+xm_a23:{name:'麋鹿娃娃',emo:'🎄',kind:'toy',price:70,sz:1.0,cat:'xmas'},
+xm_a24:{name:'聖誕搖搖馬',emo:'🎄',kind:'toy',price:90,sz:1.2,cat:'xmas'},
+xm_a25:{name:'聖誕毛線籃',emo:'🎄',kind:'toy',price:50,sz:0.9,cat:'xmas'},
+xm_a30:{name:'格紋貓屋',emo:'🎄',kind:'toy',price:100,sz:1.3,cat:'xmas'},
+xm_a31:{name:'格紋睡窩',emo:'🎄',kind:'toy',price:90,sz:1.3,cat:'xmas'},
+xm_a32:{name:'麋鹿睡窩',emo:'🎄',kind:'toy',price:90,sz:1.3,cat:'xmas'},
+xm_a33:{name:'魚魚貓窩',emo:'🎄',kind:'toy',price:100,sz:1.3,cat:'xmas'},
+xm_a34:{name:'雪地貓跳台',emo:'🎄',kind:'toy',price:110,sz:1.4,cat:'xmas'},
+xm_a35:{name:'花圈狗屋',emo:'🎄',kind:'toy',price:100,sz:1.3,cat:'xmas'},
+xm_a40:{name:'腳掌雙碗',emo:'🎄',kind:'toy',price:50,sz:0.9,cat:'xmas'},
+xm_a41:{name:'骨頭零食罐',emo:'🎄',kind:'toy',price:50,sz:0.9,cat:'xmas'},
+xm_a42:{name:'聖誕老鼠玩具',emo:'🎄',kind:'toy',price:40,sz:0.8,cat:'xmas'},
+xm_a43:{name:'紅綠繩結',emo:'🎄',kind:'toy',price:40,sz:0.8,cat:'xmas'},
+xm_a44:{name:'羽毛逗貓棒',emo:'🎄',kind:'toy',price:40,sz:1.0,cat:'xmas'},
+xm_a45:{name:'格紋魚抱枕',emo:'🎄',kind:'toy',price:50,sz:0.9,cat:'xmas'},
+xm_a50:{name:'格紋貓隧道',emo:'🎄',kind:'toy',price:80,sz:1.3,cat:'xmas'},
+xm_a51:{name:'禮物盒貓屋',emo:'🎄',kind:'toy',price:90,sz:1.2,cat:'xmas'},
+xm_a52:{name:'雪橇床',emo:'🎄',kind:'toy',price:110,sz:1.4,cat:'xmas'},
+xm_a53:{name:'禮物堆',emo:'🎄',kind:'toy',price:80,sz:1.1,cat:'xmas'},
+xm_a54:{name:'腳掌郵筒',emo:'🎄',kind:'toy',price:70,sz:1.1,cat:'xmas'},
+xm_a55:{name:'雪人睡窩',emo:'🎄',kind:'toy',price:100,sz:1.3,cat:'xmas'},
+xm_b00:{name:'金緞禮物盒',emo:'🎄',kind:'toy',price:50,sz:0.9,cat:'xmas'},
+xm_b01:{name:'綠色禮物盒',emo:'🎄',kind:'toy',price:50,sz:0.9,cat:'xmas'},
+xm_b02:{name:'腳掌禮物袋',emo:'🎄',kind:'toy',price:50,sz:0.9,cat:'xmas'},
+xm_b03:{name:'聖誕襪',emo:'🎄',kind:'toy',price:50,sz:0.9,cat:'xmas'},
+xm_b04:{name:'小屋雪景球',emo:'🎄',kind:'toy',price:50,sz:0.9,cat:'xmas'},
+xm_b05:{name:'雪人雪景球',emo:'🎄',kind:'toy',price:50,sz:0.9,cat:'xmas'},
+xm_b10:{name:'腳掌花圈',emo:'🎄',kind:'toy',price:50,sz:0.9,cat:'xmas'},
+xm_b11:{name:'金色鈴鐺',emo:'🎄',kind:'toy',price:50,sz:0.9,cat:'xmas'},
+xm_b12:{name:'薑餅人',emo:'🎄',kind:'toy',price:50,sz:0.9,cat:'xmas'},
+xm_b13:{name:'聖誕樹餅乾',emo:'🎄',kind:'toy',price:50,sz:0.9,cat:'xmas'},
+xm_b14:{name:'星星餅乾',emo:'🎄',kind:'toy',price:50,sz:0.9,cat:'xmas'},
+xm_b15:{name:'拐杖糖',emo:'🎄',kind:'toy',price:50,sz:0.9,cat:'xmas'},
+xm_b20:{name:'迷你聖誕樹',emo:'🎄',kind:'toy',price:50,sz:0.9,cat:'xmas'},
+xm_b21:{name:'雪地提燈',emo:'🎄',kind:'toy',price:50,sz:0.9,cat:'xmas'},
+xm_b22:{name:'蝴蝶結蠟燭',emo:'🎄',kind:'toy',price:50,sz:0.9,cat:'xmas'},
+xm_b23:{name:'聖誕擴香',emo:'🎄',kind:'toy',price:50,sz:0.9,cat:'xmas'},
+xm_b24:{name:'棉花糖可可',emo:'🎄',kind:'toy',price:50,sz:0.9,cat:'xmas'},
+xm_b25:{name:'雪人馬克杯',emo:'🎄',kind:'toy',price:50,sz:0.9,cat:'xmas'},
+xm_b30:{name:'小麋鹿',emo:'🎄',kind:'toy',price:60,sz:1.0,cat:'xmas'},
+xm_b31:{name:'聖誕帽',emo:'🎄',kind:'toy',price:60,sz:1.0,cat:'xmas'},
+xm_b32:{name:'聖誕老公公',emo:'🎄',kind:'toy',price:60,sz:1.0,cat:'xmas'},
+xm_b33:{name:'禮帽雪人',emo:'🎄',kind:'toy',price:60,sz:1.0,cat:'xmas'},
+xm_b34:{name:'耳罩企鵝',emo:'🎄',kind:'toy',price:60,sz:1.0,cat:'xmas'},
+xm_b35:{name:'圍巾白熊',emo:'🎄',kind:'toy',price:60,sz:1.0,cat:'xmas'},
+xm_b40:{name:'小木馬',emo:'🎄',kind:'toy',price:60,sz:1.0,cat:'xmas'},
+xm_b41:{name:'星星小鼓',emo:'🎄',kind:'toy',price:60,sz:1.0,cat:'xmas'},
+xm_b42:{name:'聖誕小火車',emo:'🎄',kind:'toy',price:60,sz:1.0,cat:'xmas'},
+xm_b43:{name:'聖誕小飛機',emo:'🎄',kind:'toy',price:60,sz:1.0,cat:'xmas'},
+xm_b44:{name:'聖誕小火箭',emo:'🎄',kind:'toy',price:60,sz:1.0,cat:'xmas'},
+xm_b45:{name:'聖誕機器人',emo:'🎄',kind:'toy',price:60,sz:1.0,cat:'xmas'},
+xm_b50:{name:'聖誕帽熊熊',emo:'🎄',kind:'toy',price:60,sz:1.0,cat:'xmas'},
+xm_b51:{name:'斗篷兔兔',emo:'🎄',kind:'toy',price:60,sz:1.0,cat:'xmas'},
+xm_b52:{name:'聖誕帽貓咪',emo:'🎄',kind:'toy',price:60,sz:1.0,cat:'xmas'},
+xm_b53:{name:'樹幹蛋糕',emo:'🎄',kind:'toy',price:60,sz:1.0,cat:'xmas'},
+xm_b54:{name:'薑餅屋',emo:'🎄',kind:'toy',price:100,sz:1.0,cat:'xmas'},
+xm_b55:{name:'聖誕旋轉木馬',emo:'🎄',kind:'toy',price:100,sz:1.0,cat:'xmas'},
+xm_c00:{name:'腳掌聖誕樹',emo:'🎄',kind:'toy',price:90,sz:1.3,cat:'xmas'},
+xm_c01:{name:'鈴鐺雪白樹',emo:'🎄',kind:'toy',price:90,sz:1.3,cat:'xmas'},
+xm_c02:{name:'玻璃聖誕樹',emo:'🎄',kind:'toy',price:120,sz:1.3,cat:'xmas'},
+xm_c03:{name:'粉紅愛心樹',emo:'🎄',kind:'toy',price:90,sz:1.3,cat:'xmas'},
+xm_c04:{name:'土星聖誕樹',emo:'🎄',kind:'toy',price:90,sz:1.3,cat:'xmas'},
+xm_c05:{name:'雪屋聖誕樹',emo:'🎄',kind:'toy',price:90,sz:1.3,cat:'xmas'},
+xm_c10:{name:'星球紫色樹',emo:'🎄',kind:'toy',price:90,sz:1.3,cat:'xmas'},
+xm_c11:{name:'禮物塔樹',emo:'🎄',kind:'toy',price:90,sz:1.3,cat:'xmas'},
+xm_c12:{name:'圍巾聖誕樹',emo:'🎄',kind:'toy',price:90,sz:1.3,cat:'xmas'},
+xm_c13:{name:'水晶聖誕樹',emo:'🎄',kind:'toy',price:120,sz:1.3,cat:'xmas'},
+xm_c14:{name:'薑餅聖誕樹',emo:'🎄',kind:'toy',price:90,sz:1.3,cat:'xmas'},
+xm_c15:{name:'聖誕老人樹',emo:'🎄',kind:'toy',price:90,sz:1.3,cat:'xmas'},
+xm_c20:{name:'雪花蝴蝶結樹',emo:'🎄',kind:'toy',price:90,sz:1.3,cat:'xmas'},
+xm_c21:{name:'雪景球聖誕樹',emo:'🎄',kind:'toy',price:90,sz:1.3,cat:'xmas'},
+xm_c22:{name:'雪松盆景',emo:'🎄',kind:'toy',price:90,sz:1.3,cat:'xmas'},
+xm_c23:{name:'起司聖誕樹',emo:'🎄',kind:'toy',price:90,sz:1.3,cat:'xmas'},
+xm_c24:{name:'螺旋燈樹',emo:'🎄',kind:'toy',price:120,sz:1.3,cat:'xmas'},
+xm_c25:{name:'氣球聖誕樹',emo:'🎄',kind:'toy',price:90,sz:1.3,cat:'xmas'},
+xm_c30:{name:'貓咪聖誕樹',emo:'🎄',kind:'toy',price:90,sz:1.3,cat:'xmas'},
+xm_c31:{name:'白貓雪球樹',emo:'🎄',kind:'toy',price:90,sz:1.3,cat:'xmas'},
+xm_c32:{name:'書本聖誕樹',emo:'🎄',kind:'toy',price:90,sz:1.3,cat:'xmas'},
+xm_c33:{name:'黑蝴蝶結樹',emo:'🎄',kind:'toy',price:90,sz:1.3,cat:'xmas'},
+xm_c34:{name:'提燈雪樹',emo:'🎄',kind:'toy',price:90,sz:1.3,cat:'xmas'},
+xm_c35:{name:'冰晶聖誕樹',emo:'🎄',kind:'toy',price:120,sz:1.3,cat:'xmas'},
+xm_c40:{name:'馬戲團聖誕樹',emo:'🎄',kind:'toy',price:90,sz:1.3,cat:'xmas'},
+xm_c41:{name:'拼布聖誕樹',emo:'🎄',kind:'toy',price:90,sz:1.3,cat:'xmas'},
+xm_c42:{name:'木頭小屋樹',emo:'🎄',kind:'toy',price:90,sz:1.3,cat:'xmas'},
+xm_c43:{name:'雲朵月亮樹',emo:'🎄',kind:'toy',price:90,sz:1.3,cat:'xmas'},
+xm_c44:{name:'紅蝴蝶結樹',emo:'🎄',kind:'toy',price:90,sz:1.3,cat:'xmas'},
+xm_c45:{name:'金光燈飾樹',emo:'🎄',kind:'toy',price:120,sz:1.3,cat:'xmas'},
+xm_c50:{name:'草莓蛋糕樹',emo:'🎄',kind:'toy',price:90,sz:1.3,cat:'xmas'},
+xm_c51:{name:'星空月亮樹',emo:'🎄',kind:'toy',price:90,sz:1.3,cat:'xmas'},
+xm_c52:{name:'玻璃罩聖誕樹',emo:'🎄',kind:'toy',price:120,sz:1.3,cat:'xmas'},
+xm_c53:{name:'燈光花圈',emo:'🎄',kind:'toy',price:90,sz:1.3,cat:'xmas'},
+xm_c54:{name:'飛碟貓聖誕樹',emo:'🎄',kind:'toy',price:90,sz:1.3,cat:'xmas'},
+xm_c55:{name:'雪人聖誕樹',emo:'🎄',kind:'toy',price:90,sz:1.3,cat:'xmas'}});   // v3.11：聖誕限定玩具 108 款（自己一個分類）
+const TOY_CATS=[['all','全部'],['new','🆕 新品'],['xmas','🎄 聖誕節'],['toy','🧸 玩具'],['pet','🐾 寵物用品'],['appl','🏠 家電'],['furn','🛋️ 家具'],['deco','🌸 擺飾'],['bath','🧴 盥洗保養']];let toyCat='all';
 const toyCatOk=(it,c)=>c==='all'||(c==='new'?!!it.nw:(it.cat||'toy')===c);
 function toyCatBar(cur,attr){return `<div class="tcats">${TOY_CATS.map(([k,n])=>`<button ${attr}="${k}" class="${k===cur?'on':''}">${n}</button>`).join('')}</div>`}
 // ================= 💼 毛孩打工（v1.90） =================
@@ -6786,7 +6919,7 @@ function announceLetters(){if(!DB.me)return;let seen=[];try{seen=JSON.parse(loca
     sfx('gift');$('#lgopen').onclick=()=>openLetter(nw[0].id,()=>$('#bell').click())};
   setTimeout(go,1800)}
 // ================= 自動更新：發現新版本就重新載入 =================
-const APP_VER='v3.10';
+const APP_VER='v3.11';
 function checkUpdate(){
   if(!/^https?:/.test(location.protocol)||!API_URL)return;
   if(!$('#modal').classList.contains('hidden'))return; // 正在填表單時不打斷
