@@ -4752,7 +4752,31 @@ const SHOW_CABS={
   blackcat2:{n:'黑貓',p:1000,a:400/511,x:[10, 90],y:[38, 57, 76, 92]},
   space2:{n:'太空艙',p:2000,a:437/512,x:[11, 89],y:[38, 57, 77, 92]},
   bat2:{n:'蝙蝠骷髏',p:1000,a:489/504,x:[14, 86],y:[38, 57, 77, 92]},
-  game2:{n:'遊戲機',p:1000,a:399/509,x:[9, 91],y:[38, 57, 77, 92]}};
+  game2:{n:'遊戲機',p:1000,a:399/509,x:[9, 91],y:[38, 57, 77, 92]},
+  robocat4:{n:'機械貓',p:1500,a:517/550,x:[17, 82],y:[36.0, 53.3, 70.7, 87.8],nw:1},
+  moonstage4:{n:'月亮舞台',p:2000,a:519/561,x:[22, 79],y:[37.3, 53.8, 69.3, 85.7],nw:1},
+  whale4:{n:'鯨魚海洋',p:1500,a:540/581,x:[20, 82],y:[36.3, 52.3, 68.2, 84.5],nw:1},
+  carousel4:{n:'旋轉木馬',p:2000,a:541/611,x:[19, 81],y:[39.0, 54.0, 69.2, 83.8],nw:1},
+  planet4:{n:'星球太空',p:1000,a:471/561,x:[18, 83],y:[38.7, 54.7, 70.2, 86.6],nw:1},
+  cake4:{n:'草莓蛋糕',p:1000,a:476/566,x:[16, 89],y:[40.5, 56.7, 72.6, 87.1],nw:1},
+  logcat4:{n:'森林貓窩',p:1000,a:493/577,x:[19, 83],y:[38.0, 53.6, 69.8, 85.6],nw:1},
+  pearl4:{n:'貝殼珍珠',p:1000,a:512/576,x:[22, 78],y:[37.7, 52.1, 67.9, 83.7],nw:1},
+  torii4:{n:'和風神社',p:1500,a:512/580,x:[21, 80],y:[35.2, 50.7, 66.4, 81.9],nw:1},
+  witch4:{n:'魔法學院',p:1500,a:519/577,x:[19, 79],y:[35.9, 51.1, 66.7, 82.1],nw:1},
+  snow4:{n:'冰雪北極熊',p:1500,a:513/599,x:[20, 81],y:[36.4, 51.3, 66.1, 81.0],nw:1},
+  tiki4:{n:'夏日海灘',p:1500,a:529/595,x:[22, 75],y:[35.8, 50.4, 65.4, 80.3],nw:1},
+  castle4:{n:'萬聖城堡',p:1500,a:507/562,x:[21, 80],y:[37.4, 53.2, 68.1, 82.7],nw:1},
+  candy4:{n:'糖果屋',p:1500,a:504/560,x:[20, 80],y:[37.1, 53.2, 68.8, 85.5],nw:1},
+  rainbow4:{n:'彩虹雲朵',p:1500,a:504/606,x:[19, 79],y:[35.0, 48.5, 63.5, 78.9],nw:1},
+  steam4:{n:'蒸氣齒輪',p:2000,a:509/603,x:[21, 80],y:[35.0, 49.4, 64.0, 79.3],nw:1},
+  garage4:{n:'工具車庫',p:1000,a:520/566,x:[20, 78],y:[36.6, 52.3, 66.8, 82.3],nw:1},
+  astro4:{n:'太空貓',p:2000,a:508/565,x:[19, 80],y:[36.6, 52.2, 67.8, 82.7],nw:1},
+  gamer4:{n:'電競玩家',p:1500,a:524/586,x:[25, 80],y:[33.3, 48.8, 64.5, 79.0],nw:1},
+  camp4:{n:'露營小屋',p:1500,a:525/602,x:[21, 79],y:[34.9, 49.7, 64.8, 80.9],nw:1},
+  band4:{n:'搖滾樂團',p:2000,a:501/562,x:[19, 79],y:[37.0, 52.3, 67.6, 82.9],nw:1},
+  street4:{n:'街頭滑板',p:1500,a:527/564,x:[22, 80],y:[37.2, 52.7, 67.7, 82.8],nw:1},
+  lab4:{n:'實驗室',p:1500,a:503/583,x:[22, 81],y:[32.6, 47.3, 63.0, 78.6],nw:1},
+  study4:{n:'星象書房',p:2000,a:526/588,x:[23, 76],y:[33.5, 48.8, 64.5, 79.1],nw:1}};   // v3.11：島主做的 24 款新櫃子（nw＝新品，商店排前面）
 const hasShow=h=>!!(h&&h.show&&typeof h.show==='object');
 const shCustom=()=>(DB.rooms||[]).filter(r=>r.r==='SH');
 function showRoomDef(id){if(SHOW_ROOMS[id])return SHOW_ROOMS[id];const r=shCustom().find(x=>x.id===id);return r?{n:r.name,p:+r.p||0,f:Math.round((r.floor&&+r.floor.y0||800)*1536/1264),img:r.img,off:!!r.off}:SHOW_ROOMS.basic}
@@ -4871,7 +4895,7 @@ function showCabPick(p){const h=house(SHV.hid),s=showNorm(h.show),cur=s.pos[p];
   $('#sheet').querySelectorAll('[data-c]').forEach(b=>b.onclick=()=>{const id=b.dataset.c;if(id===cur)return closeModal();if(showDo(SHV.hid,{op:'cab',pos:p,id})){sfx('tap');closeModal()}})}
 function showCabShop(p,tabs){const hid=shHid(),h=house(hid),s=showNorm(h.show),g=DB.game;
   openModal(`<h3>${tabs?'🛋️ 裝潢目錄':'🗄️ 買櫃子'}</h3>${tabs||''}<p class="lead">你有 🪙${g.coins||0}・買了會先擺到空位，沒空位就收進倉庫</p>
-    <div class="shgrid">${Object.entries(SHOW_CABS).map(([id,C])=>`<button class="si" data-b="${id}"><img class="pv" src="${showCabImg(id)}" alt="">${+s.cabs[id]?`<span class="tag">有 ${+s.cabs[id]}</span>`:''}<div class="sn">${esc(C.n)}</div><div class="sf">🪙${C.p}</div></button>`).join('')}</div>
+    <div class="shgrid">${Object.entries(SHOW_CABS).sort((a,b)=>(b[1].nw||0)-(a[1].nw||0)).map(([id,C])=>`<button class="si" data-b="${id}"><img class="pv" src="${showCabImg(id)}" alt="">${+s.cabs[id]?`<span class="tag">有 ${+s.cabs[id]}</span>`:C.nw?'<span class="tag">新</span>':''}<div class="sn">${esc(C.n)}</div><div class="sf">🪙${C.p}</div></button>`).join('')}</div>
     <div class="row2">${$('#shv')?'<button id="shmy">🔁 擺櫃子</button>':''}<button data-close>關閉</button></div>`);if(tabs)decoTabs();
   if($('#shmy'))$('#shmy').onclick=()=>{const e=s.pos.indexOf('');showCabPick(p!=null?p:e>=0?e:0)};
   $('#sheet').querySelectorAll('[data-b]').forEach(b=>b.onclick=()=>{const id=b.dataset.b,C=SHOW_CABS[id];

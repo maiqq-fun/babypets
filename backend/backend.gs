@@ -1,5 +1,6 @@
 /*
- * 毛很多 babypets 後端・整理版 v76
+ * 毛很多 babypets 後端・整理版 v77
+ * v77：🗄️ 24 款新展示櫃（*4 結尾，🪙1000～2000）。
  * v76：🛏️🗄️ 第二間民宿、第二間展示間（擴建 inn2／show2，第 1 次加蓋 🪙3000、第 2 次 🪙6000；民宿 2 房租一半）；民宿、展示間可以改名（h.rn）。
  *      做法：請求帶 slot（f3＝民宿 2、sh2＝展示間 2）時，讀這個家會把第二間的資料換到原本的欄位（slotSwap_），存回去前再換回來，原本的動作都不用改。
  * v75：🏠 都更・外牆整修 🪙500；📐 島主可以調整內建背景的佈告欄／層板位置和地板範圍（meta roompos，adminRoomPos）
@@ -2474,9 +2475,9 @@ function testPush() {
 const SHOW_ROOMS_ = { basic: 0, lilac: 800, mint: 800, steel: 1500, space: 1500, pink: 2000, stone: 1500, latte: 800, ufo: 1500, moonblue: 1500, sunny: 800 };   // v57：全部 2000 以內（粉紅公主 3000 → 2000）
 // v57：櫃子降價（500→300、800→600、1500→1000、3000→2000），買過的人寄信補差價（econFix_）
 const SHOW_CABS_OLD_ = { wood: 500, plain: 800, butter: 800, sky: 800, peach: 800, lilac: 800, steel: 1500, cat: 1500, princess: 1500, noir: 3000, pearl: 3000 , star2: 1500, bow2: 1500, catlilac2: 1500, cloud2: 1500, royal2: 3000, angel2: 3000, catshop2: 3000, garden2: 3000, blackcat2: 1500, space2: 3000, bat2: 1500, game2: 1500};
-const SHOW_CABS_ = { wood: 300, plain: 600, butter: 600, sky: 600, peach: 600, lilac: 600, steel: 1000, cat: 1000, princess: 1000, noir: 2000, pearl: 2000 , star2: 1000, bow2: 1000, catlilac2: 1000, cloud2: 1000, royal2: 2000, angel2: 2000, catshop2: 2000, garden2: 2000, blackcat2: 1000, space2: 2000, bat2: 1000, game2: 1000};
+const SHOW_CABS_ = { wood: 300, plain: 600, butter: 600, sky: 600, peach: 600, lilac: 600, steel: 1000, cat: 1000, princess: 1000, noir: 2000, pearl: 2000 , star2: 1000, bow2: 1000, catlilac2: 1000, cloud2: 1000, royal2: 2000, angel2: 2000, catshop2: 2000, garden2: 2000, blackcat2: 1000, space2: 2000, bat2: 1000, game2: 1000, robocat4: 1500, moonstage4: 2000, whale4: 1500, carousel4: 2000, planet4: 1000, cake4: 1000, logcat4: 1000, pearl4: 1000, torii4: 1500, witch4: 1500, snow4: 1500, tiki4: 1500, castle4: 1500, candy4: 1500, rainbow4: 1500, steam4: 2000, garage4: 1000, astro4: 2000, gamer4: 1500, camp4: 1500, band4: 2000, street4: 1500, lab4: 1500, study4: 2000};
 const SHOW_ROOM_N_ = { basic: '溫馨木地板', lilac: '薰衣草', mint: '薄荷條紋', steel: '工業風', space: '星空宇宙', pink: '粉紅公主', stone: '奶茶石屋', latte: '拿鐵格紋', ufo: '紫色太空喵', moonblue: '藍色月光', sunny: '奶油黃小舖' };
-const SHOW_CAB_N_ = { wood: '木頭腳掌', plain: '簡約原木', butter: '奶油黃', sky: '天空藍', peach: '蜜桃粉', lilac: '薰衣草紫', steel: '不鏽鋼', cat: '貓咪薄荷', princess: '公主蝴蝶結', noir: '黑金星球', pearl: '珍珠白金' , star2: '星星薄荷', bow2: '粉紅蝴蝶結', catlilac2: '紫色貓耳', cloud2: '天空雲朵', royal2: '皇家粉金', angel2: '天使雲朵', catshop2: '貓咪小舖', garden2: '花園小屋', blackcat2: '黑貓', space2: '太空艙', bat2: '蝙蝠骷髏', game2: '遊戲機'};
+const SHOW_CAB_N_ = { wood: '木頭腳掌', plain: '簡約原木', butter: '奶油黃', sky: '天空藍', peach: '蜜桃粉', lilac: '薰衣草紫', steel: '不鏽鋼', cat: '貓咪薄荷', princess: '公主蝴蝶結', noir: '黑金星球', pearl: '珍珠白金' , star2: '星星薄荷', bow2: '粉紅蝴蝶結', catlilac2: '紫色貓耳', cloud2: '天空雲朵', royal2: '皇家粉金', angel2: '天使雲朵', catshop2: '貓咪小舖', garden2: '花園小屋', blackcat2: '黑貓', space2: '太空艙', bat2: '蝙蝠骷髏', game2: '遊戲機', robocat4: '機械貓', moonstage4: '月亮舞台', whale4: '鯨魚海洋', carousel4: '旋轉木馬', planet4: '星球太空', cake4: '草莓蛋糕', logcat4: '森林貓窩', pearl4: '貝殼珍珠', torii4: '和風神社', witch4: '魔法學院', snow4: '冰雪北極熊', tiki4: '夏日海灘', castle4: '萬聖城堡', candy4: '糖果屋', rainbow4: '彩虹雲朵', steam4: '蒸氣齒輪', garage4: '工具車庫', astro4: '太空貓', gamer4: '電競玩家', camp4: '露營小屋', band4: '搖滾樂團', street4: '街頭滑板', lab4: '實驗室', study4: '星象書房'};
 // v60：櫃子 3 → 5 個。it 的位置：0～2 原本的櫃子、3～4 層板、5 壁櫃、6～7 新的兩個櫃子（櫃子位置 3、4）
 const SHOW_N_ = 20, SHOW_POS_ = 5, SHOW_CAB_MAX_ = 30, SHOW_IT_ = 8;
 const cabIt_ = p => p < 3 ? p : p + 3;
