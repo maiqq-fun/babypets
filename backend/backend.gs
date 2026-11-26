@@ -1,5 +1,6 @@
 /*
- * 毛很多 babypets 後端・整理版 v77
+ * 毛很多 babypets 後端・整理版 v78
+ * v78：🛏️ 島主可以上傳「民宿裝潢」背景（rooms 類別 F2，訂價錢，在裝潢目錄的民宿分類賣）；抽卡／一番賞／訂製款背景也可以勾「民宿專用」。
  * v77：🗄️ 24 款新展示櫃（*4 結尾，🪙1000～2000）；🪵 30 款新層板（*4 結尾，🪙1000／1500）；🎁 20 個新盲盒系列（29～48，每系列 2 隻隱藏版）。
  * v76：🛏️🗄️ 第二間民宿、第二間展示間（擴建 inn2／show2，第 1 次加蓋 🪙3000、第 2 次 🪙6000；民宿 2 房租一半）；民宿、展示間可以改名（h.rn）。
  *      做法：請求帶 slot（f3＝民宿 2、sh2＝展示間 2）時，讀這個家會把第二間的資料換到原本的欄位（slotSwap_），存回去前再換回來，原本的動作都不用改。
@@ -1757,7 +1758,7 @@ const ACTIONS = {
   adminRoomSave(req) {
     isAdmin_(req);
     const x = req.room || {}, R = meta_('rooms'), list = Array.isArray(R.list) ? R.list : [];
-    const name = String(x.name || '').trim().slice(0, 12), r = ['N', 'R', 'SSR', 'LTD', 'CU', 'SH'].indexOf(x.r) >= 0 ? x.r : 'CU';
+    const name = String(x.name || '').trim().slice(0, 12), r = ['N', 'R', 'SSR', 'LTD', 'CU', 'SH', 'F2'].indexOf(x.r) >= 0 ? x.r : 'CU';
     if (!name) throw new Error('幫背景取個名字');
     let o = x.id ? list.find(y => y.id === x.id) : null;
     if (!o) {
@@ -1770,8 +1771,8 @@ const ACTIONS = {
     if (x.floor && typeof x.floor === 'object') o.floor = { y0: nb(x.floor.y0), t: [nb((x.floor.t || [])[0]), nb((x.floor.t || [])[1])], b: [0, 848] };
     if ('houseId' in x) o.houseId = String(x.houseId || '');
     o.off = x.off ? 1 : '';
-    o.p = r === 'SH' ? Math.round(clampN_(x.p, 0, 99999)) : '';
-    o.f2 = x.f2 && r === 'CU' ? 1 : '';
+    o.p = r === 'SH' || r === 'F2' ? Math.round(clampN_(x.p, 0, 99999)) : '';
+    o.f2 = r === 'F2' || (x.f2 && r !== 'SH') ? 1 : '';
     if (o.f2 && o.houseId) { const hh = get_('houses', o.houseId); if (hh && !Number(hh.floor2)) throw new Error(`「${hh.name}」還沒有民宿，民宿專用的背景只能給有民宿的家`); }
     R.list = list; R.ver = (Number(R.ver) || 0) + 1; put_('meta', R);
     return o;
@@ -2705,7 +2706,8 @@ Object.assign(ACTIONS, {
   // ---------- 🛋️ 裝潢目錄：民宿背景（金幣由 App 扣，跟其他商店一樣） ----------
   decoBuy(req) {
     const h = mustFam_(req), id = String(req.id || '');
-    if (String(req.kind) !== 'f2room' || !has_(DECO_F2_, id)) throw new Error('沒有這個商品');
+    const cr = roomsView_().find(r => r.id === id && r.r === 'F2' && !r.off);   // v78：島主上傳的民宿裝潢
+    if (String(req.kind) !== 'f2room' || !(has_(DECO_F2_, id) || cr)) throw new Error('沒有這個商品');
     if (!Number(h.floor2)) throw new Error('要先擴建民宿才能買民宿背景');
     const o = ownedOf_(h);
     if (o.indexOf(id) >= 0) throw new Error('你家已經有這間了');

@@ -1913,7 +1913,7 @@ async function pushSheet(){const kinds=`<div class="sec"><h4>會通知你的事<
 // ---------- 👑 島主：玩家金幣、轉移碼 ----------
 // ================= v1.83 👑 島主上傳：背景、房子、商店商品、折扣碼 =================
 let ADM_D=null;
-const ROOM_TYPES=[['SH','展示間裝潢（在裝潢目錄賣，不會被抽到）'],['N','普通（可抽卡、一番賞）'],['R','稀有（可抽卡、一番賞）'],['SSR','超稀有（可抽卡、一番賞）'],['LTD','限定款（只進一番賞 A 賞）'],['CU','訂製款（不抽，送給某一家）']];
+const ROOM_TYPES=[['F2','民宿裝潢（在裝潢目錄的民宿分類賣，不會被抽到）'],['SH','展示間裝潢（在裝潢目錄賣，不會被抽到）'],['N','普通（可抽卡、一番賞）'],['R','稀有（可抽卡、一番賞）'],['SSR','超稀有（可抽卡、一番賞）'],['LTD','限定款（只進一番賞 A 賞）'],['CU','訂製款（不抽，送給某一家）']];
 const ROOM_TN={N:'普通',R:'稀有',SSR:'超稀有',LTD:'限定款',CU:'訂製款',SH:'展示間'};
 const PRICE_TIERS={treat:[['cheap','🍬 便宜',10,10],['normal','🍪 普通',15,20],['high','🎁 高級',30,50]],toy:[['cheap','🍬 便宜',20,40],['normal','🍪 普通',50,80],['high','🎁 高級',100,140],['lux','💎 豪華',160,200]]};
 const FAV_SPECIES=['貓','狗','兔','倉鼠','鳥','其他'];
@@ -2011,12 +2011,12 @@ function roomEditor(o){const E=o?JSON.parse(JSON.stringify(o)):{name:'',r:'N',bo
     <p class="lead" style="font-size:12px" id="rehint">拉黃色框對準軟木板（右下角圓點調大小）；藍線是毛孩可以走的地板最上緣</p>
     ${fld('rename','名字',`<input id="rename" maxlength="12" value="${esc(E.name)}" placeholder="例如：星空露營房">`)}
     ${fld('retype','類別',`<select id="retype">${ROOM_TYPES.map(([k,n])=>`<option value="${k}" ${E.r===k?'selected':''}>${n}</option>`).join('')}</select>`)}
-    <div id="resh" style="display:${E.r==='SH'?'':'none'}">${fld('reprice','價錢（🪙）',`<input id="reprice" type="number" min="0" max="99999" value="${+E.p||1500}">`,'藍線拉到牆和地板交界的地方，展示櫃會站在這條線上')}</div>
-    <div id="recu" style="display:${E.r==='CU'?'':'none'}"><label class="chk"><input type="checkbox" id="ref2" ${E.f2?'checked':''}> 民宿專用（只能放民宿，只能送給有民宿的家）</label>${fld('rehouse','送給哪一家（可以之後再送）',`<select id="rehouse"><option value="">（先不送）</option>${hs}</select>`)}</div>
+    <div id="resh" style="display:${E.r==='SH'||E.r==='F2'?'':'none'}">${fld('reprice','價錢（🪙）',`<input id="reprice" type="number" min="0" max="99999" value="${+E.p||1500}">`,'藍線拉到牆和地板交界的地方，展示櫃會站在這條線上')}</div>
+    <div id="ref2w" style="display:${E.r==='SH'||E.r==='F2'?'none':''}"><label class="chk"><input type="checkbox" id="ref2" ${E.f2?'checked':''}> 民宿專用（只能放民宿；訂製款只能送給有民宿的家）</label></div><div id="recu" style="display:${E.r==='CU'?'':'none'}">${fld('rehouse','送給哪一家（可以之後再送）',`<select id="rehouse"><option value="">（先不送）</option>${hs}</select>`)}</div>
     ${o?`<label class="chk"><input type="checkbox" id="reoff" ${E.off?'checked':''}> 下架（抽卡、一番賞不會再出現；已經有的人保留）</label>`:''}
     <div class="err" id="reerr"></div><div class="row2 sticky"><button id="reback">← 後台</button><button class="primary" id="resave">${o?'儲存':'上傳'}</button></div>`);
-  $('#reback').onclick=adminSheet;$('#retype').onchange=e=>{$('#recu').style.display=e.target.value==='CU'?'':'none';$('#resh').style.display=e.target.value==='SH'?'':'none'};
-  const f2Opts=()=>{const on=$('#ref2').checked;[...$('#rehouse').options].forEach(o=>{if(o.value)o.disabled=on&&!o.dataset.f2});if(on&&$('#rehouse').selectedOptions[0]&&$('#rehouse').selectedOptions[0].disabled)$('#rehouse').value=''};const f2Lab=()=>{const on=$('#retype').value==='CU'&&$('#ref2').checked;$('#rebd span').textContent=on?'層板位置':'軟木板';$('#rehint').textContent=on?'民宿背景：黃色框拉到空牆上，就是放層板的地方（框高一點會排 2 排）；藍線是毛孩可以走的地板最上緣':'拉黃色框對準軟木板（右下角圓點調大小）；藍線是毛孩可以走的地板最上緣'};   // v2.96
+  $('#reback').onclick=adminSheet;$('#retype').onchange=e=>{const v=e.target.value;$('#recu').style.display=v==='CU'?'':'none';$('#resh').style.display=v==='SH'||v==='F2'?'':'none';$('#ref2w').style.display=v==='SH'||v==='F2'?'none':''};
+  const f2Opts=()=>{const on=$('#ref2').checked;[...$('#rehouse').options].forEach(o=>{if(o.value)o.disabled=on&&!o.dataset.f2});if(on&&$('#rehouse').selectedOptions[0]&&$('#rehouse').selectedOptions[0].disabled)$('#rehouse').value=''};const f2Lab=()=>{const v=$('#retype').value,on=v==='F2'||(v!=='SH'&&$('#ref2').checked);$('#rebd span').textContent=on?'層板位置':'軟木板';$('#rehint').textContent=on?'民宿背景：黃色框拉到空牆上，就是放層板的地方（框高一點會排 2 排）；藍線是毛孩可以走的地板最上緣':'拉黃色框對準軟木板（右下角圓點調大小）；藍線是毛孩可以走的地板最上緣'};   // v2.96
   $('#ref2').onchange=()=>{f2Opts();f2Lab()};f2Opts();f2Lab();$('#retype').addEventListener('change',f2Lab);
   const box=$('#redit'),bd=$('#rebd'),fl=$('#refl'),W=848,H=1264;
   const draw=()=>{const b=E.board;Object.assign(bd.style,{left:b[0]/W*100+'%',top:b[1]/H*100+'%',width:(b[2]-b[0])/W*100+'%',height:(b[3]-b[1])/H*100+'%'});
@@ -2032,7 +2032,7 @@ function roomEditor(o){const E=o?JSON.parse(JSON.stringify(o)):{name:'',r:'N',bo
   if($('#refile'))$('#refile').onchange=async e=>{const f=e.target.files[0];if(!f)return;$('#rel').textContent='處理中…';try{img=await roomCrop(f);file=1;$('#reimg').src=img;$('#reimg').style.opacity=1;$('#rel').textContent='📷 換一張'}catch(x){$('#rel').textContent='這張圖讀不了，換一張'}};
   $('#resave').onclick=async ev=>{const b=ev.currentTarget,name=$('#rename').value.trim(),r=$('#retype').value;if(!name)return $('#reerr').textContent='幫背景取個名字';if(!img)return $('#reerr').textContent='先選一張背景圖';
     b.disabled=true;try{let url=o?o.img:'';if(file){b.textContent='上傳圖片中…';url=await upImg(img)}b.textContent='儲存中…';
-      const res=await adminCall('adminRoomSave',{room:{id:o?o.id:'',name,r,img:url,board:E.board,floor:E.floor,off:$('#reoff')?$('#reoff').checked:false,f2:r==='CU'&&$('#ref2').checked,p:r==='SH'?Math.max(0,Math.round(+$('#reprice').value||0)):'',houseId:r==='CU'?($('#rehouse').value||E.houseId||''):''}});
+      const res=await adminCall('adminRoomSave',{room:{id:o?o.id:'',name,r,img:url,board:E.board,floor:E.floor,off:$('#reoff')?$('#reoff').checked:false,f2:r==='F2'||(r!=='SH'&&$('#ref2').checked),p:r==='SH'||r==='F2'?Math.max(0,Math.round(+$('#reprice').value||0)):'',houseId:r==='CU'?($('#rehouse').value||E.houseId||''):''}});
       const L=DB.rooms=DB.rooms||[],i=L.findIndex(x=>x.id===res.id);if(i>=0)L[i]=res;else L.push(res);applyRooms();
       const to=r==='CU'&&$('#rehouse').value;if(to&&to!==(o&&o.houseId)){b.textContent='送給那一家…';try{await adminCall('adminGiftHouse',{houseId:to,room:res.id,roomName:name})}catch(x){toast(x.message)}}
       toast(o?'背景改好了':'新背景上架了 🖼️'+(to?'，也送給那一家了':''));adminSheet()}catch(x){$('#reerr').textContent=x.message;b.disabled=false;b.textContent=o?'儲存':'上傳'}}}
@@ -2436,7 +2436,7 @@ function buildFlow(slot){
   s1();
 }
 
-function roomChoices(hid){const o=hid?owned(hid):new Set();return ROOMS.map(([k,n])=>({k,n,tag:'初始'})).concat(CARDS.filter(c=>o.has(c.id)).map(c=>({k:c.id,n:c.name,tag:RAR[c.r].name}))).concat((DB.rooms||[]).filter(r=>(r.r||'CU')==='CU'&&o.has(r.id)).map(r=>({k:r.id,n:r.name,tag:'訂製款',cu:1,f2:!!r.f2}))).concat((typeof F2SHOP!=='undefined'?F2SHOP:[]).filter(r=>o.has(r.id)).map(r=>({k:r.id,n:r.n,tag:'商店款',f2:1})))}
+function roomChoices(hid){const o=hid?owned(hid):new Set();return ROOMS.map(([k,n])=>({k,n,tag:'初始'})).concat(CARDS.filter(c=>o.has(c.id)).map(c=>({k:c.id,n:c.name,tag:RAR[c.r].name,f2:!!c.f2}))).concat((DB.rooms||[]).filter(r=>(r.r||'CU')==='CU'&&o.has(r.id)).map(r=>({k:r.id,n:r.name,tag:'訂製款',cu:1,f2:!!r.f2}))).concat((typeof F2SHOP!=='undefined'?F2SHOP:[]).filter(r=>o.has(r.id)).map(r=>({k:r.id,n:r.n,tag:'商店款',f2:1}))).concat((DB.rooms||[]).filter(r=>r.r==='F2'&&o.has(r.id)).map(r=>({k:r.id,n:r.name,tag:'商店款',f2:1})))}
 function roomPicker(id,cur,hid,fl){const list=roomChoices(hid);return `<div class="rooms" id="${id}">${list.map(r=>{const lock=r.f2&&fl!==2;return `<button type="button" data-v="${r.k}" ${lock?'disabled':''} class="${r.k===cur?'on':''}${r.cu?' cu':''}${lock?' f2lock':''}"><img src="${roomImg(r.k)}" alt="">${r.cu?'<i class="cub"><img src="assets/icon_custom.webp" alt=""></i>':''}${r.f2?'<em class="f2tag">2F專用</em>':''}<span>${esc(r.n)}${lock?'<small>（民宿專用）</small>':''}</span></button>`}).join('')}</div><div class="hint">${hid?'抽卡抽到的房間也會出現在這裡':'抽卡可以解鎖更多房間'}</div>`}
 function bindRoom(id,cb){const g=$('#'+id);g.onclick=e=>{const b=e.target.closest('button');if(!b||b.disabled)return;g.querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===b));cb(b.dataset.v)}}
 // ================= 家裡 =================
@@ -3467,7 +3467,7 @@ function roomPosEdit(r){const G=roomGrid(r.id),B=BOARDS[r.id],has=!!B||!r.f2||tr
   $('#rpok').onclick=()=>save(0);if($('#rpreset'))$('#rpreset').onclick=()=>save(1)}
 function applyRooms(){(DB.rooms||[]).forEach(r=>{const t=r.r||'CU';if(Array.isArray(r.board))BOARDS[r.id]=r.board;if(r.floor&&r.floor.t)RFLOOR[r.id]=Object.assign({b:[0,848]},r.floor);
   Object.keys(KUJI_POOL).forEach(k=>{const i=KUJI_POOL[k].indexOf(r.id);if(i>=0)KUJI_POOL[k].splice(i,1)});
-  if(t==='CU'||t==='SH')return;let c=CARDS.find(x=>x.id===r.id);if(!c){c={id:r.id};CARDS.push(c)}Object.assign(c,{name:r.name,r:t==='LTD'?'H':t,img:r.img,off:!!r.off,custom:1});
+  if(t==='CU'||t==='SH'||t==='F2')return;let c=CARDS.find(x=>x.id===r.id);if(!c){c={id:r.id};CARDS.push(c)}Object.assign(c,{name:r.name,r:t==='LTD'?'H':t,img:r.img,off:!!r.off,custom:1,f2:!!r.f2});
   if(!r.off&&KUJI_TIER[t])KUJI_POOL[KUJI_TIER[t]].push(r.id)})}
 const KUJI_POOL={
   A:['party','princess','redcheck','hawaiicat','sweetdevil','snoopy','stussy'],
@@ -5684,20 +5684,22 @@ function bbSpark(el,n,emo){const r=el.getBoundingClientRect();for(let k=0;k<n;k+
 const F2SHOP=[{id:'f2shop_loftblack',n:'黑貓工業閣樓',p:2000},{id:'f2shop_loftgreen',n:'森林綠閣樓',p:2000},{id:'f2shop_daisy',n:'奶油小雛菊',p:1500},{id:'f2shop_creampaw',n:'奶油貓掌房',p:1500},{id:'f2shop_spacewhite',n:'白色太空艙',p:2000},{id:'f2shop_spacemint',n:'薄荷太空站',p:2000},{id:'f2shop_princess2',n:'粉紅愛心城堡',p:2000},{id:'f2shop_crystal2',n:'水晶月光房',p:2000},{id:'f2shop_mine',n:'寶石礦坑',p:2000},{id:'f2shop_fairyforest',n:'蘑菇森林小徑',p:2000},{id:'f2shop_pig',n:'粉紅小豬房',p:1500},{id:'f2shop_xmas',n:'聖誕小屋',p:2000},{id:'f2shop_ghost',n:'萬聖節幽靈屋',p:2000},{id:'f2shop_space',n:'星空太空房',p:2000}];
 const f2Shop=id=>F2SHOP.find(x=>x.id===id);
 const shHid=()=>(SHV&&$('#shv'))?SHV.hid:((myHouse()||{}).id);
+// v3.13：民宿背景＝內建的 F2SHOP＋島主上傳的「民宿裝潢」（rooms 類別 F2，新的排前面）
+const f2List=()=>(DB.rooms||[]).filter(r=>r.r==='F2'&&!r.off).slice().reverse().map(r=>({id:r.id,n:r.name,p:+r.p||0,img:r.img})).concat(F2SHOP.map(r=>Object.assign({},r,{img:`assets/room_${r.id}.webp?v=2`})));
 function decoShop(tab){if(!needMe())return;const h=myHouse();if(!h)return toast('要有家才能買裝潢');tab=tab||'f2';const g=DB.game;
   const tabs=`<div class="dctab"><button data-dt="f2" class="${tab==='f2'?'on':''}">🛏️ 民宿</button><button data-dt="room" class="${tab==='room'?'on':''}">🖼️ 展示間</button><button data-dt="cab" class="${tab==='cab'?'on':''}">🗄️ 櫃子</button><button data-dt="wall" class="${tab==='wall'?'on':''}">🧱 牆面</button></div>`;
   if(tab!=='f2'){if(!hasShow(h))return openModal(`<h3>🛋️ 裝潢目錄</h3>${tabs}<div class="locked">你家還沒有展示間<br>到島民中心「擴建」蓋一間吧</div><div class="row2"><button data-close>關閉</button></div>`),decoTabs();return tab==='room'?showRoomShop(tabs):tab==='wall'?wallShop(tabs):showCabShop(null,tabs)}
   const own=owned(h.id);
   openModal(`<h3>🛋️ 裝潢目錄</h3>${tabs}<p class="lead" style="font-size:12px">你有 🪙${g.coins||0}・${hasF2(h)?'買了收進房間收藏，到民宿「🎨 背景」就能換':'要先在島民中心擴建民宿才能用'}</p>
-    <div class="shgrid">${F2SHOP.map(r=>`<button class="si room${own.has(r.id)?' on':''}" data-f2="${r.id}"><img class="pv" src="assets/room_${r.id}.webp?v=2" alt=""><div class="sn">${esc(r.n)}</div><div class="sf">${own.has(r.id)?'已經有了':'🪙'+r.p}</div></button>`).join('')}</div>
+    <div class="shgrid">${f2List().map(r=>`<button class="si room${own.has(r.id)?' on':''}" data-f2="${r.id}"><img class="pv" src="${r.img}" alt=""><div class="sn">${esc(r.n)}</div><div class="sf">${own.has(r.id)?'已經有了':'🪙'+r.p}</div></button>`).join('')}</div>
     <div class="row2"><button data-close>關閉</button></div>`);decoTabs();
-  $('#sheet').querySelectorAll('[data-f2]').forEach(b=>b.onclick=()=>{const r=f2Shop(b.dataset.f2);if(owned(h.id).has(r.id))return toast('你家已經有這間了');if(!hasF2(h))return toast('要先擴建民宿才能買民宿背景');
+  $('#sheet').querySelectorAll('[data-f2]').forEach(b=>b.onclick=()=>{const r=f2List().find(x=>x.id===b.dataset.f2);if(!r)return;if(owned(h.id).has(r.id))return toast('你家已經有這間了');if(!hasF2(h))return toast('要先擴建民宿才能買民宿背景');
     if((g.coins||0)<r.p)return toast(`金幣不夠，要 🪙${r.p}`);
-    openModal(`<div style="text-align:center"><img src="assets/room_${r.id}.webp?v=2" alt="" style="width:160px;border-radius:12px"><h3>${esc(r.n)}</h3><p class="lead">🪙${r.p}・民宿背景</p></div><div class="row2"><button id="dcno">← 回去</button><button class="primary" id="dcyes">買！（🪙${r.p}）</button></div>`);
+    openModal(`<div style="text-align:center"><img src="${r.img}" alt="" style="width:160px;border-radius:12px"><h3>${esc(r.n)}</h3><p class="lead">🪙${r.p}・民宿背景</p></div><div class="row2"><button id="dcno">← 回去</button><button class="primary" id="dcyes">買！（🪙${r.p}）</button></div>`);
     $('#dcno').onclick=()=>decoShop('f2');
     $('#dcyes').onclick=async e=>{const bt=e.currentTarget;bt.disabled=true;if((g.coins||0)<r.p)return toast('金幣不夠');g.coins-=r.p;save();updTix&&updTix();
       try{await call('decoBuy',Object.assign(cred(),{houseId:h.id,kind:'f2room',id:r.id}));const o=new Set(DB.owned[h.id]||[]);o.add(r.id);DB.owned[h.id]=[...o];sfx('coin');
-        openModal(`<div style="text-align:center"><img src="assets/room_${r.id}.webp?v=2" alt="" style="width:160px;border-radius:12px"><h3>買到了！</h3><p class="lead">到民宿按「🎨 背景」就能換上「${esc(r.n)}」</p></div><div class="row2"><button data-close>好</button>${hasF2(h)?'<button class="primary" id="dcgo">現在去民宿</button>':''}</div>`);
+        openModal(`<div style="text-align:center"><img src="${r.img}" alt="" style="width:160px;border-radius:12px"><h3>買到了！</h3><p class="lead">到民宿按「🎨 背景」就能換上「${esc(r.n)}」</p></div><div class="row2"><button data-close>好</button>${hasF2(h)?'<button class="primary" id="dcgo">現在去民宿</button>':''}</div>`);
         if($('#dcgo'))$('#dcgo').onclick=()=>{closeModal();openFloor2(h.id)}}
       catch(x){g.coins+=r.p;save();updTix&&updTix();bt.disabled=false;toast(x.message)}}})}
 function decoTabs(){$('#sheet').querySelectorAll('[data-dt]').forEach(b=>b.onclick=()=>decoShop(b.dataset.dt))}
@@ -6926,7 +6928,7 @@ function announceLetters(){if(!DB.me)return;let seen=[];try{seen=JSON.parse(loca
     sfx('gift');$('#lgopen').onclick=()=>openLetter(nw[0].id,()=>$('#bell').click())};
   setTimeout(go,1800)}
 // ================= 自動更新：發現新版本就重新載入 =================
-const APP_VER='v3.12';
+const APP_VER='v3.13';
 function checkUpdate(){
   if(!/^https?:/.test(location.protocol)||!API_URL)return;
   if(!$('#modal').classList.contains('hidden'))return; // 正在填表單時不打斷
