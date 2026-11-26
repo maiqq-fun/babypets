@@ -13,8 +13,8 @@ function make(){
   code+=`
 const __c=x=>JSON.parse(JSON.stringify(x));
 function all_(n){return Object.values(STORE[n]||{}).map(__c)}
-function get_(n,id){if(!id)return null;const o=(STORE[n]||{})[String(id)];return o?__c(o):null}
-function put_(n,o){(STORE[n]=STORE[n]||{})[String(o.id)]=__c(o)}
+function get_(n,id){if(!id)return null;const o=(STORE[n]||{})[String(id)];return o?slotGet_(n,__c(o)):null}
+function put_(n,o){o=slotPut_(n,o);(STORE[n]=STORE[n]||{})[String(o.id)]=__c(o)}
 function delWhere_(n,t){const s=STORE[n]||{};let k=0;for(const id in s)if(t(__c(s[id]))){delete s[id];k++}return k}
 function pushKey_(){return null}
 function sh_(){return {getLastRow:()=>1,deleteRows(){}}}

@@ -1,11 +1,13 @@
 /*
- * 毛很多 babypets 後端・整理版 v75
+ * 毛很多 babypets 後端・整理版 v76
+ * v76：🛏️🗄️ 第二間民宿、第二間展示間（擴建 inn2／show2，第 1 次加蓋 🪙3000、第 2 次 🪙6000；民宿 2 房租一半）；民宿、展示間可以改名（h.rn）。
+ *      做法：請求帶 slot（f3＝民宿 2、sh2＝展示間 2）時，讀這個家會把第二間的資料換到原本的欄位（slotSwap_），存回去前再換回來，原本的動作都不用改。
  * v75：🏠 都更・外牆整修 🪙500；📐 島主可以調整內建背景的佈告欄／層板位置和地板範圍（meta roompos，adminRoomPos）
- * v74：🎨 訂製裝潢一次 🪙1000（以前申請的照當時付的退）；申請分三種（kind：b 通用佈告欄版／w 二樓空牆版／d 二樓裝潢設計版），完成時一起存佈告欄（層板）位置和地板線；一個家一個月一次（折扣碼也算）
+ * v74：🎨 訂製裝潢一次 🪙1000（以前申請的照當時付的退）；申請分三種（kind：b 通用佈告欄版／w 民宿空牆版／d 民宿裝潢設計版），完成時一起存佈告欄（層板）位置和地板線；一個家一個月一次（折扣碼也算）
  * v73：🎫 一番賞改成一抽 🪙800（現在這箱也是，之後每一箱都是）；🏷️ 毛二街高價收購公仔（shop.want：每天 3 款、🪙1200～6000，賣出一隻那款就結束）
  * v72：🏷️ 毛二街出清：二手架超過 40 樣被擠下來的貨進出清候補（clrq，最多 30），每天換一批 6 樣到出清籃（clr），價錢是二手價的 1/4，沒賣掉的隔天刪掉
  * v71：🌱 農田紀錄（farm.log：誰在什麼時候種、澆、收，最近 30 筆）；🪵 新增 13 款層板
- * v70：🛏️ 二樓：玩具最多 25 個（地上＋層板）；二樓牆面掛層板（show.f2.w，跟展示間共用倉庫），層板上放玩具（toys2 的 w、c）；相框記掛上去的時間（wfa）；新增 10 款二樓背景
+ * v70：🛏️ 民宿：玩具最多 25 個（地上＋層板）；民宿牆面掛層板（show.f2.w，跟展示間共用倉庫），層板上放玩具（toys2 的 w、c）；相框記掛上去的時間（wfa）；新增 10 款民宿背景
  * v69：🎫 一番賞不下架了：這箱抽完自動開下一箱，新箱一抽 🪙1200（price 跟著箱子；前端帶 pay，付不夠就擋下來）
  * v68：🌱 修「澆水、收成會跳回去」：寫進試算表的資料要先真的存好（flush）才讓下一個人排進來；以前偶爾會被別人讀到舊的那份再整列蓋回去
  * v67：🏝️ 外島（adminMoveHouse）：島主把沒在玩的家搬到外島（slot 100～112）；外島的家冬眠：不長便便、不掉錢、不變餓魔、小偷不去、不推播肚子餓；搬回主島時重新計時
@@ -18,17 +20,17 @@
  * v52.1：🐞 人氣王的計分紀錄整週累積，超過試算表一格 5 萬字的上限 → 只留今天的；之後有資料太大會說是哪一筆
  * v52：🎄 小麋鹿豆豆的聖誕禮物（adminXmas／xmasGive／xmasNote／xmasClaim）：送對禮物那家收到 🪙30 的信、全島送滿 100 份每人 🪙300、全部送完 🪙5000
  * v51：🎁 島主自己上傳盲盒系列（adminBbSave／adminBbGet），玩家讀小島時拿到系列清單（不含稀有度）
- * v50：🎁 盲盒店（v51.1：怪咖小鎮補回 SNOWBALL、MOOSE，10 隻全出）（bbDraw：機率和保底在後端抽，每個系列 150 盒保底、隱藏版上動態、集滿送 🪙1000）、🛋️ 裝潢目錄買二樓背景（decoBuy）
+ * v50：🎁 盲盒店（v51.1：怪咖小鎮補回 SNOWBALL、MOOSE，10 隻全出）（bbDraw：機率和保底在後端抽，每個系列 150 盒保底、隱藏版上動態、集滿送 🪙1000）、🛋️ 裝潢目錄買民宿背景（decoBuy）
  * v49：🗄️ 展示間：島民中心擴建（Lv7、🪙1500、不用審核）；買裝潢、買櫃子（左中右 3 個位置、倉庫）、每個櫃子 4 層 × 5 格放玩具（showEdit）
  * v48：😈 餓魔變溫和：全家 5 天沒上線才出現（原本 2 天）、變成餓魔不發動態；別人摸／餵／零食／玩具一次就解除（不用集 10 點）
  *      🍚 肚子餓推播改成 12 小時沒吃才發（原本 8 小時）
- *      🏗️ 擴建二樓、農田不用島主審核，付錢馬上蓋好（都更還是要審核）
+ *      🏗️ 擴建民宿、農田不用島主審核，付錢馬上蓋好（都更還是要審核）
  * v47：💬 便利貼可以回覆（所有人都能回、通知貼的人）、🔒 秘密便條（只有這家的家人和貼的人看得到，其他人只看到摺起來的便條）
  * v46：💼 毛孩打工（毛二街賣萌、公園撿垃圾）：徵才單、投履歷、隔天 4 點抽籤寄信、急徵先搶先贏、每班表現、領薪水（jobApply／jobCancel／jobPay）
  * v45：🐞 排行榜重複發獎：讀小島不排隊（v40 起）時，換週那一刻兩個人同時讀小島會各結算一次 → 結算只在排隊的那段做；順便清掉已經重複的排行榜信
  * v44：島主後台變快——打開後台（adminLogin）、看信（adminMailList）、型錄不用排隊；送禮給全島改成一次送完（adminGiftAll）
  * v43：毛二街買東西可以重送（網路慢逾時後再問，自己剛買到的會直接回「買到了」，不會變成被別人買走）
- * v42：二樓專用的訂製款（只能放二樓、只能送給有二樓的家）；訂製裝潢可以選一樓或二樓
+ * v42：民宿專用的訂製款（只能放民宿、只能送給有民宿的家）；訂製裝潢可以選一樓或民宿
  * v41：換機碼（4 位數）＋「加入現有家庭」點自己名字接回帳號；新島民歡迎信（🪙500＋抽卡券）；島主合併帳號；
  *      訂製裝潢折扣碼（預設「我毛很多」，免費、不限次數）；島主送單一家的禮物不上動態；
  *      島主自己上傳背景（N／R／SSR／限定款／訂製款、軟木板和地板範圍）；島主上傳房子、商店商品（價位、上下架）；
@@ -41,7 +43,7 @@
  * v36：🌳 毛毛公園（特別的家 id park：毛孩可以遛去、島主免費布置、最多 8 位毛孩客人）
  * v35：🎨 訂製裝潢（島民中心申請 🪙500、一家一個月一次、全島最多 3 件；島主上傳房間寄信給申請人，或退回退款）、島主有沒讀的信直接顯示
  * v34：民宿租金加倍（每小時＝舒適度÷4）、存錢筒最多存 24 小時
- * v33：📐 擴建（島民中心申請、島主審核）：二樓民宿（另一份玩具、換背景、收租）＋農田（種植、澆水、收成、加開格子）
+ * v33：📐 擴建（島民中心申請、島主審核）：民宿（另一份玩具、換背景、收租）＋農田（種植、澆水、收成、加開格子）
  * v32：🏛️ 島民中心（第 16 塊地不能蓋房子、工讀生設定 adminCenter）、公告可以設期限（1／3／7 天或一直顯示）
  * v31：星寶找到一半（5 次）寫動態、集滿時推播給全島
  * v30：⭐ 星寶活動（adminStar 島主開始／結束、starClaim 集滿 10 次領 500 金幣＋限定房「星星探險屋」）
@@ -118,7 +120,7 @@ function doPost(e) {
   let out, got = false;
   try {
     const req = JSON.parse(e.postData.contents || '{}');
-    resetCache_();
+    resetCache_(); SLOT_ = null; SLOTW_ = [];
     if (req.action === 'getState') {
       // v40：讀小島最常被呼叫（每個人每 45 秒一次）。要寫的部分最多等 3 秒，排不到就跳過（下一次或別人會做）；
       //      讀資料、組畫面的大段不佔排隊，其他人的動作就不會被卡住
@@ -137,6 +139,7 @@ function doPost(e) {
     } else {
       lock.waitLock(25000); got = true;
       resetCache_();
+      if ((req.slot === 'f3' || req.slot === 'sh2') && req.houseId) SLOT_ = { k: req.slot, hid: String(req.houseId) };
       const fn = ACTIONS[req.action];
       if (!fn) throw new Error('不認識的動作：' + req.action);
       out = { ok: true, data: fn(req) };
@@ -235,6 +238,15 @@ function stateView_(req, now) {
 // 同一次請求裡，每個分頁只讀一次，之後都從記憶體拿；寫入時同時更新記憶體
 let SS_ = null, C_ = {};
 function resetCache_() { C_ = {}; }
+// v76：第二間民宿／展示間。SLOT_ = { k:'f3'|'sh2', hid }；讀這個家時把第二間換到原本的欄位，存回去前換回來（換兩次＝原樣）
+let SLOT_ = null, SLOTW_ = [];
+const SHOW_RK_ = ['room', 'pos', 'it', 'wsh', 'wcb', 'wfr', 'wfp', 'wfa', 'neon'];
+function slotSwap_(h, k) {
+  const sw = (o, a, b) => { const t = o[a]; o[a] = o[b]; o[b] = t; if (o[a] === undefined) delete o[a]; if (o[b] === undefined) delete o[b]; };
+  if (k === 'f3') { sw(h, 'room2', 'room3'); sw(h, 'toys2', 'toys3'); sw(h, 'inn', 'innb'); sw(h, 'floor2', 'inn2'); if (h.show && typeof h.show === 'object') sw(h.show, 'f2', 'f2b'); }
+  else if (k === 'sh2' && h.show && typeof h.show === 'object' && h.show.b && typeof h.show.b === 'object') { const s = h.show, b = s.b; SHOW_RK_.forEach(x => { const t = s[x]; s[x] = b[x]; b[x] = t; if (s[x] === undefined) delete s[x]; if (b[x] === undefined) delete b[x]; }); }
+  return h;
+}
 // v68：放掉排隊鎖之前，先把這次寫的東西真的存進試算表（不然下一個人可能讀到舊的，再整列蓋回去）
 function flushSafe_() { try { SpreadsheetApp.flush(); } catch (x) {} }
 function ss_() {
@@ -249,6 +261,8 @@ function ss_() {
   props.setProperty('SSID', SS_.getId());
   return SS_;
 }
+function slotGet_(name, o) { if (o && SLOT_ && name === 'houses' && o.id === SLOT_.hid) { slotSwap_(o, SLOT_.k); SLOTW_.push(o); } return o; }
+function slotPut_(name, obj) { return SLOT_ && name === 'houses' && SLOTW_.indexOf(obj) >= 0 ? slotSwap_(JSON.parse(JSON.stringify(obj)), SLOT_.k) : obj; }
 function sh_(name) {
   const ss = ss_();
   let s = ss.getSheetByName(name);
@@ -283,9 +297,11 @@ function all_(name) { const c = tab_(name); return c.rows.filter(r => r[0] !== '
 function get_(name, id) {
   if (!id) return null;
   const c = tab_(name), i = c.idx[String(id)];
-  return i === undefined ? null : decode_(c.h, c.rows[i]);
+  if (i === undefined) return null;
+  return slotGet_(name, decode_(c.h, c.rows[i]));
 }
 function put_(name, obj) {
+  obj = slotPut_(name, obj);
   const c = tab_(name), s = c.s, h = c.h;
   Object.keys(obj).forEach(k => { if (h.indexOf(k) < 0) { h.push(k); s.getRange(1, h.length).setValue(k); c.rows.forEach(r => r.push('')); } });
   const row = h.map(k => { const v = obj[k]; if (v === undefined || v === null) return ''; return typeof v === 'object' ? JSON.stringify(v) : String(v); });
@@ -428,7 +444,7 @@ function freeSpot_(houseId, skipId) {
   return best;
 }
 function newDrop_(houseId, amt, fl) {
-  if (fl === 2) {   // v57：二樓也會掉錢（位置由前端放進二樓的地板範圍）
+  if (fl === 2) {   // v57：民宿也會掉錢（位置由前端放進民宿的地板範圍）
     const L = drops_().filter(d => d.houseId === houseId && Number(d.fl) === 2);
     let best = null, bestD = -1;
     for (let i = 0; i < 16; i++) { const x = 0.1 + Math.random() * 0.8, y = 0.15 + Math.random() * 0.7, d = L.length ? Math.min(...L.map(o => Math.hypot(o.x - x, o.y - y))) : 9; if (d > bestD) { bestD = d; best = { x: Math.round(x * 1000) / 1000, y: Math.round(y * 1000) / 1000 }; } }
@@ -577,11 +593,11 @@ function letterMark_(req, field) {
   arr.push(pid); l[field] = arr; put_('letters', l);
   return { l: l, already: false };
 }
-// v42：二樓專用的訂製款
+// v42：民宿專用的訂製款
 function roomF2_(id) { const L = meta_('rooms').list; const o = Array.isArray(L) ? L.find(x => x.id === id) : null; return !!(o && o.f2); }
-function f2RoomCheck_(h, room) { if (room && roomF2_(room) && !Number(h.floor2)) throw new Error(`「${h.name}」還沒有二樓，二樓專用的背景只能送給有二樓的家`); }
+function f2RoomCheck_(h, room) { if (room && roomF2_(room) && !Number(h.floor2)) throw new Error(`「${h.name}」還沒有民宿，民宿專用的背景只能送給有民宿的家`); }
 function letterRoomCheck_(to, room) {
-  if (to === '*' && roomF2_(room)) throw new Error('二樓專用的背景不能寄給全島，請送給有二樓的家');
+  if (to === '*' && roomF2_(room)) throw new Error('民宿專用的背景不能寄給全島，請送給有民宿的家');
   if (to === '*') {
     if (all_('houses').some(h => ownedOf_(h).indexOf(room) >= 0)) throw new Error('已經有家擁有這間房間了，寄給全島只能送大家都沒有的房間');
     return;
@@ -961,8 +977,13 @@ const ACTIONS = {
       h.name = n;
     }
     if (p.motto !== undefined) h.motto = String(p.motto).slice(0, 20);
-    if (p.room) { if (roomF2_(p.room)) throw new Error('這是二樓專用的背景，到二樓換吧'); h.room = p.room; }
+    if (p.room) { if (roomF2_(p.room)) throw new Error('這是民宿專用的背景，到民宿換吧'); h.room = p.room; }
     if (p.room2 && Number(h.floor2)) h.room2 = accId_(p.room2) || h.room2;
+    if (p.rn && typeof p.rn === 'object') {   // v76：民宿、展示間的名字（f2／f3／sh／sh2，空白＝用原本的名字）
+      const rn = h.rn && typeof h.rn === 'object' ? h.rn : {};
+      ['f2', 'f3', 'sh', 'sh2'].forEach(k => { if (p.rn[k] !== undefined) { const v = String(p.rn[k] || '').trim().slice(0, 8); if (v) rn[k] = v; else delete rn[k]; } });
+      h.rn = rn;
+    }
     if (p.newPw) h.pw = p.newPw;
     put_('houses', h);
     return true;
@@ -1198,7 +1219,7 @@ const ACTIONS = {
     saveDrops_(list.filter(x => x.id !== d.id));
     const amt = Number(d.amt) * (dblOn_() ? 2 : 1), h = get_('houses', d.houseId);
     put_('meta', { id: 'picked', list: picked.concat({ id: d.id, by: me.id, amt: amt, at: Date.now() }).slice(-60) });
-    feed_(Number(d.amt) >= DROP_GOLD_ ? `✨ ${me.nick} 撿到金色福袋 ${amt} 金幣！` : `${me.nick} 在 ${h ? h.name : '島上'}${Number(d.fl) === 2 ? '二樓' : ''} 撿到 ${amt} 金幣 💰`);
+    feed_(Number(d.amt) >= DROP_GOLD_ ? `✨ ${me.nick} 撿到金色福袋 ${amt} 金幣！` : `${me.nick} 在 ${h ? h.name : '島上'}${Number(d.fl) === 2 ? '民宿' : ''} 撿到 ${amt} 金幣 💰`);
     rankAdd_('coin', me.id, amt);
     return { amt: amt };
   },
@@ -1252,10 +1273,10 @@ const ACTIONS = {
   placeToy(req) {
     const h = mustFam_(req, true), k = toyKey_(h, req), toys = Array.isArray(h[k]) ? h[k] : [];
     const cap = k === 'toys2' ? TOY2_MAX_ : TOY_MAX_;
-    if (toys.length >= cap) throw new Error(k === 'toys2' ? `二樓最多放 ${cap} 個玩具` : `地上最多放 ${cap} 個玩具`);
+    if (toys.length >= cap) throw new Error(k === 'toys2' ? `民宿最多放 ${cap} 個玩具` : `地上最多放 ${cap} 個玩具`);
     if (!/^[a-z0-9_]{1,20}$/i.test(String(req.item || ''))) throw new Error('這不是玩具');
     const t = { id: uid_(), item: req.item, x: Math.round(Number(req.x) || 400), y: Math.round(Number(req.y) || 1000) };
-    if (k === 'toys2' && req.w !== undefined && req.w !== null && req.w !== '') {   // v70：放在二樓牆上的層板
+    if (k === 'toys2' && req.w !== undefined && req.w !== null && req.w !== '') {   // v70：放在民宿牆上的層板
       const w = Math.floor(Number(req.w)), c = Math.floor(Number(req.c)), s = h.show && typeof h.show === 'object' ? showNorm_(h.show) : null;
       if (!s || !(w >= 0 && w < F2_N_) || String(s.f2.w[w]).indexOf('sh:') !== 0) throw new Error('這裡沒有層板');
       if (!(c >= 0 && c < 5)) throw new Error('沒有這一格');
@@ -1608,7 +1629,7 @@ const ACTIONS = {
     let ok = 0, skip = 0, fail = '';
     all_('houses').filter(h => !isSpecialId_(h.id)).forEach(h => {
       try { ACTIONS.adminGiftHouse(Object.assign({}, req, { houseId: h.id, all: 1 })); ok++; }
-      catch (e) { if (/已經有這間房間|還沒有二樓/.test(e.message)) skip++; else fail = e.message; }
+      catch (e) { if (/已經有這間房間|還沒有民宿/.test(e.message)) skip++; else fail = e.message; }
     });
     return { ok: ok, skip: skip, fail: fail };
   },
@@ -1750,7 +1771,7 @@ const ACTIONS = {
     o.off = x.off ? 1 : '';
     o.p = r === 'SH' ? Math.round(clampN_(x.p, 0, 99999)) : '';
     o.f2 = x.f2 && r === 'CU' ? 1 : '';
-    if (o.f2 && o.houseId) { const hh = get_('houses', o.houseId); if (hh && !Number(hh.floor2)) throw new Error(`「${hh.name}」還沒有二樓，二樓專用的背景只能給有二樓的家`); }
+    if (o.f2 && o.houseId) { const hh = get_('houses', o.houseId); if (hh && !Number(hh.floor2)) throw new Error(`「${hh.name}」還沒有民宿，民宿專用的背景只能給有民宿的家`); }
     R.list = list; R.ver = (Number(R.ver) || 0) + 1; put_('meta', R);
     return o;
   },
@@ -1872,9 +1893,11 @@ const ACTIONS = {
     const h = mustFam_(req), me = mustPlayer_(req.playerId), kind = String(req.kind || '');
     if (!EXP_NAME_[kind]) throw new Error('不知道要擴建什麼');
     if (Math.max(Number((me.game || {}).lv) || 0, Number(req.lv) || 0) < expLv_(kind)) throw new Error(`要 Lv.${expLv_(kind)} 以上才能申請${kind === 'renew' ? '都更' : '擴建'}`);
-    if (kind === 'floor2' && Number(h.floor2)) throw new Error('你家已經有二樓了');
+    if (kind === 'floor2' && Number(h.floor2)) throw new Error('你家已經有民宿了');
     if (kind === 'farm' && h.farm) throw new Error('你家已經有農田了');
     if (kind === 'show' && h.show && typeof h.show === 'object') throw new Error('你家已經有展示間了');
+    if (kind === 'inn2') { if (!Number(h.floor2)) throw new Error('要先有民宿才能蓋第二間'); if (Number(h.inn2)) throw new Error('你家已經有第二間民宿了'); }
+    if (kind === 'show2') { if (!h.show || typeof h.show !== 'object') throw new Error('要先有展示間才能蓋第二間'); if (h.show.b) throw new Error('你家已經有第二間展示間了'); }
     const APL = all_('apply');
     if (APL.some(a => a.houseId === h.id && a.st === 'wait' && (kind === 'renew' || a.kind === kind))) throw new Error('你家已經有一張申請在等島主看了');
     let style = 0;
@@ -1884,12 +1907,14 @@ const ACTIONS = {
       renewStyleOk_(h, style);
       if (APL.some(a => a.kind === 'renew' && a.st === 'wait' && Number(a.style) === style)) throw new Error('這款房子有別家正在申請了，換一款吧');
     }
-    const a = { id: uid_(), kind: kind, houseId: h.id, house: h.name, playerId: me.id, nick: me.nick, note: String(req.note || '').trim().slice(0, 60), cost: expCost_(kind), at: Date.now(), st: 'wait', reply: '' };
+    const a = { id: uid_(), kind: kind, houseId: h.id, house: h.name, playerId: me.id, nick: me.nick, note: String(req.note || '').trim().slice(0, 60), cost: expCost_(kind, h), at: Date.now(), st: 'wait', reply: '' };
     if (style) { a.style = style; a.from = Number(h.style) || 0; h.renewAt = Date.now(); put_('houses', h); }
-    if (kind !== 'renew') {   // v48：二樓、農田不用審核，付錢馬上蓋好
+    if (kind !== 'renew') {   // v48：民宿、農田不用審核，付錢馬上蓋好
       const now = Date.now();
       if (kind === 'floor2') { h.floor2 = 1; h.room2 = h.room2 || 'basic1'; h.toys2 = Array.isArray(h.toys2) ? h.toys2 : []; h.inn = { at: now }; }
       else if (kind === 'show') h.show = showNorm_(null);
+      else if (kind === 'inn2') { h.inn2 = 1; h.room3 = h.room3 || 'basic1'; h.toys3 = Array.isArray(h.toys3) ? h.toys3 : []; h.innb = { at: now }; }
+      else if (kind === 'show2') { const s = showNorm_(h.show); s.b = { room: 'basic' }; h.show = showNorm_(s); }
       else h.farm = { n: FARM_N0_, p: [] };
       put_('houses', h);
       a.st = 'ok'; a.doneAt = now; a.reply = '';
@@ -1927,12 +1952,12 @@ const ACTIONS = {
     notify_(ok ? mem : [a.playerId], 'letter', ok ? (a.kind === 'renew' ? `🏗️ 「${a.house}」都更完成，換上新外觀了！` : `🏗️ 「${a.house}」的${EXP_NAME_[a.kind]}蓋好了！`) : `🏗️ ${a.kind === 'renew' ? '都更' : '擴建'}申請有結果了，打開信看看`);
     return a;
   },
-  // ---------- 🛏️ 二樓民宿：收租（全家共用一個存錢筒，最多存 12 小時；v57：每小時 舒適度÷2） ----------
+  // ---------- 🛏️ 民宿：收租（全家共用一個存錢筒，最多存 12 小時；v57：每小時 舒適度÷2） ----------
   innCollect(req) {
     const h = mustFam_(req);
-    if (!Number(h.floor2)) throw new Error('這個家還沒有二樓');
+    if (!Number(h.floor2)) throw new Error('這個家還沒有民宿');
     const now = Date.now(), inn = h.inn && typeof h.inn === 'object' ? h.inn : { at: now }, hrs = Math.min(INN_CAP_H_, Math.max(0, (now - Number(inn.at || now)) / HOUR_));
-    const comfort = innComfort_(h), coins = Math.floor(hrs * comfort / 2);
+    const comfort = innComfort_(h), coins = Math.floor(hrs * comfort / 2 * (SLOT_ && SLOT_.k === 'f3' ? 0.5 : 1));   // v76：民宿 2 房租一半
     if (coins <= 0) return { coins: 0, comfort: comfort };
     h.inn = { at: now, last: coins, by: req.playerId }; put_('houses', h);
     return { coins: coins, comfort: comfort };
@@ -1979,7 +2004,7 @@ const ACTIONS = {
     const img = String(req.img || '');
     if (img && (img.indexOf('data:image/') !== 0 || img.length > 45000)) throw new Error('參考圖太大了，換一張試試');
     const kind = ['b', 'w', 'd'].indexOf(String(req.kind)) >= 0 ? String(req.kind) : (req.f2 ? 'w' : 'b'), f2 = kind === 'b' ? '' : 1;
-    if (f2 && !Number(h.floor2)) throw new Error('你家還沒有二樓喔，先申請擴建吧');
+    if (f2 && !Number(h.floor2)) throw new Error('你家還沒有民宿喔，先申請擴建吧');
     const code = String(req.code || '').trim(), free = !!code && code === String(meta_('deco').code || '我毛很多');
     if (code && !free) throw new Error('折扣碼不對喔');
     if (Number(h.decoAt) && now - Number(h.decoAt) < DECO_DAYS_ * DAY_) throw new Error(`你家這個月已經申請過了，${Math.ceil((Number(h.decoAt) + DECO_DAYS_ * DAY_ - now) / DAY_)} 天後可以再申請`);   // v74：折扣碼也一個月一次
@@ -1990,7 +2015,7 @@ const ACTIONS = {
     put_('adminmail', m);
     h.decoAt = now; h.decoFree = free ? now : ''; put_('houses', h);
     const admin = meta_('island').adminId;
-    if (admin && admin !== me.id) notify_([admin], 'mail', `🎨 ${me.nick} 申請了${f2 ? '二樓的' : ''}訂製裝潢`);
+    if (admin && admin !== me.id) notify_([admin], 'mail', `🎨 ${me.nick} 申請了${f2 ? '民宿的' : ''}訂製裝潢`);
     return { id: m.id, free: free ? 1 : 0 };
   },
   adminDecoFinish(req) {
@@ -2005,7 +2030,7 @@ const ACTIONS = {
     if (req.floor && typeof req.floor === 'object') ro.floor = { y0: nb(req.floor.y0), t: [nb((req.floor.t || [])[0]), nb((req.floor.t || [])[1])], b: [0, 848] };
     R.list = (Array.isArray(R.list) ? R.list : []).concat(ro); R.ver = (Number(R.ver) || 0) + 1; put_('meta', R);
     const reply = String(req.reply || '').trim().slice(0, 300);
-    put_('letters', { id: uid_(), to: m.fromId, title: '🎨 你訂製的房間完成了！', body: `「${name}」裝潢好了！` + (m.f2 ? '這是二樓專用的，收下之後到二樓按「🎨 背景」就能換上。' : '收下之後到「⚙️ 家」就能換上。') + (reply ? `\n\n島主說：${reply}` : ''),
+    put_('letters', { id: uid_(), to: m.fromId, title: '🎨 你訂製的房間完成了！', body: `「${name}」裝潢好了！` + (m.f2 ? '這是民宿專用的，收下之後到民宿按「🎨 背景」就能換上。' : '收下之後到「⚙️ 家」就能換上。') + (reply ? `\n\n島主說：${reply}` : ''),
       at: Date.now(), coins: 0, tickets: 0, item: '', n: 0, room: roomId, roomName: name, read: [], claimed: [], hidden: [] });
     m.st = 'done'; m.read = 1; m.replied = 1; m.roomId = roomId; put_('adminmail', m);
     notify_([m.fromId], 'letter', '🎨 你訂製的房間完成了！快打開信看看');
@@ -2040,13 +2065,15 @@ const ACTIONS = {
 };
 
 
-// ================= 📐 擴建：二樓民宿＋農田（v33） =================
+// ================= 📐 擴建：民宿＋農田（v33） =================
 const EXP_COST_ = 1000, EXP_LV_ = 7, INN_CAP_H_ = 12, FARM_N0_ = 4, FARM_MAX_ = 6, FARM_GROW_H_ = 8, FARM_WATER_MAX_ = 3;
 const CROPS_ = { tomato: 1, pumpkin: 1, apple: 1 };
-const EXP_NAME_ = { floor2: '二樓民宿', farm: '農田', show: '展示間', renew: '都更・外牆整修' };
+const EXP_NAME_ = { floor2: '民宿', farm: '農田', show: '展示間', renew: '都更・外牆整修', inn2: '第二間民宿', show2: '第二間展示間' };
+const EXP2_COST_ = [3000, 6000];   // v76：第二間民宿／展示間，這個家第 1 次加蓋 3000、第 2 次 6000
+const exp2N_ = h => (Number(h.inn2) ? 1 : 0) + (h.show && typeof h.show === 'object' && h.show.b ? 1 : 0);
 const SHOW_COST_ = 1500;
 const RENEW_COST_ = 500, RENEW_LV_ = 7, RENEW_DAYS_ = 30;
-const expCost_ = k => k === 'renew' ? RENEW_COST_ : k === 'show' ? SHOW_COST_ : EXP_COST_;
+const expCost_ = (k, h) => k === 'renew' ? RENEW_COST_ : k === 'show' ? SHOW_COST_ : (k === 'inn2' || k === 'show2') ? EXP2_COST_[Math.min(1, h ? exp2N_(h) : 0)] : EXP_COST_;
 const expLv_ = k => k === 'renew' ? RENEW_LV_ : EXP_LV_;
 // 都更要換的款式：1～42、不是現在的、島上沒人用、也沒有別家正在申請
 function renewStyleOk_(h, style) {
@@ -2054,8 +2081,8 @@ function renewStyleOk_(h, style) {
   if (style === Number(h.style)) throw new Error('這就是你家現在的樣子喔');
   if (all_('houses').some(x => x.id !== h.id && Number(x.style) === style)) throw new Error('這款房子島上已經有人用了，換一款吧');
 }
-function toyKey_(h, req) { if (Number(req.floor) === 2) { if (!Number(h.floor2)) throw new Error('這個家還沒有二樓'); return 'toys2'; } return 'toys'; }
-const innComfort_ = h => Math.min(TOY2_MAX_, (Array.isArray(h.toys2) ? h.toys2 : []).length) * 2;     // 二樓每個玩具 +2 舒適度
+function toyKey_(h, req) { if (Number(req.floor) === 2) { if (!Number(h.floor2)) throw new Error('這個家還沒有民宿'); return 'toys2'; } return 'toys'; }
+const innComfort_ = h => Math.min(TOY2_MAX_, (Array.isArray(h.toys2) ? h.toys2 : []).length) * 2;     // 民宿每個玩具 +2 舒適度
 // v71：農田紀錄（最近 30 筆）
 function farmLog_(f, req, a, i, c) { const p = req.playerId ? get_('players', req.playerId) : null; f.log = (Array.isArray(f.log) ? f.log : []).concat([{ t: Date.now(), by: p ? p.nick : '', a: a, i: i, c: c || '' }]).slice(-30); }
 function farm_(h) { const f = h.farm && typeof h.farm === 'object' ? h.farm : null; if (!f) throw new Error('這個家還沒有農田'); f.n = clampN_(f.n || FARM_N0_, 1, FARM_MAX_); f.p = Array.isArray(f.p) ? f.p : []; while (f.p.length < FARM_MAX_) f.p.push(null); return f; }
@@ -2476,12 +2503,17 @@ function showNorm_(s) {
   s.wsh = two(s.wsh, WSH_P_); s.wcb = has_(WCB_P_, s.wcb) ? s.wcb : ''; s.wfr = two(s.wfr, WFR_P_, 4);
   s.wfp = Array.isArray(s.wfp) ? s.wfp.slice(0, 4).map(x => String(x || '')) : []; while (s.wfp.length < 4) s.wfp.push('');
   s.wfa = Array.isArray(s.wfa) ? s.wfa.slice(0, 4).map(x => Number(x) || 0) : []; while (s.wfa.length < 4) s.wfa.push(0);
-  {  // v70：二樓牆面，每個位置是 'sh:款式' 或 'fr:款式' 或空的
+  {  // v70：民宿牆面，每個位置是 'sh:款式' 或 'fr:款式' 或空的
     const f = s.f2 && typeof s.f2 === 'object' ? s.f2 : {};
     const ok = x => { const p = String(x || '').split(':'); return p[0] === 'sh' && has_(WSH_P_, p[1]) ? 'sh:' + p[1] : ''; };
     const arr = (a, fn) => { a = Array.isArray(a) ? a.slice(0, F2_N_) : []; while (a.length < F2_N_) a.push(''); return a.map(fn); };
     s.f2 = { w: arr(f.w, ok), fp: arr(f.fp, x => String(x || '').slice(0, 40)), fa: arr(f.fa, x => Number(x) || 0) };
+    if (s.f2b && typeof s.f2b === 'object') { const g = s.f2b; s.f2b = { w: arr(g.w, ok), fp: arr(g.fp, x => String(x || '').slice(0, 40)), fa: arr(g.fa, x => Number(x) || 0) }; } else delete s.f2b;
   }
+  if (s.b && typeof s.b === 'object') {   // v76：第二間展示間只存擺設（裝潢、櫃子、牆面），倉庫共用
+    const t = showNorm_(Object.assign({}, s.b, { rooms: s.rooms, cabs: s.cabs, wo: s.wo, f2: null, b: null, f2b: null, hon: null })), b = {};
+    SHOW_RK_.forEach(k => { b[k] = t[k]; }); s.b = b;
+  } else delete s.b;
   s.neon = s.neon && typeof s.neon === 'object' && s.neon.t ? { t: String(s.neon.t).slice(0, 12), c: NEON_C_.indexOf(s.neon.c) >= 0 ? s.neon.c : 'pink' } : null;
   s.hon = Array.isArray(s.hon) ? s.hon.slice(0, 30) : [];
   return s;
@@ -2494,7 +2526,7 @@ function econFix_() {
   const P = all_('players');
   all_('houses').forEach(h => {
     const own = Array.isArray(h.owned) ? h.owned : [];
-    let f2back = ['f2shop_xmas', 'f2shop_ghost', 'f2shop_space'].filter(k => own.indexOf(k) >= 0).length * 1000;   // 二樓裝潢 3000 → 2000
+    let f2back = ['f2shop_xmas', 'f2shop_ghost', 'f2shop_space'].filter(k => own.indexOf(k) >= 0).length * 1000;   // 民宿裝潢 3000 → 2000
     if (!h.show || typeof h.show !== 'object') { if (f2back) econLetter_(h, f2back, P); return; }
     const s = h.show, cabs = s.cabs && typeof s.cabs === 'object' ? s.cabs : {}, wo = s.wo && typeof s.wo === 'object' ? s.wo : {};
     let back = 0;
@@ -2519,9 +2551,10 @@ Object.assign(ACTIONS, {
     const okPos = () => { if (!(pos >= 0 && pos < SHOW_POS_)) throw new Error('沒有這個位置'); };
     const okSlot = () => { if (!(pos >= 0 && pos < SHOW_IT_)) throw new Error('沒有這個位置'); const cap = wallCap_(s, pos); if (!cap) throw new Error(pos < 3 ? '這裡還沒有櫃子' : '這裡還沒有層板'); if (!(i >= 0 && i < cap)) throw new Error('沒有這一格'); };
     const W = { sh: WSH_P_, cb: WCB_P_, fr: WFR_P_ }, kind = String(req.kind || ''), row = Math.floor(Number(req.row)), busy = p => s.it[p].some(Boolean);
-    const wFree = (k, wid, ex, exF2) => (Number(s.wo[k + ':' + wid]) || 0) - (k === 'sh' ? s.wsh : k === 'fr' ? s.wfr : [s.wcb]).filter((x, r) => x === wid && r !== ex).length - s.f2.w.filter((x, r) => x === k + ':' + wid && r !== exF2).length;
+    const wFree = (k, wid, ex, exF2) => (Number(s.wo[k + ':' + wid]) || 0) - (k === 'sh' ? s.wsh : k === 'fr' ? s.wfr : [s.wcb]).filter((x, r) => x === wid && r !== ex).length - s.f2.w.filter((x, r) => x === k + ':' + wid && r !== exF2).length
+      - (s.b ? (k === 'sh' ? s.b.wsh : k === 'fr' ? s.b.wfr : [s.b.wcb]).filter(x => x === wid).length : 0) - (s.f2b ? s.f2b.w.filter(x => x === k + ':' + wid).length : 0);   // v76：另一間展示間、另一間民宿掛著的也算
     const shBusy2 = r => (Array.isArray(h.toys2) ? h.toys2 : []).some(t => t.w !== undefined && t.w !== null && t.w !== '' && Number(t.w) === r);
-    const free = (cid, except) => (Number(s.cabs[cid]) || 0) - s.pos.filter((c, k) => c === cid && k !== except).length;
+    const free = (cid, except) => (Number(s.cabs[cid]) || 0) - s.pos.filter((c, k) => c === cid && k !== except).length - (s.b ? s.b.pos.filter(c => c === cid).length : 0);
     let brag = '', shelf = null;
     if (op === 'buyRoom') {
       const cr = shRoom_(id);
@@ -2593,13 +2626,13 @@ Object.assign(ACTIONS, {
         if (id && wFree('fr', id, row) <= 0) throw new Error('這款相框都掛出去了');
         s.wfr[row] = id; if (!id) { s.wfp[row] = ''; s.wfa[row] = 0; }
       }
-    } else if (op === 'f2W') {   // v70：二樓牆面的一個位置掛層板或相框（id 空的＝收起來）
-      if (!Number(h.floor2)) throw new Error('這個家還沒有二樓');
+    } else if (op === 'f2W') {   // v70：民宿牆面的一個位置掛層板或相框（id 空的＝收起來）
+      if (!Number(h.floor2)) throw new Error('這個家還沒有民宿');
       if (!(row >= 0 && row < F2_N_)) throw new Error('沒有這個位置');
       const cur = s.f2.w[row];
       if (!id) { if (cur.indexOf('sh:') === 0 && shBusy2(row)) throw new Error('層板上還有玩具，先收回背包'); s.f2.w[row] = ''; s.f2.fp[row] = ''; s.f2.fa[row] = 0; }
       else {
-        if (kind !== 'sh' || !has_(WSH_P_, id)) throw new Error('二樓只能掛層板');
+        if (kind !== 'sh' || !has_(WSH_P_, id)) throw new Error('民宿只能掛層板');
         if (cur !== kind + ':' + id && wFree(kind, id, -1, row) <= 0) throw new Error('這款都掛出去了');
         s.f2.w[row] = 'sh:' + id;
       }
@@ -2668,11 +2701,11 @@ Object.assign(ACTIONS, {
     if (complete) feed_(`🏆 ${me.nick} 集滿了「${S.name}」全系列！`);
     return { i: i, r: r, pity: bb.p[sid], complete: complete, bonus: complete ? BB_DONE_COINS_ : 0 };
   },
-  // ---------- 🛋️ 裝潢目錄：二樓背景（金幣由 App 扣，跟其他商店一樣） ----------
+  // ---------- 🛋️ 裝潢目錄：民宿背景（金幣由 App 扣，跟其他商店一樣） ----------
   decoBuy(req) {
     const h = mustFam_(req), id = String(req.id || '');
     if (String(req.kind) !== 'f2room' || !has_(DECO_F2_, id)) throw new Error('沒有這個商品');
-    if (!Number(h.floor2)) throw new Error('要先擴建二樓才能買二樓背景');
+    if (!Number(h.floor2)) throw new Error('要先擴建民宿才能買民宿背景');
     const o = ownedOf_(h);
     if (o.indexOf(id) >= 0) throw new Error('你家已經有這間了');
     o.push(id); h.owned = o; put_('houses', h);
@@ -2935,15 +2968,15 @@ Object.assign(ACTIONS, {
 });
 
 // ================= 🦹 玩具小偷・📹 寵物監視器（v57） =================
-// 小偷：全島一天 2～3 次（什麼時間都可能），闖進某一家的一樓或二樓，一次偷 2～4 個地上的玩具
+// 小偷：全島一天 2～3 次（什麼時間都可能），闖進某一家的一樓或民宿，一次偷 2～4 個地上的玩具
 //       待 15 分鐘（那層有租監視器就待 30 分鐘）；家裡有高冷的毛孩會叫 → 少偷一個、早 5 分鐘走
 //       時間到沒人報警：玩具一半拿去毛二街賣、一半不見，然後一半機率換一家繼續偷（最多再換 2 家）
 //       報警：本人家 → 玩具拿回來＋小偷留下的獎品；幫別人家 → 良民獎金 🪙200，玩具還給主人
-// 監視器：一樓、二樓分開租，🪙500 七天（金幣由 App 扣）；有小偷、有掉錢就推播（每人每天最多 5 則，不佔一般推播的 10 則）
+// 監視器：一樓、民宿分開租，🪙500 七天（金幣由 App 扣）；有小偷、有掉錢就推播（每人每天最多 5 則，不佔一般推播的 10 則）
 const THIEF_STAY_ = 15 * 60000, THIEF_STAY_CAM_ = 30 * 60000, THIEF_BARK_ = 5 * 60000, THIEF_HOPS_ = 2, THIEF_HERO_ = 200;
 const THIEF_SAFE_ = /^(t_teepee|t_astro|t_ufo|crown|starlamp|rainbow|castle|xmastree|crystal|unicorn|balloonair|gacha|bb\d.*|xm_.*)$/;   // 限定、生日、公仔不偷
 const CAM_DAYS_ = 7, CAM_PUSH_MAX_ = 5;
-const flName_ = fl => Number(fl) === 2 ? '二樓' : '一樓';
+const flName_ = fl => Number(fl) === 2 ? '民宿' : '一樓';
 function camOn_(h, fl) { return !!(h && h.cam && typeof h.cam === 'object' && Number(h.cam['f' + (Number(fl) === 2 ? 2 : 1)]) > Date.now()); }
 function camNotify_(h, fl, kind) {
   if (!camOn_(h, fl) || isQuiet_()) return 0;   // 半夜 11 點～早上 8 點不吵人
@@ -3040,10 +3073,10 @@ Object.assign(ACTIONS, {
     }
     return { own: own, coins: coins, n: loot.length, toys: loot, fl: Number(c.fl) === 2 ? 2 : 1, houseId: h.id };
   },
-  // 📹 租寵物監視器（一樓、二樓分開租，一次 7 天，可以續租）
+  // 📹 租寵物監視器（一樓、民宿分開租，一次 7 天，可以續租）
   camRent(req) {
     const h = mustFam_(req), fl = Number(req.fl) === 2 ? 2 : 1;
-    if (fl === 2 && !Number(h.floor2)) throw new Error('這個家還沒有二樓');
+    if (fl === 2 && !Number(h.floor2)) throw new Error('這個家還沒有民宿');
     const cam = h.cam && typeof h.cam === 'object' ? h.cam : {}, k = 'f' + fl, now = Date.now();
     cam[k] = Math.max(now, Number(cam[k]) || 0) + CAM_DAYS_ * DAY_; h.cam = cam; put_('houses', h);
     return { cam: cam };
