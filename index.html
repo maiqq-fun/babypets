@@ -1008,7 +1008,7 @@ img{-webkit-user-drag:none}
 .upit img{width:100%;aspect-ratio:1;object-fit:cover;border-radius:8px;background:#f6efe2}.upit b{font-size:12px;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.upit small{font-size:10.5px;color:var(--soft)}
 .redit{position:relative;width:min(300px,100%);aspect-ratio:848/1264;margin:8px auto;background:#efe4cf;border-radius:10px;overflow:hidden;touch-action:none;user-select:none}
 .redit>img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;pointer-events:none}
-.dkinds{display:flex;flex-direction:column;gap:6px}.dkinds button{text-align:left;border:2px solid var(--line);border-radius:12px;padding:8px 12px;background:#fffaf2;display:flex;flex-direction:column;gap:2px}.dkinds button.on{border-color:var(--accent);background:#fff0e6}.dkinds button[disabled]{opacity:.5}.dkinds small{color:var(--soft);font-size:12px}
+.dkinds{display:flex;flex-direction:column;gap:6px}.dkinds button{text-align:left;border:2px solid var(--line);border-radius:12px;padding:8px 12px;background:#fffaf2;display:flex;flex-direction:column;gap:2px}.dkinds button.on{border-color:var(--accent);background:#fff0e6}.dkinds button[disabled]{opacity:.5}.dkinds small{color:var(--soft);font-size:12px;white-space:normal;line-height:1.45}.dkinds small b{color:var(--ink,#5a4636)}
 .rebd{position:absolute;border:3px solid #ffcc33;background:rgba(255,204,51,.18);border-radius:6px;cursor:move;touch-action:none}
 .rebd span,.refl span{position:absolute;left:4px;top:2px;font-size:11px;font-weight:700;color:#7a4a00;background:rgba(255,255,255,.85);border-radius:6px;padding:0 4px;pointer-events:none;white-space:nowrap}
 .rebd .rh{position:absolute;right:-9px;bottom:-9px;width:18px;height:18px;border-radius:50%;background:#ffcc33;border:2px solid #fff;touch-action:none}
@@ -5737,7 +5737,7 @@ const customRoom=id=>(typeof DB!=='undefined'&&Array.isArray(DB.rooms)?DB.rooms:
 function decoForm(){const h=myHouse();if(!h)return toast('要有家才能申請訂製裝潢');if(!ONLINE)return toast('試做版沒有訂製裝潢');const g=DB.game,last=+h.decoAt||0,wait=last&&Date.now()-last<DECO_DAYS*864e5;let img='';
   openModal(`<h3 class="mh3"><img class="mic" src="assets/icon_deco.webp" alt="" style="width:36px;height:36px">訂製裝潢</h3>
     ${wait?`<div class="locked" style="margin-bottom:10px">你家這個月已經申請過了，${Math.ceil((last+DECO_DAYS*864e5-Date.now())/864e5)} 天後可以再申請</div>`:''}${`
-    <div class="field"><div class="flabel">要哪一種？</div><div class="dkinds" id="dfl">${DECO_KINDS.map(([k,n,d])=>`<button type="button" data-f="${k}" class="${k==='b'?'on':''}" ${k!=='b'&&!hasF2(h)?'disabled':''}><b>${n}</b><small>${k!=='b'&&!hasF2(h)?'要先有民宿':d}</small></button>`).join('')}</div></div>
+    <div class="field"><div class="flabel">要哪一種？</div><div class="dkinds" id="dfl">${DECO_KINDS.map(([k,n,d])=>`<button type="button" data-f="${k}" class="${k==='b'?'on':''}" ${k!=='b'&&!hasF2(h)?'disabled':''}><b>${n}</b><small>${k!=='b'&&!hasF2(h)?'要先有民宿・'+d:d}</small></button>`).join('')}</div></div>
     <p class="lead"><b>你希望打造什麼樣的房間呢？</b><br>描述得越仔細越好！畢竟裝潢一個月只能換一次<br><small>（例如：風格／主色系／主題／氣氛⋯）</small></p>
     <textarea id="dtx" rows="7" maxlength="400" style="display:block;width:100%;box-sizing:border-box;min-height:170px;font-size:16px" placeholder="例如：想要粉紅色和奶油色的星空房間，有一扇大圓窗看得到月亮，牆上掛小燈串，氣氛溫暖安靜，像睡前的感覺"></textarea><div class="mcnt"><span id="dcn">0</span> / 400</div>
     <div class="row2"><label class="mimg"><input type="file" accept="image/*" id="dfile" hidden><span id="dimgl">📷 附一張參考圖（可以不附）</span></label></div><div id="dprev"></div>
@@ -5773,7 +5773,7 @@ function posEditor(el,img,P,kind){const W=848,H=1264,lab=kind==='b'?'佈告欄�
   drag(fl.querySelector('.fl'),(dx,dy,st)=>{P.floor.t=[cl(st.floor.t[0]+dx,0,st.floor.t[1]-120),st.floor.t[1]]});
   drag(fl.querySelector('.fr'),(dx,dy,st)=>{P.floor.t=[st.floor.t[0],cl(st.floor.t[1]+dx,st.floor.t[0]+120,W)]})}
 // v2.99：訂製分三種（b 通用佈告欄版、w 民宿空牆版、d 民宿裝潢設計版）
-const DECO_KINDS=[['b','通用・佈告欄版','一樓、民宿都能放，有佈告欄（民宿會變層板）'],['w','民宿・空牆版','只能放民宿，牆上留大片空牆，可以放比較多層板'],['d','民宿・裝潢設計版','只能放民宿，整面牆都設計好，不放層板']];
+const DECO_KINDS=[['b','通用・佈告欄版','一樓、民宿都能用・牆上有<b>佈告欄區</b>：放一樓可以貼便條，放民宿會變成擺層板的地方'],['w','民宿・空牆版','只能放民宿・牆上留一大片空牆當<b>層板區</b>，可以掛比較多層板・沒有佈告欄，不能貼便條'],['d','民宿・裝潢設計版','只能放民宿・<b>滿版設計</b>，整面牆都畫好・沒有佈告欄也沒有層板，只能擺地上的玩具']];   // v3.10：寫清楚三種的差別（島主要求）
 const decoKind=m=>m.kind||(m.f2?'w':'b');
 const DECO_HEAD='請幫我畫一張遊戲的房間背景圖：3D 黏土風、可愛粉嫩、柔和打光的室內房間，正面視角，直式 2:3。',DECO_TAIL='下半部是寬敞、空曠、平整的地板（之後要放家具和毛孩，地板上不要有東西）。畫面裡不要有人物、動物，也不要有任何文字。';
 const decoPrompt=(t,k)=>{k=k===true?'w':k===false||!k?'b':k;const mid=k==='w'?'上半部是牆面，牆的正中間留一大塊乾淨的空牆（大約畫面寬度的 4 成、從畫面高度 1/4 到 3/5 左右），上面什麼都不要放（不要佈告欄、層架、相框、海報、窗戶），之後要掛層板；窗戶、植物、燈和小擺設放在左右兩側。'
