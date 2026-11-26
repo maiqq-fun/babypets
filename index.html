@@ -5870,8 +5870,10 @@ let GPLAN=null;
 function guestPlan(){const k=Math.floor(Date.now()/HOUR),inns=DB.houses.filter(h=>!isSpecialH(h)&&hasF2(h)&&guestN(comfortOf(h))>0).sort((a,b)=>comfortOf(b)-comfortOf(a)||(a.id<b.id?-1:1));
   const sig=k+'|'+inns.map(h=>h.id+':'+comfortOf(h)).join(',')+'|'+DB.houses.length+'|'+DB.houses.map(h=>+h.inn2?(h.toys3||[]).length:'').join(',');if(GPLAN&&GPLAN.sig===sig)return GPLAN;
   const pool=GUESTS.slice().sort((a,b)=>hash01(k+'g'+a.i)-hash01(k+'g'+b.i)),plan={sig,inn:{},visit:{},park:[],top:inns[0]||null};
-  inns.forEach(h=>{plan.inn[h.id]=pool.splice(0,guestN(comfortOf(h)))});
-  DB.houses.filter(h=>!isSpecialH(h)&&+h.inn2).forEach(h=>{const n=guestN(Math.min(TOY2_MAX,(h.toys3||[]).length)*2);if(n)plan.inn[h.id+'#3']=pool.splice(0,n)});   // v3.10：民宿 2 的旅客
+  // v3.16：每家民宿各自從全部旅客裡抽（以前大家搶同一批 25 位，民宿一多後面的就沒人住，公園也空了）
+  const pick=(key,n)=>GUESTS.slice().sort((a,b)=>hash01(k+key+a.i)-hash01(k+key+b.i)).slice(0,n);
+  inns.forEach(h=>{plan.inn[h.id]=pick('i'+h.id,guestN(comfortOf(h)))});
+  DB.houses.filter(h=>!isSpecialH(h)&&+h.inn2).forEach(h=>{const n=guestN(Math.min(TOY2_MAX,(h.toys3||[]).length)*2);if(n)plan.inn[h.id+'#3']=pick('j'+h.id,n)});
   pool.splice(0,Math.floor(hash01(k+'trip')*3));   // 出去旅行
   const homes=DB.houses.filter(h=>!isSpecialH(h)).map(h=>h.id).sort((a,b)=>hash01(k+'h'+a)-hash01(k+'h'+b));
   homes.slice(0,Math.min(3,pool.length)).forEach(hid=>{plan.visit[hid]=pool.shift()});
@@ -6941,7 +6943,7 @@ function announceLetters(){if(!DB.me)return;let seen=[];try{seen=JSON.parse(loca
     sfx('gift');$('#lgopen').onclick=()=>openLetter(nw[0].id,()=>$('#bell').click())};
   setTimeout(go,1800)}
 // ================= 自動更新：發現新版本就重新載入 =================
-const APP_VER='v3.15';
+const APP_VER='v3.16';
 function checkUpdate(){
   if(!/^https?:/.test(location.protocol)||!API_URL)return;
   if(!$('#modal').classList.contains('hidden'))return; // 正在填表單時不打斷
