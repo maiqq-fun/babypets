@@ -1043,6 +1043,7 @@ img{-webkit-user-drag:none}
 .tabs6 .tbn{line-height:1.2}
 .centerv .cbtns{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;max-width:440px;margin:0 auto;width:100%;box-sizing:border-box}
 .centerv .cbtns .act{justify-content:center;gap:6px;width:100%;margin:0;white-space:nowrap}
+.cbpair{display:flex;gap:6px;min-width:0}.cbpair .act{flex:1;min-width:0}.cbpair .act.cbrn{flex:none;width:52px;padding-left:0;padding-right:0}   /* v3.17：改名字小按鈕 */
 .cnote{-webkit-line-clamp:4;font-size:clamp(9px,2.6cqw,13px);line-height:1.35}
 .rnprev{display:flex;align-items:center;justify-content:center;gap:8px;flex-wrap:wrap;margin:4px 0 10px}
 .rnprev img{width:84px;height:84px;object-fit:contain;background:#fff;border:2px solid var(--line);border-radius:12px;padding:3px;transition:opacity .2s}
@@ -4547,9 +4548,9 @@ function renderF2(){const v=$('#f2v');if(!v||!F2)return;const h=house(F2.hid),st
   if(!gn&&!(h.toys2||[]).length){const tip=document.createElement('div');tip.className='f2hint';tip.textContent=fam?'民宿空空的，擺些玩具家具，旅客就會來住了':'民宿還在布置中';st.appendChild(tip)}
   const j=document.createElement('button');j.className='rentjar noic';j.id='rentjar';st.appendChild(j);j.onclick=e=>{e.stopPropagation();fam?collectRent():innInfo()};updRent();
   if(F2.placing){v.querySelector('.cbtns').innerHTML='<button class="act" id="f2x">✕ 取消擺放</button>';$('#f2x').onclick=()=>{F2.placing=null;renderF2()};return}
-  v.querySelector('.cbtns').innerHTML=fam?`<button class="act" id="f2toy">🧸 擺設</button><button class="act" id="f2bg">🎨 背景</button><button class="act" id="f2rent"><img class="mic" src="assets/icon_rent.webp" alt="">收租</button><button class="act" id="f2info"><img class="mic" src="assets/icon_comfort.webp" alt="">${c}</button>`
+  v.querySelector('.cbtns').innerHTML=fam?`<button class="act" id="f2toy">🧸 擺設</button><button class="act" id="f2bg">🎨 背景</button><button class="act" id="f2rent"><img class="mic" src="assets/icon_rent.webp" alt="">收租</button><div class="cbpair"><button class="act" id="f2info"><img class="mic" src="assets/icon_comfort.webp" alt="">${c}</button><button class="act cbrn" id="f2rn" aria-label="改名字">✏️</button></div>`
     :`<button class="act" id="f2info"><img class="mic" src="assets/icon_comfort.webp" alt="">舒適度 ${c}</button>`;
-  if($('#f2toy'))$('#f2toy').onclick=f2Placer;if($('#f2bg'))$('#f2bg').onclick=f2Bg;if($('#f2rent'))$('#f2rent').onclick=collectRent;$('#f2info').onclick=innInfo}
+  if($('#f2toy'))$('#f2toy').onclick=f2Placer;if($('#f2bg'))$('#f2bg').onclick=f2Bg;if($('#f2rent'))$('#f2rent').onclick=collectRent;if($('#f2rn'))$('#f2rn').onclick=()=>roomRename(h.id,F2.b?'f3':'f2');$('#f2info').onclick=innInfo}
 function updRent(){const j=$('#rentjar');if(!j||!F2)return;const h=house(F2.hid),n=rentNow(h),full=n>=Math.floor(INN_CAP_H*rentRate(h))&&n>0;
   j.innerHTML=`<img src="assets/icon_rent.webp" alt=""><b><img class="rjc" src="assets/icon_coin.webp" alt="">${n}</b>${full?'<small>存滿了！</small>':''}`;j.classList.toggle('full',full)}
 function innInfo(){const h=house(F2.hid),c=comfortOf(h);openModal(`<div style="text-align:center"><img src="assets/icon_inn.webp" alt="" style="width:90px"><h3>🛏️ ${esc(h.name)}・${esc(innName(h,F2.b))}</h3>
@@ -4881,9 +4882,9 @@ function renderShow(){const v=$('#shv');if(!v||!SHV)return;const h=house(SHV.hid
   if(!s.pos.some(c=>c)){const tip=document.createElement('div');tip.className='f2hint';tip.textContent=fam?'展示間空空的，先買一個櫃子吧！':own?'展示間空空的，按「✏️ 編輯」開始擺吧！':'展示間還在布置中';st.appendChild(tip)}
   const n=s.it.reduce((a,x)=>a+x.filter(Boolean).length,0);if(own&&ONLINE&&!SHV.hon){SHV.hon=1;call('showEdit',Object.assign(cred(),{houseId:h.id,op:'honor'}),true).then(r=>{if(r&&r.show&&Array.isArray(r.show.hon)){const hh=house(h.id);if(hh){const hon=r.show.hon;hh.show=Object.assign(showNorm(hh.show),{hon});if(SHOWP[h.id])SHOWP[h.id].s.hon=hon;renderShow()}}}).catch(()=>{})}   // v2.20：榮譽牆只更新徽章，不然慢回來的舊資料會蓋掉剛剛的擺設
   v.querySelector('.cbtns').innerHTML=fam?`<button class="act" id="shcabs">🗄️ 櫃子</button><button class="act" id="shwall">🧱 牆面</button><button class="act" id="shroom">🎨 裝潢</button><button class="act" id="shview">👀 完成</button>`
-    :`${own?'<button class="act" id="shedit">✏️ 編輯</button>':''}<button class="act" id="shinfo">🧸 收藏 ${n} 件</button><button class="act" id="shhon">🏆 榮譽牆</button><button class="act" id="shxc">🔄 公仔交換</button>`;
+    :`${own?'<button class="act" id="shedit">✏️ 編輯</button>':''}${own?`<div class="cbpair"><button class="act" id="shinfo">🧸 收藏 ${n} 件</button><button class="act cbrn" id="shrn2" aria-label="改名字">✏️</button></div>`:`<button class="act" id="shinfo">🧸 收藏 ${n} 件</button>`}<button class="act" id="shhon">🏆 榮譽牆</button><button class="act" id="shxc">🔄 公仔交換</button>`;
   if($('#shhon'))$('#shhon').onclick=()=>honorSheet(s);if($('#shxc'))$('#shxc').onclick=()=>xcSheet(own?undefined:'new');
-  if($('#shedit'))$('#shedit').onclick=()=>{SHV.edit=true;sfx('tap');renderShow()};if($('#shview'))$('#shview').onclick=()=>{SHV.edit=false;sfx('tap');renderShow()};
+  if($('#shrn2'))$('#shrn2').onclick=()=>roomRename(h.id,SHV.b?'sh2':'sh');if($('#shedit'))$('#shedit').onclick=()=>{SHV.edit=true;sfx('tap');renderShow()};if($('#shview'))$('#shview').onclick=()=>{SHV.edit=false;sfx('tap');renderShow()};
   if($('#shcabs'))$('#shcabs').onclick=()=>showCabShop();if($('#shwall'))$('#shwall').onclick=()=>decoShop('wall');if($('#shroom'))$('#shroom').onclick=()=>showRoomShop();if($('#shinfo'))$('#shinfo').onclick=()=>{if(!own)return toast(`${h.name} 的${showName(h,SHV.b)}擺了 ${n} 件收藏`);openModal(`<div style="text-align:center"><h3>🗄️ ${esc(showName(h,SHV.b))}</h3><p class="lead">擺了 ${n} 件收藏</p></div><div class="row2"><button id="shrn">✏️ 改名字</button><button data-close class="primary">好</button></div>`);$('#shrn').onclick=()=>roomRename(h.id,SHV.b?'sh2':'sh')}}
 // 近看一個櫃子
 function showClose(p,sel){if(p>=3&&p<6)return wallClose(p,sel);const h=house(SHV.hid),s=showNorm(h.show),cid=s.pos[itCab(p)],fam=isFamily(h.id)&&!!SHV.edit;if(!cid)return;const C=SHOW_CABS[cid],n=s.it[p].filter(Boolean).length;
@@ -6943,7 +6944,7 @@ function announceLetters(){if(!DB.me)return;let seen=[];try{seen=JSON.parse(loca
     sfx('gift');$('#lgopen').onclick=()=>openLetter(nw[0].id,()=>$('#bell').click())};
   setTimeout(go,1800)}
 // ================= 自動更新：發現新版本就重新載入 =================
-const APP_VER='v3.16';
+const APP_VER='v3.17';
 function checkUpdate(){
   if(!/^https?:/.test(location.protocol)||!API_URL)return;
   if(!$('#modal').classList.contains('hidden'))return; // 正在填表單時不打斷
