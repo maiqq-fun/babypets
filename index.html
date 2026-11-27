@@ -5670,7 +5670,7 @@ const bbSer=sid=>bbAll().find(x=>x.id===+sid);
 const bbId=(sid,i)=>`bb${sid}_${String(i+1).padStart(2,'0')}`;
 // v2.86：圖片偶爾沒載到（網路斷一下）會變成破圖：自動重抓兩次，還是不行就先藏起來，不顯示破圖
 function imgRetry(im){const n=+(im.dataset.rt||0);if(n>=2){im.style.visibility='hidden';return}im.dataset.rt=n+1;const u=im.src.replace(/([?&])rt=\d+/,'').replace(/[?&]$/,'');setTimeout(()=>{im.src=u+(u.includes('?')?'&':'?')+'rt='+(n+1)},600*(n+1))}
-const bbImg=(sid,i)=>{const S=bbSer(sid);return S&&Array.isArray(S.img)&&S.img[i]?S.img[i]:`assets/${bbId(sid,i)}.webp${sid===46&&(i===3||i===4)?'?v=3':sid>=29&&sid<=48?'?v=2':''}`};   // v3.20：29～48 重切過（被切到的耳朵、邊邊補回來），讓手機重抓
+const bbImg=(sid,i)=>{const S=bbSer(sid);return S&&Array.isArray(S.img)&&S.img[i]?S.img[i]:`assets/${bbId(sid,i)}.webp${(sid===46&&(i===3||i===4))||(sid===45&&i>=1&&i<=3)?'?v=3':sid>=29&&sid<=48?'?v=2':''}`};   // v3.20：29～48 重切過（被切到的耳朵、邊邊補回來），讓手機重抓
 const bbBox=sid=>{const S=bbSer(sid);return S&&S.box?S.box:`assets/bb${sid}_box.webp`};
 function bbRegister(){bbAll().filter(S=>!S.off).forEach(S=>S.f.forEach((n,i)=>{if((S.x||[]).includes(i))return;ITEMS[bbId(S.id,i)]={name:n,emo:'🎁',kind:'fig',price:0,img:bbImg(S.id,i),bb:S.id}}))}
 bbRegister();
@@ -7294,7 +7294,7 @@ function announceLetters(){if(!DB.me)return;let seen=[];try{seen=JSON.parse(loca
     sfx('gift');$('#lgopen').onclick=()=>openLetter(nw[0].id,()=>$('#bell').click())};
   setTimeout(go,1800)}
 // ================= 自動更新：發現新版本就重新載入 =================
-const APP_VER='v3.24';
+const APP_VER='v3.25';
 function checkUpdate(){
   if(!/^https?:/.test(location.protocol)||!API_URL)return;
   if(!$('#modal').classList.contains('hidden'))return; // 正在填表單時不打斷
