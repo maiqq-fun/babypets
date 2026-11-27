@@ -4770,7 +4770,7 @@ const SHOW_CABS={
   peach:{n:'蜜桃粉',p:600,a:483/553,x:[11,89],y:[38,53.5,69.5,86]},
   lilac:{n:'薰衣草紫',p:600,a:483/553,x:[11,89],y:[38,53.5,69.5,86]},
   steel:{n:'不鏽鋼',p:1000,a:440/515,x:[10,90],y:[31,48,66,84]},
-  cat:{n:'貓咪薄荷',p:1000,a:485/543,x:[14,86],y:[33,47.5,62.5,77.5]},
+  cat:{n:'貓咪薄荷',p:1000,a:485/543,x:[14,86],y:[35.5,49.5,64.5,80]},
   princess:{n:'公主蝴蝶結',p:1000,a:446/551,x:[12,88],y:[34,50,65,80]},
   noir:{n:'黑金星球',p:2000,a:800/1106,x:[11,89],y:[34,50,66,84.5]},
   pearl:{n:'珍珠白金',p:2000,a:800/1135,x:[9,91],y:[35,51,67,85]},
@@ -5655,7 +5655,7 @@ const bbSer=sid=>bbAll().find(x=>x.id===+sid);
 const bbId=(sid,i)=>`bb${sid}_${String(i+1).padStart(2,'0')}`;
 // v2.86：圖片偶爾沒載到（網路斷一下）會變成破圖：自動重抓兩次，還是不行就先藏起來，不顯示破圖
 function imgRetry(im){const n=+(im.dataset.rt||0);if(n>=2){im.style.visibility='hidden';return}im.dataset.rt=n+1;const u=im.src.replace(/([?&])rt=\d+/,'').replace(/[?&]$/,'');setTimeout(()=>{im.src=u+(u.includes('?')?'&':'?')+'rt='+(n+1)},600*(n+1))}
-const bbImg=(sid,i)=>{const S=bbSer(sid);return S&&Array.isArray(S.img)&&S.img[i]?S.img[i]:`assets/${bbId(sid,i)}.webp`};
+const bbImg=(sid,i)=>{const S=bbSer(sid);return S&&Array.isArray(S.img)&&S.img[i]?S.img[i]:`assets/${bbId(sid,i)}.webp${sid>=29&&sid<=48?'?v=2':''}`};   // v3.20：29～48 重切過（被切到的耳朵、邊邊補回來），讓手機重抓
 const bbBox=sid=>{const S=bbSer(sid);return S&&S.box?S.box:`assets/bb${sid}_box.webp`};
 function bbRegister(){bbAll().filter(S=>!S.off).forEach(S=>S.f.forEach((n,i)=>{if((S.x||[]).includes(i))return;ITEMS[bbId(S.id,i)]={name:n,emo:'🎁',kind:'fig',price:0,img:bbImg(S.id,i),bb:S.id}}))}
 bbRegister();
@@ -7279,7 +7279,7 @@ function announceLetters(){if(!DB.me)return;let seen=[];try{seen=JSON.parse(loca
     sfx('gift');$('#lgopen').onclick=()=>openLetter(nw[0].id,()=>$('#bell').click())};
   setTimeout(go,1800)}
 // ================= 自動更新：發現新版本就重新載入 =================
-const APP_VER='v3.19';
+const APP_VER='v3.20';
 function checkUpdate(){
   if(!/^https?:/.test(location.protocol)||!API_URL)return;
   if(!$('#modal').classList.contains('hidden'))return; // 正在填表單時不打斷
