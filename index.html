@@ -5876,16 +5876,18 @@ const isParkH=h=>!!(h&&(h.kind==='park'||h.id===PARK_ID)),isSpecialH=h=>isShopH(
 GUESTS.push(...[['alpaca','外星人 Bobo'],['otter','河豚師傅'],['fox','燈泡哥'],['sloth','名媛 Vivian'],['dog','貝斯手阿翔'],['penguin','女僕咪咪'],['horse','MC 阿傑'],['sheep','太空人陳大明'],['monkey','打工仔小胖'],['cow','刺青雄哥'],['lion','郵差伯伯'],['zebra','王課長']].map(([k,n])=>({img:`assets/guest_${k}.webp`,n})));
 // v1.89 新島民 9 位（黏土魚人）
 GUESTS.push(...[['captain','菸斗船長'],['hoops','二十三號'],['chef','鬍子主廚'],['leopard','豹紋阿姨'],['bubble','泡泡糖少年'],['grandpa','魚骨爺爺'],['punk','龐克刺刺'],['icecream','冰淇淋小妹'],['diver','咕嚕潛水員']].map(([k,n])=>({img:`assets/guest_${k}.webp`,n})));
+// v3.19 新居民 34 位（島主做的黏土魚人，名字 Claude 取，釣魚那隻叫「尬電」）
+GUESTS.push(...[['n2_a00','迷路機長阿德'],['n2_a01','打針護士阿芳'],['n2_a02','單片眼鏡伯爵'],['n2_a03','刺蝟頭阿雷'],['n2_a04','退休艦長老王'],['n2_a10','嚼嚼耳機妹'],['n2_a11','拿鐵店長阿綠'],['n2_a12','魔法阿公'],['n2_a13','旱鴨子小黃'],['n2_a14','八爪主廚'],['n2_a20','刺刺大哥'],['n2_a21','澆花阿桃'],['n2_a22','畢卡魚'],['n2_a23','狗仔阿亮'],['n2_a24','舞王美玲'],['n2_a30','夜燈大嘴'],['n2_a31','貴婦珍珠姐'],['n2_a32','水母教授'],['n2_a33','熱炒阿嬤'],['n2_a34','探險家阿郎'],['n2_a40','衝浪仙女'],['n2_a41','機長阿鴨'],['n2_a42','打坐師父'],['n2_a43','爆炸實驗室'],['n2_a44','駭客貓貓'],['n2_b00','海盜阿彪'],['n2_b01','握壽司阿河'],['n2_b02','度假貴婦'],['n2_b10','尬電'],['n2_b11','深海保全'],['n2_b12','牙醫鱷魚'],['n2_b20','雷鬼阿嘛'],['n2_b21','機器魚 X-9'],['n2_b22','唱歌美人魚']].map(([k,n])=>({img:`assets/guest_${k}.webp`,n})));
 GUESTS.forEach((g,i)=>g.i=i);
 // 每小時重新分配一次（大家看到的一樣）：舒適度高的民宿先挑 → 0～2 隻去旅行 → 最多 3 隻去島民家晃 → 其他在公園
 let GPLAN=null;
 function guestPlan(){const k=Math.floor(Date.now()/HOUR),inns=DB.houses.filter(h=>!isSpecialH(h)&&hasF2(h)&&guestN(comfortOf(h))>0).sort((a,b)=>comfortOf(b)-comfortOf(a)||(a.id<b.id?-1:1));
   const sig=k+'|'+inns.map(h=>h.id+':'+comfortOf(h)).join(',')+'|'+DB.houses.length+'|'+DB.houses.map(h=>+h.inn2?(h.toys3||[]).length:'').join(',');if(GPLAN&&GPLAN.sig===sig)return GPLAN;
   const pool=GUESTS.slice().sort((a,b)=>hash01(k+'g'+a.i)-hash01(k+'g'+b.i)),plan={sig,inn:{},visit:{},park:[],top:inns[0]||null};
-  // v3.16：每家民宿各自從全部旅客裡抽（以前大家搶同一批 25 位，民宿一多後面的就沒人住，公園也空了）
-  const pick=(key,n)=>GUESTS.slice().sort((a,b)=>hash01(k+key+a.i)-hash01(k+key+b.i)).slice(0,n);
-  inns.forEach(h=>{plan.inn[h.id]=pick('i'+h.id,guestN(comfortOf(h)))});
-  DB.houses.filter(h=>!isSpecialH(h)&&+h.inn2).forEach(h=>{const n=guestN(Math.min(TOY2_MAX,(h.toys3||[]).length)*2);if(n)plan.inn[h.id+'#3']=pick('j'+h.id,n)});
+  // v3.19：旅客全島不重複（同一位不會同時在兩個地方，才好抓小偷）。民宿和民宿2 一起照舒適度排，從同一批旅客輪流分
+  const c3=h=>Math.min(TOY2_MAX,(h.toys3||[]).length)*2,rooms=inns.map(h=>({key:h.id,c:comfortOf(h)})).concat(DB.houses.filter(h=>!isSpecialH(h)&&+h.inn2&&guestN(c3(h))>0).map(h=>({key:h.id+'#3',c:c3(h)}))).sort((a,b)=>b.c-a.c||(a.key<b.key?-1:1));
+  const keep=[];let cap=Math.max(0,pool.length-9);   // 留 9 位給來家裡晃和公園
+  rooms.forEach(r=>{const n=Math.min(guestN(r.c),cap);cap-=n;plan.inn[r.key]=pool.splice(0,n)});
   pool.splice(0,Math.floor(hash01(k+'trip')*3));   // 出去旅行
   const homes=DB.houses.filter(h=>!isSpecialH(h)).map(h=>h.id).sort((a,b)=>hash01(k+'h'+a)-hash01(k+'h'+b));
   homes.slice(0,Math.min(3,pool.length)).forEach(hid=>{plan.visit[hid]=pool.shift()});
@@ -7277,7 +7279,7 @@ function announceLetters(){if(!DB.me)return;let seen=[];try{seen=JSON.parse(loca
     sfx('gift');$('#lgopen').onclick=()=>openLetter(nw[0].id,()=>$('#bell').click())};
   setTimeout(go,1800)}
 // ================= 自動更新：發現新版本就重新載入 =================
-const APP_VER='v3.18';
+const APP_VER='v3.19';
 function checkUpdate(){
   if(!/^https?:/.test(location.protocol)||!API_URL)return;
   if(!$('#modal').classList.contains('hidden'))return; // 正在填表單時不打斷
