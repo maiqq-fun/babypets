@@ -6529,7 +6529,7 @@ z3_56:{name:'粉紅逗貓棒',emo:'🧸',kind:'toy',price:30,sz:0.9,cat:'pet',nw
 z3_61:{name:'彩色麻花繩',emo:'🧸',kind:'toy',price:30,sz:0.8,cat:'pet',nw:1},
 z3_62:{name:'肉球刺刺球',emo:'🧸',kind:'toy',price:30,sz:0.8,cat:'pet',nw:1},
 z3_63:{name:'羽毛球',emo:'🧸',kind:'toy',price:30,sz:0.7,cat:'hobby',nw:1},
-z3_64:{name:'網球拍',emo:'🧸',kind:'toy',price:40,sz:0.9,cat:'hobby',nw:1},
+z3_64:{name:'網球拍',emo:'🧸',kind:'toy',img:'assets/item_z3_64.webp?v=2',price:40,sz:0.9,cat:'hobby',nw:1},
 z3_65:{name:'按摩滾筒',emo:'🧸',kind:'toy',price:40,sz:0.9,cat:'hobby',nw:1},
 z3_66:{name:'瑜珈墊',emo:'🧸',kind:'toy',price:40,sz:0.9,cat:'hobby',nw:1},
 z4_00:{name:'貓耳沙發',emo:'🧸',kind:'toy',price:120,sz:1.5,cat:'furn',nw:1},
@@ -7294,7 +7294,7 @@ function announceLetters(){if(!DB.me)return;let seen=[];try{seen=JSON.parse(loca
     sfx('gift');$('#lgopen').onclick=()=>openLetter(nw[0].id,()=>$('#bell').click())};
   setTimeout(go,1800)}
 // ================= 自動更新：發現新版本就重新載入 =================
-const APP_VER='v3.25';
+const APP_VER='v3.26';
 function checkUpdate(){
   if(!/^https?:/.test(location.protocol)||!API_URL)return;
   if(!$('#modal').classList.contains('hidden'))return; // 正在填表單時不打斷
