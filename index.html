@@ -911,6 +911,7 @@ img{-webkit-user-drag:none}
 .centerv .chead .pill{border:2px solid var(--wood);background:rgba(255,250,238,.94);padding:6px 14px;font-size:15px;box-shadow:0 2px 0 rgba(0,0,0,.12);margin-left:0}
 .centerv .chead .ctitle{margin:0 auto;border:2px solid var(--wood);background:rgba(255,250,238,.94);box-shadow:0 2px 0 rgba(0,0,0,.12);padding:4px 14px;font-size:clamp(15px,4.4vw,19px);max-width:48%}
 .centerv .chead .cpad{width:52px;flex:none}
+.centerv .chead .rnav{max-width:31%;min-width:0;gap:2px;padding:6px 8px!important;font-size:12.5px!important;letter-spacing:-.3px}.centerv .chead .rnav .rnt{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}.centerv .chead .rnav>.noic{font-size:20px;line-height:1;flex:none}.centerv .chead .ctitle{max-width:36%}
 #homewrap .top.hbar,.centerv .chead{height:62px;min-height:62px;box-sizing:border-box;align-items:center}
 #homewrap .top.hbar>.pill:not(.housename),.centerv .chead>.pill{height:38px;box-sizing:border-box;display:inline-flex;align-items:center}
 #homewrap .top.hbar .housename,.centerv .chead .ctitle{height:46px;box-sizing:border-box;display:flex;flex-direction:column;align-items:center;justify-content:center;line-height:1.2}
@@ -4520,7 +4521,7 @@ function rentNow(h){const inn=h.inn&&typeof h.inn==='object'?h.inn:{at:Date.now(
 const guestN=c=>c>=28?3:c>=14?2:c>=4?1:0;
 let F2=null,f2Tick=0;const F2K=()=>F2&&F2.b?':3':':2';
 function openFloor2(hid,b){const h=houseRaw(hid);if(!hasF2(h)||(b&&!+h.inn2))return;sfx&&sfx('tap');ALTV=b?{hid,k:'f3'}:null;
-  const v=sceneOpen('f2v',esc(h.name),'🛏️ '+esc(innName(h,b)),roomImg((b?h.room3:h.room2)||'basic1'),'<img class="mic" src="assets/icon_down.webp" alt="">一樓');F2={hid,placing:null,b:!!b};
+  const v=sceneOpen('f2v',esc(h.name),'🛏️ '+esc(innName(h,b)),roomImg((b?h.room3:h.room2)||'basic1'),'<img class="mic" src="assets/icon_down.webp" alt="">一樓');F2={hid,placing:null,b:!!b};roomNav('f2v',hid,b?'f3':'f2');
   const st=v.querySelector('.cstage');st.onclick=e=>f2Click(e);renderF2();clearInterval(f2Tick);let f2n=0;f2Tick=setInterval(()=>{if(!$('#f2v'))return clearInterval(f2Tick);if(!document.hidden)f2Wander($('#f2v .cstage'));if(++f2n%4==0)updRent()},900)}
 // 民宿散步：跟公園同一套走法，但每隻休息時間到了就走（不會一開始定格）
 function f2Floor(){const h=F2&&house(F2.hid),G=roomGrid(h&&h.room2||'basic1');return {x0:Math.max(G.t[0],G.b[0])+45,x1:Math.min(G.t[1],G.b[1])-45,y0:G.y0+35,y1:1200}}
@@ -4661,8 +4662,18 @@ const lastW=c=>{const w=c.w||[];if(!w.length)return 0;const x=w[w.length-1];retu
 function farmOf(h){const f=h.farm&&typeof h.farm==='object'?h.farm:{n:FARM_N0,p:[]};f.n=+f.n||FARM_N0;f.p=Array.isArray(f.p)?f.p:[];while(f.p.length<FARM_MAX)f.p.push(null);h.farm=f;return f}
 const fmLeft=ms=>{const m=Math.max(0,Math.ceil(ms/60000)),h=Math.floor(m/60);return h?`${h} 小時 ${m%60} 分`:`${m} 分`};
 let FM=null,fmTick=0;
+// v3.21：同一個家的房間一鍵切換（一樓、農田、民宿、民宿2、展示間、展示間2，照右邊按鈕的順序）。左上＝上一間、右上＝下一間，名字用改過的
+function roomSeq(hid){const h=houseRaw(hid);if(!h)return [];const L=[{k:'home',n:'一樓'}];if(hasFarm(h))L.push({k:'farm',n:'農田'});
+  if(hasF2(h))L.push({k:'f2',n:innName(h)});if(hasF2(h)&&+h.inn2)L.push({k:'f3',n:innName(h,1)});
+  if(hasShow(h)){L.push({k:'sh',n:showName(h)});if(h.show&&h.show.b)L.push({k:'sh2',n:showName(h,1)})}return L}
+function roomGo(hid,k){document.querySelectorAll('.centerv.scene').forEach(x=>x.remove());ALTV=null;
+  if(k==='home'){if(home&&!$('#home').classList.contains('hidden'))openHome(home.id,true);else openHome(hid);return}
+  if(k==='farm')openFarm(hid);else if(k==='f2')openFloor2(hid);else if(k==='f3')openFloor2(hid,1);else if(k==='sh')openShow(hid);else if(k==='sh2')openShow(hid,1)}
+function roomNav(id,hid,k){const v=$('#'+id);if(!v)return;const L=roomSeq(hid),i=L.findIndex(x=>x.k===k);if(i<0)return;const pv=L[i-1],nx=L[i+1],hd=v.querySelector('.chead');
+  const b=hd.querySelector('[data-back]');b.classList.add('rnav');b.innerHTML=`<span class="noic">‹</span><span class="rnt">${esc(pv.n)}</span>`;b.onclick=()=>{sfx&&sfx('tap');roomGo(hid,pv.k)};
+  const pad=hd.querySelector('.cpad');if(nx){const r=document.createElement('button');r.className='pill rnav rnr';r.innerHTML=`<span class="rnt">${esc(nx.n)}</span><span class="noic">›</span>`;r.onclick=()=>{sfx&&sfx('tap');roomGo(hid,nx.k)};pad.replaceWith(r)}}
 function openFarm(hid){const h=house(hid);if(!hasFarm(h))return;sfx&&sfx('tap');
-  const v=sceneOpen('farmv',esc(h.name),'🌱 農田・番茄 4 小時、其他 8 小時','assets/room_farm.webp','← 回家');FM={hid};renderFarm();
+  const v=sceneOpen('farmv',esc(h.name),'🌱 農田・番茄 4 小時、其他 8 小時','assets/room_farm.webp','← 回家');FM={hid};renderFarm();roomNav('farmv',hid,'farm');
   clearInterval(fmTick);fmTick=setInterval(()=>{if(!$('#farmv'))return clearInterval(fmTick);renderFarm()},30000)}
 function renderFarm(){const v=$('#farmv');if(!v||!FM)return;const h=house(FM.hid),f=farmOf(h),st=v.querySelector('.cstage'),fam=isFamily(h.id),now=sNow();
   st.querySelectorAll('.plot,.plab').forEach(x=>x.remove());
@@ -4879,7 +4890,7 @@ function cabHTML(cid,items,big,can,sel){const C=SHOW_CABS[cid];if(!C)return '';c
   return `<div class="cabv${big?' cabbig':''}" style="--a:${C.a}"><img class="cabimg" src="${showCabImg(cid)}" alt="">${h}</div>`}
 let SHV=null;
 function openShow(hid,b){const h=houseRaw(hid);if(!hasShow(h))return;h.show=showNorm(h.show);if(b&&!h.show.b)return;sfx&&sfx('tap');ALTV=b?{hid,k:'sh2'}:null;
-  sceneOpen('shv',esc(h.name),'🗄️ '+esc(showName(h,b)),showRoomImg((b?h.show.b:h.show).room),'<img class="mic" src="assets/icon_down.webp" alt="">一樓');SHV={hid,edit:false,b:!!b};renderShow()}   // v2.26：先用客人的角度欣賞，按「布置」才編輯
+  sceneOpen('shv',esc(h.name),'🗄️ '+esc(showName(h,b)),showRoomImg((b?h.show.b:h.show).room),'<img class="mic" src="assets/icon_down.webp" alt="">一樓');SHV={hid,edit:false,b:!!b};renderShow();roomNav('shv',hid,b?'sh2':'sh')}   // v2.26：先用客人的角度欣賞，按「布置」才編輯
 function renderShow(){const v=$('#shv');if(!v||!SHV)return;const h=house(SHV.hid);if(!hasShow(h))return;const own=isFamily(h.id),s=showNorm(h.show),fam=own&&!!SHV.edit,st=v.querySelector('.cstage');
   st.querySelector('.cbg').src=showRoomImg(s.room);st.querySelectorAll('.shcab,.shghost,.f2hint,.shw,.shwit,.shneon,.shframe,.shbadge,.shwghost,.shedtag').forEach(x=>x.remove());st.classList.toggle('shediting',fam);
   if(fam){const t=document.createElement('div');t.className='shedtag';t.textContent='✏️ 編輯模式・點虛線框擺東西，好了按「👀 完成」';st.appendChild(t)}
@@ -7279,7 +7290,7 @@ function announceLetters(){if(!DB.me)return;let seen=[];try{seen=JSON.parse(loca
     sfx('gift');$('#lgopen').onclick=()=>openLetter(nw[0].id,()=>$('#bell').click())};
   setTimeout(go,1800)}
 // ================= 自動更新：發現新版本就重新載入 =================
-const APP_VER='v3.20';
+const APP_VER='v3.21';
 function checkUpdate(){
   if(!/^https?:/.test(location.protocol)||!API_URL)return;
   if(!$('#modal').classList.contains('hidden'))return; // 正在填表單時不打斷
