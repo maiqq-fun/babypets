@@ -912,6 +912,7 @@ img{-webkit-user-drag:none}
 .centerv .chead .ctitle{margin:0 auto;border:2px solid var(--wood);background:rgba(255,250,238,.94);box-shadow:0 2px 0 rgba(0,0,0,.12);padding:4px 14px;font-size:clamp(15px,4.4vw,19px);max-width:48%}
 .centerv .chead .cpad{width:52px;flex:none}
 .centerv .chead .rnav{max-width:31%;min-width:0;gap:2px;padding:6px 8px!important;font-size:12.5px!important;letter-spacing:-.3px}.centerv .chead .rnav .rnt{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}.centerv .chead .rnav>.noic{font-size:20px;line-height:1;flex:none}.centerv .chead .ctitle{max-width:36%}
+.centerv .chead .rhome{width:38px;min-width:38px;padding:0!important;justify-content:center;flex:none}.centerv .chead .rhome img{width:24px;height:24px}.centerv .chead:has(.rhome) .rnav{max-width:26%}.centerv .chead:has(.rhome) .ctitle{max-width:32%}
 #homewrap .top.hbar,.centerv .chead{height:62px;min-height:62px;box-sizing:border-box;align-items:center}
 #homewrap .top.hbar>.pill:not(.housename),.centerv .chead>.pill{height:38px;box-sizing:border-box;display:inline-flex;align-items:center}
 #homewrap .top.hbar .housename,.centerv .chead .ctitle{height:46px;box-sizing:border-box;display:flex;flex-direction:column;align-items:center;justify-content:center;line-height:1.2}
@@ -4670,6 +4671,7 @@ function roomGo(hid,k){document.querySelectorAll('.centerv.scene').forEach(x=>x.
   if(k==='home'){if(home&&!$('#home').classList.contains('hidden'))openHome(home.id,true);else openHome(hid);return}
   if(k==='farm')openFarm(hid);else if(k==='f2')openFloor2(hid);else if(k==='f3')openFloor2(hid,1);else if(k==='sh')openShow(hid);else if(k==='sh2')openShow(hid,1)}
 function roomNav(id,hid,k){const v=$('#'+id);if(!v)return;const L=roomSeq(hid),i=L.findIndex(x=>x.k===k);if(i<0)return;const pv=L[i-1],nx=L[i+1],hd=v.querySelector('.chead');
+  if(pv.k!=='home'){const hb=document.createElement('button');hb.className='pill rhome';hb.setAttribute('aria-label','回一樓');hb.innerHTML='<img src="assets/icon_home.webp" alt="">';hb.onclick=()=>{sfx&&sfx('tap');roomGo(hid,'home')};hd.insertBefore(hb,hd.firstChild)}   // v3.22：一鍵回一樓
   const b=hd.querySelector('[data-back]');b.classList.add('rnav');b.innerHTML=`<span class="noic">‹</span><span class="rnt">${esc(pv.n)}</span>`;b.onclick=()=>{sfx&&sfx('tap');roomGo(hid,pv.k)};
   const pad=hd.querySelector('.cpad');if(nx){const r=document.createElement('button');r.className='pill rnav rnr';r.innerHTML=`<span class="rnt">${esc(nx.n)}</span><span class="noic">›</span>`;r.onclick=()=>{sfx&&sfx('tap');roomGo(hid,nx.k)};pad.replaceWith(r)}}
 function openFarm(hid){const h=house(hid);if(!hasFarm(h))return;sfx&&sfx('tap');
@@ -7290,7 +7292,7 @@ function announceLetters(){if(!DB.me)return;let seen=[];try{seen=JSON.parse(loca
     sfx('gift');$('#lgopen').onclick=()=>openLetter(nw[0].id,()=>$('#bell').click())};
   setTimeout(go,1800)}
 // ================= 自動更新：發現新版本就重新載入 =================
-const APP_VER='v3.21';
+const APP_VER='v3.22';
 function checkUpdate(){
   if(!/^https?:/.test(location.protocol)||!API_URL)return;
   if(!$('#modal').classList.contains('hidden'))return; // 正在填表單時不打斷
