@@ -5121,7 +5121,7 @@ function xcSync(){if(!DB.me||!ONLINE)return;
 function xcHave(id){if((bag()[id]||0)>0)return {bag:1};const h=myHouse();if(!h||!hasShow(h))return null;const s=showNorm(h.show);
   for(let p=0;p<s.it.length;p++){const i=s.it[p].indexOf(id);if(i>=0)return {pos:p,i}}return null}
 // v2.66：交換卡片上直接寫「你有幾隻」（背包＋展示櫃）
-function xcHave(id){const b=+(bag()[id]||0),s=xcShowN(myHouse(),id),n=b+s;return `<small class="xchave${n?'':' none'}">${n?`背包 ${b}・家裡櫃子 ${s}`:'你家還沒有'}</small>`}
+function xcHave(id){const b=+(bag()[id]||0),s=xcShowN(myHouse(),id),n=b+s;return `<small class="xchave${n?'':' none'}">${n?`背包 ${b}・家裡 ${s}`:'你家還沒有'}</small>`}
 function xcCard(t,mine){const other=mine?t.toNick:t.fromNick,a=mine?t.give:t.want,b=mine?t.want:t.give;
   return `<div class="xcrow" style="flex-wrap:wrap"><div class="xcfig"><img src="${xcImg(a)}" alt="">${mine?'你給':'他要'}<br><b>${esc(xcName(a))}</b>${t.st==='wait'?xcHave(a):''}</div><div class="xcarr">⇄</div>
     <div class="xcfig"><img src="${xcImg(b)}" alt="">${mine?'你要':'他給'}<br><b>${esc(xcName(b))}</b>${t.st==='wait'?xcHave(b):''}</div>
@@ -5142,11 +5142,13 @@ function xcSheet(tab){if(!needMe())return;tab=tab||(xcIn().length?'in':'new');co
   $('#sheet').querySelectorAll('[data-xcy]').forEach(b=>b.onclick=()=>xcAnswer(b.dataset.xcy,true))}
 // 對方有的公仔：背包＋他家展示櫃
 // v2.24：每一款有幾隻（背包＋展示櫃）。後端舊版沒給背包數量時，背包算 1 隻
-function xcShowN(h,id){if(!h||!hasShow(h))return 0;let n=0;showNorm(h.show).it.forEach(a=>a.forEach(x=>{if(x===id)n++}));return n}
+function showAllIt(h){if(!h||!hasShow(h))return [];const s=showNorm(h.show),L=s.it.slice();if(s.b&&Array.isArray(s.b.it))L.push(...s.b.it);return L}
+function houseFigs(h){const L=[];showAllIt(h).forEach(a=>a.forEach(x=>{if(x)L.push(x)}));if(h)['toys','toys2','toys3'].forEach(k=>(Array.isArray(h[k])?h[k]:[]).forEach(t=>{if(t&&t.item)L.push(t.item)}));return L}
+function xcShowN(h,id){let n=0;houseFigs(h).forEach(x=>{if(x===id)n++});return n}
 function xcCnt(p,id){const b=(p.figs||[]).includes(id)?(p.figN&&p.figN[id]!=null?+p.figN[id]||0:1):0;return {b,s:xcShowN(house(p.houseId),id),t:b+xcShowN(house(p.houseId),id)}}
 function xcMy(id){return (bag()[id]||0)+xcShowN(myHouse(),id)}
 function xcTheirs(p){const S=new Set((p.figs||[]).filter(id=>XC_RE.test(id)&&ITEMS[id]));const h=house(p.houseId);
-  if(h&&hasShow(h))showNorm(h.show).it.forEach(a=>a.forEach(id=>{if(id&&XC_RE.test(id)&&ITEMS[id])S.add(id)}));return [...S].sort()}
+  houseFigs(h).forEach(id=>{if(id&&XC_RE.test(id)&&ITEMS[id])S.add(id)});return [...S].sort()}
 function xcPickWant(pid){const p=(DB.players||[]).find(x=>x.id===pid);if(!p)return;const L=xcTheirs(p).map(id=>Object.assign({id,my:xcMy(id)},xcCnt(p,id))).sort((a,b)=>(a.my>0)-(b.my>0)||b.t-a.t||(a.id<b.id?-1:1));
   openModal(`<h3>🔄 想要 ${esc(p.nick)} 的哪一隻？</h3><p class="lead" style="font-size:12px">🟢 你還沒有的排前面・他有 2 隻以上的比較好換</p><div class="xcgrid">${L.map(x=>`<button data-w="${x.id}"${x.t>=2?' style="box-shadow:0 0 0 2px #7fb069 inset"':''}><img src="${xcImg(x.id)}" alt="">${esc(xcName(x.id))}<small style="display:block;font-size:11px;color:var(--soft);line-height:1.4">他有 ×${x.t}${x.s?`（展示 ${x.s}）`:''}<br>${x.my?`你有 ×${x.my}`:'<b style="color:#3d9a5b">🟢 你還沒有</b>'}</small></button>`).join('')}</div><div class="row2"><button id="xcb">← 回去</button></div>`);
   $('#xcb').onclick=()=>xcSheet('new');$('#sheet').querySelectorAll('[data-w]').forEach(b=>b.onclick=()=>xcPickGive(pid,b.dataset.w))}
@@ -5684,7 +5686,7 @@ const bbDex=sid=>{const d=bbData().d[sid],out=Array.isArray(d)?d.slice():[],S=bb
 const bbHas=(sid,i)=>+(bbDex(sid)[i]||0)>0;
 // v2.67：自己的（抽過的紀錄、自己背包）vs 只有家人有（家裡展示櫃、家人背包）
 const bbMine=(sid,i)=>{const d=bbData().d[sid];return (Array.isArray(d)&&+d[i]>0)||(bag()[bbId(sid,i)]||0)>0};
-const bbFam=(sid,i)=>{const id=bbId(sid,i),h=myHouse();if(!h)return false;if(hasShow(h)&&showNorm(h.show).it.some(a=>a.includes(id)))return true;return (DB.players||[]).some(p=>p.houseId===h.id&&p.id!==(DB.me&&DB.me.id)&&(p.figs||[]).includes(id))};
+const bbFam=(sid,i)=>{const id=bbId(sid,i),h=myHouse();if(!h)return false;if(houseFigs(h).includes(id))return true;return (DB.players||[]).some(p=>p.houseId===h.id&&p.id!==(DB.me&&DB.me.id)&&(p.figs||[]).includes(id))};
 function bbShop(){if(!needMe())return;const v=document.createElement('div');v.className='bbv';v.id='bbv';document.body.appendChild(v);bbShopRender()}
 function bbShopRender(){const v=$('#bbv');if(!v)return;const g=DB.game;
   v.innerHTML=`<div class="bbh"><b>🎁 MAIMINE 盲盒店<small>一盒 🪙${BB_PRICE}・每個系列 ${BB_PITY} 盒內必出隱藏版</small><small class="bblg"><i class="on"></i>你的<i class="fam"></i>只有家人有（含展示間）</small></b><span class="bbc">🪙 ${(g.coins||0).toLocaleString()}</span><button class="x">關閉</button></div>
@@ -7295,7 +7297,7 @@ function announceLetters(){if(!DB.me)return;let seen=[];try{seen=JSON.parse(loca
     sfx('gift');$('#lgopen').onclick=()=>openLetter(nw[0].id,()=>$('#bell').click())};
   setTimeout(go,1800)}
 // ================= 自動更新：發現新版本就重新載入 =================
-const APP_VER='v3.27';
+const APP_VER='v3.28';
 function checkUpdate(){
   if(!/^https?:/.test(location.protocol)||!API_URL)return;
   if(!$('#modal').classList.contains('hidden'))return; // 正在填表單時不打斷
