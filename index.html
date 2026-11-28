@@ -4875,15 +4875,24 @@ function showOp(s,{op,id,pos,i,item}){s=showNorm(s);pos=+pos;i=+i;
   else if(op==='honor'){}
   else throw new Error('不知道要做什麼');return s}
 // 剛改的展示間先記著，同步回來的舊資料不會蓋掉
-const SHOWP={};function keepShow(){const nw=Date.now();for(const hid in SHOWP){const o=SHOWP[hid],h=houseRaw(hid);if(!h||nw-o.t>60000){delete SHOWP[hid];continue}h.show=clone(o.s)}}
+const SHOWP={},SHQ={};function keepShow(){const nw=Date.now();for(const hid in SHOWP){const o=SHOWP[hid],h=houseRaw(hid),q=SHQ[hid],busyQ=q&&(q.run||q.q.length);if(!h||(!busyQ&&nw-o.t>60000)){delete SHOWP[hid];continue}h.show=clone(o.s)}}
 // req：要做的事；undo：失敗時要退回的（金幣、背包）
 function showDo(hid,req,undo){const h=house(hid),B=houseRaw(hid);if(!h)return false;const ak=h._alt,before=clone(B.show);let s;
   try{s=showOp(clone(h.show),req)}catch(e){toast(e.message);return false}
-  h.show=s;SHOWP[hid]={t:Date.now(),s:clone(B.show)};renderShow();renderF2();const seq=SHOWSEQ[hid]=(SHOWSEQ[hid]||0)+1;
-  // v2.20：只有「最後一次操作」的回覆才採用，前一個比較慢回來的舊資料不會把剛剛的擺設蓋回去
-  call('showEdit',Object.assign(cred(),{houseId:hid},req),true).then(r=>{if(r&&r.show&&ONLINE&&seq===SHOWSEQ[hid]){SHOWP[hid]={t:Date.now(),s:clone(showConv(ak,r.show))}}})
-    .catch(e=>{const hh=houseRaw(hid);if(seq===SHOWSEQ[hid]){if(hh)hh.show=before;delete SHOWP[hid]}else if(hh){try{hh.show=showConv(ak,showOp(clone(showConv(ak,hh.show)),Object.assign({},req,{op:req.op==='put'?'take':req.op==='take'?'put':req.op})))}catch(x){}SHOWP[hid]={t:Date.now(),s:clone(hh.show)}}undo&&undo();renderShow();renderF2();toast(e.message)});return true}
-const SHOWSEQ={};
+  h.show=s;SHOWP[hid]={t:Date.now(),s:clone(B.show)};renderShow();renderF2();
+  const Q=SHQ[hid]=SHQ[hid]||{q:[],run:false};Q.q.push({req:Object.assign({},req,{slot:ak||''}),ak,undo,before});showPump(hid);return true}
+// v3.29：展示間的動作排隊一個一個送（以前同時送，小島收到的順序可能顛倒 → 擺好的又跳回舊的、或兩個版本跳來跳去）
+function showReplay(base,L){L.forEach(it=>{try{base=showConv(it.ak,showOp(clone(showConv(it.ak,base)),it.req))}catch(x){}});return base}
+async function showPump(hid){const Q=SHQ[hid];if(!Q||Q.run||!Q.q.length)return;Q.run=true;
+  try{while(Q.q.length){const it=Q.q[0];let r=null,err=null;
+    for(let k=0;k<4;k++){try{r=await call('showEdit',Object.assign(cred(),{houseId:hid},it.req),true);err=null;break}catch(e){err=e;if(!/忙|鎖定/.test(String(e&&e.message||'')))break;await new Promise(z=>setTimeout(z,900*(k+1)))}}
+    Q.q.shift();let base=null;
+    if(r&&r.show)base=showConv(it.ak,r.show);
+    else if(err&&FARM_NET(err)){delete SHOWP[hid];for(let k=0;k<30&&syncing;k++)await new Promise(z=>setTimeout(z,500));try{await sync(true)}catch(x){}const hh=houseRaw(hid);base=hh&&hh.show?clone(hh.show):null}
+    else if(err){it.undo&&it.undo();toast(err.message);base=clone(it.before)}
+    const B=houseRaw(hid);if(base&&B){base=showReplay(base,Q.q);B.show=base;SHOWP[hid]={t:Date.now(),s:clone(base)}}
+    try{renderShow();renderF2()}catch(x){}}}
+  finally{Q.run=false}}
 // v2.22：毛二街買到（d=1）或退回（d=-1）的展示櫃、牆面裝飾，直接放進展示間倉庫
 function showStore(hid,x,d){const h=house(hid);if(!h||!hasShow(h))return;const s=showNorm(clone(h.show)),o=x.t==='cab'?s.cabs:s.wo;o[x.item]=Math.max(0,(+o[x.item]||0)+d);if(!o[x.item])delete o[x.item];h.show=s;SHOWP[hid]={t:Date.now(),s:clone(houseRaw(hid).show)};renderShow()}
 const itemSrc=id=>{const it=ITEMS[id]||{};return it.img||`assets/item_${id}.webp`};
@@ -7297,7 +7306,7 @@ function announceLetters(){if(!DB.me)return;let seen=[];try{seen=JSON.parse(loca
     sfx('gift');$('#lgopen').onclick=()=>openLetter(nw[0].id,()=>$('#bell').click())};
   setTimeout(go,1800)}
 // ================= 自動更新：發現新版本就重新載入 =================
-const APP_VER='v3.28';
+const APP_VER='v3.29';
 function checkUpdate(){
   if(!/^https?:/.test(location.protocol)||!API_URL)return;
   if(!$('#modal').classList.contains('hidden'))return; // 正在填表單時不打斷
